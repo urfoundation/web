@@ -99,3 +99,17 @@ export const mainnetActions = {
         { text: ' with zero Bittensor experience.' },
     ],
 };
+
+// The dated notice above the box at the top: epoch 3's delayed payout, and its
+// recovery with epoch 5. Its dates are the epochs' (tests/mainnet-timeline.test.mjs
+// holds them together), and `link` opens its full text in the sn repo.
+export const mainnetNotice = {
+    date: 'October 31, 2026',
+    title: 'Epoch 3 payout delayed. Funds are safe.',
+    paragraphs: [
+        "Epoch 3's payout root was not committed within its window on October 30, because a server step timed out at mainnet scale. That step is now fixed. Epoch 1 had no eligible work to pay out, so its funding carried forward under the protocol's missed-commit rule.",
+        "Both epochs' funding is safe in the v1 settlement vault: 3,482.26 α for epoch 1 and 4,132.72 α for epoch 3. Carried funding does not expire.",
+        "At the end of epoch 4 (around November 6, 18:25 UTC), a recovery root moves these funds to the v2 vault. They are paid out with epoch 5, with epoch 3's funds going to the providers who did epoch 3's work. Claims are expected from around November 15. Epoch 4 is unaffected, and there is nothing you need to do.",
+    ],
+    link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-10-31-epoch-3-payout-recovery.md' },
+};

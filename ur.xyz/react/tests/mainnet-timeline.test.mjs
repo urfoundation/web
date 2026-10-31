@@ -18,7 +18,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { mainnetActions, mainnetEpochs, SECONDS_PER_BLOCK } from '../src/data/mainnet.js';
+import { mainnetActions, mainnetEpochs, mainnetNotice, SECONDS_PER_BLOCK } from '../src/data/mainnet.js';
 import {
     EXPLORER_PLACEHOLDERS,
     REF_FORMATS,
@@ -270,4 +270,22 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
     assert.equal(payments.link, undefined);
     assert.deepEqual(mainnetActions.closing.filter((run) => run.href).map((run) => [run.text, run.href]), [['the apps', '/operators']]);
     assert.match(mainnetActions.closing.map((run) => run.text).join(''), /^Once settlement v2 is active, the subnet is set up to run itself and scale to millions of miners\. New miners can participate in Bittensor from the apps with zero Bittensor experience\.$/);
+});
+
+test('the notice gives the epochs\' dates, and links to its full text in the sn repo', () => {
+    const text = mainnetNotice.paragraphs.join(' ');
+    // dated the day it was posted, the day its full text's file name starts with
+    assert.equal(mainnetNotice.date, 'October 31, 2026');
+    assert.match(mainnetNotice.link.href, /^https:\/\/github\.com\/urfoundation\/sn\/blob\/main\/mainnet\/notices\/2026-10-31-[a-z0-9-]+\.md$/);
+    // the recovery root goes in at the end of epoch 4, at about 18:25 on November 6
+    const epoch4 = mainnetEpochs[4];
+    assert.equal(epoch4.end.time, '2026-11-06T18:25:00Z');
+    assert.match(text, /end of epoch 4 \(around November 6, 18:25 UTC\)/);
+    // it pays with epoch 5, whose claims open 14,400 blocks after it ends
+    const claims = new Date(Date.parse(epoch4.end.time) + (50400 + 14400) * SECONDS_PER_BLOCK * 1000);
+    assert.equal(claims.toISOString().slice(0, 10), '2026-11-15');
+    assert.match(text, /paid out with epoch 5/);
+    assert.match(text, /Claims are expected from around November 15\./);
+    // the amounts are the full text's, to the hundredth of an alpha
+    assert.match(text, /3,482\.26 α for epoch 1 and 4,132\.72 α for epoch 3/);
 });

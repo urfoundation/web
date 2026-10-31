@@ -2,7 +2,7 @@ import React from 'react';
 import Section from '../Section';
 import { EXTERNAL, isExternal } from '../../lib/links';
 import timeline from '../../data/mainnet-timeline.json';
-import { mainnetActions, mainnetAfterEpochs, mainnetBeforeEpochs, mainnetEpochs } from '../../data/mainnet';
+import { mainnetActions, mainnetAfterEpochs, mainnetBeforeEpochs, mainnetEpochs, mainnetNotice } from '../../data/mainnet';
 import {
     SETTLEMENT_LABEL,
     STATUS_LABEL,
@@ -48,6 +48,7 @@ export default function MainnetPage({ updated = null, summary = null }) {
 
     return (
         <div className="mainnet-page">
+            {mainnetNotice && <MainnetNotice notice={mainnetNotice} />}
             <MinerActions actions={mainnetActions} />
 
             <Section id="mainnet" eyebrow="SN25 · Bittensor mainnet" title="Mainnet launch timeline" headingLevel="h1">
@@ -99,6 +100,25 @@ export default function MainnetPage({ updated = null, summary = null }) {
                 </p>
             </Section>
         </div>
+    );
+}
+
+/**
+ * The dated notice above the box at the top (data/mainnet.js
+ * mainnetNotice), with a link to its full text. Like the box's headline,
+ * its title is an h2 under the page's single h1.
+ */
+function MainnetNotice({ notice }) {
+    const external = isExternal(notice.link.href) ? EXTERNAL : {};
+    return (
+        <section className="mainnet-notice" id="notice" aria-labelledby="notice-heading">
+            <div className="mainnet-notice-box" role="note">
+                <p className="mainnet-notice-date">Notice · {notice.date}</p>
+                <h2 className="mainnet-notice-title" id="notice-heading">{notice.title}</h2>
+                {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
+                <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">→</span></a>
+            </div>
+        </section>
     );
 }
 

@@ -199,7 +199,12 @@ export default defineConfig({
         },
         // Allow imports from the react/ source tree
         server: {
-            fs: { allow: [PROJECT_ROOT] }
+            fs: { allow: [PROJECT_ROOT] },
+            // dev only: /dashboard reads grafana.bringyour.com, whose CORS
+            // allowlist names ur.xyz and ur.io, not localhost
+            proxy: {
+                '/__grafana': { target: 'https://grafana.bringyour.com', changeOrigin: true, rewrite: (p) => p.replace(/^\/__grafana/, '') }
+            }
         },
         build: {
             // the i18n module top-level-awaits the page language's dictionary

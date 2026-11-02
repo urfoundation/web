@@ -92,6 +92,7 @@ gates: install-playwright-browser
 	node --test ../react/tests/docs-search.test.mjs
 	node --test ../react/tests/docs-chapters.test.mjs
 	node --test ../scripts/agent-assets.test.mjs
+	node --test ../scripts/before-flip.test.mjs
 	node ../react/tests/visual-parity.mjs
 	node ../react/tests/network-privacy.mjs
 	node ../react/tests/static-affordances.mjs

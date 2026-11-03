@@ -155,7 +155,23 @@ export default {
         usdUnavailable: 'Live α price unavailable, so USD equivalents are hidden.',
         subscribe: 'Subscribe to price changes (RSS)',
         rawFile:   'Raw price sheet (price.yml)',
-        initialPeriod: 'Initial period: the published rate is 0 α. No operator demand deposits are collected while the network is being hardened; every operator pool is given equal demand, so measured quality alone steers the pool channel.'
+        initialPeriod: 'Initial period: the published rate is 0 α. No operator demand deposits are collected while the network is being hardened; every operator pool is given equal demand, so measured quality alone steers the pool channel.',
+        signedNote: 'Signed by the subnet owner: these rates apply from epoch {epoch}, with a deposit cap of {cap} α per operator per epoch. {before}',
+        signedEarlier: 'Earlier signed prices, newest first:',
+        colFromEpoch: 'From epoch',
+        colCap: 'Cap per epoch',
+        signedBefore:          'Epochs before epoch {epoch} keep the earlier rate.',
+        signedBeforeInitial:   'Until epoch {epoch}, the initial period\'s rate of 0 α stays in force.',
+        sourcingTitle:         'Sourcing commitment',
+        sourcingPays:          'From the first priced epoch, the network operator pays every SN25 demand deposit with alpha bought on the open market with its revenue. It uses no alpha obtained any other way.',
+        sourcingRoute:         'Every purchase is on chain. USDC is swapped for TAO on Solana through Jupiter, bridged to Bittensor over LayerZero, and staked into SN25 alpha by the deposit wallet:',
+        sourcingUsdcWallet:    'USDC wallet (Solana):',
+        sourcingDepositWallet: 'Deposit wallet (Bittensor):',
+        sourcingCheck:         'Anyone can check it: from the first priced epoch on, the alpha the deposit wallet has deposited never exceeds the alpha it has bought this way.',
+        sourcingCopy:          'Copy',
+        sourcingCopied:        'Copied',
+        sourcingCopiedStatus:  'Copied to the clipboard',
+        sourcingView:          'View on {explorer}'
     },
 
     roadmap: {

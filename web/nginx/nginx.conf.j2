@@ -522,6 +522,22 @@ http {
             add_header 'Access-Control-Allow-Origin' $public_cors_origin always;
         }
 
+        # The signed price sheet: the tracked copy of sn/price.yml. It goes out
+        # as text/plain so a browser shows it rather than downloading it, and
+        # people read the same bytes that validators and operators verify. Its
+        # readers ask for application/yaml or text/plain and never check the
+        # type. They refresh it every few minutes and keep their last verified
+        # copy, and the short lifetime keeps a cached copy at most five minutes
+        # behind a new signed entry. Only the file itself is served.
+        location = /price.yml {
+            types { text/plain yml; }
+            autoindex off;
+            try_files $uri =404;
+            add_header 'Cache-Control' 'public, max-age=300';
+            add_header 'X-Robots-Tag' $ur_preview_robots always;
+            add_header 'Access-Control-Allow-Origin' $public_cors_origin always;
+        }
+
         # Content-hashed bundles never change under the same name. The load
         # balancer picks a block for each request, so during a staged rollout
         # a page's bundles may come from a block of the other release. This

@@ -455,6 +455,10 @@ expect_header ur.xyz /investors Access-Control-Allow-Origin ''
 # The price feed caches like the other machine-readable files, not like a page.
 expect_header ur.xyz /price.rss Cache-Control 'public, max-age=3600, stale-while-revalidate=86400'
 
+# The signed price sheet opens as text in a browser and is at most five minutes
+# stale in any cache, so a new signed entry reaches its readers quickly.
+expect_header ur.xyz /price.yml Cache-Control 'public, max-age=300'
+
 # ur.xyz publishes markdown twins of its legal documents from
 # scripts/generate-agent-assets.mjs; each points search engines at its page.
 # Until the build has them, say so instead of failing the image.
@@ -477,6 +481,7 @@ for host in ur.xyz; do
 done
 expect_header ur.xyz /docs-md/miner.md Content-Type 'text/markdown; charset=utf-8'
 expect_header ur.xyz /operators.yml Content-Type 'application/yaml; charset=utf-8'
+expect_header ur.xyz /price.yml Content-Type 'text/plain; charset=utf-8'
 expect_header ur.xyz /price.rss Content-Type 'application/rss+xml; charset=utf-8'
 
 # A synthetic edge request proves the only emitted page-view fields are the

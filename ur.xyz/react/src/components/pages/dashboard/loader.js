@@ -3,13 +3,11 @@
 //
 // On ur.xyz and ur.io the visitor's browser reads grafana.bringyour.com directly (its
 // CORS allowlist names those origins). Anywhere else, the local dev server above all,
-// the same requests go through /__grafana, which astro.config.mjs proxies in dev.
-import { GRAFANA, buildLive, grafana } from '@react/lib/dashboardData.js';
+// the same requests go through /__grafana, which the dev servers proxy (react/vite.config.js,
+// astro/astro.config.mjs).
+import { GRAFANA, buildLive, grafana } from '../../../lib/dashboardData.js';
 import engineUrl from './engine.js?url';
 import pageUrl from './page.js?url';
-
-const firstParty = /(^|\.)(ur\.xyz|ur\.io)$/.test(location.hostname);
-const base = firstParty ? GRAFANA : '/__grafana';
 
 function load(src) {
     return new Promise((resolve, reject) => {
@@ -30,7 +28,9 @@ async function history() {
     }
 }
 
-async function main() {
+export async function startDashboard() {
+    const firstParty = /(^|\.)(ur\.xyz|ur\.io)$/.test(location.hostname);
+    const base = firstParty ? GRAFANA : '/__grafana';
     const status = document.getElementById('upd');
     try {
         window.SNAP = await buildLive({ g: grafana(base), history: await history() });
@@ -47,5 +47,3 @@ async function main() {
         }
     }
 }
-
-main();

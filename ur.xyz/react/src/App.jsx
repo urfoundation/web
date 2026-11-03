@@ -24,6 +24,7 @@ import InvestorsPage from './components/pages/Investors';
 import BuildPage from './components/pages/Build';
 import ReservePage from './components/pages/Reserve';
 import MainnetPage from './components/pages/Mainnet';
+import DashboardPage from './components/pages/Dashboard';
 import ResearchReportPage from './components/pages/ResearchReport';
 import ResearchMethodologyPage from './components/pages/ResearchMethodology';
 import { useRoute } from './router';
@@ -66,6 +67,8 @@ export default function App() {
     const route = useRoute();
 
     if (route.name === 'docs') return <DocsExplorer />;
+    // standalone: its own shell, not the site's chrome
+    if (route.name === 'dashboard') return <DashboardPage />;
 
     const SectionComponent = SECTION_COMPONENTS[route.name];
     if (SectionComponent) return <SectionPage Component={SectionComponent} route={route} />;

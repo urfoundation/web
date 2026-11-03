@@ -1,20 +1,15 @@
 ---
 // /dashboard — UR's network and SN25 stats, read live.
 //
-// A standalone page (its own shell, not the site's Base layout): the markup,
-// styles, engine and page script live in src/dashboard/, ported from the
-// stats-dashboard design. src/dashboard/loader.js builds the data in the
+// The page is the React component the SPA renders for this route
+// (react/src/components/pages/Dashboard.jsx), rendered on the server here and
+// hydrated on load. It is standalone (this shell, not the site's Base layout):
+// react/src/components/pages/dashboard/loader.js builds the data in the
 // visitor's browser from grafana.bringyour.com (public dashboard + stats.json)
 // and Bittensor mainnet (the public RPC, as /reserve reads it), on top of
 // /dashboard/history.json, the daily history scripts/dashboard-history.mjs
 // keeps. Hidden until launch: noindex, nofollow, not in the nav or sitemap.
-import body from '../dashboard/body.html?raw';
-import css from '../dashboard/page.css?raw';
-import medium from '../dashboard/PPNeueMontreal-Medium.woff2?url';
-
-const fonts = `@font-face{font-family:'PP Neue Montreal';src:url(/PPNeueMontreal-Regular.woff2) format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'PP Neue Montreal';src:url(${medium}) format('woff2');font-weight:500;font-display:swap}
-@font-face{font-family:'JetBrains Mono';src:url(/JetBrainsMono-Regular.woff2) format('woff2');font-display:swap}`;
+import DashboardPage from '@react/components/pages/Dashboard.jsx';
 ---
 <!doctype html>
 <html lang="en">
@@ -24,13 +19,8 @@ const fonts = `@font-face{font-family:'PP Neue Montreal';src:url(/PPNeueMontreal
 <meta name="robots" content="noindex, nofollow">
 <title>UR Stats</title>
 <link rel="preconnect" href="https://grafana.bringyour.com" crossorigin>
-<style is:inline set:html={fonts}></style>
-<style is:inline set:html={css}></style>
 </head>
 <body class="is-loading">
-<Fragment set:html={body} />
-<script>
-import '../dashboard/loader.js';
-</script>
+<DashboardPage client:load />
 </body>
 </html>

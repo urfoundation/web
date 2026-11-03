@@ -53,9 +53,10 @@ export const LEGAL_ROUTES = ['terms', 'privacy', 'vdp'];
  * and the Investor Centre's documents live under /investors/<slug>. They
  * have no translations, so they exist at the bare path only. /reserve is the
  * Network Capacity Reserve dashboard and /mainnet the SN25 mainnet launch
- * timeline, both linked from the footer.
+ * timeline, both linked from the footer. /dashboard is the live stats page, standalone
+ * and unlinked until launch.
  */
-export const PAGE_ROUTES = ['about', 'investors', 'build', 'reserve', 'mainnet'];
+export const PAGE_ROUTES = ['about', 'investors', 'build', 'reserve', 'mainnet', 'dashboard'];
 
 /**
  * The research reports: English-only documents under the translated research

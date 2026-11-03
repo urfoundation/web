@@ -6,5 +6,9 @@
   {
     "date": "2026-09-26T00:18:42.381Z",
     "yaml": "sn: 25\n# the alpha must be deposited as demand deposits per block (7 days)\n#\n# Initial period: no operator demand deposits are collected, so every rate is\n# 0 alpha per GiB and 0 alpha per user. The tiers are kept for the shape of the\n# schedule (an operator pays the best tier whose staked-alpha threshold it meets;\n# the 0 tier applies to everyone) and will be filled in when deposits start.\ntiered_per_block_demand_deposits:\n  0:\n    alpha_per_gib: 0\n    alpha_per_user: 0\n  1000:\n    alpha_per_gib: 0\n    alpha_per_user: 0\n"
+  },
+  {
+    "date": "2026-11-03T05:17:28.843Z",
+    "yaml": "sn: 25\n# the alpha must be deposited as demand deposits per block (7 days)\n#\n# From epoch 7, an operator deposits 0.010437 alpha per GiB and 0.005218 alpha per\n# active user of the epoch before, signed below. When it was set that was $0.01 per\n# GiB and $0.005 per user, at $0.958 per alpha. Every tier pays the same (an\n# operator pays the best tier whose staked-alpha threshold it meets; the 0 tier\n# applies to everyone).\ntiered_per_block_demand_deposits:\n  0:\n    alpha_per_gib: 0.010437\n    alpha_per_user: 0.005218\n  1000:\n    alpha_per_gib: 0.010437\n    alpha_per_user: 0.005218\nsigned_schedule:\n  7:\n    epoch_cap_alpha: 3000\n    signature: \"0x60ab8746c64a78773c0dadc3be500d0601b009432ce701bab7fc64e535c6528a2d930d8f6c457976061189b9254236fe525a42f4fe4439676adecc53eb5ceb2e1c\"\n    tiers:\n      0:\n        alpha_per_gib: 0.010437\n        alpha_per_user: 0.005218\n      1000:\n        alpha_per_gib: 0.010437\n        alpha_per_user: 0.005218\n"
   }
 ]

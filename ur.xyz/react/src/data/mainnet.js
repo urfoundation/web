@@ -59,12 +59,35 @@ export const mainnetEpochs = [
         start: { block: 9398428, time: '2026-10-30T18:25:00Z', projected: true },
         end: { block: 9448828, time: '2026-11-06T18:25:00Z', projected: true },
     },
+    {
+        number: 5,
+        settlement: 'v2',
+        summary: 'The first settlement v2 close and claims',
+        start: { block: 9448828, time: '2026-11-06T18:25:00Z', projected: true },
+        end: { block: 9499228, time: '2026-11-13T18:25:00Z', projected: true },
+    },
+    {
+        number: 6,
+        settlement: 'v2',
+        summary: 'Its usage prices the first demand deposit',
+        start: { block: 9499228, time: '2026-11-13T18:25:00Z', projected: true },
+        end: { block: 9549628, time: '2026-11-20T18:25:00Z', projected: true },
+    },
+    {
+        number: 7,
+        settlement: 'v2',
+        summary: 'The first epoch with priced demand deposits',
+        start: { block: 9549628, time: '2026-11-20T18:25:00Z', projected: true },
+        end: { block: 9600028, time: '2026-11-27T18:25:00Z', projected: true },
+    },
 ];
 
 // the milestones before the first epoch listed above, and after the last
-// (the page names that group after the last epoch's number)
+// (the page names that group after the last epoch's number). The epochs run to
+// epoch 7, the first with priced demand deposits; the first settlement v2 cycle,
+// which once came after the last epoch, is epoch 5's.
 export const mainnetBeforeEpochs = { title: 'Before launch' };
-export const mainnetAfterEpochs = { summary: 'The first settlement v2 cycle' };
+export const mainnetAfterEpochs = {};
 
 export const SECONDS_PER_BLOCK = 12;
 

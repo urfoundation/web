@@ -228,16 +228,26 @@ test('a milestone is grouped by the epoch it ends in, a day counting from its st
         { id: 'f', date: '2026-10-23T18:09:00Z' },
         { id: 'g', date: '2026-10-30T18:25:00Z/2026-10-30T22:25:00Z' },
         { id: 'i', date: '2026-11-06T18:25:00Z/2026-11-06T22:25:00Z' },
+        // after the last epoch listed, epoch 7
+        { id: 'j', date: '2026-11-27T18:25:00Z/2026-11-27T22:25:00Z' },
         { id: 'h', date: 'not a date' },
     ];
     const groups = groupByEpoch(fixture, epochs, { before: { title: 'Before launch' }, after: { summary: 'After' } });
     const where = Object.fromEntries(groups.flatMap((g) => g.events.map((e) => [e.id, g.id])));
-    assert.deepEqual(where, { a: 'before-launch', b: 'epoch-0', c: 'epoch-0', d: 'epoch-1', e: 'epoch-2', f: 'epoch-3', g: 'epoch-4', i: 'after-epoch-4' });
-    assert.deepEqual(groups.map((g) => g.title), ['Before launch', 'Epoch 0', 'Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'After epoch 4']);
+    assert.deepEqual(where, { a: 'before-launch', b: 'epoch-0', c: 'epoch-0', d: 'epoch-1', e: 'epoch-2', f: 'epoch-3', g: 'epoch-4', i: 'epoch-5', j: 'after-epoch-7' });
+    assert.deepEqual(groups.map((g) => g.title), ['Before launch', 'Epoch 0', 'Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'After epoch 7']);
 
     // the real milestones all land in a group, in the order the data lists them
     const real = groupByEpoch(events, epochs);
     assert.deepEqual(real.flatMap((g) => g.events.map((e) => e.id)), events.map((e) => e.id));
+    // the first priced demand deposits begin epoch 7: its first block, at its projected time
+    const priced = events.find((e) => e.id === 'demand-deposits-priced');
+    const epoch7 = epochs.find((e) => e.number === 7);
+    assert.equal(real.find((g) => g.events.some((e) => e.id === priced.id)).id, 'epoch-7');
+    assert.equal(priced.date, epoch7.start.time);
+    assert.equal(epoch7.start.block, 9549628);
+    assert.match(priced.detail, /^From block 9,549,628, /);
+    assert.ok(priced.sources.some((s) => s.kind === 'evm_block' && s.label === "Epoch 7's first block, 9,549,628"));
 });
 
 test('the box at the top gives the timeline\'s dates, and links only pages the site has', () => {

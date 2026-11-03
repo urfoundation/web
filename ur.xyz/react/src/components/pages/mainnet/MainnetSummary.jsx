@@ -42,11 +42,15 @@ export default function MainnetSummary({ model }) {
                                 className="mainnet-summary-band"
                                 data-settlement={band.settlement}
                                 data-tail={band.tail ? '' : undefined}
+                                data-week={band.short ? undefined : ''}
                                 style={{ '--hours': band.hours }}
                             >
                                 <div className="mainnet-summary-box">
                                     <span className="mainnet-summary-name">
-                                        {band.short ? <><span aria-hidden="true">{band.short}</span><span className="mainnet-visually-hidden">{band.name}</span></> : band.name}
+                                        {band.short
+                                            ? <><span aria-hidden="true">{band.short}</span><span className="mainnet-visually-hidden">{band.name}</span></>
+                                            // a week on the narrowest screens: "E5", over the full name a screen reader reads
+                                            : <><span className="mainnet-summary-name-full">{band.name}</span><span className="mainnet-summary-name-abbr" aria-hidden="true">{`E${band.number}`}</span></>}
                                     </span>
                                     <span className="mainnet-visually-hidden">: </span>
                                     <span className="mainnet-summary-days">

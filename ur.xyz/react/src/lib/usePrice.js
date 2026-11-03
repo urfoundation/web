@@ -17,7 +17,7 @@ const SPOT_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
  * Sharing one poller keeps the request volume well under the public
  * feeds' rate limits no matter how many components subscribe.
  *
- *   sheet          — { sn, tiers } from /price.yml (null until loaded)
+ *   sheet          — { sn, tiers, signed } from /price.yml (null until loaded)
  *   alphaUsd       — current USD price of 1 α (cached value until a feed answers)
  *   alphaUsdSource — 'operators' (mean of the operators' stats feeds) or
  *                    'gecko' (the public subnet pool feed)

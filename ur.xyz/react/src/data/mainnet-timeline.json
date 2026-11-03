@@ -323,6 +323,20 @@
       "title": "Modern provider gate turns on",
       "detail": "Quality and Speed admit only providers verified as modern. The gate turns on automatically at 00:00 UTC, three weeks later than the October 21 first planned.",
       "sources": []
+    },
+    {
+      "id": "demand-deposits-priced",
+      "date": "2026-11-20T18:25:00Z",
+      "status": "scheduled",
+      "key": true,
+      "title": "Signed price goes live: demand deposits from epoch 7",
+      "detail": "From block 9,549,628, the network operator deposits 0.010437 α per GiB and 0.005218 α per active user of epoch 6, capped at 3,000 α per epoch, as signed by the subnet owner in price.yml (published November 3). Validators check each epoch's deposit against it at every steering pass, with the validator release that ships before epoch 7. Until the deposit matches what the previous epoch's usage owes, the operator's pool gets no weight.",
+      "sources": [
+        { "label": "price.yml", "kind": "doc", "ref": "https://ur.xyz/price.yml" },
+        { "label": "The signed price in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/price.yml" },
+        { "label": "Epoch 7's first block, 9,549,628", "kind": "evm_block", "ref": "" },
+        { "label": "First priced deposit", "kind": "evm_tx", "ref": "" }
+      ]
     }
   ]
 }

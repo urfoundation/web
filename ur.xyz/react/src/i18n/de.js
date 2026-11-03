@@ -130,7 +130,23 @@ export default {
         usdUnavailable: 'Live-α-Preis nicht verfügbar — USD-Äquivalente ausgeblendet.',
         subscribe: 'Preisänderungen abonnieren (RSS)',
         rawFile:   'Rohe Preistabelle (price.yml)',
-        initialPeriod: 'Anfangsphase: Der veröffentlichte Tarif beträgt 0 α. Solange das Netzwerk gehärtet wird, werden keine Nachfrage-Einlagen von Betreibern erhoben; jedem Betreiber-Pool wird die gleiche Nachfrage zugerechnet, sodass allein die gemessene Qualität den Pool-Kanal steuert.'
+        initialPeriod: 'Anfangsphase: Der veröffentlichte Tarif beträgt 0 α. Solange das Netzwerk gehärtet wird, werden keine Nachfrage-Einlagen von Betreibern erhoben; jedem Betreiber-Pool wird die gleiche Nachfrage zugerechnet, sodass allein die gemessene Qualität den Pool-Kanal steuert.',
+        signedNote: 'Vom Subnet-Eigentümer signiert: Diese Tarife gelten ab Epoche {epoch}, mit einer Einlagen-Obergrenze von {cap} α pro Betreiber und Epoche. {before}',
+        signedEarlier: 'Frühere signierte Preise, die neuesten zuerst:',
+        colFromEpoch: 'Ab Epoche',
+        colCap: 'Obergrenze pro Epoche',
+        signedBefore:          'Für Epochen vor Epoche {epoch} gilt der bisherige Tarif.',
+        signedBeforeInitial:   'Bis zum Beginn von Epoche {epoch} gilt weiterhin der Tarif der Anfangsphase von 0 α.',
+        sourcingTitle:         'Beschaffungszusage',
+        sourcingPays:          'Ab der ersten bepreisten Epoche bezahlt der Netzbetreiber jede Nachfrage-Einlage von SN25 mit Alpha, das er mit seinen Einnahmen am offenen Markt gekauft hat. Alpha, das er auf anderem Weg erhalten hat, setzt er nicht ein.',
+        sourcingRoute:         'Jeder Kauf erfolgt On-Chain. USDC wird auf Solana über Jupiter gegen TAO getauscht, über LayerZero nach Bittensor übertragen und von der Einlagen-Wallet in SN25-Alpha gestakt:',
+        sourcingUsdcWallet:    'USDC-Wallet (Solana):',
+        sourcingDepositWallet: 'Einlagen-Wallet (Bittensor):',
+        sourcingCheck:         'Das kann jeder prüfen: Ab der ersten bepreisten Epoche übersteigt das Alpha, das die Einlagen-Wallet hinterlegt hat, nie das Alpha, das sie auf diesem Weg gekauft hat.',
+        sourcingCopy:          'Kopieren',
+        sourcingCopied:        'Kopiert',
+        sourcingCopiedStatus:  'In die Zwischenablage kopiert',
+        sourcingView:          'Auf {explorer} ansehen'
     },
 
     roadmap: {

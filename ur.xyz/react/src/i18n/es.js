@@ -130,7 +130,23 @@ export default {
         usdUnavailable: 'Precio de α en vivo no disponible — equivalentes en USD ocultos.',
         subscribe: 'Suscribirse a los cambios de precio (RSS)',
         rawFile:   'Tabla de precios sin procesar (price.yml)',
-        initialPeriod: 'Período inicial: la tarifa publicada es 0 α. Mientras la red se endurece no se cobran depósitos de demanda a los operadores; a cada pool de operador se le asigna la misma demanda, de modo que solo la calidad medida dirige el canal de pools.'
+        initialPeriod: 'Período inicial: la tarifa publicada es 0 α. Mientras la red se endurece no se cobran depósitos de demanda a los operadores; a cada pool de operador se le asigna la misma demanda, de modo que solo la calidad medida dirige el canal de pools.',
+        signedNote: 'Firmado por el propietario de la subred: estas tarifas se aplican desde la época {epoch}, con un tope de depósito de {cap} α por operador y época. {before}',
+        signedEarlier: 'Precios firmados anteriores, primero los más recientes:',
+        colFromEpoch: 'Desde la época',
+        colCap: 'Tope por época',
+        signedBefore:          'Las épocas anteriores a la época {epoch} conservan la tarifa previa.',
+        signedBeforeInitial:   'Hasta que comience la época {epoch}, sigue vigente la tarifa del período inicial, de 0 α.',
+        sourcingTitle:         'Compromiso de procedencia',
+        sourcingPays:          'Desde la primera época con precio, el operador de red paga cada depósito de demanda de SN25 con α comprado en el mercado abierto con sus ingresos. No usa α obtenido de ninguna otra forma.',
+        sourcingRoute:         'Cada compra es on-chain. El USDC se intercambia por TAO en Solana a través de Jupiter, se transfiere a Bittensor mediante LayerZero y la billetera de depósitos lo pone en stake como α de SN25:',
+        sourcingUsdcWallet:    'Billetera de USDC (Solana):',
+        sourcingDepositWallet: 'Billetera de depósitos (Bittensor):',
+        sourcingCheck:         'Cualquiera puede comprobarlo: desde la primera época con precio, el α que la billetera de depósitos ha depositado nunca supera el α que ha comprado de esta forma.',
+        sourcingCopy:          'Copiar',
+        sourcingCopied:        'Copiado',
+        sourcingCopiedStatus:  'Copiado al portapapeles',
+        sourcingView:          'Ver en {explorer}'
     },
 
     roadmap: {

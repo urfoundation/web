@@ -90,6 +90,8 @@
 .mainnet-page .mainnet-summary-days { position: relative; z-index: 2; white-space: nowrap; text-shadow: 0 0 3px var(--brand-bg), 0 0 6px var(--brand-bg); }
 .mainnet-page .mainnet-summary-name { font-family: 'PPNeueBit', monospace; font-size: 0.92rem; line-height: 1.1; letter-spacing: 0.05em; color: var(--brand-ur); }
 .mainnet-page .mainnet-summary-days { font-size: 0.8rem; line-height: 1.25; color: var(--brand-white); }
+/* a week's short name ("E5"), shown only where its band is too narrow for the full one */
+.mainnet-page .mainnet-summary-name-abbr { display: none; }
 
 /* the axis: the bands' bottom edge, filled up to now */
 .mainnet-page .mainnet-summary-track { position: relative; display: block; height: 2px; background: rgba(214, 230, 244, 0.26); }
@@ -243,6 +245,14 @@
     .mainnet-page .mainnet-summary-date-meta { gap: 4px 6px; }
     .mainnet-page .mainnet-summary-day { letter-spacing: 0.1em; }
     .mainnet-page .mainnet-summary-date-title { font-size: 0.9rem; }
+}
+
+/* Phones up to 420 px: the epochs to epoch 7 share the width, so each week's
+   band may narrow to 30 px and is named by its number, "E5", as epoch 0 is */
+@media (max-width: 420px) {
+    .mainnet-page .mainnet-summary-band[data-week] { min-width: 30px; }
+    .mainnet-page .mainnet-summary-name-full { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .mainnet-page .mainnet-summary-name-abbr { display: inline; }
 }
 
 /* The narrowest phones: the bands' text a size down, so a week's dates fit */

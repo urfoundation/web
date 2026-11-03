@@ -15,9 +15,12 @@
  * NOT supported (the OpenAPI document does not use them):
  *   anchors / aliases, folded scalars (>), tagged scalars, multiple
  *   documents, complex flow mappings.
+ *
+ * With { exactNumbers: true } a number stays the text it was written as, for a
+ * reader that must not see it rounded through a float (lib/price.js).
  */
 
-export function parseYaml(text) {
+export function parseYaml(text, { exactNumbers = false } = {}) {
     const rawLines = text.split('\n');
 
     // Pre-process: strip end-of-line comments, compute indent, mark blank
@@ -34,7 +37,7 @@ export function parseYaml(text) {
         };
     });
 
-    const pos = { i: 0 };
+    const pos = { i: 0, exactNumbers };
     const value = parseValue(lines, pos);
     return value === null ? {} : value;
 }
@@ -126,7 +129,7 @@ function parseMapping(lines, pos, indent) {
         if (valuePart === '[]') { map[key] = []; continue; }
 
         if (valuePart.startsWith('[') && valuePart.endsWith(']')) {
-            map[key] = parseFlowSequence(valuePart);
+            map[key] = parseFlowSequence(valuePart, pos.exactNumbers);
             continue;
         }
 
@@ -135,7 +138,7 @@ function parseMapping(lines, pos, indent) {
         // (the standard YAML rule for multi-line plain scalars), and then
         // collapse the non-standard " |" line-break sentinel that the
         // OpenAPI spec uses inside descriptions into actual newlines.
-        let scalar = parseScalar(valuePart);
+        let scalar = parseScalar(valuePart, pos.exactNumbers);
         if (typeof scalar === 'string' && pos.i < lines.length) {
             const buf = [scalar];
             while (pos.i < lines.length) {
@@ -200,7 +203,7 @@ function parseSequence(lines, pos, indent) {
         }
 
         // "- scalar"
-        arr.push(parseScalar(itemContent));
+        arr.push(parseScalar(itemContent, pos.exactNumbers));
         pos.i++;
     }
     return arr;
@@ -258,7 +261,7 @@ function findColon(s) {
     return -1;
 }
 
-function parseScalar(s) {
+function parseScalar(s, exactNumbers = false) {
     if (s === '' || s === '~' || s === 'null') return null;
     if (s === 'true') return true;
     if (s === 'false') return false;
@@ -274,17 +277,18 @@ function parseScalar(s) {
     if (s.length >= 2 && s.startsWith("'") && s.endsWith("'")) {
         return s.slice(1, -1).replace(/''/g, "'");
     }
+    if (exactNumbers) return s;
     if (/^-?\d+$/.test(s)) return parseInt(s, 10);
     if (/^-?\d+\.\d+$/.test(s)) return parseFloat(s);
     return s;
 }
 
-function parseFlowSequence(s) {
+function parseFlowSequence(s, exactNumbers = false) {
     const inner = s.slice(1, -1).trim();
     if (!inner) return [];
     // Naive split — sufficient because the OpenAPI spec only uses simple
     // enum-style flow sequences like [quality, speed].
-    return inner.split(',').map(x => parseScalar(x.trim()));
+    return inner.split(',').map(x => parseScalar(x.trim(), exactNumbers));
 }
 
 function unquote(s) {

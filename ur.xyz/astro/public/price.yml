@@ -1,14 +1,26 @@
 sn: 25
 # the alpha must be deposited as demand deposits per block (7 days)
 #
-# Initial period: no operator demand deposits are collected, so every rate is
-# 0 alpha per GiB and 0 alpha per user. The tiers are kept for the shape of the
-# schedule (an operator pays the best tier whose staked-alpha threshold it meets;
-# the 0 tier applies to everyone) and will be filled in when deposits start.
+# From epoch 7, an operator deposits 0.010437 alpha per GiB and 0.005218 alpha per
+# active user of the epoch before, signed below. When it was set that was $0.01 per
+# GiB and $0.005 per user, at $0.958 per alpha. Every tier pays the same (an
+# operator pays the best tier whose staked-alpha threshold it meets; the 0 tier
+# applies to everyone).
 tiered_per_block_demand_deposits:
   0:
-    alpha_per_gib: 0
-    alpha_per_user: 0
+    alpha_per_gib: 0.010437
+    alpha_per_user: 0.005218
   1000:
-    alpha_per_gib: 0
-    alpha_per_user: 0
+    alpha_per_gib: 0.010437
+    alpha_per_user: 0.005218
+signed_schedule:
+  7:
+    epoch_cap_alpha: 3000
+    signature: "0x60ab8746c64a78773c0dadc3be500d0601b009432ce701bab7fc64e535c6528a2d930d8f6c457976061189b9254236fe525a42f4fe4439676adecc53eb5ceb2e1c"
+    tiers:
+      0:
+        alpha_per_gib: 0.010437
+        alpha_per_user: 0.005218
+      1000:
+        alpha_per_gib: 0.010437
+        alpha_per_user: 0.005218

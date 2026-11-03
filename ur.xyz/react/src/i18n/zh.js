@@ -128,7 +128,23 @@ export default {
         usdUnavailable: '实时 α 价格不可用——已隐藏 USD 等值。',
         subscribe: '订阅价格变更 (RSS)',
         rawFile:   '原始价格表 (price.yml)',
-        initialPeriod: '初始阶段：公开费率为 0 α。在网络加固期间不收取运营商需求存款；每个运营商池被赋予相同的需求，因此仅由实测质量决定池通道的分配。'
+        initialPeriod: '初始阶段：公开费率为 0 α。在网络加固期间不收取运营商需求存款；每个运营商池被赋予相同的需求，因此仅由实测质量决定池通道的分配。',
+        signedNote: '由子网所有者签名：这些费率自周期 {epoch} 起适用，每个运营商每个周期的存款上限为 {cap} α。{before}',
+        signedEarlier: '此前已签名的价格（最新的在前）：',
+        colFromEpoch: '起始周期',
+        colCap: '每周期上限',
+        signedBefore:          '周期 {epoch} 之前的各周期沿用此前的费率。',
+        signedBeforeInitial:   '在周期 {epoch} 开始之前，初始阶段 0 α 的费率继续有效。',
+        sourcingTitle:         'α 来源承诺',
+        sourcingPays:          '自首个定价周期起，网络运营商以其收入在公开市场上购买的 α 支付每一笔 SN25 需求存款，不使用以任何其他方式获得的 α。',
+        sourcingRoute:         '每一笔购买都在链上进行。USDC 在 Solana 上通过 Jupiter 兑换为 TAO，经 LayerZero 跨链转入 Bittensor，再由存款钱包质押为 SN25 的 α：',
+        sourcingUsdcWallet:    'USDC 钱包（Solana）：',
+        sourcingDepositWallet: '存款钱包（Bittensor）：',
+        sourcingCheck:         '任何人都可以核查：自首个定价周期起，存款钱包存入的 α 从不超过它以这种方式购买的 α。',
+        sourcingCopy:          '复制',
+        sourcingCopied:        '已复制',
+        sourcingCopiedStatus:  '已复制到剪贴板',
+        sourcingView:          '在 {explorer} 上查看'
     },
 
     roadmap: {

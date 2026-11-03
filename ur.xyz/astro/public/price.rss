@@ -6,7 +6,40 @@
         <atom:link href="https://ur.xyz/price.rss" rel="self" type="application/rss+xml" />
         <description>Published price sheet changes for the UR subnet — the alpha demand deposit required per GiB and per user in each 7-day block, by staked-alpha tier.</description>
         <language>en</language>
-        <lastBuildDate>Sat, 26 Sep 2026 00:18:42 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 03 Nov 2026 05:17:28 GMT</lastBuildDate>
+        <item>
+            <title>UR usage cost update — 2026-11-03</title>
+            <link>https://ur.xyz/price</link>
+            <guid isPermaLink="false">urn:ur-xyz:price:2026-11-03T05:17:28.843Z</guid>
+            <pubDate>Tue, 03 Nov 2026 05:17:28 GMT</pubDate>
+            <description><![CDATA[<p>UR subnet 25 — demand deposit price per block (7 days). An operator pays the best tier whose staked-&#945; threshold it meets; tier 0 applies to everyone.</p><p>Signed by the subnet owner: these rates apply from epoch 7, with a deposit cap of 3000 &#945; per operator per epoch.</p><table border="1" cellpadding="4" cellspacing="0"><tr><th>Tier</th><th>Staked &#945; threshold</th><th>&#945; / GiB</th><th>&#945; / user</th></tr><tr><td>0</td><td>0 (everyone)</td><td>0.010437</td><td>0.005218</td></tr><tr><td>1</td><td>&#8805; 1000</td><td>0.010437</td><td>0.005218</td></tr></table><pre>sn: 25
+# the alpha must be deposited as demand deposits per block (7 days)
+#
+# From epoch 7, an operator deposits 0.010437 alpha per GiB and 0.005218 alpha per
+# active user of the epoch before, signed below. When it was set that was $0.01 per
+# GiB and $0.005 per user, at $0.958 per alpha. Every tier pays the same (an
+# operator pays the best tier whose staked-alpha threshold it meets; the 0 tier
+# applies to everyone).
+tiered_per_block_demand_deposits:
+  0:
+    alpha_per_gib: 0.010437
+    alpha_per_user: 0.005218
+  1000:
+    alpha_per_gib: 0.010437
+    alpha_per_user: 0.005218
+signed_schedule:
+  7:
+    epoch_cap_alpha: 3000
+    signature: &quot;0x60ab8746c64a78773c0dadc3be500d0601b009432ce701bab7fc64e535c6528a2d930d8f6c457976061189b9254236fe525a42f4fe4439676adecc53eb5ceb2e1c&quot;
+    tiers:
+      0:
+        alpha_per_gib: 0.010437
+        alpha_per_user: 0.005218
+      1000:
+        alpha_per_gib: 0.010437
+        alpha_per_user: 0.005218
+</pre>]]></description>
+        </item>
         <item>
             <title>UR usage cost update — 2026-09-26</title>
             <link>https://ur.xyz/price</link>

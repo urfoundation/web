@@ -135,6 +135,16 @@ function NetworkMenu({ code, route, t, mobile = false }) {
 }
 
 
+// The call to action for /dashboard, top right on English pages (hidden below 1020px,
+// where the drawer's Network menu lists Dashboard).
+function DashboardCta() {
+    return (
+        <a className="nav-cta" href="/dashboard">
+            <i aria-hidden="true" />Live dashboard<span className="nav-cta-arrow" aria-hidden="true">→</span>
+        </a>
+    );
+}
+
 export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
     const { code, setLang, langs, t } = useLanguage();
     const detectedRoute = useRoute();
@@ -239,6 +249,7 @@ export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
                     </nav>
 
                     <div className="nav-actions">
+                        {code === 'en' && <DashboardCta />}
                         <LanguageSelector />
                         <button
                             type="button"

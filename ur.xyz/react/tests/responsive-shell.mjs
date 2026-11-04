@@ -29,7 +29,7 @@ const PROFILES = [
   { name: 'phone-landscape', width: 844, height: 390 },
 ];
 const PRIMARY_ORDER = ['research', 'build', 'investors', 'about', 'docs'];
-const MOBILE_ORDER = ['operators', 'miners', 'validators', ...PRIMARY_ORDER];
+const MOBILE_ORDER = ['operators', 'miners', 'validators', 'dashboard', ...PRIMARY_ORDER];
 const LANGUAGE_ORDER = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
 
 function freePort() {
@@ -188,7 +188,7 @@ async function auditPage(browser, base, route, profile) {
       });
       assert(networkRhythm.underline === 'none', `${route} mobile Network label still renders a divider`);
       assert(networkRhythm.firstGap >= 3, `${route} Operators sits too close to the Network label`);
-      assert(networkRhythm.nextGap <= 8, `${route} leaves too much space between Validators and Research`);
+      assert(networkRhythm.nextGap <= 8, `${route} leaves too much space between the Network links and Research`);
       assert(networkRhythm.activeShadow === 'none', `${route} active Network link still renders a table-like side rule`);
     }
 

@@ -8,7 +8,7 @@
 // visitor's browser from grafana.bringyour.com (public dashboard + stats.json)
 // and Bittensor mainnet (the public RPC, as /reserve reads it), on top of
 // /dashboard/history.json, the daily history scripts/dashboard-history.mjs
-// keeps. Hidden until launch: noindex, nofollow, not in the nav or sitemap.
+// keeps. Linked from the nav and footer and listed in the sitemap.
 import DashboardPage from '@react/components/pages/Dashboard.jsx';
 ---
 <!doctype html>
@@ -16,8 +16,25 @@ import DashboardPage from '@react/components/pages/Dashboard.jsx';
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
 <title>UR Stats</title>
+<meta name="description" content="Live URnetwork and SN25 stats: users, providers online, data carried, epochs, payouts and the Network Capacity Reserve, read from Grafana and Bittensor mainnet.">
+<meta name="robots" content="max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="canonical" href="https://ur.xyz/dashboard">
+<meta name="theme-color" content="#101010">
+<meta property="og:site_name" content="UR">
+<meta property="og:title" content="UR Stats">
+<meta property="og:description" content="Live URnetwork and SN25 stats: users, providers online, data carried, epochs, payouts and the Network Capacity Reserve, read from Grafana and Bittensor mainnet.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ur.xyz/dashboard">
+<meta property="og:image" content="https://ur.xyz/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="UR Stats">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@urnetwork">
+<meta name="twitter:title" content="UR Stats">
+<meta name="twitter:description" content="Live URnetwork and SN25 stats: users, providers online, data carried, epochs, payouts and the Network Capacity Reserve, read from Grafana and Bittensor mainnet.">
+<meta name="twitter:image" content="https://ur.xyz/og.png">
 <link rel="preconnect" href="https://grafana.bringyour.com" crossorigin>
 </head>
 <body class="is-loading">

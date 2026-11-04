@@ -13,8 +13,7 @@ const STYLE = { __html: fonts + css };
 const BODY = { __html: body };
 
 /**
- * /dashboard: UR's network and SN25 stats, read live. Hidden until launch:
- * noindex, not in the nav or sitemap.
+ * /dashboard: UR's network and SN25 stats, read live.
  *
  * A standalone page, without the site's chrome. The markup and styles are
  * rendered here (and into the static HTML by astro/src/pages/dashboard.astro);
@@ -34,18 +33,10 @@ export default function DashboardPage() {
         const title = document.title;
         const site = [...document.styleSheets].filter((s) => s.ownerNode !== own.current && !s.disabled);
         site.forEach((s) => { s.disabled = true; });
-        let robots = null;
-        if (!document.querySelector('meta[name="robots"]')) {
-            robots = document.createElement('meta');
-            robots.name = 'robots';
-            robots.content = 'noindex, nofollow';
-            document.head.appendChild(robots);
-        }
         document.title = 'UR Stats';
         cls.add('is-loading');
         return () => {
             site.forEach((s) => { s.disabled = false; });
-            robots?.remove();
             document.title = title;
             cls.remove('is-loading', 'is-error');
             delete document.body.dataset.accent;

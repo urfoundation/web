@@ -544,3 +544,6 @@ section[data-tab="method"]:not([hidden])~.foot .hwc{display:none!important}
 .oe-figs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .oe-figs .k{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}.oe-figs .v{display:block;font:400 30px/1 var(--f-sans);letter-spacing:-.02em}.oe-figs .d{display:block;font-size:12.5px;color:var(--muted);margin-top:8px}
 @media (max-width:620px){.oe-figs{grid-template-columns:1fr 1fr}.oe-figs .v{font-size:24px}}
+/* ---------- Links back to ur.xyz (2026-11-04) ---------- */
+a.brand{color:var(--ink);text-decoration:none;width:fit-content;padding:4px 8px;margin:-4px 0;border-radius:8px;transition:background .2s}a.brand:hover{background:#1e1e1e}a.brand svg{display:block;height:20px;width:auto}
+.foot .home{color:var(--ink);text-decoration:none;font:500 13.5px var(--f-sans)}.foot .home:hover{text-decoration:underline;text-underline-offset:3px}

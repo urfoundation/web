@@ -125,6 +125,10 @@ function NetworkMenu({ code, route, t, mobile = false }) {
                         {t.nav[name]}
                     </a>
                 ))}
+                {/* the stats dashboard is English-only, like /reserve */}
+                {code === 'en' && (
+                    <a href="/dashboard" className={route.name === 'dashboard' ? 'is-active' : ''} aria-current={route.name === 'dashboard' ? 'page' : undefined}>Dashboard</a>
+                )}
             </div>
         </details>
     );

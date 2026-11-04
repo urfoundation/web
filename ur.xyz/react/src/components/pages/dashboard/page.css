@@ -233,6 +233,10 @@ div[data-cm],.zoomable{cursor:zoom-in}
 @keyframes shim{to{background-position:-200% 0}}
 body.is-loading :is(section[data-tab] :is(.big,.mid,.fig .v,.lk-stats .v,.kv dd,.dl,.sub,.rows b),#nowroute .rn b,#nr-live,#upd,#c-reg,#c-conc){color:transparent!important;border-radius:6px;background:linear-gradient(90deg,#1b1b1b 25%,#262626 50%,#1b1b1b 75%);background-size:200% 100%;animation:shim 1.3s linear infinite}
 body.is-loading :is(section[data-tab] :is(.dl,.sub,.rows b),#c-reg) *{visibility:hidden}
+body.is-loading section[data-tab] :is(.big,.mid,.fig .v,.lk-stats .v,.kv dd,.rows b,.dl,.sub):empty{display:inline-block;min-width:5ch;min-height:1em;vertical-align:middle}
+body.is-loading section[data-tab] .sub:empty{min-width:16ch}
+body.is-loading :is(.oe-meta,.oe-figs):empty{display:block;min-width:18ch;min-height:1em;border-radius:6px;background:linear-gradient(90deg,#1b1b1b 25%,#262626 50%,#1b1b1b 75%);background-size:200% 100%;animation:shim 1.3s linear infinite}
+body.is-loading .oe-figs:empty{min-height:78px}
 body.is-loading section[data-tab] :is(svg,canvas,.legend,.t tbody,.stack,.etl,.xsplit,.lk-list,.wl,.rows .tr){opacity:.08}
 body.is-error section[data-tab] :is(svg,canvas,.legend,.t tbody,.stack,.etl,.lk-list,.rows .tr){visibility:hidden}
 body.is-error #h1live{display:none!important}
@@ -432,7 +436,7 @@ table.t th{color:var(--muted)}
 .dl b{margin-right:0;padding:2px 8px;border-radius:999px;font-size:12.5px;line-height:1.4}
 .dl b.up{color:#9CF57F;background:rgba(135,251,103,.1)}.dl b.dn{color:#FF8A7A;background:rgba(255,108,88,.1)}.dl b.fl{color:var(--muted);background:rgba(255,255,255,.06)}
 /* overview hero: the live figures are the first thing you read */
-.h1live{font-size:13px;color:var(--muted)}.h1live b{font-size:22px;color:var(--acc);text-shadow:0 0 24px rgba(237,143,255,.35)}
+.h1live{font-size:13px;color:var(--muted)}.h1live b{font-size:22px;color:var(--acc)}
 .nowroute .rn,.route .rn{background:var(--panel);border-color:var(--line2)}
 .nr-flow .rn{width:clamp(150px,19cqi,220px);padding:12px 16px}.nr-flow .rn b{font-size:32px;letter-spacing:-.025em}
 .route .trk{background:linear-gradient(90deg,rgba(237,143,255,.05),rgba(237,143,255,.35),rgba(237,143,255,.05))}
@@ -533,3 +537,10 @@ section[data-tab="method"]:not([hidden])~.foot .hwc{display:none!important}
 #p-tot.pend{font-size:clamp(34px,3.4vw,46px);letter-spacing:-.02em}
 #p-usd a{color:var(--ink);text-underline-offset:3px}
 #p-pend:empty{display:none}#p-pend{margin-top:10px;padding-top:12px;border-top:1px solid var(--line)}#p-pend b{color:var(--ink);font-weight:500}
+/* ---------- Overview: this epoch (2026-11-04) ---------- */
+.oe .ph{display:flex;align-items:baseline;justify-content:space-between;gap:8px 16px;flex-wrap:wrap}
+.oe-meta{font-size:13px;color:var(--muted)}.oe-meta b{color:var(--ink);font-weight:500}
+.oe-bar{height:4px;border-radius:999px;background:rgba(255,255,255,.07);margin:2px 0 18px;overflow:hidden}.oe-bar i{display:block;height:100%;background:var(--acc);border-radius:inherit}
+.oe-figs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.oe-figs .k{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}.oe-figs .v{display:block;font:400 30px/1 var(--f-sans);letter-spacing:-.02em}.oe-figs .d{display:block;font-size:12.5px;color:var(--muted);margin-top:8px}
+@media (max-width:620px){.oe-figs{grid-template-columns:1fr 1fr}.oe-figs .v{font-size:24px}}

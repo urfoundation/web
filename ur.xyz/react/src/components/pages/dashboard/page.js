@@ -28,11 +28,11 @@ const PAGES={overview:['UR Stats',''],
   method:['How we count','What each number means and where it comes from.']};
 // each tab opens on its own default period until the viewer picks one (Network is the macro view: 90D)
 const DEFP={network:90};
-function show(p,user){if(!Object.hasOwn(PAGES,p))p='overview';{const nv=$('.nav'),b=$(`.nav button[data-t="${p}"]`);if(nv&&b&&nv.scrollWidth>nv.clientWidth)nv.scrollLeft=b.offsetLeft-(nv.clientWidth-b.offsetWidth)/2}const dp=Object.hasOwn(DEFP,p)?DEFP[p]:30;if(!UR.picked&&UR.P!==dp)UR.setP(dp);if(UR.closeChart)UR.closeChart(true);
+function show(p,user){if(!Object.hasOwn(PAGES,p))p='overview';{const nv=$('.nav'),b=$(`.nav button[data-t="${p}"]`);if(nv&&b&&nv.scrollWidth>nv.clientWidth)nv.scrollLeft=b.offsetLeft-(nv.clientWidth-b.offsetWidth)/2}const dp=Object.hasOwn(DEFP,p)?DEFP[p]:7;if(!UR.picked&&UR.P!==dp)UR.setP(dp);if(UR.closeChart)UR.closeChart(true);
   $$('.nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.t===p));
   $$('section[data-tab]').forEach(s=>s.hidden=s.dataset.tab!==p);
   set('#h1',PAGES[p][0]);set('#lede',PAGES[p][1]);$('#lede').hidden=!PAGES[p][1];
-  $('#livewrap').hidden=true;$('#nowroute').hidden=p!=='overview';$('#h1live').hidden=p!=='overview';$('#pbar').hidden=p==='method';$('#orgbar').hidden=true;
+  $('#livewrap').hidden=true;$('#nowroute').hidden=p!=='network';$('#h1live').hidden=p!=='overview';$('#pbar').hidden=p==='method'||p==='subnet';$('#orgbar').hidden=true;
   if(location.hash!=='#'+p)history[user?'pushState':'replaceState'](null,'','#'+p);UR.hideTip();if(user)$('#h1').focus({preventScroll:true});
   const sec=$(`section[data-tab="${p}"]`);requestAnimationFrame(()=>{sec.querySelectorAll('*').forEach(e=>{if(e._draw)e._draw()});liveFade()})}
 $$('.nav button').forEach(b=>b.addEventListener('click',()=>{show(b.dataset.t,true);scrollTo({top:0})}));
@@ -60,15 +60,33 @@ function netsAdded(P,off=0){const h=P<=3,a=h?UR.Hs.nets:UR.D.nets,n=h?P*24:P,L0=
 // daily users over P days = the average of each day's 24-hour count; for 1D that is the last 24 hours
 const dailyUsers=P=>{if(P>3)return UR.series('users24','mean');const h=UR.Hs.users24,n=h.length;
   const avg=k=>{const a=[];for(let i=0;i<P;i++){const v=h[n-1-(k+i)*24];if(v!=null)a.push(v)}return a.length?a.reduce((x,y)=>x+y,0)/a.length:null};return{total:avg(0),prevTotal:avg(P)}};
+// the latest point of a gauge (the chart's last bucket) and the same point one period earlier
+const latest=(k,agg,P)=>{const h=P<=3,src=h?UR.Hs[k]:UR.D[k],b=h?UR.PERIODS[P].bucket:1,off=h?P*24:P;
+  const red=e=>{if(e<0)return null;const a=src.slice(Math.max(0,e-b+1),e+1).filter(v=>v!=null);return a.length?(agg==='mean'?a.reduce((x,y)=>x+y,0)/a.length:a[a.length-1]):null};
+  let e=src.length-1;while(e>=0&&red(e)==null)e--;return{cur:red(e),prev:red(e-off)}};
+const avgLab=P=>P===1?'24-hour average':P+'-day average';
+// live values: users in the last 24 hours, providers online now (stats feed), data carried in the last 24 hours
+const s24=x=>{const h=UR.Hs.traffic;if(x<23)return null;const a=h.slice(x-23,x+1).filter(v=>v!=null);return a.length?a.reduce((p,q)=>p+q,0):null};
+const NOWV=()=>{const h=UR.Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;return{users:L.users24,prov:L.providers,data:s24(e)}};
+// the point that ends a chart on the card's live value (daily charts; providers always, as its hourly series is an average)
+const nowPt=k=>{const P=UR.P,v=NOWV(),t=Date.now();if(k==='providers')return{t,v:v.prov,lab:'Now, online'};if(P<=3)return null;
+  if(k==='users24')return{t,v:v.users,lab:'Now, last 24 hours'};if(k==='traffic')return{t,v:v.data,lab:'Now, last 24 hours'};return null};
 let picked=null;
 UR.onChange(()=>{
-  const P=UR.P,tr=SER('traffic');
-  set('#o-data',tbF(tr.total));dl($('#o-data-d'),tr.total,tr.prevTotal);
-  html('#o-data-s',`${P>1?`<b>${tbF(tr.total/P)}</b> a day on average<br>`:''}<b>${gbs(tr.total*8e12/(P*86400)/1e9)}</b> on average`);
-  const um=dailyUsers(P);set('#o-users',nf(Math.round(um.total)));dl($('#o-users-d'),um.total,um.prevTotal);
-  html('#o-users-s',P===1?'in the last 24 hours':'average a day');
-  const po=SER('providers');set('#o-prov',nf(Math.round(po.total)));dl($('#o-prov-d'),po.total,po.prevTotal);
-  html('#o-prov-s',`average online<br>highest ${P===1?'hour':P===3?'6-hour block':'day'} <b>${nf(Math.round(Math.max(...po.v.filter(v=>v!=null))))}</b>`);
+  const P=UR.P,tr=SER('traffic'),ago=P===1?'vs a day ago':`vs ${plab()} ago`;
+  // the cards show the live value (the same as the point that ends each chart), against the same value one period earlier
+  const nw=NOWV(),back=(k,hv)=>{if(P<=3){const h=UR.Hs[k];let e=h.length-1;while(e>=0&&h[e]==null)e--;return hv?hv(e-P*24):h[e-P*24]??null}const d=UR.D[k];return d[d.length-P]??null};
+  const unit=P===1?'hour':P===3?'6-hour block':'day';
+  set('#o-data',tbF(nw.data));dl($('#o-data-d'),nw.data,P<=3?back('traffic',s24):back('traffic'),ago);
+  set('#o-data-k','in the last 24 hours');
+  html('#o-data-s',`${P>1?`${P}-day total <b>${tbF(tr.total)}</b><br><b>${tbF(tr.total/P)}</b> a day on average<br>`:''}<b>${gbs(tr.total*8e12/(P*86400)/1e9)}</b> on average`);
+  const um=dailyUsers(P);set('#o-users',nf(nw.users));dl($('#o-users-d'),nw.users,back('users24'),ago);
+  set('#o-users-k','in the last 24 hours');
+  html('#o-users-s',P===1?'':`${avgLab(P)} <b>${nf(Math.round(um.total))}</b>`);
+  const po=SER('providers'),ph=Math.round(Math.max(...po.v.filter(v=>v!=null)));
+  set('#o-prov',nf(nw.prov));dl($('#o-prov-d'),nw.prov,back('providers'),ago);
+  set('#o-prov-k',`online now, in ${L.countries} countries`);
+  html('#o-prov-s',`${avgLab(P)} <b>${nf(Math.round(po.total))}</b>${ph>nw.prov?`<br>highest ${unit} <b>${nf(ph)}</b>`:''}`);
   const na=netsAdded(P);set('#o-nets',cpt(L.nets));html('#o-nets-d',na?`<b class="up">+${nf(Math.round(na.added))}</b>new in the last ${plab()}`:'');
   drawPick();
 });
@@ -94,14 +112,14 @@ const regTot=UR.CONTINENTS.map(([k,n])=>[n,cs.filter(c=>c.ct===k).reduce((a,c)=>
 const regRows=regTot.map(([n,v])=>`<div class="r"><span>${n}</span><b>${(v/UR.PROV*100).toFixed(1)}%</b><span class="tr"><i style="width:${(v/regTot[0][1]*100).toFixed(1)}%"></i></span></div>`).join('');
 html('#c-reg',regRows);
 const uLab=()=>UR.P>3?'Users':'Users, 24 hours to then';
-const mini=(id,k,kind,fmt,name,zero)=>UR.chart($(id),()=>{const s=SER(k);return{t:s.t,series:[{v:s.v,kind,color:kind==='col'?BAR:BAR_HI,name:typeof name==='function'?name():name,fmt}],hiLast:BAR_HI,zero:zero??kind==='col',T,height:70,ml:0,noX:true,yFmt:()=>'',label:name}});
+const mini=(id,k,kind,fmt,name,zero)=>UR.chart($(id),()=>{const s=SER(k);return{t:s.t,series:[{v:s.v,kind,color:kind==='col'?BAR:BAR_HI,name:typeof name==='function'?name():name,fmt}],hiLast:BAR_HI,now:nowPt(k),zero:zero??kind==='col',T,height:70,ml:0,noX:true,yFmt:()=>'',label:name}});
 mini('#o-data-c','traffic','col',tbF,'Carried');
 mini('#o-users-c','users24','area',nf,uLab,false);
 mini('#o-prov-c','providers','area',nf,'Online, average',false);
 mini('#o-nets-c','nets','area',nf,'Networks, all time',false);
 const trafficCfg=h=>{const s=SER('traffic'),daily=UR.P>3;const ser=[{v:s.v,kind:'col',color:BAR,name:'Carried '+UR.unitLab(),fmt:tbF}];
   if(daily){const n=s.v.length,full=UR.D.traffic,Ln=full.length;ser.push({v:s.v.map((_,i)=>{const j=Ln-n+i;const w=full.slice(Math.max(0,j-6),j+1).filter(v=>v!=null);return w.length?w.reduce((a,b)=>a+b,0)/w.length:null}),kind:'line',color:AVG,name:'7-day average',fmt:tbF})}
-  return{t:s.t,series:ser,hiLast:daily?null:BAR_HI,T,height:h,endLabel:daily,unit:'TB',label:'Data carried'}};
+  return{t:s.t,series:ser,hiLast:BAR_HI,now:nowPt('traffic'),T,height:h,endLabel:daily,unit:'TB',label:'Data carried'}};
 const bigTraffic=(el,h)=>UR.chart(el,()=>trafficCfg(h));
 set('#rt-u',nf(L.users24));set('#rt-p',nf(L.providers));set('#rt-c',L.countries);
 new IntersectionObserver(([e])=>{if(e.isIntersecting){const r=$('.route');r.classList.remove('play');void r.offsetWidth;r.classList.add('play')}},{threshold:.5}).observe($('.route'));
@@ -110,8 +128,8 @@ const cumCfg=h=>{const t=UR.D.traffic,f=t.findIndex(v=>v!=null);let c=0;const cu
 {const t=UR.D.traffic,f=t.findIndex(v=>v!=null);let c=0;t.forEach(v=>{if(v!=null)c+=v});
   set('#o-cum',tbF(c));html('#o-cum-s',`since ${fmtD(UR.dayT[f])}`);
   UR.chart($('#o-cum-c'),()=>cumCfg(236))}
-{const area=(k,name,fmt,label,ml)=>()=>{const s=SER(k);return{t:s.t,series:[{v:s.v,kind:'area',color:BAR_HI,name:typeof name==='function'?name():name,fmt}],zero:false,trim:true,T,height:380,endLabel:true,ml:ml||56,label}};
-  const CM={users:['Daily users',plab,area('users24',uLab,nf,'Daily users')],prov:['Providers online',plab,area('providers','Online, average',v=>nf(Math.round(v)),'Providers online')],
+{const area=(k,name,fmt,label,ml,ref)=>()=>{const s=SER(k);return{t:s.t,series:[{v:s.v,kind:'area',color:BAR_HI,name:typeof name==='function'?name():name,fmt}],zero:false,trim:true,T,height:380,endLabel:true,ml:ml||56,label,ref:ref&&ref(),now:nowPt(k)}};
+  const CM={users:['Daily users',plab,area('users24',uLab,nf,'Daily users',undefined,()=>UR.P===1?null:{v:dailyUsers(UR.P).total,label:avgLab(UR.P)})],prov:['Providers online',plab,area('providers','Online, average',v=>nf(Math.round(v)),'Providers online',undefined,()=>({v:SER('providers').total,label:avgLab(UR.P)}))],
     data:['Data carried',plab,()=>trafficCfg(380)],nets:['Total networks',plab,area('nets','Networks, all time',nf,'Total networks',64)],cum:['Total data carried',()=>'All recorded',()=>cumCfg(380)]};
   let cm=null,opener=null;const box=$('#cmodal');
   const named=()=>typeof cm==='string';
@@ -246,6 +264,10 @@ ctRows();set('#v-conc-n',`Top 3 countries hold ${share(3).toFixed(0)}% of provid
 function pxAt(t){if(t===EP.start&&S.EXTRA.prevSettlePx)return S.EXTRA.prevSettlePx;const h=UR.hourT.findIndex(x=>x>=t);if(h>=0&&UR.Hs.price[h]!=null)return UR.Hs.price[h];const d=UR.dayT.findIndex(x=>x<=t&&t<x+UR.DAY);return d>=0&&UR.D.price[d]!=null?UR.D.price[d]:K.usd}
 set('#e-h','Current epoch');
 set('#e-pct',`Epoch ${EP.n}`);html('#e-left',`<b>${Math.round(EP.p*100)}%</b> complete · <b>${EP.leftTxt}</b> left · ends ${when(EP.end)}, block ${nf(S.EPOCH.endBlock)}`);
+// overview: this epoch so far. Operators pay per epoch, so its users and data are what the subnet earns from
+{const E=S.EPOCH,f=(k,v,d)=>`<div><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></div>`;
+  html('#oe-meta',`<b>Epoch ${EP.n}</b> · ${Math.round(EP.p*100)}% complete`);$('#oe-bar').style.width=(EP.p*100).toFixed(1)+'%';
+  html('#oe-figs',f('Users this epoch',nf(E.users),`${nf(E.prevUsers)} in epoch ${EP.n-1}`)+f('Data carried this epoch',tbF(epTB(E.dataGiB)),`${tbF(epTB(E.prevDataGiB))} in epoch ${EP.n-1}`)+f('Time left',EP.leftTxt,'ends '+when(EP.end)))}
 {const W=7*UR.DAY,eps=[];for(let n=Math.max(0,EP.n-4);n<=EP.n+1;n++){const st=n===0?EP.start-(EP.n-1)*W-UR.DAY:EP.start+(n-EP.n)*W;eps.push({n,start:st,state:n<EP.n?'done':n===EP.n?'now':'sch'})}
   html('#e-tl',eps.map(e=>`<div class="${e.state}"${e.state==='now'?` style="--p:${(EP.p*100).toFixed(1)}%"`:''}><span>E${e.n}${e.state==='now'?' · now':e.state==='sch'?' · '+fmtD(e.start):''}</span></div>`).join(''));$('#e-tl').style.gridTemplateColumns=eps.map((e,i)=>e.n===0?'minmax(max-content,1.5fr)':i===eps.length-1?'minmax(max-content,4fr)':'7fr').join(' ')}
 {const H=36e5,DAY=UR.DAY,hr=(a,b)=>UR.hourT.reduce((t,x,i)=>x>a&&x<=b&&UR.Hs.traffic[i]!=null?t+UR.Hs.traffic[i]:t,0),
@@ -270,8 +292,12 @@ if(S.EXTRA.payouts){const X=S.EXTRA,PE=X.payouts.epochs||{},EV=X.epochs||{},ent=
   set('#p-tot',nf(Math.round(paid)));html('#p-usd',`worth <b>$${nf(Math.round(usd))}</b> at settlement`);
   html('#p-pend',pend.length?`<b>${nf(Math.round(pend.reduce((a,[,p])=>a+p.pending,0)))} α</b> pending · ${pend.map(([n,p])=>`epoch ${n}, ${p.note||'pending'}`).join('; ')}`:'')}
 else {const X=S.EXTRA,E=X.epochs?Object.values(X.epochs).filter(e=>e.miner!=null):[],tot=E.length?E.reduce((a,e)=>a+e.miner,0):X.prevMinerAlpha+X.minerAlpha,usd=E.length?E.reduce((a,e)=>a+e.miner*(e.settlePx??pxAt(e.end)),0):X.prevMinerAlpha*pxAt(EP.start);set('#p-tot',nf(Math.round(tot)));html('#p-usd',`worth <b>$${nf(Math.round(usd))}</b> when settled`)}
-UR.onChange(()=>{const r=UR.D.reserve,n=r.length,a=r[n-1],i0=r.findIndex(x=>x!=null),bi=n-1-UR.P,b=bi>=i0&&i0>=0?r[bi]:null;html('#r-d',a==null||i0<0?'':b!=null?`<b class="up">+${nf(Math.round(a-b))} α</b>in the last ${plab()}`:`<b class="up">+${nf(Math.round(a-r[i0]))} α</b>since ${fmtD(UR.dayT[i0])}`)});
-UR.chart($('#r-c'),()=>{const s=UR.P>3?UR.series('reserve','last'):{t:UR.dayT.slice(-7),v:UR.D.reserve.slice(-7)};return{t:s.t,xFmt:UR.P>3?undefined:fmtD,tipX:UR.P>3?undefined:fmtDw,series:[{v:s.v,kind:'area',color:BAR_HI,name:'Balance',fmt:UR.alpha}],trim:true,T,height:390,ml:56,unit:'α',label:'Reserve balance'}});
+// reserve balance: its own period (7D / 30D / All); the reserve is daily and SN25 has no page-wide period
+{let RP=30;const r=UR.D.reserve,n=r.length,i0=r.findIndex(x=>x!=null);
+  const rd=()=>{const a=r[n-1],bi=RP?n-1-RP:-1,b=bi>=i0&&i0>=0?r[bi]:null;html('#r-d',a==null||i0<0?'':b!=null?`<b class="up">+${nf(Math.round(a-b))} α</b>in the last ${RP} days`:`<b class="up">+${nf(Math.round(a-r[i0]))} α</b>since ${fmtD(UR.dayT[i0])}`)};
+  UR.chart($('#r-c'),()=>{const k=RP||n;return{t:UR.dayT.slice(-k),xFmt:fmtD,tipX:fmtDw,series:[{v:r.slice(-k),kind:'area',color:BAR_HI,name:'Balance',fmt:UR.alpha}],trim:true,T,height:390,ml:56,unit:'α',label:'Reserve balance'}});
+  const pick=p=>{RP=p;$$('#r-period button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.p===p));rd();$('#r-c')._draw()};
+  $$('#r-period button').forEach(b=>b.addEventListener('click',()=>pick(+b.dataset.p)));pick(RP)}
 // conviction locks (chain snapshot): the team lock pinned first, the rest by size
 {const C=S.EXTRA.conviction,locks=C.locks.slice().sort((a,b)=>(b.coldkey===C.team)-(a.coldkey===C.team)||b.alpha-a.alpha),cnt=f=>C.locks.filter(f).length,short=a=>a.slice(0,6)+'…'+a.slice(-4);
   set('#cv-tot',nf(Math.round(C.total))+' α');set('#cv-tot-d',`${(C.shareOfOut*100).toFixed(1)}% of alpha outstanding`);

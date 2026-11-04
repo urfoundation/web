@@ -6,7 +6,7 @@
       <button data-t="network"><svg viewBox="0 0 16 16"><path d="M1.5 9.5l3-4 3 5 3-7 4 6"/></svg>Network</button>
       <button data-t="providers"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c1.8 1.8 2.6 3.8 2.6 6.2S9.8 12.4 8 14.2C6.2 12.4 5.4 10.4 5.4 8S6.2 3.6 8 1.8z"/></svg>Providers</button>
       <button data-t="subnet"><svg viewBox="0 0 16 16"><path d="M8 1.6l5.5 3.2v6.4L8 14.4l-5.5-3.2V4.8z"/><path d="M8 8l5.5-3.2M8 8v6.4M8 8L2.5 4.8"/></svg>SN25</button>
-      <button data-t="more"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>More<span class="nl-x"> stats</span></button>
+      <button data-t="more"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg><span>More<span class="nl-x"> stats</span></span></button>
       <div class="sep" role="presentation"></div>
       <button data-t="method"><svg viewBox="0 0 16 16"><path d="M2.5 3h4a1.5 1.5 0 011.5 1.5V14a1.5 1.5 0 00-1.5-1.5h-4zM13.5 3h-4A1.5 1.5 0 008 4.5V14a1.5 1.5 0 011.5-1.5h4z"/></svg>How we count</button>
     </nav>
@@ -14,9 +14,9 @@
   </aside>
 
   <main class="main">
-    <div class="top"><div class="toprow"><h1 id="h1" tabindex="-1"></h1><span class="h1live" id="h1live" hidden><i aria-hidden="true"></i><b id="nr-live">0 GB</b>carried since you opened this page</span></div><p id="lede"></p></div>
+    <div class="top"><div class="toprow"><h1 id="h1" tabindex="-1">UR Stats</h1><span class="h1live" id="h1live" hidden><i aria-hidden="true"></i><b id="nr-live">0 GB</b>carried since you opened this page</span></div><p id="lede"></p></div>
 
-    <div class="livewrap" id="livewrap"><div class="livebar" id="livebar" aria-label="Live values">
+    <div class="livewrap" id="livewrap" hidden><div class="livebar" id="livebar" aria-label="Live values">
       <div class="tag"><i></i>Right now</div>
       <div class="it"><span>Providers online</span><b id="lv-prov"></b></div>
       <div class="it"><span>Users (24 hours)</span><b id="lv-users"></b></div>
@@ -45,7 +45,7 @@
     <div class="pbar" id="pbar">
       <span class="pl">Period</span>
       <div class="seg" role="group" aria-label="Period" id="period">
-        <button data-p="1">1D</button><button data-p="3">3D</button><button data-p="7">7D</button><button data-p="30">30D</button><button data-p="90">90D</button>
+        <button data-p="1">1D</button><button data-p="3">3D</button><button data-p="7" aria-pressed="true">7D</button><button data-p="30">30D</button><button data-p="90">90D</button>
       </div>
       <span class="win" id="win"></span>
       <div class="org" id="orgbar" hidden><span class="pl">Org</span>
@@ -56,13 +56,14 @@
     <!-- ===================== OVERVIEW ===================== -->
     <section data-tab="overview" class="g">
       <div class="pn s3 kpi"><div class="ph"><h2 class="pt">Daily users</h2><div class="tags"><button class="xp" data-cm="users" aria-label="Expand the daily users chart"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg></button></div></div>
-        <div class="big" id="o-users"></div><span class="dl" id="o-users-d"></span><span class="sub" id="o-users-s"></span><div class="mini" id="o-users-c" data-cm="users"></div></div>
+        <div class="cumhead"><div class="big" id="o-users"></div><span class="sub" id="o-users-k"></span></div><span class="dl" id="o-users-d"></span><span class="sub" id="o-users-s"></span><div class="mini" id="o-users-c" data-cm="users"></div></div>
       <div class="pn s3 kpi"><div class="ph"><h2 class="pt">Providers online</h2><div class="tags"><button class="xp" data-cm="prov" aria-label="Expand the providers online chart"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg></button></div></div>
-        <div class="big" id="o-prov"></div><span class="dl" id="o-prov-d"></span><span class="sub" id="o-prov-s"></span><div class="mini" id="o-prov-c" data-cm="prov"></div></div>
+        <div class="cumhead"><div class="big" id="o-prov"></div><span class="sub" id="o-prov-k"></span></div><span class="dl" id="o-prov-d"></span><span class="sub" id="o-prov-s"></span><div class="mini" id="o-prov-c" data-cm="prov"></div></div>
       <div class="pn s3 kpi"><div class="ph"><h2 class="pt">Data carried</h2><div class="tags"><button class="xp" data-cm="data" aria-label="Expand the data carried chart"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg></button></div></div>
-        <div class="big" id="o-data"></div><span class="dl" id="o-data-d"></span><span class="sub" id="o-data-s"></span><div class="mini" id="o-data-c" data-cm="data"></div></div>
+        <div class="cumhead"><div class="big" id="o-data"></div><span class="sub" id="o-data-k"></span></div><span class="dl" id="o-data-d"></span><span class="sub" id="o-data-s"></span><div class="mini" id="o-data-c" data-cm="data"></div></div>
       <div class="pn s3 kpi"><div class="ph"><h2 class="pt">Total networks</h2><div class="tags"><button class="xp" data-cm="nets" aria-label="Expand the total networks chart"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg></button></div></div>
         <div class="cumhead"><div class="big" id="o-nets"></div><span class="sub">all time</span></div><span class="dl" id="o-nets-d"></span><span class="sub">A network is an account. One account can connect several devices.</span><div class="mini" id="o-nets-c" data-cm="nets"></div></div>
+      <div class="pn s12 oe"><div class="ph"><h2 class="pt">This epoch</h2><span class="oe-meta" id="oe-meta"></span></div><div class="oe-bar"><i id="oe-bar" style="width:0"></i></div><div class="oe-figs" id="oe-figs"></div></div>
 
       <div class="pn s8"><div class="ph"><h2 class="pt">Data carried</h2><button class="xp" data-cm="data" aria-label="Expand the data carried chart"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg></button></div><div class="legend" id="o-big-leg" style="margin:-4px 0 8px"></div><div id="o-big" data-cm="data"></div>
         <div style="margin-top:14px"><button class="more" data-go="network">More network stats →</button></div></div>
@@ -155,7 +156,7 @@
         <p class="note" id="cv-n"></p></div>
 
       <div class="hd"><h2>Network Capacity Reserve</h2><p>The reserve funds network capacity. <a href="https://ur.xyz/reserve" style="color:var(--ink)">Details ↗</a></p></div>
-      <div class="pn s8"><div class="ph"><h2 class="pt">Reserve balance</h2></div><span class="dl" id="r-d"></span><div id="r-c" style="margin-top:8px"></div></div>
+      <div class="pn s8"><div class="ph"><h2 class="pt">Reserve balance</h2><div class="tags"><div class="seg" role="group" aria-label="Reserve balance period" id="r-period"><button data-p="7">7D</button><button data-p="30">30D</button><button data-p="0">All</button></div></div></div><span class="dl" id="r-d"></span><div id="r-c" style="margin-top:8px"></div></div>
       <div class="pn s4" style="display:flex;flex-direction:column"><div class="ph"><h2 class="pt">Reserve</h2></div>
         <div class="cumhead"><div class="big" id="r-bal"></div><span class="sub">α</span></div>
         <div class="lk-lab" style="margin-top:18px">Wallet and hotkeys</div>
@@ -185,8 +186,8 @@
     <section data-tab="method" class="g" hidden>
       <div class="pn s12"><div class="ph"><h2 class="pt">Network</h2></div>
         <div class="defs">
-          <div><h3>Data carried</h3><p>Data moved through the network for its users, as counted by the operator's monitoring. Averages in Gb/s spread it evenly over the period.</p></div>
-          <div><h3>Daily users</h3><p>Accounts that moved data in a 24-hour window. A hosted proxy and the clients behind it count as one account. Over a period, the average of each day's count.</p></div>
+          <div><h3>Data carried</h3><p>Data moved through the network for its users, as counted by the operator's monitoring. The big number is the last 24 hours. The period's total and daily average are shown below it. Averages in Gb/s spread it evenly over the period.</p></div>
+          <div><h3>Daily users</h3><p>Accounts that moved data in a 24-hour window. A hosted proxy and the clients behind it count as one account. The big number is the last 24 hours, read when the page opens. The period's average is shown below it and as a dashed line on the chart.</p></div>
           <div><h3>Weekly users</h3><p>Accounts that moved data in a payout week, each counted once however many days it was active.</p></div>
           <div><h3>Networks and sign-ups</h3><p>A network is an account. One account can connect several devices. Sign-ups are networks created in the period.</p></div>
           <div><h3>When traffic flows</h3><p>The period's average day, hour by hour, in local time. The hourly shape comes from throughput and is scaled so the 24 hours add up to an average day of data carried.</p></div>
@@ -195,7 +196,7 @@
         </div></div>
       <div class="pn s12"><div class="ph"><h2 class="pt">Providers</h2></div>
         <div class="defs">
-          <div><h3>Providers online</h3><p>Devices sharing their connection right now. Over a period, the average of the count, with the highest day (or hour) shown beside it.</p></div>
+          <div><h3>Providers online</h3><p>Devices sharing their connection. The big number is the count online now. The period's average and highest point are shown below it, and the average as a dashed line on the chart.</p></div>
           <div><h3>Countries and cities</h3><p>Where providers are, never where users are. Locations are shown by country, and no provider is shown individually.</p></div>
           <div><h3>Change</h3><p>The count now against the count at the start of the period. Where our stats don't reach back that far, no change is shown.</p></div>
         </div></div>

@@ -296,11 +296,13 @@ export async function buildLive({ g = grafana(), history, now = Date.now(), endp
     const ep = (k) => (st[k] == null ? null : st[k] * 1000);
     const alphaBy = Object.fromEntries((reserve?.stakes || []).map((s) => [s.hotkey, s.alpha]));
 
+    // the newest hour Grafana has reported (the last hour or two can still be empty)
+    const lastOf = (k) => { const a = Hs[k]; for (let i = NH - 1; i >= 0; i--) if (a[i] != null) return a[i]; return null; };
     return {
         NOW, END: end, dayT, hourT, D, Hs,
         LIVE: {
-            providers: st.online_providers, throughput: Hs.throughput[NH - 1], conn: Hs.conn[NH - 1], users24: Hs.users24[NH - 1],
-            countries: st.countries, regions: Hs.regions[NH - 1], cities: Hs.cities[NH - 1], nets: st.total_networks, devices: Hs.devices[NH - 1],
+            providers: st.online_providers, throughput: lastOf('throughput'), conn: lastOf('conn'), users24: lastOf('users24'),
+            countries: st.countries, regions: lastOf('regions'), cities: lastOf('cities'), nets: st.total_networks, devices: lastOf('devices'),
         },
         COUNTRY_NOW: cNow?.counts || {}, COUNTRY_NAMES: names,
         COUNTRY_PAST: { 1: c1?.counts || {}, 3: c3?.counts || {}, 7: at(7), 30: at(30), 90: at(90) },

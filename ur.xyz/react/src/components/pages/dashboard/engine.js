@@ -59,7 +59,7 @@ UR.RESERVE={alpha:S.RESERVE.alpha,inflow:S.EMISSION.minerPerDay*S.ROUTING.reserv
 
 /* ---------- period engine ---------- */
 UR.PERIODS={1:{k:'1D',lab:'24 hours',bucket:1},3:{k:'3D',lab:'3 days',bucket:6},7:{k:'7D',lab:'7 days',bucket:24},30:{k:'30D',lab:'30 days',bucket:24},90:{k:'90D',lab:'90 days',bucket:24}};
-UR.P=30; UR.ORG='all'; UR.subs=[];
+UR.P=7; UR.ORG='all'; UR.subs=[];
 UR.onChange=f=>{UR.subs.push(f);f()};
 UR.setP=p=>{UR.P=p;UR.subs.forEach(f=>f())};
 UR.setOrg=o=>{UR.ORG=o;UR.subs.forEach(f=>f())};
@@ -94,21 +94,24 @@ UR.chart=(el,get)=>{
     const o=get();const w=el.clientWidth;if(!w)return;
     const T=o.T,h=o.height||220,SP=h<=90,EL=o.endLabel&&w>=480,m={l:o.ml??52,r:EL?84:12,t:o.endLabel&&!EL?24:14,b:o.noX?6:24};if(w-m.l-m.r<40)return;
     if(o.trim){let f=0;while(f<o.t.length-1&&o.series.every(q=>q.v[f]==null))f++;if(f){o.t=o.t.slice(f);o.series=o.series.map(q=>({...q,v:q.v.slice(f)}))}}
+    if(o.now&&o.now.v!=null){o.t=o.t.concat(o.now.t);o.series=o.series.map((q,k)=>({...q,v:q.v.concat(k===0?o.now.v:null)}))}
     const n=o.t.length,cols=o.series.filter(q=>q.kind==='col'),lines=o.series.filter(q=>q.kind!=='col');
     const stackTop=i=>o.stack?cols.reduce((a,q)=>a+(q.v[i]||0),0):Math.max(0,...cols.map(q=>q.v[i]||0));
     let mx=0,mn=Infinity;for(let i=0;i<n;i++){mx=Math.max(mx,stackTop(i));lines.forEach(q=>{if(q.v[i]!=null){mx=Math.max(mx,q.v[i]);mn=Math.min(mn,q.v[i])}})}
+    const RF=!SP&&o.ref&&o.ref.v!=null&&isFinite(o.ref.v)?o.ref:null;if(RF){mx=Math.max(mx,RF.v);mn=Math.min(mn,RF.v)}
     const zero=o.zero!==false||cols.length;let sc=scaleY(mx||1,zero?0:mn*0.98);if(o.int&&sc.ticks.length>1&&!Number.isInteger(sc.ticks[1]-sc.ticks[0])){const a=Math.floor(zero?0:mn),b=Math.max(Math.ceil(mx),a+2);sc={lo:a,top:b,ticks:[a,Math.round((a+b)/2),b]}}const{lo,top,ticks}=sc;
     const step=ticks.length>1?ticks[1]-ticks[0]:1,u=o.unit?' '+o.unit:'';const dec=x=>{for(let d=0;d<5;d++){const y=x*10**d;if(Math.abs(y-Math.round(y))<1e-6)return d}return 4};const dTick=v=>v===0?'0':top>=1e6?(v/1e6).toFixed(dec(step/1e6))+'M':top>=1e4?(v/1e3).toFixed(dec(step/1e3))+'K':v.toFixed(dec(step));
     const iw=w-m.l-m.r,ih=h-m.t-m.b,bw=iw/n,px=i=>m.l+bw*i+bw/2,py=v=>m.t+ih-((v-lo)/((top-lo)||1))*ih,yF=o.yFmt||(v=>dTick(v)+u),vF=o.vFmt||(v=>(Math.abs(v)>=1e4?nf(v):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2))+u);
     let g='';
     if(!SP)ticks.forEach(t=>{g+=`<line x1="${m.l}" x2="${w-m.r}" y1="${py(t)}" y2="${py(t)}" stroke="${T.grid}"/><text x="${m.l-8}" y="${py(t)+4}" text-anchor="end" fill="${T.text}" font-size="11" font-family="${T.font}">${yF(t)}</text>`});
+    if(RF){const y=py(RF.v),f=(lines[0]&&lines[0].fmt)||vF;g+=`<line x1="${m.l}" x2="${w-m.r}" y1="${y}" y2="${y}" stroke="${T.strong}" stroke-opacity=".55" stroke-dasharray="4 4"/><text x="${m.l+8}" y="${y-7}" fill="${T.strong}" fill-opacity=".8" font-size="11.5" font-family="${T.font}">${RF.label} ${f(RF.v)}</text>`}
     const cw=Math.max(1,Math.min(22,bw<6?bw-1:bw-2));
     for(let i=0;i<n;i++){let base=0;cols.forEach((q,k)=>{const v=q.v[i]||0;if(!o.stack&&k>0)base=0;const y0=py(base+v),y1=py(base);
       const gap=o.stack&&base>0?2:0;g+=`<path d="${colPath(px(i)-cw/2,y0,cw,Math.max(0,y1-y0-gap),Math.min(3,cw/2))}" fill="${o.hiLast&&i===n-1&&!o.stack?o.hiLast:q.color}"/>`;if(o.stack)base+=v})}
     lines.forEach(q=>{const V=q.v.slice(),gp=new Array(n).fill(false);
       for(let i=0;i<n;i++)if(V[i]==null){let a=i-1,b=i;while(b<n&&q.v[b]==null)b++;if(a>=0&&b<n&&q.v[a]!=null){for(let k=i;k<b;k++){V[k]=q.v[a]+(q.v[b]-q.v[a])*(k-a)/(b-a);gp[k]=true}}i=b}
       let d='',dd='',area='',start=-1,pp='';V.forEach((v,i)=>{if(v==null){if(start>=0&&q.kind==='area')area+=`L${px(i-1)},${py(lo)}L${px(start)},${py(lo)}Z`;start=-1;return}
-        const p=`${px(i).toFixed(1)},${py(v).toFixed(1)}`;if(start<0){d+='M'+p;area+='M'+p;start=i}else{if(gp[i]||gp[i-1]){dd+=`M${pp}L${p}`;d+='M'+p}else d+='L'+p;area+='L'+p}pp=p});
+        const p=`${px(i).toFixed(1)},${py(v).toFixed(1)}`;if(start<0){d+='M'+p;area+='M'+p;start=i}else{if(gp[i]||gp[i-1]||(o.now&&q===o.series[0]&&i===n-1)){dd+=`M${pp}L${p}`;d+='M'+p}else d+='L'+p;area+='L'+p}pp=p});
       if(dd)g+=`<path d="${dd}" fill="none" stroke="#5C5C66" stroke-width="1.5" stroke-dasharray="1 4" stroke-linecap="round"/>`;
       if(start>=0&&q.kind==='area')area+=`L${px(n-1)},${py(lo)}L${px(start)},${py(lo)}Z`;
       if(q.kind==='area'){UR._gid=(UR._gid||0)+1;g+=`<defs><linearGradient id="ag${UR._gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${q.color}" stop-opacity="${SP?.12:(q.op??.1)*1.8}"/><stop offset="1" stop-color="${q.color}" stop-opacity="0"/></linearGradient></defs><path d="${area}" fill="url(#ag${UR._gid})"/>`}
@@ -118,7 +121,7 @@ UR.chart=(el,get)=>{
     if(!o.noX){const xf=o.xFmt||UR.xFmt(),xi=iw<260?[0,n-1]:iw>500&&n>8?[0,1,2,3,4].map(k=>Math.round((n-1)*k/4)):[0,Math.floor((n-1)/2),n-1],xl=xi.length-1;xi.forEach((i,k)=>{g+=`<text x="${k===0?m.l:k===xl?w-m.r:px(i)}" y="${h-6}" text-anchor="${k===0?'start':k===xl?'end':'middle'}" fill="${T.text}" font-size="11" font-family="${T.font}">${xf(o.t[i])}</text>`})}
     g+=`<g class="hov"></g><rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
     el.innerHTML=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" tabindex="0" role="img" aria-label="${o.label||''}" style="display:block;outline-offset:4px">${g}</svg>`;
-    const svg=el.firstChild,hov=svg.querySelector('.hov');let cur=-1;const tf=o.tipX||UR.tipFmt();
+    const svg=el.firstChild,hov=svg.querySelector('.hov');let cur=-1;const tf0=o.tipX||UR.tipFmt(),tf=t=>o.now&&t===o.now.t?o.now.lab:tf0(t);
     const at=(i,cx,cy)=>{if(i<0||i>=n){hov.innerHTML='';UR.hideTip();cur=-1;if(o.onHover)o.onHover(null);return}cur=i;const L=lines[0];if(o.onHover)o.onHover(i,o.t[i],o.series);
       hov.innerHTML=`<line x1="${px(i)}" x2="${px(i)}" y1="${m.t}" y2="${m.t+ih}" stroke="${T.cross}"/>`+(L&&L.v[i]!=null?`<circle cx="${px(i)}" cy="${py(L.v[i])}" r="4.5" fill="${L.color}" stroke="${T.surface}" stroke-width="2"/>`:'');
       if(cx==null){const r=svg.getBoundingClientRect();cx=r.left+px(i);cy=r.top+m.t+ih/3}
@@ -205,6 +208,6 @@ UR.flatMap=(cv,o)=>{const TOP=84,BOT=-57;
   cv.addEventListener('pointerleave',UR.hideTip);cv.parentElement._draw=draw;RO.observe(cv.parentElement);draw()};
 
 /* ---------- live counter ---------- */
-UR.BPS=(D.traffic[ND-1]||0)*1e12/86400;   // last full day's data carried, spread per second
+UR.BPS=(()=>{const h=Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;const a=h.slice(Math.max(0,e-23),e+1).filter(v=>v!=null);return a.length===24?a.reduce((x,y)=>x+y,0):(D.traffic[ND-1]||0)})()*1e12/86400;   // the last 24 hours carried (the Data carried card), spread per second; else the last full day
 UR.liveCounter=el=>{const t0=performance.now();const tick=()=>{const b=UR.BPS*(performance.now()-t0)/1000;el.textContent=b>=1e12?(b/1e12).toFixed(3)+' TB':(b/1e9).toFixed(2)+' GB';setTimeout(tick,RM?1000:90)};tick()};
 })();

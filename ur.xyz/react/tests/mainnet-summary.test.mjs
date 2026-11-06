@@ -66,10 +66,10 @@ test('the bands are the data\'s epochs, which agree with the epoch clock', () =>
     assert.equal(parseWhen(byId('demand-deposits-priced').date).start.ms, Date.parse(mainnetEpochs.at(-1).start.time));
     assert.equal(model.startMs, model.bands[0].startMs);
     assert.equal(model.endMs, Date.parse(mainnetEpochs.at(-1).end.time));
-    // each band is one of the list's groups, but epoch 6, which has no milestone
-    // (the list shows its row without a link); and each group after launch is a band
+    // each band is one of the list's groups (epoch 6 has the epoch 5 claims with
+    // the recovered funding); and each group after launch is a band
     const groups = groupByEpoch(events, mainnetEpochs).map((g) => g.id);
-    assert.deepEqual(model.bands.map((b) => b.group).filter((g) => !groups.includes(g)), ['epoch-6']);
+    assert.deepEqual(model.bands.map((b) => b.group).filter((g) => !groups.includes(g)), []);
     for (const group of groups.filter((g) => g !== 'before-launch')) assert.ok(model.bands.some((b) => b.group === group), `${group} is a band`);
 });
 
@@ -154,13 +154,13 @@ test('markers in one lane are far enough apart never to overlap', () => {
 test('the text: what a screen reader reads, the key dates\' days and the legend', () => {
     assert.equal(marker('fp2-modern-provider-gate').label, '7. Modern provider gate turns on, Wed Nov 11 · 00:00 UTC, Scheduled');
     assert.equal(marker('v1-contracts-deployed').label, '1. Version 1 contracts deployed, Thu Oct 8 · 17:59–18:16 UTC, Done');
-    assert.equal(marker('settlement-v2-active').label, '5. Target: settlement v2 active, epoch 4 begins, Fri Oct 30 · ≈18:25 UTC, Planned');
+    assert.equal(marker('settlement-v2-active').label, '5. Settlement v2 active: epoch 4 begins, Fri Oct 30 · ≈18:25 UTC, Done');
     assert.equal(marker('demand-deposits-priced').label, '8. Signed price goes live: demand deposits from epoch 7, Fri Nov 20 · ≈18:25 UTC, Scheduled');
     assert.deepEqual(model.markers.map((m) => m.day), ['Oct 8', 'Oct 9', 'Oct 11', '≈ Oct 17', 'Oct 30', 'Nov 8', 'Nov 11', 'Nov 20']);
     assert.deepEqual(model.markers.map((m) => m.dateTime), model.markers.map((m) => byId(m.id).date.split('/')[0]));
-    const pending = model.spans[0];
-    assert.equal(pending.days, 'Oct 24–30');
-    assert.equal(pending.label, 'Settlement v2 pool registration, pending, Sat Oct 24 · ≈16:40 → Fri Oct 30 · ≈18:24 UTC, Planned');
+    const registration = model.spans[0];
+    assert.equal(registration.days, 'Oct 24–30');
+    assert.equal(registration.label, 'Settlement v2 pool registered, Sat Oct 24 · ≈16:40 → Fri Oct 30 · ≈18:24 UTC, Done');
     assert.deepEqual(model.settlements, [{ settlement: 'v1', label: 'Version 1' }, { settlement: 'v2', label: 'Settlement v2' }]);
     assert.deepEqual(model.looks, [{ look: 'filled', label: 'Done' }, { look: 'outlined', label: 'Scheduled or planned' }]);
     // the model is plain data, for the static page to hand to its island

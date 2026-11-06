@@ -340,9 +340,10 @@
       "date": "2026-11-08T19:30:00Z/2026-11-10T18:25:00Z",
       "status": "planned",
       "title": "Recovered funds scheduled into epoch 5",
-      "detail": "Once the recovery reaches the v2 vault, the governance Safe schedules adding it to epoch 5's payout through the 72-hour timelock. It must be scheduled by about November 10, 18:25 UTC to take effect before epoch 5 closes; otherwise the recovered payout moves to epoch 6.",
+      "detail": "Once the recovery reaches the v2 vault, the governance Safe schedules adding it to epoch 5's payout through the 72-hour timelock. It must be scheduled by about November 10, 18:25 UTC to take effect before epoch 5 closes; otherwise the recovered payout moves to epoch 6. The recovery's record on the v2 settlement contract was scheduled on November 6 and can take effect from November 9, 21:19 UTC.",
       "sources": [
-        { "label": "Scheduled", "kind": "evm_tx", "ref": "" },
+        { "label": "Recovery record scheduled", "kind": "evm_tx", "ref": "0xd6d37a32a7f1d09cb1837f0be5ccebd58fe8baf554e41eaa9a63c052e6de2dd7" },
+        { "label": "Assignment scheduled", "kind": "evm_tx", "ref": "" },
         { "label": "Added to epoch 5", "kind": "evm_tx", "ref": "" }
       ]
     },

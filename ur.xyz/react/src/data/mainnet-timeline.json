@@ -248,10 +248,10 @@
     {
       "id": "v2-pool-registered",
       "date": "2026-10-24T16:40:00Z/2026-10-30T18:24:00Z",
-      "status": "planned",
+      "status": "done",
       "key": true,
-      "title": "Settlement v2 pool registration, pending",
-      "detail": "The governance Safe registers the v2 pool for epoch 4, after the final production checks. This is the activation, and it must finalize before block 9,398,428. At finalized block 9,354,702, on October 24 at 16:40 UTC, the pool was not yet registered.",
+      "title": "Settlement v2 pool registered",
+      "detail": "The governance Safe registered network operator 1's pool in the v2 vault before epoch 4 began, with epoch 4 as its first v2 epoch. This was the activation of settlement v2.",
       "sources": [
         { "label": "Registration through the governance Safe", "kind": "evm_tx", "ref": "" }
       ],
@@ -270,36 +270,57 @@
     {
       "id": "settlement-v2-active",
       "date": "2026-10-30T18:25:00Z",
-      "status": "planned",
+      "status": "done",
       "key": true,
-      "title": "Target: settlement v2 active, epoch 4 begins",
-      "detail": "From block 9,398,428, if the v2 pool registration has finalized by then. If it has not, epoch 4 also stays on version 1, and a new date will be set. Epoch 3 still closes on version 1, with its payout root due by around 22:25 UTC.",
+      "approximate": true,
+      "title": "Settlement v2 active: epoch 4 begins",
+      "detail": "From block 9,398,428, settlement v2 pays epoch 4 and every epoch after it. Epoch 3 closed on version 1 without a payout root; its funding is recovered and paid with epoch 5 (see the notice at the top).",
       "sources": [
-        { "label": "Epoch 4's first block, 9,398,428", "kind": "evm_block", "ref": "" },
-        { "label": "Epoch 3 close", "kind": "evm_tx", "ref": "" },
-        { "label": "Epoch 3 payout root", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 4's first block, 9,398,428", "kind": "evm_block", "ref": "9398428" }
       ]
     },
     {
       "id": "last-v1-claims-epoch-3",
       "date": "2026-11-01T18:25:00Z",
-      "status": "scheduled",
-      "title": "Last version 1 claims (epoch 3), if v2 starts with epoch 4",
-      "detail": "The epoch 3 payout root can finalize from block 9,412,828 at the earliest. The same version 1 limit applies.",
+      "status": "done",
+      "approximate": true,
+      "title": "Epoch 3 finalized without a payout root",
+      "detail": "Epoch 3's payout root was not committed in its window, so it had no version 1 claims. Its 4,132.72 α carried forward with epoch 1's 3,482.26 α, and both are recovered and paid with epoch 5 (see the notice at the top).",
       "sources": [
         { "label": "Epoch 3 finalized", "kind": "evm_tx", "ref": "" }
       ]
     },
     {
-      "id": "first-v2-close-and-commit",
-      "date": "2026-11-06T18:25:00Z/2026-11-06T22:25:00Z",
-      "status": "planned",
-      "title": "First settlement v2 close and commit",
-      "detail": "If settlement v2 starts with epoch 4: epoch 4 ends at block 9,448,828, and the first v2 ledger root is due by block 9,450,028.",
+      "id": "settlement-v2-timelock",
+      "date": "2026-11-06T17:43:12Z",
+      "status": "done",
+      "title": "Settlement v2 changes now wait 72 hours",
+      "detail": "The settlement v2 contract that runs payouts is now owned by a timelock. Any change to it, such as an upgrade, a new auditor set or adding recovered funds to an epoch, is announced on chain and waits 72 hours, and can be cancelled during that time. Payout roots, approvals and claims are unaffected.",
       "sources": [
-        { "label": "First v2 close", "kind": "evm_tx", "ref": "" },
-        { "label": "First v2 ledger root", "kind": "evm_tx", "ref": "" },
-        { "label": "Validator approval", "kind": "evm_tx", "ref": "" }
+        { "label": "Timelock deployed", "kind": "evm_tx", "ref": "0xfa632257a7bc27d394462fd97b77e1b29ac98473f815906ec120b4a6a5029df0" },
+        { "label": "Ownership moved to the timelock", "kind": "evm_tx", "ref": "0x832da70ea60d269ee5a8542c3d42e56378f665f045481aae818e8ea3e4ccebea" },
+        { "label": "Timelock", "kind": "evm_address", "ref": "0x5529dfe070f73A96C14b5aFCf4fb3DdeA6122fAc" }
+      ]
+    },
+    {
+      "id": "first-v2-close-and-commit",
+      "date": "2026-11-06T19:08:24Z",
+      "status": "done",
+      "title": "First settlement v2 close and commit",
+      "detail": "Epoch 4 ended at block 9,448,828. Its v2 ledger root was committed at block 9,449,034 and approved by the validator at block 9,449,041.",
+      "sources": [
+        { "label": "First v2 ledger root", "kind": "evm_tx", "ref": "0x07a977c0d4e9e829dd3b9b9e4d6777bf9f8a0940d7a2d8647fa5d182563fa37d" },
+        { "label": "Validator approval", "kind": "evm_tx", "ref": "0x90118e3836c054531ce75618597b5d020ab059d95e83125056f98993ec05e1b4" }
+      ]
+    },
+    {
+      "id": "epoch-3-recovery-root",
+      "date": "2026-11-06T19:09:48Z",
+      "status": "done",
+      "title": "Recovery root sends the epoch 1 and 3 funding to the v2 vault",
+      "detail": "A single version 1 root pays the whole carry, 3,482.26 α from epoch 1 and 4,132.72 α from epoch 3, to the v2 vault. It can be claimed into the vault after its 48-hour challenge period, from about November 8, 18:25 UTC.",
+      "sources": [
+        { "label": "Recovery root", "kind": "evm_tx", "ref": "0x1731a110aba17ae0827a502896f84ba82b0e2d9e45792e8a380dd3f4f838662a" }
       ]
     },
     {
@@ -308,10 +329,21 @@
       "status": "planned",
       "key": true,
       "title": "First settlement v2 claims, earliest",
-      "detail": "The first v2 root can finalize 14,400 blocks after its commit, from block 9,463,228 to 9,464,428 at the earliest, and claims follow once it has. Open challenges, a late or invalid root, or delayed finalization can push claims later.",
+      "detail": "The first v2 root can finalize at block 9,463,434, 14,400 blocks after its commit, and claims follow once it has. An open challenge or delayed finalization can push claims later.",
       "sources": [
         { "label": "First v2 root finalized", "kind": "evm_tx", "ref": "" },
         { "label": "First v2 claim", "kind": "evm_tx", "ref": "" }
+      ]
+    },
+    {
+      "id": "epoch-3-recovery-scheduled",
+      "date": "2026-11-08T19:30:00Z/2026-11-10T18:25:00Z",
+      "status": "planned",
+      "title": "Recovered funds scheduled into epoch 5",
+      "detail": "Once the recovery reaches the v2 vault, the governance Safe schedules adding it to epoch 5's payout through the 72-hour timelock. It must be scheduled by about November 10, 18:25 UTC to take effect before epoch 5 closes; otherwise the recovered payout moves to epoch 6.",
+      "sources": [
+        { "label": "Scheduled", "kind": "evm_tx", "ref": "" },
+        { "label": "Added to epoch 5", "kind": "evm_tx", "ref": "" }
       ]
     },
     {
@@ -323,6 +355,16 @@
       "title": "Modern provider gate turns on",
       "detail": "Quality and Speed admit only providers verified as modern. The gate turns on automatically at 00:00 UTC, three weeks later than the October 21 first planned.",
       "sources": []
+    },
+    {
+      "id": "epoch-5-claims-with-recovery",
+      "date": "2026-11-15T18:25:00Z/2026-11-15T22:25:00Z",
+      "status": "planned",
+      "title": "Epoch 5 claims, with the recovered epoch 1 and 3 funding",
+      "detail": "Epoch 5 ends at block 9,499,228. Its root pays epoch 3's recovered funding to the providers who did epoch 3's work, in proportion to their usage, and adds epoch 1's to the regular payout. Claims follow its 14,400-block challenge period.",
+      "sources": [
+        { "label": "Epoch 5 ledger root", "kind": "evm_tx", "ref": "" }
+      ]
     },
     {
       "id": "demand-deposits-priced",

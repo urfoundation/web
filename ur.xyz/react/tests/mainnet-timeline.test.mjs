@@ -260,10 +260,10 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
     assert.equal(gate.date, '2026-11-11T00:00:00Z');
     assert.match(text(install), /November 11, 2026/);
     assert.match(text(install), /From 00:00 UTC on November 11\b/);
-    // epoch 3 stays on version 1; settlement v2 targets epoch 4, at about 18:25 on October 30
+    // epoch 3 stayed on version 1; settlement v2 started with epoch 4, at about 18:25 on October 30
     const [, , , epoch3, epoch4] = mainnetEpochs;
     assert.equal(epoch3.settlement, 'v1');
-    assert.match(text(payments), /Epoch 3 is still paid by version 1/);
+    assert.match(text(payments), /Epoch 3's funding is recovered and paid with epoch 5/);
     assert.equal(epoch4.settlement, 'v2');
     assert.equal(epoch4.start.time, '2026-10-30T18:25:00Z');
     assert.match(text(payments), /epoch 4, from about October 30, 18:25 UTC/);
@@ -279,7 +279,7 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
     }
     assert.equal(payments.link, undefined);
     assert.deepEqual(mainnetActions.closing.filter((run) => run.href).map((run) => [run.text, run.href]), [['the apps', '/operators']]);
-    assert.match(mainnetActions.closing.map((run) => run.text).join(''), /^Once settlement v2 is active, the subnet is set up to run itself and scale to millions of miners\. New miners can participate in Bittensor from the apps with zero Bittensor experience\.$/);
+    assert.match(mainnetActions.closing.map((run) => run.text).join(''), /^With settlement v2 active, the subnet is set up to run itself and scale to millions of miners\. New miners can participate in Bittensor from the apps with zero Bittensor experience\.$/);
 });
 
 test('the notice gives the epochs\' dates, and links to its full text in the sn repo', () => {

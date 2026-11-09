@@ -150,9 +150,9 @@ const cumCfg=h=>{const t=UR.D.traffic,f=t.findIndex(v=>v!=null);let c=0;const cu
 UR.onChange(()=>{const daily=UR.P>3,u=UR.unitLab();const leg=`<span><i class="bar" style="background:${BAR}"></i>${u[0].toUpperCase()+u.slice(1)}</span>`+(daily?`<span><i style="background:${AVG}"></i>7-day average</span>`:`<span><i class="bar" style="background:${BAR_HI}"></i>Latest</span>`);html('#o-big-leg',leg);html('#n-leg',leg)});
 UR.globe($('#globe'),{scale:.41,onPick:c=>pick(c),picked:()=>picked});
 {const r=UR.D.reserve,first=r.findIndex(v=>v!=null);
-  set('#s-px','$'+K.usd.toFixed(2));html('#s-px-d',`${UR.signed(K.d24)} in 24 hours · τ${K.tao.toFixed(5)}`);
+  set('#s-px','$'+K.usd.toFixed(2));html('#s-px-d',`τ${K.tao.toFixed(5)}`);
   set('#s-res',UR.alpha(UR.RESERVE.alpha));set('#s-res-d',`+${nf(UR.RESERVE.inflow)} α a day`);
-  set('#s-epu',nf(S.EPOCH.users));set('#s-epu-d',`${nf(S.EPOCH.prevUsers)} last week`)}
+  {const C=S.EXTRA.conviction;if(C)set('#s-lock',nf(Math.round(C.total))+' α')}}
 
 /* ---------- NETWORK ---------- */
 bigTraffic($('#n-data'),300);

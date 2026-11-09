@@ -370,7 +370,23 @@ operators: {
             units: { days: 'Días', hours: 'Horas', minutes: 'Minutos', seconds: 'Segundos' },
             startDate: 'Jueves 29 de octubre · 00:00 UTC',
             startedDate: 'Comenzó el jueves 29 de octubre · 00:00 UTC',
-            imageAlt: 'Dos nodos unidos por rutas a través de una barrera: la competencia de latencia simulada de Apex'
+            imageAlt: 'Dos nodos unidos por rutas a través de una barrera: la competencia de latencia simulada de Apex',
+            results: {
+                progressLabel: 'Progreso de la competencia',
+                progress: '{done} de {total} épocas completadas',
+                title: 'Mejora neta desde el inicio',
+                comparison: 'Ganadora de la época {epoch} frente a la línea base inicial',
+                asOf: 'Datos al {date}',
+                lower: '{value} % menor',
+                higher: '{value} % mayor',
+                metrics: {
+                    p95CompletionS: { name: 'Tiempo p95 de finalización de solicitudes completas', range: 'de {before} s a {after} s' },
+                    medianThroughputMbps: { name: 'Rendimiento mediano de transferencia', range: 'de {before} a {after} Mbps' }
+                },
+                caveat: 'Son resultados de evaluación en el benchmark frente a la línea base inicial, no mejoras del producto desplegado.',
+                ttfb: 'El tiempo hasta el primer byte no mejoró.',
+                link: 'Resultados de la época {epoch} (JSON)'
+            }
         },
         anonymization: {
             title: 'Anonimización',

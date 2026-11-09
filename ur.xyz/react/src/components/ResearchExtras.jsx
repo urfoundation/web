@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ResearchExtras.css';
 import { openResearchArea, researchAreaId } from './research-areas.js';
-import { APEX_COMPETITION, competitionPhase, countdown } from './research-competition.js';
+import { APEX_COMPETITION, competitionPhase, competitionResultsText, countdown, sentenceGap } from './research-competition.js';
 import ResearchLoops, { ResearchLoopsKey } from './ResearchLoops';
 
 /**
@@ -164,12 +164,82 @@ function CompetitionClock({ c, phase, now }) {
     );
 }
 
+// names the progress bar; the card is on the page once
+const PROGRESS_LABEL_ID = 'research-competition-progress-label';
+
+/**
+ * The competition's progress and results, under the card's text: how many of
+ * its epochs are complete, as a bar of one segment per epoch, then the net
+ * change from the starting baseline to the current best (the newest approved
+ * winner) and what those figures are not. They come from APEX_RESULTS
+ * (research-competition.js) and change by edit, not with the clock, so unlike
+ * the band this block is in the sitemap's content fingerprint and in the
+ * parity test's pixels. Figures and the day are in the page's language.
+ *
+ * The bar is a progressbar named by its label, with the count as its value
+ * text; the same count is written beside the label for the eye and hidden
+ * from assistive technology, which reads it from the bar.
+ */
+function CompetitionResults({ copy, lang }) {
+    if (!copy) return null;
+    const r = competitionResultsText(copy, lang);
+    const caveat = r.net ? r.net.caveat : '';
+    return (
+        <div className="research-competition-results">
+            <div className="research-competition-progress">
+                <span className="research-competition-label" id={PROGRESS_LABEL_ID}>{r.progressLabel}</span>
+                <span className="research-competition-progress-count" aria-hidden="true">{r.progress}</span>
+                <div
+                    className="research-competition-progress-bar"
+                    role="progressbar"
+                    aria-labelledby={PROGRESS_LABEL_ID}
+                    aria-valuemin={0}
+                    aria-valuemax={r.total}
+                    aria-valuenow={r.done}
+                    aria-valuetext={r.progress}
+                >
+                    {Array.from({ length: r.total }, (_, i) => (
+                        <span key={i} data-done={i < r.done ? '' : undefined} />
+                    ))}
+                </div>
+            </div>
+            {r.net && (
+                <div className="research-competition-net">
+                    <h3 className="research-competition-label">{r.net.title}</h3>
+                    <p className="research-competition-net-meta">
+                        {keepDot(`${r.net.comparison} · `)}
+                        <time dateTime={r.net.asOfIso}>{r.net.asOf}</time>
+                    </p>
+                    <div className="research-competition-stats">
+                        {r.net.metrics.map((m) => (
+                            <div className="research-competition-stat" key={m.key} data-worse={m.improved ? undefined : ''}>
+                                <b>{m.change}</b>
+                                <span className="research-competition-stat-name">{m.name}</span>
+                                <span className="research-competition-stat-range">{m.range}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+            {(caveat || r.link) && (
+                <p className="research-competition-caveat">
+                    {caveat}
+                    {caveat && r.link ? sentenceGap(caveat) : ''}
+                    {r.link && <a className="research-competition-code" href={r.link.href} {...external}>{r.link.label}</a>}
+                </p>
+            )}
+        </div>
+    );
+}
+
 /**
  * Gold competition card at the top of the research page: the art, the
- * countdown band, the eyebrow, the title, the body and the button. The body
- * carries a link of its own, so the card is not one big link (anchors cannot
- * nest): the art, the title and the button each link to the competition. The
- * title renders once the dictionary has one (research.competition.title).
+ * countdown band, the eyebrow, the title, the body and the button, then the
+ * competition's progress and results (CompetitionResults). The body carries a
+ * link of its own, so the card is not one big link (anchors cannot nest): the
+ * art, the title and the button each link to the competition. The title
+ * renders once the dictionary has one (research.competition.title). `lang` is
+ * the page's language, which the results' figures follow.
  *
  * The band follows the visitor's clock. Until the clock is read the phase is
  * `initialPhase` (the Astro page passes the phase at build time, so the
@@ -177,7 +247,7 @@ function CompetitionClock({ c, phase, now }) {
  * effect on it is the phase at the browser's time, and the band turns from
  * the countdown to live at the start without a reload.
  */
-export function ResearchCompetition({ t, copy, initialPhase }) {
+export function ResearchCompetition({ t, copy, initialPhase, lang = 'en' }) {
     const c = copy || t.research.competition;
     const now = useClock(clockStep);
     const phase = now == null ? (initialPhase || competitionPhase(Date.now())) : competitionPhase(now);
@@ -220,6 +290,7 @@ export function ResearchCompetition({ t, copy, initialPhase }) {
                     ? <a className="research-competition-cta" href={APEX_COMPETITION_URL} {...external}>{c.cta}</a>
                     : <span className="research-competition-cta research-competition-cta--pending" aria-disabled="true">{c.cta}</span>}
             </div>
+            <CompetitionResults copy={c.results} lang={lang} />
         </div>
     );
 }

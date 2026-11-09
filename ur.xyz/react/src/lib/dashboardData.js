@@ -200,14 +200,19 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
         const cur = st.epoch, s0 = st.epoch_start * 1000;
         const bounds = (k) => (k === 0 ? [MAINNET_FROM, s0 - (cur - 1) * EPOCH_MS] : [s0 - (cur - k) * EPOCH_MS, s0 - (cur - k - 1) * EPOCH_MS]);
         const hours = Math.ceil((today - MAINNET_FROM) / H);
-        const [uf, df] = await Promise.all([17, 18].map((pid) => g.post(pid, MAINNET_FROM, today, H, hours).then((fs) => fs.find((f) => f.ref === 'A'))));
+        // each panel has two series: A counts up through the current epoch, B holds the last finished epoch's total
+        // from just after it ends. A resets hours after the boundary (and dips mid-epoch), so its maximum over an
+        // epoch can pick up the epoch before's total; B, read just after the epoch ends, is that epoch's own figure.
+        const [[uf, ub], [df, db]] = await Promise.all([17, 18].map((pid) => g.post(pid, MAINNET_FROM, today, H, hours).then((fs) => ['A', 'B'].map((r) => fs.find((f) => f.ref === r)))));
+        const after = (f, b) => { if (!f) return null; for (let i = 0; i < f.t.length; i++) if (f.t[i] > b && f.t[i] <= b + DAY && f.v[i] != null) return f.v[i]; return null; };
+        const before = (f, a, b) => { let v = null; if (f) f.t.forEach((t, i) => { if (t > a && t <= b && f.v[i] != null) v = f.v[i]; }); return v; };
         const kept = h.epochs || {};
         h.epochs = {};
         for (let k = 0; k < cur; k++) {
             const [a, b] = bounds(k);
             let users = null, deposits = null, tb = 0, covered = 0;
-            if (uf) uf.t.forEach((t, i) => { if (t > a && t <= b && uf.v[i] != null) users = Math.max(users ?? 0, uf.v[i]); });
-            if (df) df.t.forEach((t, i) => { if (t > a && t <= b && df.v[i] != null) deposits = Math.max(deposits ?? 0, df.v[i]); });
+            users = after(ub, b) ?? before(uf, a, b);
+            deposits = after(db, b) ?? before(df, a, b);
             for (let d = day(a); d < b; d += DAY) {
                 const v = h.days[iso(d)]?.traffic, o = Math.min(b, d + DAY) - Math.max(a, d);
                 if (o > 0 && v != null) { tb += (v * o) / DAY; covered += o; }

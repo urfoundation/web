@@ -165,7 +165,7 @@ UR.onChange(()=>{const s=SER('traffic'),P=UR.P,tf=UR.tipFmt();
   set('#n-k3-t','Busiest '+bl);const gb=v=>v<1?Math.round(v*1000)+' GB':tbF(v);set('#n-k3',gb(s.v[bi]));html('#n-k3-s',`${P<=3?UR.tipFmt()(s.t[bi]):fmtDw(s.t[bi])}<br><span class="vs">vs ${P===1?gb(s.total/24)+' in an average hour':P===3?gb(s.total/12)+' in an average 6 hours':gb(s.total/P)+' average this period'}</span>`);
   const na=netsAdded(P),np=netsAdded(P,1);html('#n-new',na?`${nf(Math.round(na.added/P))} <small>a day</small>`:'—');dl($('#n-new-d'),na&&na.added,np&&np.added);
   set('#n-tot2',nf(L.nets))});
-const wkLab=`Last week, ${fmtD(EP.start-7*UR.DAY)} – ${fmtD(EP.start)}`;
+const wkLab=`Epoch ${EP.n-1}, ${fmtD(EP.start-7*UR.DAY)} – ${fmtD(EP.start)}`;
 // when traffic flows: the period's average day, hour by hour, in the viewer's time.
 // The hourly shape comes from throughput (hourly for 90 days); it's scaled so the 24 hours add up to the period's average day of data carried.
 {const TP=S.TPH,hl=h=>String(h).padStart(2,'0')+':00';
@@ -190,7 +190,7 @@ UR.chart($('#n-tp'),()=>{const s=SER('throughput');return{t:s.t,series:[{v:s.v,k
     el.querySelectorAll('path[data-h]').forEach(p=>{const sh=e=>{const i=+p.dataset.h;UR.showTip(`<span class="k">${hl(i)} to ${hl((i+1)%24)}</span>${UR.tipRow('Approx.',Math.round(v[i])+' GB an hour')}`,e.clientX,e.clientY)};p.addEventListener('pointermove',sh);p.addEventListener('pointerdown',sh);p.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')UR.hideTip()})})};
   el._draw=draw;new ResizeObserver(draw).observe(el);UR.onChange(draw)}
 // Users (proposed): four figures across, the daily chart underneath
-UR.onChange(()=>{const q=UR.P===1?7:UR.P,um=dailyUsers(q);html('#n-u2',`<div class="fig"><span class="k">Last 24 hours</span><span class="v">${nf(L.users24)}</span></div><div class="fig"><span class="k">This week so far</span><span class="v">${nf(S.EPOCH.users)}</span></div><div class="fig"><span class="k">${wkLab}</span><span class="v">${nf(S.EPOCH.prevUsers)}</span></div>`)});
+UR.onChange(()=>{const q=UR.P===1?7:UR.P,um=dailyUsers(q);html('#n-u2',`<div class="fig"><span class="k">Last 24 hours</span><span class="v">${nf(L.users24)}</span></div><div class="fig"><span class="k">This epoch</span><span class="v">${nf(S.EPOCH.users)}</span></div><div class="fig"><span class="k">${wkLab}</span><span class="v">${nf(S.EPOCH.prevUsers)}</span></div>`)});
 UR.chart($('#n-dau2'),()=>{const s=SER('users24');return{t:s.t,series:[{v:s.v,kind:'area',color:BAR_HI,name:uLab(),fmt:nf}],T,height:220,trim:true,label:'Daily users'}});
 // Growth (proposed): networks added in the period, growth since its start, and how often a new one arrives
 const kM=v=>v>=1e6?(v/1e6).toFixed(2)+'M':Math.round(v/1e3)+'K',kMp=(a,b)=>kM(a)===kM(b)?[nf(Math.round(a)),nf(Math.round(b))]:[kM(a),kM(b)];

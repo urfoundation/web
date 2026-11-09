@@ -260,8 +260,6 @@ function ctRows(){const tot=UR.CONTINENTS.map(([k,n])=>[k,n,cs.filter(c=>c.ct===
 ctRows();set('#v-conc-n',`Top 3 countries hold ${share(3).toFixed(0)}% of providers online.`);
 
 /* ---------- SN25 ---------- */
-// alpha price (USD) at a moment: the hourly series where it reaches, else that day's
-function pxAt(t){if(t===EP.start&&S.EXTRA.prevSettlePx)return S.EXTRA.prevSettlePx;const h=UR.hourT.findIndex(x=>x>=t);if(h>=0&&UR.Hs.price[h]!=null)return UR.Hs.price[h];const d=UR.dayT.findIndex(x=>x<=t&&t<x+UR.DAY);return d>=0&&UR.D.price[d]!=null?UR.D.price[d]:K.usd}
 set('#e-h','Current epoch');
 set('#e-pct',`Epoch ${EP.n}`);html('#e-left',`<b>${Math.round(EP.p*100)}%</b> complete · <b>${EP.leftTxt}</b> left · ends ${when(EP.end)}, block ${nf(S.EPOCH.endBlock)}`);
 // overview: this epoch so far. Operators pay per epoch, so its users and data are what the subnet earns from
@@ -270,28 +268,29 @@ set('#e-pct',`Epoch ${EP.n}`);html('#e-left',`<b>${Math.round(EP.p*100)}%</b> co
   html('#oe-figs',f('Users this epoch',nf(E.users),`${nf(E.prevUsers)} in epoch ${EP.n-1}`)+f('Data carried this epoch',tbF(epTB(E.dataGiB)),`${tbF(epTB(E.prevDataGiB))} in epoch ${EP.n-1}`)+f('Time left',EP.leftTxt,'ends '+when(EP.end)))}
 {const W=7*UR.DAY,eps=[];for(let n=Math.max(0,EP.n-4);n<=EP.n+1;n++){const st=n===0?EP.start-(EP.n-1)*W-UR.DAY:EP.start+(n-EP.n)*W;eps.push({n,start:st,state:n<EP.n?'done':n===EP.n?'now':'sch'})}
   html('#e-tl',eps.map(e=>`<div class="${e.state}"${e.state==='now'?` style="--p:${(EP.p*100).toFixed(1)}%"`:''}><span>E${e.n}${e.state==='now'?' · now':e.state==='sch'?' · '+fmtD(e.start):''}</span></div>`).join(''));$('#e-tl').style.gridTemplateColumns=eps.map((e,i)=>e.n===0?'minmax(max-content,1.5fr)':i===eps.length-1?'minmax(max-content,4fr)':'7fr').join(' ')}
+const earnedIn=n=>{const X=S.EXTRA,p=((X.payouts&&X.payouts.epochs)||{})[n]||{},e=(X.epochs||{})[n];if(p.testing)return null;if(p.earned!=null)return p.earned;if(e&&e.miner!=null)return e.miner;return n===EP.n-1&&X.prevMinerAlpha?X.prevMinerAlpha:null};
 {const H=36e5,DAY=UR.DAY,hr=(a,b)=>UR.hourT.reduce((t,x,i)=>x>a&&x<=b&&UR.Hs.traffic[i]!=null?t+UR.Hs.traffic[i]:t,0),
     dy=(a,b)=>UR.dayT.reduce((t,x,i)=>{const s0=x,e0=x+DAY,o=Math.max(0,Math.min(b,e0)-Math.max(a,s0));return UR.D.traffic[i]!=null&&o>0?t+UR.D.traffic[i]*o/DAY:t},0);
   const curTB=epTB(S.EPOCH.dataGiB),prevTB=epTB(S.EPOCH.prevDataGiB);
   const X=S.EXTRA,PEND=X.payouts&&X.payouts.pending,
     PE=(X.payouts&&X.payouts.epochs)||{},
-    earn=r=>{const p=PE[r.n]||{};if(p.testing)return'<span class="muted">—</span>';if(p.paid!=null)return`${nf(Math.round(p.paid))} α <span class="muted">· $${nf(Math.round(p.paid*(r.settlePx??pxAt(r.b))))}</span>`;if(p.pending!=null)return`${nf(Math.round(p.pending))} α <span class="muted">· ${p.note||'pending'}</span>`;return X.payouts?'<span class="muted">—</span>':r.miner!=null?`${nf(Math.round(r.miner))} α <span class="muted">· $${nf(Math.round(r.miner*(r.settlePx??pxAt(r.b))))}</span>`:'<span class="muted">—</span>'},
+    earn=r=>{const p=PE[r.n]||{},a=earnedIn(r.n);if(a==null)return'<span class="muted">—</span>';return`${nf(Math.round(a))} α <span class="muted">· ${p.paid!=null?'paid':'payout pending'}</span>`},
     rows=[{n:EP.n,a:EP.start,b:null,tb:curTB,users:S.EPOCH.users,dep:X.depositAlpha,cur:true}].concat(X.epochs
       ?Object.entries(X.epochs).map(([n,e])=>({n:+n,a:e.start,b:e.end,tb:e.dataGiB!=null?epTB(e.dataGiB):null,users:e.users,dep:e.deposits??null,miner:e.miner,settlePx:e.settlePx})).sort((p,q)=>q.n-p.n)
       :[{n:EP.n-1,a:EP.start-7*DAY,b:EP.start,tb:prevTB,users:S.EPOCH.prevUsers,dep:X.prevDepositAlpha,miner:X.prevMinerAlpha}]),
     dash='<span class="muted">—</span>',
-    row=r=>`<tr class="${r.n<EP.n-2?'ep-old':''}${(PE[r.n]||{}).testing?' ep-test':''}"${(PE[r.n]||{}).testing?' title="Testing epoch: providers were still paid in USDC"':''}><td class="l">${r.n}</td><td class="l">${fmtD(r.a)} – ${r.cur?'now':fmtD(r.b)}</td><td>${r.tb!=null?tbF(r.tb):dash}</td><td>${r.users!=null?nf(r.users):dash}</td><td>${r.cur?'<span class="muted">at settlement</span>':earn(r)}</td></tr>`,
+    row=r=>`<tr class="${r.n<EP.n-2?'ep-old':''}${(PE[r.n]||{}).testing?' ep-test':''}"${(PE[r.n]||{}).testing?' title="Testing epoch: providers were still paid in USDC"':''}><td class="l">${r.n}</td><td class="l">${fmtD(r.a)} – ${r.cur?'now':fmtD(r.b)}</td><td>${r.tb!=null?tbF(r.tb):dash}</td><td>${r.users!=null?nf(r.users):dash}</td><td>${r.cur?(X.minerAlpha?`${nf(Math.round(X.minerAlpha))} α <span class="muted">· in progress</span>`:'<span class="muted">at settlement</span>'):earn(r)}</td></tr>`,
     old=rows.filter(r=>r.n<EP.n-2);
   html('#e-tbl',`<thead><tr><th class="l">Epoch</th><th class="l">Dates</th><th>Data carried</th><th>Users</th><th>Earned by providers</th></tr></thead><tbody>${rows.map(row).join('')}</tbody>`);
   if(old.length&&!$('#e-more')){const lo=Math.min(...old.map(r=>r.n)),hi=Math.max(...old.map(r=>r.n)),lab=lo===hi?`epoch ${lo}`:`epochs ${lo}–${hi}`;
     $('#e-tbl').closest('.tw').insertAdjacentHTML('afterend',`<button class="more" id="e-more" aria-expanded="false" aria-controls="e-tbl">Show ${lab}</button>`);
     $('#e-more').addEventListener('click',e=>{const on=$('#e-tbl').classList.toggle('show-old');e.currentTarget.setAttribute('aria-expanded',on);e.currentTarget.textContent=(on?'Hide ':'Show ')+lab})}}
-if(S.EXTRA.payouts){const X=S.EXTRA,PE=X.payouts.epochs||{},EV=X.epochs||{},ent=Object.entries(PE),
-    paid=ent.reduce((a,[,p])=>a+(p.paid||0),0),usd=ent.reduce((a,[n,p])=>a+(p.paid||0)*((EV[n]||{}).settlePx??pxAt((EV[n]||{}).end??EP.start)),0),
-    pend=ent.filter(([,p])=>p.pending!=null);
-  set('#p-tot',nf(Math.round(paid)));html('#p-usd',`worth <b>$${nf(Math.round(usd))}</b> at settlement`);
-  html('#p-pend',pend.length?`<b>${nf(Math.round(pend.reduce((a,[,p])=>a+p.pending,0)))} α</b> pending · ${pend.map(([n,p])=>`epoch ${n}, ${p.note||'pending'}`).join('; ')}`:'')}
-else {const X=S.EXTRA,E=X.epochs?Object.values(X.epochs).filter(e=>e.miner!=null):[],tot=E.length?E.reduce((a,e)=>a+e.miner,0):X.prevMinerAlpha+X.minerAlpha,usd=E.length?E.reduce((a,e)=>a+e.miner*(e.settlePx??pxAt(e.end)),0):X.prevMinerAlpha*pxAt(EP.start);set('#p-tot',nf(Math.round(tot)));html('#p-usd',`worth <b>$${nf(Math.round(usd))}</b> when settled`)}
+// earned by providers, all time: finished epochs (testing aside) plus the current epoch's, in progress; pending until confirmed paid
+{const X=S.EXTRA,PE=(X.payouts&&X.payouts.epochs)||{},EV=X.epochs||{},ns=[...new Set([...Object.keys(EV),...Object.keys(PE),EP.n-1].map(Number))].filter(n=>n>=0&&n<EP.n),
+    got=ns.map(n=>[n,earnedIn(n)]).filter(([,a])=>a!=null),tot=got.reduce((s,[,a])=>s+a,0),
+    paid=got.reduce((s,[n])=>s+(PE[n]&&PE[n].paid!=null?PE[n].paid:0),0),pend=tot-paid;
+  const cur=X.minerAlpha||0;set('#p-tot',nf(Math.round(tot)+Math.round(cur)));
+  html('#p-pend',`${paid?`<b>${nf(Math.round(paid))} α</b> paid · `:''}${pend>0?`<b>${nf(Math.round(pend))} α</b> payout pending · `:''}<a href="/mainnet">Payout schedule →</a>`+(cur?`<br><b>${nf(Math.round(cur))} α</b> · epoch ${EP.n} in progress`:''))}
 // reserve balance: its own period (7D / 30D / All); the reserve is daily and SN25 has no page-wide period
 {let RP=30;const r=UR.D.reserve,n=r.length,i0=r.findIndex(x=>x!=null);
   const rd=()=>{const a=r[n-1],bi=RP?n-1-RP:-1,b=bi>=i0&&i0>=0?r[bi]:null;html('#r-d',a==null||i0<0?'':b!=null?`<b class="up">+${nf(Math.round(a-b))} α</b>in the last ${RP} days`:`<b class="up">+${nf(Math.round(a-r[i0]))} α</b>since ${fmtD(UR.dayT[i0])}`)};

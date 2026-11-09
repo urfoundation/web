@@ -34,18 +34,21 @@ const RESERVE_FROM = Date.UTC(2026, 9, 10); // the reserve wallet's first balanc
 const MAINNET_FROM = Date.UTC(2026, 9, 8); // SN25 mainnet, epoch 0 (8 Oct 2026)
 
 /**
- * Provider payouts by epoch, set by hand until a feed reports them (2026-11-02):
+ * Provider payouts by epoch (updated 2026-11-09). What providers earned in an epoch comes from the
+ * stats feed (prev_miner_emissions_alpha, kept per epoch in the history); this table only holds what
+ * the feed can't say:
  *   testing  epochs 0 and 1 were testing; providers were still paid in USDC (Lemz)
- *   pending  α owed and when it pays: epoch 3's 4,132.72 α is paid with epoch 4 (Brien, 1 Nov 2026;
- *            the 31 Oct notice on ur.xyz/mainnet says epoch 5)
- *   paid     α paid out; the page values it at the α price when the epoch settled
- * No payout has been made yet. Update this as epochs are paid.
+ *   earned   α earned, where the feed's figure isn't kept: epoch 3's 4,132.72 α, which closed on
+ *            version 1 without a payout root and is recovered and paid with epoch 5 (ur.xyz/mainnet, 6 Nov)
+ *   paid     set once an epoch's payout is confirmed paid; until then the page shows it as pending
+ *            (claims can be delayed or paused, so nothing is marked paid from the schedule alone)
+ * No payout has been confirmed yet. The schedule lives on ur.xyz/mainnet.
  */
 export const PAYOUTS = {
     epochs: {
         0: { testing: true },
         1: { testing: true },
-        3: { pending: 4132.72, note: 'paid with epoch 4' },
+        3: { earned: 4132.72 },
     },
 };
 
@@ -198,6 +201,7 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
         const bounds = (k) => (k === 0 ? [MAINNET_FROM, s0 - (cur - 1) * EPOCH_MS] : [s0 - (cur - k) * EPOCH_MS, s0 - (cur - k - 1) * EPOCH_MS]);
         const hours = Math.ceil((today - MAINNET_FROM) / H);
         const [uf, df] = await Promise.all([17, 18].map((pid) => g.post(pid, MAINNET_FROM, today, H, hours).then((fs) => fs.find((f) => f.ref === 'A'))));
+        const kept = h.epochs || {};
         h.epochs = {};
         for (let k = 0; k < cur; k++) {
             const [a, b] = bounds(k);
@@ -208,11 +212,12 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
                 const v = h.days[iso(d)]?.traffic, o = Math.min(b, d + DAY) - Math.max(a, d);
                 if (o > 0 && v != null) { tb += (v * o) / DAY; covered += o; }
             }
-            h.epochs[k] = { start: a, end: b, users, deposits, dataGiB: covered >= (b - a) * 0.9 ? (tb * 1e12) / 2 ** 30 : null, settlePx: h.settlePx[b] ?? null };
+            h.epochs[k] = { start: a, end: b, users, deposits, dataGiB: covered >= (b - a) * 0.9 ? (tb * 1e12) / 2 ** 30 : null, settlePx: h.settlePx[b] ?? null, miner: kept[k]?.miner ?? null };
         }
         const last = h.epochs[cur - 1];
         if (st.prev_users != null) last.users = st.prev_users;
         if (st.prev_data_gib != null) last.dataGiB = st.prev_data_gib;
+        if (st.prev_miner_emissions_alpha != null) last.miner = st.prev_miner_emissions_alpha;
         if (st.prev_demand_deposits_alpha != null) last.deposits = st.prev_demand_deposits_alpha;
     }
     // the reserve's balance at the end of each day, from the archive node

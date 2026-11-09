@@ -535,7 +535,7 @@ section[data-tab="method"]:not([hidden])~.foot .hwc{display:none!important}
 #e-tbl tr.ep-old{display:none}#e-tbl.show-old tr.ep-old{display:table-row}
 #e-more{margin-top:12px}
 #p-tot.pend{font-size:clamp(34px,3.4vw,46px);letter-spacing:-.02em}
-#p-usd a{color:var(--ink);text-underline-offset:3px}
+#p-pend a{color:var(--ink);text-underline-offset:3px}
 #p-pend:empty{display:none}#p-pend{margin-top:10px;padding-top:12px;border-top:1px solid var(--line)}#p-pend b{color:var(--ink);font-weight:500}
 /* ---------- Overview: this epoch (2026-11-04) ---------- */
 .oe .ph{display:flex;align-items:baseline;justify-content:space-between;gap:8px 16px;flex-wrap:wrap}

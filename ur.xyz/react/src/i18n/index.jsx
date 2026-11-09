@@ -63,15 +63,9 @@ export function pathForLang(code) {
     return code === DEFAULT_LANG ? '/' : `/${code}`;
 }
 
-/**
- * The locale to hand Intl for a page language — numbers and dates follow
- * the page, never the browser. Arabic keeps Western digits: its copy writes
- * figures that way (10–20%, 200, N≥2) and the block number and countdown sit
- * in the same lines.
- */
-export function intlLocale(code) {
-    return code === 'ar' ? 'ar-u-nu-latn' : (LANGS[code] ? code : DEFAULT_LANG);
-}
+// The locale to hand Intl for a page language (locale.js, which has no
+// dictionaries, so the islands that take their strings as props can use it).
+export { intlLocale } from './locale.js';
 
 /**
  * Parse the leading /xx out of `pathname`. Returns the language code if

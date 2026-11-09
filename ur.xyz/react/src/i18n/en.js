@@ -402,7 +402,29 @@ operators: {
             units: { days: 'Days', hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds' },
             startDate: 'Thursday, October 29 · 00:00 UTC',
             startedDate: 'Started Thursday, October 29 · 00:00 UTC',
-            imageAlt: 'Two nodes joined by routes through a barrier: the Apex sim-latency competition'
+            imageAlt: 'Two nodes joined by routes through a barrier: the Apex sim-latency competition',
+            // the progress and results under the text, from APEX_RESULTS in
+            // research-competition.js: {done} and {total} count epochs; {epoch}
+            // is an epoch's number, {date} the day of the figures, {value} a
+            // change in percent and {before} and {after} a figure's values, all
+            // written in the page's language. lower or higher words a change by
+            // its sign; ttfb follows caveat while time to first byte is no better
+            results: {
+                progressLabel: 'Competition progress',
+                progress: '{done} of {total} epochs complete',
+                title: 'Net improvement since the start',
+                comparison: 'Epoch {epoch} winner against the starting baseline',
+                asOf: 'As of {date}',
+                lower: '{value}% lower',
+                higher: '{value}% higher',
+                metrics: {
+                    p95CompletionS: { name: 'p95 full-request completion time', range: '{before} s to {after} s' },
+                    medianThroughputMbps: { name: 'Median transfer throughput', range: '{before} to {after} Mbps' }
+                },
+                caveat: 'These are benchmark evaluation results against the starting baseline, not deployed product gains.',
+                ttfb: 'Time to first byte did not improve.',
+                link: 'Epoch {epoch} results (JSON)'
+            }
         },
         anonymization: {
             title: 'Anonymization',

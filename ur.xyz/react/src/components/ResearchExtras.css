@@ -422,6 +422,178 @@
     }
 }
 
+/* --- The progress and results under the card's text (CompetitionResults):
+       the epochs complete as one segment each, then the net change from the
+       starting baseline to the current best, set as the research pages' key
+       figures (.rm-facts, .rr-kpi) in the card's gold, and what the figures
+       are not. They change by edit, not with the clock, so nothing here
+       moves: no animation, nothing for reduced motion to stop. The card
+       draws its own dark ground, so the colours hold whatever the system's
+       theme; in forced colours the segments take system colours. Sides are
+       logical, so the bar fills from the right on the Arabic page. --- */
+.research-competition-results {
+    padding: 22px 28px 26px;
+    border-top: 1px solid rgba(240, 195, 80, 0.25);
+}
+
+/* the card's eyebrow face, for the bar's label and the results' heading */
+.research-competition-label {
+    display: block;
+    margin: 0;
+    color: #F0C350;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* the label and the count share a line while they fit; on a narrow screen
+   the count goes under the label rather than breaking it */
+.research-competition-progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+}
+
+.research-competition-progress-count {
+    color: var(--brand-white);
+    font-size: 0.85rem;
+    line-height: 1.35;
+}
+
+.research-competition-progress-bar {
+    display: flex;
+    flex: 1 0 100%;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.research-competition-progress-bar > span {
+    flex: 1 1 0;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(240, 195, 80, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(240, 195, 80, 0.45);
+}
+
+.research-competition-progress-bar > [data-done] {
+    background: linear-gradient(90deg, #F5D06C, #D89B2E);
+    box-shadow: 0 0 14px rgba(240, 195, 80, 0.4);
+}
+
+.research-competition-net {
+    margin-top: 26px;
+}
+
+.section-body .research-competition-net-meta {
+    margin: 6px 0 0;
+    color: rgba(248, 248, 248, 0.72);
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+/* the day, and the results link, each break onto a line whole */
+.research-competition-net-meta time,
+.research-competition-caveat a {
+    white-space: nowrap;
+}
+
+.research-competition-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 14px;
+    border-block: 1px solid rgba(240, 195, 80, 0.2);
+}
+
+.research-competition-stat {
+    min-width: 0;
+    padding: 16px 16px 16px 18px;
+    border-inline-start: 1px solid rgba(240, 195, 80, 0.2);
+}
+
+.research-competition-stat:first-child {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+}
+
+.research-competition-stat b {
+    display: block;
+    color: #F5D06C;
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.05;
+    white-space: nowrap;
+}
+
+/* a figure worse than the baseline is not lit gold */
+.research-competition-stat[data-worse] b {
+    color: var(--brand-white);
+}
+
+.research-competition-stat-name {
+    display: block;
+    margin-top: 8px;
+    color: var(--brand-white);
+    font-size: 0.85rem;
+    line-height: 1.42;
+}
+
+.research-competition-stat-range {
+    display: block;
+    margin-top: 2px;
+    color: rgba(248, 248, 248, 0.72);
+    font-size: 0.8rem;
+    line-height: 1.42;
+}
+
+.section-body .research-competition-caveat {
+    margin: 14px 0 0;
+    color: rgba(248, 248, 248, 0.72);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    max-width: 690px;
+    text-wrap: pretty;
+}
+
+/* letter spacing would pull the Arabic letters apart */
+.research-competition-results:lang(ar) .research-competition-label {
+    letter-spacing: 0;
+}
+
+@media (max-width: 640px) {
+    .research-competition-results {
+        padding: 20px;
+    }
+
+    .research-competition-stats {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .research-competition-stat,
+    .research-competition-stat:first-child {
+        padding: 14px 0;
+        border-inline-start: 0;
+    }
+
+    .research-competition-stat + .research-competition-stat {
+        border-top: 1px solid rgba(240, 195, 80, 0.2);
+    }
+}
+
+@media (forced-colors: active) {
+    .research-competition-progress-bar > span {
+        border: 1px solid CanvasText;
+    }
+
+    .research-competition-progress-bar > [data-done] {
+        forced-color-adjust: none;
+        background: Highlight;
+    }
+}
+
 /* --- Algorithm areas: a native <details> per area, drawn as the site's
        cards (Section.css .card) in one column so an open area has the
        reading measure. Sides are logical: the Arabic page runs right to left

@@ -61,7 +61,7 @@ const jsonLd = section === 'research'
                 {/* hydrated for its countdown, which runs on the visitor's clock; the
                     server render (and the first client render) show the build's phase
                     and no numbers */}
-                {section === 'research' && <ResearchCompetition client:load copy={t.research.competition} initialPhase={competitionPhase(Date.now())} />}
+                {section === 'research' && <ResearchCompetition client:load copy={t.research.competition} lang={lang} initialPhase={competitionPhase(Date.now())} />}
                 {section === 'miners' && <MinerGlobeIntro client:load alt={sectionData.globeAlt} labels={sectionData.globeLabels} />}
                 <p>{sectionData.intro}</p>
                 {section === 'research' && <ResearchReportCard t={t} />}

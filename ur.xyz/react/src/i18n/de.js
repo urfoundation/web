@@ -370,7 +370,23 @@ operators: {
             units: { days: 'Tage', hours: 'Stunden', minutes: 'Minuten', seconds: 'Sekunden' },
             startDate: 'Donnerstag, 29. Oktober · 00:00 Uhr UTC',
             startedDate: 'Gestartet am Donnerstag, 29. Oktober · 00:00 Uhr UTC',
-            imageAlt: 'Zwei Knoten, verbunden über Routen durch eine Barriere: der Apex-Sim-Latenz-Wettbewerb'
+            imageAlt: 'Zwei Knoten, verbunden über Routen durch eine Barriere: der Apex-Sim-Latenz-Wettbewerb',
+            results: {
+                progressLabel: 'Fortschritt des Wettbewerbs',
+                progress: '{done} von {total} Epochen abgeschlossen',
+                title: 'Nettoverbesserung seit dem Start',
+                comparison: 'Gewinner der Epoche {epoch} gegenüber der Start-Baseline',
+                asOf: 'Stand: {date}',
+                lower: '{value} % niedriger',
+                higher: '{value} % höher',
+                metrics: {
+                    p95CompletionS: { name: 'p95-Abschlusszeit vollständiger Anfragen', range: 'von {before} s auf {after} s' },
+                    medianThroughputMbps: { name: 'Median des Übertragungsdurchsatzes', range: 'von {before} auf {after} Mbit/s' }
+                },
+                caveat: 'Dies sind Ergebnisse der Benchmark-Auswertung gegenüber der Start-Baseline, keine Verbesserungen im ausgerollten Produkt.',
+                ttfb: 'Die Zeit bis zum ersten Byte hat sich nicht verbessert.',
+                link: 'Ergebnisse der Epoche {epoch} (JSON)'
+            }
         },
         anonymization: {
             title: 'Anonymisierung',

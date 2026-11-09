@@ -369,7 +369,23 @@ operators: {
             units: { days: 'أيام', hours: 'ساعات', minutes: 'دقائق', seconds: 'ثوانٍ' },
             startDate: 'الخميس 29 أكتوبر · 00:00 بتوقيت UTC',
             startedDate: 'بدأت الخميس 29 أكتوبر · 00:00 بتوقيت UTC',
-            imageAlt: 'عقدتان تربط بينهما مسارات عبر حاجز: مسابقة Apex لزمن الاستجابة في المحاكاة'
+            imageAlt: 'عقدتان تربط بينهما مسارات عبر حاجز: مسابقة Apex لزمن الاستجابة في المحاكاة',
+            results: {
+                progressLabel: 'تقدّم المسابقة',
+                progress: 'الحقب المكتملة: {done} من {total}',
+                title: 'صافي التحسّن منذ البداية',
+                comparison: 'الفائز في الحقبة {epoch} مقارنةً بخط الأساس الأولي',
+                asOf: 'حتى {date}',
+                lower: 'أقل بنسبة {value}%',
+                higher: 'أعلى بنسبة {value}%',
+                metrics: {
+                    p95CompletionS: { name: 'زمن إكمال الطلب الكامل (p95)', range: 'من {before} ث إلى {after} ث' },
+                    medianThroughputMbps: { name: 'الوسيط لمعدل نقل البيانات', range: 'من {before} إلى {after} ميغابت/ث' }
+                },
+                caveat: 'هذه نتائج تقييم على معيار الأداء مقارنةً بخط الأساس الأولي، وليست مكاسب في المنتج المنشور.',
+                ttfb: 'لم يتحسّن زمن وصول البايت الأول.',
+                link: 'نتائج الحقبة {epoch} (JSON)'
+            }
         },
         anonymization: {
             title: 'إخفاء الهوية',

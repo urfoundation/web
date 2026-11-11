@@ -300,7 +300,7 @@ test('the notice gives the epochs\' dates, and links to its full text in the sn 
     assert.match(text, /3,482\.26 α for epoch 1 and 4,132\.72 α for epoch 3/);
 });
 
-test('the extender amendment: the pool begins epoch 8, and the billing change is planned, not done', () => {
+test('the extender amendment: the pool begins epoch 8, and the billing change is live since November 11', () => {
     // approved on November 10 (the sn whitepaper's §8.6): the extender pool starts with epoch 8's first
     // block, which is the end of epoch 7, the last epoch listed, so the list shows it after epoch 7
     const pool = events.find((e) => e.id === 'extender-pool-epoch-8');
@@ -323,13 +323,21 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     // not a key milestone: the summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
     assert.equal(pool.key, undefined);
 
-    // the billing change: dated the day it was approved, planned until it deploys
+    // the billing change (§8.6.7, step 0): done, dated by its deploy on November 11, which reached the network
+    // operator's services in stages from 05:43 to 11:39 UTC, so it is listed after the 00:00 UTC provider gate.
+    // The id keeps the name it was published with, so links to it still land on it.
     const billing = events.find((e) => e.id === 'intra-traffic-billing-planned');
-    assert.equal(billing.date, '2026-11-10');
-    assert.equal(billing.status, 'planned');
-    assert.match(billing.detail, /^Approved by the subnet owner on November 10\. Once the billing change deploys, /);
+    assert.equal(billing.status, 'done');
+    assert.equal(billing.date, '2026-11-11T05:43:00Z/2026-11-11T11:39:00Z');
+    assert.equal(whenText(parseWhen(billing.date), { approxStart: isApproximate(billing) }), 'Wed Nov 11 · 05:43–11:39 UTC');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === billing.id)).id, 'epoch-5');
+    assert.equal(billing.title, 'Same-network and friends-and-family traffic now draws on the data balance');
+    assert.match(billing.detail, /^Traffic between devices of one network and traffic to a provider in friends-and-family mode now draw on the sending network's data balance, as other traffic does, on the free plan or a paid one\. /);
+    assert.match(billing.detail, /The billing change, approved by the subnet owner on November 10, reached the network operator's services in stages from 05:43 UTC, and all of them by 11:39 UTC\./);
     // only who pays changes: a friends-and-family provider's credit does not depend on the plan (§8.6.3)
     assert.match(billing.detail, /Friends-and-family providers are credited for it as before: paid and free traffic count alike\./);
-    assert.match(billing.detail, /Contracts opened before the deploy are not charged\./);
+    assert.match(billing.detail, /Contracts opened before the change are not charged\.$/);
+    // nothing of the plan is left
+    assert.doesNotMatch(`${billing.title} ${billing.detail}`, /\bto draw\b|\bonce the billing change deploys\b|\bplanned\b|\bwill be added\b/i);
     assert.equal(billing.key, undefined);
 });

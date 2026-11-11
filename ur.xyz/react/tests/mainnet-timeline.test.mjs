@@ -18,7 +18,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { mainnetActions, mainnetEpochs, mainnetNotices, SECONDS_PER_BLOCK } from '../src/data/mainnet.js';
+import { mainnetActions, mainnetEpochs, mainnetNotices, newestFirst, noticeDay, SECONDS_PER_BLOCK } from '../src/data/mainnet.js';
 import {
     EXPLORER_PLACEHOLDERS,
     REF_FORMATS,
@@ -31,6 +31,7 @@ import {
     parseWhen,
     sourceLink,
     sourceRows,
+    thousands,
     whenText,
 } from '../src/components/pages/mainnet/timeline.js';
 
@@ -268,9 +269,9 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
     // epoch 3 stayed on version 1; settlement v2 started with epoch 4, at about 18:25 on October 30
     const [, , , epoch3, epoch4] = mainnetEpochs;
     assert.equal(epoch3.settlement, 'v1');
-    // the epoch 3 notice is the one at the top, as the milestones say; another notice may follow it
-    assert.equal(mainnetNotices[0].id, 'notice');
-    assert.match(text(payments), /Epoch 3's funding is recovered, as the notice at the top explains\./);
+    // the epoch 3 notice is one of the notices at the top, and the box names it, as the milestones do
+    assert.ok(mainnetNotices.some((n) => n.id === 'notice'));
+    assert.match(text(payments), /Epoch 3's funding is recovered, as the epoch 3 notice at the top explains\./);
     assert.doesNotMatch(text(payments), /paid with epoch 5/);
     assert.equal(epoch4.settlement, 'v2');
     assert.equal(epoch4.start.time, '2026-10-30T18:25:00Z');
@@ -293,10 +294,10 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
     assert.match(mainnetActions.closing.map((run) => run.text).join(''), /^With settlement v2 active, the subnet is set up to run itself and scale to millions of miners\. New miners can participate in Bittensor from the apps with zero Bittensor experience\.$/);
 });
 
-test('the notice gives the epochs\' dates, and links to its full text in the sn repo', () => {
-    // epoch 3's notice, the first, at the top of the page
-    const mainnetNotice = mainnetNotices[0];
-    assert.equal(mainnetNotice.id, 'notice');
+test('the epoch 3 notice gives the epochs\' dates, and links to its full text in the sn repo', () => {
+    // epoch 3's notice, at the top of the page under the newer notices
+    const mainnetNotice = mainnetNotices.find((n) => n.id === 'notice');
+    assert.ok(mainnetNotice, 'the epoch 3 notice is listed');
     assert.equal(mainnetNotice.title, 'Epoch 3 payout delayed. Funds are safe.');
     const text = mainnetNotice.paragraphs.join(' ');
     // dated the day it was posted, the day its full text's file name starts with
@@ -487,10 +488,11 @@ test('Pro data on each network\'s own cycle: a milestone and a notice for the su
     const ids = events.map((e) => e.id);
     assert.equal(ids.indexOf(cycle.id), ids.indexOf('intra-traffic-billing-planned') + 1);
     assert.equal(cycle.key, undefined);
-    // the miner guide's rule for SN25 rewards, and the notice's full text, linked once it is on sn's main branch
+    // the miner guide's rule for SN25 rewards, and the notice's full text, which is on sn's main branch
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-pro-data-per-cycle.md';
     assert.deepEqual(cycle.sources, [
         { label: 'How rewards are counted, in the miner guide', kind: 'doc', ref: '/docs/miner/rewards#how-rewards-are-counted' },
-        { label: 'The full notice in the sn repo', kind: 'doc', ref: '' },
+        { label: 'The full notice in the sn repo', kind: 'doc', ref: fullText },
     ]);
     assert.equal(cycle.title, "Pro data follows each network's own cycle, and the provider subsidy counts its revenue once");
     assert.match(cycle.detail, /^From the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, and each cycle's grant carries that cycle's share of the subscription's revenue\. /);
@@ -514,17 +516,15 @@ test('Pro data on each network\'s own cycle: a milestone and a notice for the su
     // it does not say the release has rolled out, and it publishes no subsidy setting or wider plan
     assert.doesNotMatch(`${cycle.title} ${cycle.detail}`, /\bnow\b|\blive\b|since November 11|remov|\$\s?\d|\d\s?%|\bfifth\b/i);
 
-    // the notice: after epoch 3's, which stays the notice at the top that the milestones point to
-    assert.equal(mainnetNotices.length, 2);
+    // the notice, one of those at the top (their order is the next test's)
     assert.equal(new Set(mainnetNotices.map((n) => n.id)).size, mainnetNotices.length);
     for (const notice of mainnetNotices) {
         assert.deepEqual(Object.keys(notice).sort(), ['date', 'id', 'link', 'paragraphs', 'title'], `${notice.id}: fields`);
         assert.match(notice.id, /^notice(?:-[a-z0-9]+)*$/, `${notice.id}: a slug that starts with notice`);
         assert.ok(!ids.includes(notice.id), `${notice.id}: a milestone's id`);
     }
-    const [first, notice] = mainnetNotices;
-    assert.equal(first.id, 'notice');
-    assert.equal(notice.id, 'notice-pro-grant-cycle');
+    const notice = mainnetNotices.find((n) => n.id === 'notice-pro-grant-cycle');
+    assert.ok(notice, 'the notice is listed');
     // dated the day of the release
     assert.equal(notice.date, 'November 11, 2026');
     assert.equal(notice.title, "Pro data moves to each network's own cycle. SN25 rewards are counted as before.");
@@ -544,7 +544,177 @@ test('Pro data on each network\'s own cycle: a milestone and a notice for the su
     assert.match(when, /^Nothing granted before the release changes\. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, when that grant's month ends\. /);
     assert.match(when, / Customers pay the same, and there is nothing you need to do\.$/);
     assert.doesNotMatch(`${notice.title} ${notice.paragraphs.join(' ')}`, /\bnow\b|\blive\b|since November 11|remov|\$\s?\d|\d\s?%|\bfifth\b/i);
-    // its full text goes in the sn repo, and until it is on sn's main branch the notice links to its milestone
-    // on this page, never to a file that does not exist yet
-    assert.deepEqual(notice.link, { label: 'See the milestone', href: `#${cycle.id}` });
+    // its full text is in the sn repo (sn 943d77a9, on its main branch), so the notice links to it, as the
+    // milestone does
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+});
+
+test('the notices at the top run newest first, by the day each was posted', () => {
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): capture the flag and Pro data,
+    // both of November 11, the later-posted first, then epoch 3's of October 31. The data lists them in the
+    // order they were posted, the other way round, so this order is the sort's
+    assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
+        ['notice-capture-the-flag', 'November 11, 2026'],
+        ['notice-pro-grant-cycle', 'November 11, 2026'],
+        ['notice', 'October 31, 2026'],
+    ]);
+    const days = mainnetNotices.map(noticeDay);
+    assert.ok(days.every(Number.isFinite), 'every notice has a readable date');
+    days.slice(1).forEach((day, i) => assert.ok(day <= days[i], `${mainnetNotices[i + 1].id} is newer than ${mainnetNotices[i].id}, above it`));
+    // listed in posting order, they come out as the page shows them; listed in any other order, still by day
+    assert.deepEqual(newestFirst([...mainnetNotices].reverse()), mainnetNotices);
+    for (let turn = 1; turn < mainnetNotices.length; turn += 1) {
+        const listed = [...mainnetNotices.slice(turn), ...mainnetNotices.slice(0, turn)];
+        assert.deepEqual(newestFirst(listed).map(noticeDay), days, `rotated by ${turn}`);
+    }
+    // within a day the later-listed, the later-posted, comes first; the list itself is left as it was
+    const posted = (id, date) => ({ id, date });
+    const listed = [posted('a', 'October 31, 2026'), posted('b', 'November 11, 2026'), posted('c', 'November 2, 2026'), posted('d', 'November 11, 2026'), posted('e', 'December 1, 2026')];
+    assert.deepEqual(newestFirst(listed).map((n) => n.id), ['e', 'd', 'b', 'c', 'a']);
+    assert.deepEqual(listed.map((n) => n.id), ['a', 'b', 'c', 'd', 'e']);
+    // a date that is not a real day written as "November 11, 2026" stops the build instead of taking a place
+    assert.equal(noticeDay(posted('x', 'November 11, 2026')), Date.UTC(2026, 10, 11));
+    for (const date of ['Nov 11, 2026', 'november 11, 2026', '2026-11-11', 'November 31, 2026', 'November 011, 2026', '11 November 2026', '']) {
+        assert.ok(Number.isNaN(noticeDay(posted('x', date))), `"${date}" should not read`);
+        assert.throws(() => newestFirst([posted('x', date)]), /is not a day such as "November 11, 2026"/, `"${date}"`);
+    }
+    // with three notices at the top, the milestones and the box name the one they point to
+    const pointers = [...events.map((e) => e.detail), ...mainnetActions.steps.map((s) => s.detail)];
+    for (const text of pointers) assert.doesNotMatch(text, /\bthe notice at the top\b/);
+    assert.equal(pointers.filter((text) => text.includes('the epoch 3 notice at the top')).length, 7);
+});
+
+test('capture the flag from epoch 8: a notice and its deployment milestones, at the times the page projects', () => {
+    // the sn repo's CAPTURETHEFLAG.md: the owner's decisions of November 11 (§12.1), the split (§2.1) and the
+    // deployment plan (§11.2). Its times here are the page's projection from block numbers at 12 seconds a
+    // block, so epoch 8's first block, the end of epoch 7, is about 18:25 UTC on November 27, as for the
+    // extender pool (the design's measured projection puts it about four minutes later)
+    const epoch7 = mainnetEpochs.at(-1);
+    assert.equal(epoch7.number, 7);
+    assert.equal(epoch7.end.time, '2026-11-27T18:25:00Z');
+    const blocksPerEpoch = epoch7.end.block - epoch7.start.block;
+    const after = (time, blocks) => new Date(Date.parse(time) + blocks * SECONDS_PER_BLOCK * 1000).toISOString().replace('.000Z', 'Z');
+    const byId = (id) => events.find((e) => e.id === id);
+    const ids = events.map((e) => e.id);
+    const groupOf = (id) => groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === id)).id;
+    const shown = (event) => whenText(parseWhen(event.date), { approxStart: isApproximate(event) });
+    const ctf = ['capture-the-flag-presence-sampling', 'capture-the-flag-pool-registration', 'capture-the-flag-epoch-8', 'capture-the-flag-first-draw', 'capture-the-flag-first-claims'];
+    // in date order among the other milestones; nothing is done yet; none is a key milestone, since the
+    // summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
+    assert.deepEqual(ctf.map((id) => ids.indexOf(id)), ctf.map((id) => ids.indexOf(id)).sort((a, b) => a - b));
+    for (const id of ctf) {
+        assert.ok(byId(id), `${id} is listed`);
+        assert.ok(['scheduled', 'planned'].includes(byId(id).status), `${id}: ${byId(id).status}`);
+        assert.equal(byId(id).key, undefined, id);
+    }
+
+    // the sampler runs by the end of epoch 6, the day epoch 7 begins, so that epoch 7 is a full shadow epoch;
+    // the start moves to epoch 9 only if it is not running when epoch 8 starts
+    const sampling = byId('capture-the-flag-presence-sampling');
+    assert.equal(sampling.date, epoch7.start.time.slice(0, 10));
+    assert.equal(shown(sampling), '≈ Fri Nov 20');
+    assert.equal(groupOf(sampling.id), 'epoch-6');
+    assert.equal(ids.indexOf(sampling.id), ids.indexOf('demand-deposits-priced') - 1);
+    assert.ok(sampling.detail.startsWith(`Before epoch 6 ends at block ${thousands(epoch7.start.block)}, the network operator's servers start sampling every provider and extender each quarter hour`));
+    assert.match(sampling.detail, / Epoch 7 then runs in full as a shadow epoch: /);
+    assert.match(sampling.detail, / Capture the flag starts with epoch 8 only if the sampling is running when epoch 8 starts\.$/);
+
+    // one timelock operation upgrades STSettlement2 and registers network operator 1's pool, 2^32 + 1, two
+    // days before epoch 8; it executes in time only if it is scheduled 72 hours before epoch 8 starts
+    const poolId = 2 ** 32 + 1;
+    const registration = byId('capture-the-flag-pool-registration');
+    assert.equal(registration.date, '2026-11-22/2026-11-25');
+    assert.equal(shown(registration), '≈ Sun Nov 22 – Wed Nov 25');
+    assert.equal(groupOf(registration.id), 'epoch-7');
+    assert.ok(registration.detail.includes(` registers network operator 1's capture the flag pool, pool ${thousands(poolId)}, from epoch 8. `));
+    const deadline = after(epoch7.end.time, -72 * 3600 / SECONDS_PER_BLOCK);
+    assert.equal(deadline, '2026-11-24T18:25:00Z');
+    assert.match(registration.detail, / the operation has to be scheduled by about November 24, 18:25 UTC\.$/);
+    // the contracts it goes through exist, and what it creates is shown once it does
+    const timelock = byId('settlement-v2-timelock').sources.find((s) => s.label === 'Timelock');
+    const settlement2 = byId('v2-contracts-deployed').sources.find((s) => s.label === 'STSettlement2');
+    assert.deepEqual(registration.sources.filter((s) => s.ref !== ''), [timelock, settlement2]);
+
+    // the start: epoch 8's first block, with the extender pool, at the same projected time
+    const start = byId('capture-the-flag-epoch-8');
+    assert.equal(start.status, 'scheduled');
+    assert.equal(start.date, epoch7.end.time);
+    assert.equal(start.date, byId('extender-pool-epoch-8').date);
+    assert.equal(ids.indexOf(start.id), ids.indexOf('extender-pool-epoch-8') + 1);
+    assert.equal(shown(start), 'Fri Nov 27 · ≈18:25 UTC');
+    assert.equal(groupOf(start.id), 'after-epoch-7');
+    assert.ok(start.detail.startsWith(`From block ${thousands(epoch7.end.block)}, the first of epoch 8, `));
+    const slots = 249 * (5 + 5);
+    assert.ok(start.detail.includes(` Each of the 249 ISO 3166-1 countries has five provider slots and five extender slots each epoch, each worth the pool's new funding for the epoch divided by ${thousands(slots)}. `));
+    assert.match(start.detail, / in that country for at least half of the epoch, and is active at its end\. /);
+    assert.match(start.detail, / each winner takes its own slot and a fifth of that pot\. /);
+    // the providers' share was 1,195.84 α in epoch 4: from epoch 8 the pool takes 9/10 of it while no fleet
+    // is weighted (the head's 5/10 cedes to the pool only), the flag pools 1/10, and the pool 4/10 after
+    const share = 119584;
+    const alpha = (hundredths) => {
+        const h = Math.round(hundredths);
+        return `${thousands(Math.floor(h / 100))}.${String(h % 100).padStart(2, '0')} α`;
+    };
+    assert.deepEqual([alpha(share), alpha(share * 9 / 10), alpha(share / 10)], ['1,195.84 α', '1,076.26 α', '119.58 α']);
+    assert.ok(start.detail.includes(` The provider pool gets 9/10 of the providers' share instead of all of it, ${alpha(share * 9 / 10)} instead of ${alpha(share)} at epoch 4's scale, and 4/10 once top-level fleets are weighted. `));
+    assert.match(start.detail, / it takes effect once the signed amendment entry is published before epoch 8 starts\.$/);
+    // the design and the notice's full text are in the sn repo; the entry and the block do not exist yet
+    const notice = mainnetNotices.find((n) => n.id === 'notice-capture-the-flag');
+    assert.deepEqual(start.sources.map((s) => [s.label, s.ref]), [
+        ['The design, CAPTURETHEFLAG.md', 'https://github.com/urfoundation/sn/blob/main/CAPTURETHEFLAG.md'],
+        ['The full notice in the sn repo', notice.link.href],
+        ['Signed amendment entry', ''],
+        [`Epoch 8's first block, ${thousands(epoch7.end.block)}`, ''],
+    ]);
+
+    // epoch 8 ends an epoch later; its list is committed within 600 blocks and its root within 1,200
+    const draw = byId('capture-the-flag-first-draw');
+    const end8 = { block: epoch7.end.block + blocksPerEpoch, time: after(epoch7.end.time, blocksPerEpoch) };
+    assert.deepEqual(end8, { block: 9650428, time: '2026-12-04T18:25:00Z' });
+    assert.equal(draw.date, `${end8.time}/${after(end8.time, 1200)}`);
+    assert.equal(shown(draw), 'Fri Dec 4 · ≈18:25–22:25 UTC');
+    assert.equal(groupOf(draw.id), 'after-epoch-7');
+    assert.ok(draw.detail.startsWith(`Epoch 8 ends at block ${thousands(end8.block)}. The network operator commits its list of entries by block ${thousands(end8.block + 600)}, `));
+    assert.ok(draw.detail.includes(` committed with the provider pool's by block ${thousands(end8.block + 1200)}. `));
+    assert.match(draw.detail, / every slot carries forward into its country's pot, and the first winners are drawn in epoch 9\.$/);
+
+    // the claims open about two days after the root, with the pool's; the approval is due by the end of epoch 9
+    const claims = byId('capture-the-flag-first-claims');
+    assert.equal(claims.date, '2026-12-07');
+    assert.equal(shown(claims), '≈ Mon Dec 7');
+    assert.equal(after(end8.time, blocksPerEpoch), '2026-12-11T18:25:00Z');
+    assert.match(claims.detail, / and the approval by the end of epoch 9, about December 11, 18:25 UTC\. /);
+    assert.match(claims.detail, / Winners are paid to the payout wallet the provider pool already uses, and claim in the same claim flow\. /);
+    assert.ok(claims.detail.endsWith(` an app shows a capture the flag account as "Pool ${poolId}" and claims it like any pool.`));
+
+    // the notice, newest at the top, says the same at the same times, and links its full text in the sn repo
+    assert.equal(notice.date, 'November 11, 2026');
+    assert.equal(notice.title, 'Capture the flag starts with epoch 8: ten slots in every country, beside the provider pool.');
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-capture-the-flag.md' });
+    const text = notice.paragraphs.join(' ');
+    assert.ok(text.startsWith(`From epoch 8, which starts at block ${thousands(epoch7.end.block)} around November 27, 18:25 UTC, `));
+    assert.ok(text.includes(` Each of the 249 ISO 3166-1 countries has ten slots each epoch (one week), five for providers and five for extenders, and every slot is worth the same: the pool's new funding for the epoch divided by ${thousands(slots)}. `));
+    assert.match(text, / when it was online, passing the network operator's checks and in that country for at least half of the epoch, and is active at its end\. /);
+    // the draw's exact odds (§12.1, item 15)
+    assert.match(text, / With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries\. /);
+    assert.match(text, / Each winner takes its own slot and a fifth of that pot, /);
+    assert.ok(text.includes(` In epoch 4 that share was ${alpha(share)}; at that scale the provider pool would get ${alpha(share * 9 / 10)} and capture the flag ${alpha(share / 10)}. Once top-level fleets are weighted, the provider pool gets 4/10. `));
+    assert.match(text, / Winners are paid to the payout wallet the provider pool already uses, so there is nothing new to sign\. /);
+    assert.match(text, / claims open around December 7, with its pool claims, in the same claim flow\. /);
+    // plain words and no earnings promises (sn design/ctf/SEO.md §2.3): the figures are at epoch 4's scale, not a
+    // forecast, beside what a reward depends on
+    assert.match(text, / These figures are at epoch 4's scale, not a forecast\. Rewards are paid in alpha, whose value changes and can fall, and what a miner receives depends on its uptime, on how many others are eligible in its country and on the network's emission\. /);
+
+    // the litepaper keeps the provider pool's "no slot to win", and puts capture the flag beside it
+    const litepaper = fs.readFileSync(path.join(__dirname, '../../docs/litepaper.md'), 'utf8');
+    assert.match(litepaper, /\. There is no slot to win and nothing to burn\. It is where a miner starts and earns a baseline reward\.\n\nBeside the pool, in the same tier, each operator also has a capture the flag pool from epoch 8, with ten reward slots in every country: /);
+    const litepaperFlag = litepaper.split('\n').find((line) => line.startsWith('Beside the pool, in the same tier,'));
+    assert.match(litepaperFlag, / The operator's miners enter it with the pool's registration and burn nothing\. /);
+    assert.match(litepaperFlag, / online, passing the operator's checks and in the country for at least half of the epoch, and active at its end; /);
+    assert.match(litepaperFlag, / Capture the flag takes a tenth of the providers' share\.$/);
+
+    const avoid = /guarantee|risk-free|\breturns?\b|\byield|\bAPY\b|lottery|jackpot|\bbet\b|invest|passive income|get rich|easy money|financial freedom|quit your job|\bjobs?\b|hiring|salary|wage|\$\s?\d/i;
+    for (const words of [`${notice.title} ${text}`, litepaperFlag, ...ctf.map((id) => `${byId(id).title} ${byId(id).detail}`)]) {
+        assert.doesNotMatch(words, avoid);
+    }
 });

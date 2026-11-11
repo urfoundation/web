@@ -46,6 +46,8 @@ A single operator can serve well over 100,000 miners, far more than a subnet's r
 
 The pool is the on-ramp. Every operator holds one on-chain slot for all of its miners; validators weight that pool by the operator's demand and its measured quality, and each miner claims its share directly from the settlement contract with a cryptographic proof. There is no slot to win and nothing to burn. It is where a miner starts and earns a baseline reward.
 
+Beside the pool, in the same tier, each operator also has a capture the flag pool from epoch 8, with ten reward slots in every country: five for providers and five for extenders. The operator's miners enter it with the pool's registration and burn nothing. Each epoch a public draw fills the slots from the miners that were online, passing the operator's checks and in the country for at least half of the epoch, and active at its end; a slot nobody wins carries forward into that country's pot for its role. Capture the flag takes a tenth of the providers' share.
+
 Top-level miners are the supply apex. The roughly 200 largest fleets, ranked by how many distinct, routable exit IPs they actually serve rather than by traffic volume, each claim their own on-chain slot and are paid directly by the network, with no operator in the payout path. A shared IP is split among the fleets that claim it, so breadth cannot be double-counted.
 
 The two tiers are one tournament: a miner starts in a pool, graduates to a top slot as its routable-IP breadth grows, and falls back to the pool if it slips. A governance-set share divides the providers' share of emission between the head and the tail.

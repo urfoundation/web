@@ -17,10 +17,11 @@
  * from the block number (`projected`), which the page marks with ≈.
  * `settlement` is what pays the epoch: 'v1' (version 1) or 'v2' (settlement
  * v2, from epoch 4: epoch 3 began before the v2 pool was registered, so it
- * stayed on version 1, and its funding is recovered: see the notice below).
+ * stayed on version 1, and its funding is recovered: see its notice below).
  *
  * Plain data with no imports: the page, the SPA and the node test
- * (tests/mainnet-timeline.test.mjs) all read it.
+ * (tests/mainnet-timeline.test.mjs) all read it. Its one rule is the order of
+ * the notices at the top, newest first (newestFirst, below).
  */
 
 export const mainnetEpochs = [
@@ -114,7 +115,7 @@ export const mainnetActions = {
         },
         {
             title: 'Settlement v2 pays every epoch from epoch 4.',
-            detail: "Settlement v2 started with epoch 4, from about October 30, 18:25 UTC, so version 1's limit of 1,500 paid miners an epoch no longer applies. Its first claims opened on November 8, at 19:10 UTC. Epoch 3's funding is recovered, as the notice at the top explains.",
+            detail: "Settlement v2 started with epoch 4, from about October 30, 18:25 UTC, so version 1's limit of 1,500 paid miners an epoch no longer applies. Its first claims opened on November 8, at 19:10 UTC. Epoch 3's funding is recovered, as the epoch 3 notice at the top explains.",
         },
     ],
     // the closing paragraph, in runs; a run with an href is a link
@@ -125,15 +126,19 @@ export const mainnetActions = {
     ],
 };
 
-// The dated notices above the box at the top, each in its own box. The first is
-// "the notice at the top" that the milestones and the box point to: epoch 3's
-// delayed payout and its recovery, with the updates that followed. The next is
-// Pro data on each network's own cycle, from November 11, and what that
-// changes in the provider subsidy. Their dates are the epochs' and the milestones'
-// (tests/mainnet-timeline.test.mjs holds them together). `id` is the anchor of
-// the notice's box. `link` opens a notice's full text in the sn repo once that
-// is on sn's main branch, and until then the notice's milestone on this page.
-export const mainnetNotices = [
+// The dated notices above the box at the top, each in its own box, listed here
+// in the order they were posted: a new notice goes at the end. The page shows
+// mainnetNotices, the same notices newest first: sorted by `date`, the day each
+// was posted ("November 11, 2026"), and within a day by the order they were
+// posted, the later first. So it shows capture the flag from epoch 8, then Pro
+// data on each network's own cycle, both of November 11, then epoch 3's delayed
+// payout and its recovery, with the updates that followed, which the milestones
+// and the box point to as "the epoch 3 notice at the top". Their dates are the
+// epochs' and the milestones' (tests/mainnet-timeline.test.mjs holds them
+// together). `id` is the anchor of the notice's box. `link` opens a notice's
+// full text in the sn repo once that is on sn's main branch, and until then the
+// notice's milestone on this page.
+const NOTICES = [
     {
         id: 'notice',
         date: 'October 31, 2026',
@@ -158,6 +163,50 @@ export const mainnetNotices = [
             "So the subsidy counts less where revenue counted twice, as in a new subscription's first month, and more for long-running Google Play subscriptions. Its timing follows each network's own cycle rather than the 1st. A payment credited during a running cycle, such as a second subscription, adds its revenue to the cycles after it, and the part that overlaps the running cycle is not counted.",
             "Nothing granted before the release changes. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, when that grant's month ends. Customers pay the same, and there is nothing you need to do.",
         ],
-        link: { label: 'See the milestone', href: '#pro-grant-per-cycle' },
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-pro-data-per-cycle.md' },
+    },
+    {
+        id: 'notice-capture-the-flag',
+        date: 'November 11, 2026',
+        title: 'Capture the flag starts with epoch 8: ten slots in every country, beside the provider pool.',
+        paragraphs: [
+            "From epoch 8, which starts at block 9,600,028 around November 27, 18:25 UTC, each network operator gets a second SN25 pool beside its provider pool: capture the flag. The provider pool pays for usage, and capture the flag pays for being present in a country. Each of the 249 ISO 3166-1 countries has ten slots each epoch (one week), five for providers and five for extenders, and every slot is worth the same: the pool's new funding for the epoch divided by 2,490.",
+            "A provider or extender enters its country's draw when it was online, passing the network operator's checks and in that country for at least half of the epoch, and is active at its end. The operator commits the list of entries on chain, and a drand round published after it draws up to five winners per country and role. Miners in one /29 IPv4 or /48 IPv6 block share one entry. With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries.",
+            "A slot with no winner carries forward into its country's pot for that role. Each winner takes its own slot and a fifth of that pot, so a miner alone in a country takes a fifth of what is left for each epoch it stays.",
+            "From epoch 8 the provider pool gets 9/10 of the providers' share of emission instead of all of it. In epoch 4 that share was 1,195.84 α; at that scale the provider pool would get 1,076.26 α and capture the flag 119.58 α. Once top-level fleets are weighted, the provider pool gets 4/10. These figures are at epoch 4's scale, not a forecast. Rewards are paid in alpha, whose value changes and can fall, and what a miner receives depends on its uptime, on how many others are eligible in its country and on the network's emission.",
+            "Winners are paid to the payout wallet the provider pool already uses, so there is nothing new to sign. Epoch 8's capture the flag claims open around December 7, with its pool claims, in the same claim flow. The pool is registered through the 72-hour timelock before epoch 8 starts, and the milestones below give each step. There is nothing you need to do.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-capture-the-flag.md' },
     },
 ];
+
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/**
+ * The day a notice was posted, from its `date` ("November 11, 2026"), as the
+ * UTC milliseconds of that day's start, or NaN when its date is not a real day
+ * written that way.
+ */
+export function noticeDay(notice) {
+    const match = /^([A-Z][a-z]+) ([1-9]\d?), (\d{4})$/.exec(String(notice?.date ?? ''));
+    const month = match ? MONTH_NAMES.indexOf(match[1]) : -1;
+    if (month < 0) return NaN;
+    const [year, day] = [Number(match[3]), Number(match[2])];
+    const ms = Date.UTC(year, month, day);
+    return new Date(ms).getUTCDate() === day ? ms : NaN;
+}
+
+/**
+ * Notices listed in the order they were posted, newest first: by the day each
+ * was posted, and within a day the later-listed first. A notice whose date
+ * cannot be read stops the build rather than taking a place by accident.
+ */
+export function newestFirst(notices) {
+    const order = notices.map((notice, index) => ({ notice, index, day: noticeDay(notice) }));
+    for (const { notice, day } of order) {
+        if (Number.isNaN(day)) throw new Error(`mainnet notice ${notice.id}: date "${notice.date}" is not a day such as "November 11, 2026"`);
+    }
+    return order.sort((a, b) => b.day - a.day || b.index - a.index).map(({ notice }) => notice);
+}
+
+export const mainnetNotices = newestFirst(NOTICES);

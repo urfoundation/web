@@ -105,9 +105,9 @@ export default function MainnetPage({ updated = null, summary = null }) {
 
 /**
  * One of the dated notices above the box at the top (data/mainnet.js
- * mainnetNotices), anchored at its id, with a link to its full text or to its
- * milestone. Like the box's headline, its title is an h2 under the page's
- * single h1.
+ * mainnetNotices, which lists them newest first), anchored at its id, with a
+ * link to its full text or to its milestone. Like the box's headline, its
+ * title is an h2 under the page's single h1.
  */
 function MainnetNotice({ notice }) {
     const external = isExternal(notice.link.href) ? EXTERNAL : {};

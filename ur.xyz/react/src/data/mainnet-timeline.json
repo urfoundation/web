@@ -148,7 +148,7 @@
       "date": "2026-10-16T18:09:48Z",
       "status": "done",
       "title": "Epoch 1 closes on version 1",
-      "detail": "Epoch 1 closed at block 9,297,631, within its 120-block close window, and the settlement vault took in its 3,482.26 α. Epoch 1 had no eligible work to pay out, so no payout root was committed by block 9,298,828, and its funding carried forward (see the notice at the top).",
+      "detail": "Epoch 1 closed at block 9,297,631, within its 120-block close window, and the settlement vault took in its 3,482.26 α. Epoch 1 had no eligible work to pay out, so no payout root was committed by block 9,298,828, and its funding carried forward (see the epoch 3 notice at the top).",
       "sources": [
         { "label": "Epoch 1 close, block 9,297,631", "kind": "evm_tx", "ref": "0xa57407ac020ab2592e1f8a324c06b9064d24befe5acfcdd524c0e77434fab5a6" }
       ]
@@ -158,7 +158,7 @@
       "date": "2026-10-18T18:09:48Z",
       "status": "done",
       "title": "Epoch 1 finalized without a payout root",
-      "detail": "Epoch 1 had no payout root, so it had no version 1 claims. Its 3,482.26 α carried forward under the protocol's missed-commit rule, and it is recovered with epoch 3's funding (see the notice at the top).",
+      "detail": "Epoch 1 had no payout root, so it had no version 1 claims. Its 3,482.26 α carried forward under the protocol's missed-commit rule, and it is recovered with epoch 3's funding (see the epoch 3 notice at the top).",
       "sources": [
         { "label": "Epoch 1 finalized, block 9,312,031", "kind": "evm_tx", "ref": "0x900e7f9ffa6524ecfd8b42c04846641124ea0118194039a15eaae78e018a601d" }
       ]
@@ -272,7 +272,7 @@
       "key": true,
       "approximate": true,
       "title": "Settlement v2 active: epoch 4 begins",
-      "detail": "From block 9,398,428, settlement v2 pays epoch 4 and every epoch after it. Epoch 3 closed on version 1 without a payout root; its funding is recovered (see the notice at the top).",
+      "detail": "From block 9,398,428, settlement v2 pays epoch 4 and every epoch after it. Epoch 3 closed on version 1 without a payout root; its funding is recovered (see the epoch 3 notice at the top).",
       "sources": [
         { "label": "Epoch 4's first block, 9,398,428", "kind": "evm_block", "ref": "9398428" }
       ]
@@ -282,7 +282,7 @@
       "date": "2026-11-01T18:26:00Z",
       "status": "done",
       "title": "Epoch 3 finalized without a payout root",
-      "detail": "Epoch 3's payout root was not committed in its window, so it had no version 1 claims. Its 4,132.72 α carried forward with epoch 1's 3,482.26 α, and both are recovered (see the notice at the top).",
+      "detail": "Epoch 3's payout root was not committed in its window, so it had no version 1 claims. Its 4,132.72 α carried forward with epoch 1's 3,482.26 α, and both are recovered (see the epoch 3 notice at the top).",
       "sources": [
         { "label": "Epoch 3 finalized, block 9,412,831", "kind": "evm_tx", "ref": "0xa08e2dbb850025d7d47ac5dc0880bb16db28d34622fe62af15a9e8e9b3113d98" }
       ]
@@ -338,7 +338,7 @@
       "status": "done",
       "approximate": true,
       "title": "Recovered funds not scheduled into epoch 5",
-      "detail": "The recovery reached the v2 vault on November 8 at 18:30 UTC. Adding it to epoch 5's payout had to be scheduled through the 72-hour timelock by about November 10, 18:25 UTC, to take effect before epoch 5 closes. It was not scheduled, so the recovered funds are not paid with epoch 5 (see the notice at the top). The recovery's record on the v2 settlement contract was scheduled on November 6 and has been ready to take effect since November 9, 21:19 UTC.",
+      "detail": "The recovery reached the v2 vault on November 8 at 18:30 UTC. Adding it to epoch 5's payout had to be scheduled through the 72-hour timelock by about November 10, 18:25 UTC, to take effect before epoch 5 closes. It was not scheduled, so the recovered funds are not paid with epoch 5 (see the epoch 3 notice at the top). The recovery's record on the v2 settlement contract was scheduled on November 6 and has been ready to take effect since November 9, 21:19 UTC.",
       "sources": [
         { "label": "Recovery root finalized, block 9,463,231", "kind": "evm_tx", "ref": "0xc9fa804023288aefdb381d0c19dd8f1ef8559530715b045f87475e695a51d6f9" },
         { "label": "Recovery claimed into the v2 vault, block 9,463,236", "kind": "evm_tx", "ref": "0x18c4e8d3f72ceaea1b6f275b54b27786967a834822e3ae1539d084bc06a7ea28" },
@@ -373,7 +373,7 @@
       "detail": "From the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, and each cycle's grant carries that cycle's share of the subscription's revenue. The network operator's provider subsidy counts that revenue once, as the traffic the grant funds is settled. Before, a paid period's revenue could count twice, in full through its 600 GiB credit and again as a share through the monthly grant on the 1st, and a long-running Google Play subscription counted only a share spread over the months since it began. SN25 pool rewards are counted as before: the pool is split by completed usage, and subscription payments are not an input. For traffic since the October 6 cutoff, the provider subsidy pays no USDC and only counts toward the weekly points the network operator awards. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, and nothing granted before the release changes. Customers pay the same.",
       "sources": [
         { "label": "How rewards are counted, in the miner guide", "kind": "doc", "ref": "/docs/miner/rewards#how-rewards-are-counted" },
-        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "" }
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-pro-data-per-cycle.md" }
       ]
     },
     {
@@ -381,10 +381,19 @@
       "date": "2026-11-15T18:25:00Z/2026-11-15T22:25:00Z",
       "status": "planned",
       "title": "Epoch 5 claims",
-      "detail": "Epoch 5 ends at block 9,499,228, and claims follow its 14,400-block challenge period. The recovered epoch 1 and 3 funding is not part of epoch 5's payout: adding it was not scheduled in time (see the notice at the top).",
+      "detail": "Epoch 5 ends at block 9,499,228, and claims follow its 14,400-block challenge period. The recovered epoch 1 and 3 funding is not part of epoch 5's payout: adding it was not scheduled in time (see the epoch 3 notice at the top).",
       "sources": [
         { "label": "Epoch 5 ledger root", "kind": "evm_tx", "ref": "" }
       ]
+    },
+    {
+      "id": "capture-the-flag-presence-sampling",
+      "date": "2026-11-20",
+      "status": "planned",
+      "approximate": true,
+      "title": "Capture the flag: presence sampling by the end of epoch 6",
+      "detail": "Before epoch 6 ends at block 9,549,628, the network operator's servers start sampling every provider and extender each quarter hour: whether it is online and passing the operator's checks, and in which country. Epoch 7 then runs in full as a shadow epoch: after it ends, the operator builds its list of entries, draw and payouts from the real samples without committing them, and publishes an unsigned report that the validator's checks run on. Capture the flag starts with epoch 8 only if the sampling is running when epoch 8 starts.",
+      "sources": []
     },
     {
       "id": "demand-deposits-priced",
@@ -401,6 +410,21 @@
       ]
     },
     {
+      "id": "capture-the-flag-pool-registration",
+      "date": "2026-11-22/2026-11-25",
+      "status": "planned",
+      "approximate": true,
+      "title": "Capture the flag pool registered through the 72-hour timelock",
+      "detail": "By about November 22, the governance Safe schedules one operation through the 72-hour public timelock: it upgrades STSettlement2 and registers network operator 1's capture the flag pool, pool 4,294,967,297, from epoch 8. Around November 25, two days before epoch 8, anyone can execute it once its 72 hours have passed. The pool then takes one SN25 UID, early enough to earn weight before its immunity ends, under a hotkey derived at execution, so nobody can register it first. The carry contract, which moves each epoch's pots back to the pool, is created after it, and vault2, which holds the funds, does not change. To execute before epoch 8 starts, the operation has to be scheduled by about November 24, 18:25 UTC.",
+      "sources": [
+        { "label": "Timelock", "kind": "evm_address", "ref": "0x5529dfe070f73A96C14b5aFCf4fb3DdeA6122fAc" },
+        { "label": "STSettlement2", "kind": "evm_address", "ref": "0xB5e3e23CD1A733410d769b0C95e1c4CA25e821b0" },
+        { "label": "Operation scheduled", "kind": "evm_tx", "ref": "" },
+        { "label": "Operation executed: the pool registered", "kind": "evm_tx", "ref": "" },
+        { "label": "Carry contract", "kind": "evm_address", "ref": "" }
+      ]
+    },
+    {
       "id": "extender-pool-epoch-8",
       "date": "2026-11-27T18:25:00Z",
       "status": "scheduled",
@@ -410,6 +434,41 @@
         { "label": "The amendment, WHITEPAPER.md §8.6", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md" },
         { "label": "Signed amendment entry", "kind": "doc", "ref": "" },
         { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-epoch-8",
+      "date": "2026-11-27T18:25:00Z",
+      "status": "scheduled",
+      "title": "Capture the flag from epoch 8: ten slots in every country",
+      "detail": "From block 9,600,028, the first of epoch 8, each network operator has a second pool beside its provider pool, capture the flag, which pays for being present in a country. Each of the 249 ISO 3166-1 countries has five provider slots and five extender slots each epoch, each worth the pool's new funding for the epoch divided by 2,490. A provider or extender enters its country's draw when it was online, passing the operator's checks and in that country for at least half of the epoch, and is active at its end. The operator commits the list of entries on chain, and a drand round published after it draws up to five winners per country and role. A slot with no winner carries forward into its country's pot, and each winner takes its own slot and a fifth of that pot. The provider pool gets 9/10 of the providers' share instead of all of it, 1,076.26 α instead of 1,195.84 α at epoch 4's scale, and 4/10 once top-level fleets are weighted. UR's validator, which holds the stake majority, weights the pool from epoch 8's first tempo. Approved by the subnet owner on November 11, it takes effect once the signed amendment entry is published before epoch 8 starts.",
+      "sources": [
+        { "label": "The design, CAPTURETHEFLAG.md", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/CAPTURETHEFLAG.md" },
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-capture-the-flag.md" },
+        { "label": "Signed amendment entry", "kind": "doc", "ref": "" },
+        { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-first-draw",
+      "date": "2026-12-04T18:25:00Z/2026-12-04T22:25:00Z",
+      "status": "planned",
+      "title": "Epoch 8's capture the flag draw and root",
+      "detail": "Epoch 8 ends at block 9,650,428. The network operator commits its list of entries by block 9,651,028, a drand round published at least a minute later draws the winners, and the capture the flag root is committed with the provider pool's by block 9,651,628. If the draw is not ready by then, the operator commits no list for epoch 8: every slot carries forward into its country's pot, and the first winners are drawn in epoch 9.",
+      "sources": [
+        { "label": "Epoch 8's list of entries committed", "kind": "evm_tx", "ref": "" },
+        { "label": "Epoch 8's capture the flag root", "kind": "evm_tx", "ref": "" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-first-claims",
+      "date": "2026-12-07",
+      "status": "planned",
+      "approximate": true,
+      "title": "First capture the flag claims",
+      "detail": "Epoch 8's capture the flag claims open once the validator has approved its root and the 14,400-block challenge period has passed, at about the same time as epoch 8's pool claims. The validator release that checks and approves capture the flag roots is due by about December 1, and the approval by the end of epoch 9, about December 11, 18:25 UTC. Winners are paid to the payout wallet the provider pool already uses, and claim in the same claim flow. Until the app releases that name it, an app shows a capture the flag account as \"Pool 4294967297\" and claims it like any pool.",
+      "sources": [
+        { "label": "First capture the flag claims", "kind": "evm_tx", "ref": "" }
       ]
     }
   ]

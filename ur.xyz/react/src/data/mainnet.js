@@ -130,10 +130,11 @@ export const mainnetActions = {
 // in the order they were posted: a new notice goes at the end. The page shows
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
-// posted, the later first. So it shows capture the flag from epoch 8, then Pro
-// data on each network's own cycle, both of November 11, then epoch 3's delayed
-// payout and its recovery, with the updates that followed, which the milestones
-// and the box point to as "the epoch 3 notice at the top". Their dates are the
+// posted, the later first. So it shows the extenders' share on the contracts
+// they can relay, capture the flag from epoch 8, then Pro data on each
+// network's own cycle, all of November 11, then epoch 3's delayed payout and its
+// recovery, with the updates that followed, which the milestones and the box
+// point to as "the epoch 3 notice at the top". Their dates are the
 // epochs' and the milestones' (tests/mainnet-timeline.test.mjs holds them
 // together). `id` is the anchor of the notice's box. `link` opens a notice's
 // full text in the sn repo once that is on sn's main branch, and until then the
@@ -177,6 +178,19 @@ const NOTICES = [
             "Winners are paid to the payout wallet the provider pool already uses, so there is nothing new to sign. Epoch 8's capture the flag claims open around December 7, with its pool claims, in the same claim flow. The pool is registered through the 72-hour timelock before epoch 8 starts, and the milestones below give each step. There is nothing you need to do.",
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-capture-the-flag.md' },
+    },
+    {
+        id: 'notice-extender-relay-share',
+        date: 'November 11, 2026',
+        title: "Extenders earn their share only on contracts they can relay. Providers on an extender's address are credited in full.",
+        paragraphs: [
+            "With the network operator's next server release, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract. This is the rule the subnet owner set on November 11: a contract that comes through an extender counts the extender as one of its n hops, each credited 1/n of the usage.",
+            "The network operator counts a connection as relayed when it comes from an extender's address. Three kinds of connection come from that address without being relayed, and they no longer make the extender a hop: the extender host's own connection, other devices of the extender's own network that share its address, and providers of other networks that share its address while providing publicly, since a public provider always connects to the platform directly.",
+            "So a provider of another network on an extender's address is credited the whole of its contracts' usage, where the extender's network was credited a share of it, usually half. So is a provider serving a device that connects from an extender of the device's own network, where the device's own network was credited a share. Within one network, a fleet's providers on its own extender's address are credited the usage they serve, and the network's total is unchanged. An extender host's own contracts are unchanged.",
+            "One kind of relay counts that did not: a connection from another address of an extender's IPv6 /64. Hosts commonly send from a temporary address of their /64 rather than the one they activated from, so an extender's relays from such an address earned it nothing. On those contracts the extender is now one of the hops, beside the provider.",
+            "SN25 pool rewards are still split by completed usage, and the network operator's provider subsidy, which for traffic since the October 6 cutoff only counts toward the weekly points it awards, follows the same hops. Contracts created before the release keep their hops. There is nothing you need to do.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-extender-relay-share.md' },
     },
 ];
 

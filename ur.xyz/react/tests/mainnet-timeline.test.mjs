@@ -255,19 +255,27 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
     const [install, wallet, payments] = mainnetActions.steps;
     assert.equal(mainnetActions.headline, 'Mainnet is live!');
     assert.equal(mainnetActions.steps.length, 3);
-    // the old miner is deprioritized when the modern provider gate turns on
+    // the old miner has been deprioritized since October 28, when priority replaced the modern provider
+    // gate: the gate's milestone keeps the instant it was due, and says it never turned on
     const gate = events.find((e) => e.id === 'fp2-modern-provider-gate');
     assert.equal(gate.date, '2026-11-11T00:00:00Z');
-    assert.match(text(install), /November 11, 2026/);
-    assert.match(text(install), /From 00:00 UTC on November 11\b/);
+    assert.equal(gate.status, 'done');
+    assert.match(gate.detail, /did not turn on: on October 28 the subnet owner replaced it with priority\./);
+    assert.equal(install.title, 'Install the new miner.');
+    assert.match(text(install), /Since October 28, providers verified as modern are drawn first in Quality and Speed/);
+    assert.doesNotMatch(text(install), /November 11|will be deprioritized/);
     // epoch 3 stayed on version 1; settlement v2 started with epoch 4, at about 18:25 on October 30
     const [, , , epoch3, epoch4] = mainnetEpochs;
     assert.equal(epoch3.settlement, 'v1');
-    assert.match(text(payments), /Epoch 3's funding is recovered and paid with epoch 5/);
+    assert.match(text(payments), /Epoch 3's funding is recovered, as the notice above explains\./);
+    assert.doesNotMatch(text(payments), /paid with epoch 5/);
     assert.equal(epoch4.settlement, 'v2');
     assert.equal(epoch4.start.time, '2026-10-30T18:25:00Z');
     assert.match(text(payments), /epoch 4, from about October 30, 18:25 UTC/);
     assert.equal(events.find((e) => e.id === 'settlement-v2-active').date, epoch4.start.time);
+    // its first claims opened when the first v2 root finalized, at 19:10 UTC on November 8
+    assert.equal(events.find((e) => e.id === 'first-v2-claim').date.split('/')[0], '2026-11-08T19:10:00Z');
+    assert.match(text(payments), /Its first claims opened on November 8, at 19:10 UTC\./);
     // links: the miner guide's own sections, and the operators' apps
     const guide = fs.readFileSync(path.join(__dirname, '../../docs/miner/README.md'), 'utf8');
     const slug = (heading) => heading.toLowerCase().replace(/[^a-z0-9 -]/g, '').trim().replace(/\s+/g, '-');
@@ -291,13 +299,130 @@ test('the notice gives the epochs\' dates, and links to its full text in the sn 
     const epoch4 = mainnetEpochs[4];
     assert.equal(epoch4.end.time, '2026-11-06T18:25:00Z');
     assert.match(text, /end of epoch 4 \(around November 6, 18:25 UTC\)/);
-    // it pays with epoch 5, whose claims open 14,400 blocks after it ends
+    // as first posted, it paid with epoch 5, whose claims open 14,400 blocks after it ends
     const claims = new Date(Date.parse(epoch4.end.time) + (50400 + 14400) * SECONDS_PER_BLOCK * 1000);
     assert.equal(claims.toISOString().slice(0, 10), '2026-11-15');
     assert.match(text, /paid out with epoch 5/);
     assert.match(text, /Claims are expected from around November 15\./);
     // the amounts are the full text's, to the hundredth of an alpha
     assert.match(text, /3,482\.26 α for epoch 1 and 4,132\.72 α for epoch 3/);
+
+    // the update of November 11, last: adding the recovery to epoch 5 was not scheduled in time
+    const update = mainnetNotice.paragraphs.at(-1);
+    assert.match(update, /^Update, November 11: the recovered funds reached the v2 vault on November 8, at 18:30 UTC\. /);
+    assert.match(update, /Adding them to epoch 5's payout was not scheduled by November 10, 18:25 UTC, /);
+    assert.match(update, /so they are not paid with epoch 5\./);
+    assert.match(update, /Epoch 5's regular payout is unaffected\.$/);
+    // the timeline says the same, and no milestone still has the recovery paid with epoch 5
+    const recovery = events.find((e) => e.id === 'epoch-3-recovery-scheduled');
+    assert.equal(recovery.status, 'done');
+    assert.equal(recovery.title, 'Recovered funds not scheduled into epoch 5');
+    assert.equal(recovery.date, '2026-11-10T18:25:00Z');
+    assert.equal(whenText(parseWhen(recovery.date), { approxStart: isApproximate(recovery) }), 'Tue Nov 10 · ≈18:25 UTC');
+    assert.match(recovery.detail, /^The recovery reached the v2 vault on November 8 at 18:30 UTC\. /);
+    assert.match(recovery.detail, /It was not scheduled, so the recovered funds are not paid with epoch 5/);
+    assert.ok(recovery.sources.every((s) => s.ref !== ''), 'the recovery lists only transactions that exist');
+    const epoch5 = events.find((e) => e.id === 'epoch-5-claims-with-recovery');
+    assert.equal(epoch5.status, 'planned');
+    assert.equal(epoch5.title, 'Epoch 5 claims');
+    assert.match(epoch5.detail, /The recovered epoch 1 and 3 funding is not part of epoch 5's payout/);
+    for (const event of events) {
+        assert.doesNotMatch(`${event.title} ${event.detail}`, /recovered and paid with epoch 5|with the recovered epoch 1 and 3 funding|Its root pays epoch 3's recovered funding/, event.id);
+    }
+});
+
+test('no milestone that ended before November 11, 2026, 12:00 UTC is still scheduled or planned', () => {
+    // brought up to date on November 11 from the chain and the rollout records
+    const cutoff = Date.parse('2026-11-11T12:00:00Z');
+    for (const event of events) {
+        const { start, end } = parseWhen(event.date);
+        const last = end || start;
+        const lastMs = last.hasTime ? last.ms : last.ms + 86400000;
+        if (lastMs <= cutoff) assert.equal(event.status, 'done', `${event.id} (${event.date}) is still ${event.status}`);
+    }
+});
+
+test('the version 1 epochs as the chain recorded them: epochs 1 to 3 finalized without a payout root', () => {
+    const byId = (id) => events.find((e) => e.id === id);
+    const close = byId('epoch-1-closes');
+    assert.equal(close.status, 'done');
+    assert.equal(close.date, '2026-10-16T18:09:48Z');
+    assert.match(close.detail, /^Epoch 1 closed at block 9,297,631, within its 120-block close window, /);
+    assert.match(close.detail, /no payout root was committed by block 9,298,828/);
+    assert.deepEqual(close.sources.map((s) => [s.label, s.ref.slice(0, 10)]), [['Epoch 1 close, block 9,297,631', '0xa57407ac']]);
+    // the ids keep the names they were published with, so links to them still land on them
+    for (const [id, epoch, date, block] of [
+        ['first-v1-claims', 1, '2026-10-18T18:09:48Z', '9,312,031'],
+        ['last-v1-claims', 2, '2026-10-25T18:26:00Z', '9,362,431'],
+        ['last-v1-claims-epoch-3', 3, '2026-11-01T18:26:00Z', '9,412,831'],
+    ]) {
+        const event = byId(id);
+        assert.equal(event.status, 'done', id);
+        assert.equal(event.title, `Epoch ${epoch} finalized without a payout root`, id);
+        assert.equal(event.date, date, id);
+        assert.equal(event.approximate, undefined, `${id}: a block time, exact`);
+        assert.match(event.detail, /had no version 1 claims/, id);
+        assert.deepEqual(event.sources.map((s) => s.label), [`Epoch ${epoch} finalized, block ${block}`], id);
+        assert.match(event.sources[0].ref, /^0x[0-9a-f]{64}$/, id);
+    }
+    // epoch 2 was not closed in its window: its emission was deferred, and epoch 3's close took it in
+    const epoch3 = byId('epoch-3-begins-on-v1');
+    assert.match(epoch3.detail, /Epoch 2 was not closed in its 120-block close window, so its emission was deferred to epoch 3's close\.$/);
+    assert.deepEqual(epoch3.sources.map((s) => s.label), ["Epoch 3's first block, 9,348,028", "Epoch 2's emission deferred, block 9,348,551"]);
+    assert.match(byId('last-v1-claims').detail, /epoch 3's 4,132\.72 α covers about two weeks/);
+});
+
+test('the settlement v2 rollout as it happened: from October 22 to 25, with the contracts on October 23', () => {
+    const byId = (id) => events.find((e) => e.id === id);
+    const checks = byId('settlement-v2-release-checks');
+    assert.equal(checks.status, 'done');
+    assert.equal(checks.title, 'Settlement v2 release not ready by October 16');
+    assert.match(checks.detail, /The release went out from October 22 to 25, too late for epoch 3\.$/);
+    // in the order they happened, each a day or a time that the page shows exactly
+    const steps = [
+        ['v2-validator-starts', '2026-10-22T20:48:38Z', 'Thu Oct 22 · 20:48 UTC'],
+        ['v2-contracts-deployed', '2026-10-23T05:55:24Z/2026-10-23T07:51:36Z', 'Fri Oct 23 · 05:55–07:51 UTC'],
+        ['validator-adopts-v2-settings', '2026-10-23T09:03:57Z', 'Fri Oct 23 · 09:03 UTC'],
+        ['operator-services-updated', '2026-10-23/2026-10-24', 'Fri Oct 23 – Sat Oct 24'],
+        ['connect-service-updated', '2026-10-24', 'Sat Oct 24'],
+        ['operator-switches-to-v2-contracts', '2026-10-25', 'Sun Oct 25'],
+    ];
+    for (const [id, date, shown] of steps) {
+        const event = byId(id);
+        assert.equal(event.status, 'done', id);
+        assert.equal(event.date, date, id);
+        assert.equal(whenText(parseWhen(event.date), { approxStart: isApproximate(event) }), shown, id);
+    }
+    const ids = events.map((e) => e.id);
+    assert.deepEqual(steps.map(([id]) => ids.indexOf(id)), steps.map(([id]) => ids.indexOf(id)).slice().sort((a, b) => a - b));
+    // the deployment's six steps, each with its transaction, and its three contracts and the claim batcher
+    const contracts = byId('v2-contracts-deployed');
+    assert.equal(contracts.key, true);
+    assert.match(contracts.detail, /^Six deployment steps on Bittensor's EVM, in blocks 9,344,278 to 9,344,859, /);
+    assert.ok(contracts.sources.every((s) => s.ref !== ''), 'every source of the deployment exists');
+    assert.deepEqual(contracts.sources.filter((s) => s.kind === 'evm_tx').map((s) => s.label.replace(/, block [\d,]+$/, '')), [
+        'vault2 created', 'Escrow registered', 'STSettlement2 implementation created', 'STSettlement2 created', 'vault2 linked to STSettlement2', 'Claim batcher created',
+    ]);
+    assert.equal(sourceRows(contracts.sources, explorers).folded.length, 6);
+    // the pool registration through the governance Safe, on October 29
+    const registered = byId('v2-pool-registered');
+    assert.match(registered.detail, /in the v2 vault on October 29 at 03:11 UTC, before epoch 4 began,/);
+    assert.deepEqual(registered.sources.map((s) => s.label), ['Registration through the governance Safe, block 9,386,659']);
+    assert.match(registered.sources[0].ref, /^0x[0-9a-f]{64}$/);
+});
+
+test('the first settlement v2 claims: epoch 4\'s root finalized at 19:10 UTC on November 8', () => {
+    const claims = events.find((e) => e.id === 'first-v2-claim');
+    assert.equal(claims.status, 'done');
+    assert.equal(claims.key, true);
+    assert.equal(claims.title, 'First settlement v2 claims');
+    assert.equal(claims.date, '2026-11-08T19:10:00Z/2026-11-08T19:11:48Z');
+    assert.equal(whenText(parseWhen(claims.date), { approxStart: isApproximate(claims) }), 'Sun Nov 8 · 19:10–19:11 UTC');
+    assert.match(claims.detail, /finalized at block 9,463,438, 14,404 blocks after its commit, and the first claims followed at block 9,463,447\.$/);
+    assert.deepEqual(claims.sources.map((s) => s.label), ['First v2 root finalized, block 9,463,438', 'First v2 claims, block 9,463,447']);
+    assert.ok(claims.sources.every((s) => /^0x[0-9a-f]{64}$/.test(s.ref)));
+    // nothing of the plan is left
+    assert.doesNotMatch(`${claims.title} ${claims.detail}`, /earliest|can finalize|can push/);
 });
 
 test('the extender amendment: the pool begins epoch 8, and the billing change is live since November 11', () => {

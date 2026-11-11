@@ -17,7 +17,7 @@
  * from the block number (`projected`), which the page marks with ≈.
  * `settlement` is what pays the epoch: 'v1' (version 1) or 'v2' (settlement
  * v2, from epoch 4: epoch 3 began before the v2 pool was registered, so it
- * stayed on version 1, and its funding is recovered and paid with epoch 5).
+ * stayed on version 1, and its funding is recovered: see the notice below).
  *
  * Plain data with no imports: the page, the SPA and the node test
  * (tests/mainnet-timeline.test.mjs) all read it.
@@ -93,16 +93,18 @@ export const SECONDS_PER_BLOCK = 12;
 
 // The box at the top of the page: what miners need to do now. Its dates are
 // the milestones' (tests/mainnet-timeline.test.mjs holds them together): the
-// modern provider gate at 00:00 UTC on November 11, and epoch 4, where
-// settlement v2 started, at about 18:25 UTC on October 30. A link goes only to a page the site has: the miner guide's install and
-// wallet sections, and the operators' apps on /operators.
+// priority that replaced the modern provider gate on October 28; epoch 4, where
+// settlement v2 started, at about 18:25 UTC on October 30; and the first v2
+// claims, at 19:10 UTC on November 8. A link goes only to a page the site has:
+// the miner guide's install and wallet sections, and the operators' apps on
+// /operators.
 export const mainnetActions = {
     headline: 'Mainnet is live!',
     title: 'What miners need to do',
     steps: [
         {
-            title: 'Install the new miner before November 11, 2026.',
-            detail: 'From 00:00 UTC on November 11, the old miner will be deprioritized.',
+            title: 'Install the new miner.',
+            detail: 'Since October 28, providers verified as modern are drawn first in Quality and Speed, so the old miner is deprioritized.',
             link: { label: 'Miner guide: Install', href: '/docs/miner#1-install' },
         },
         {
@@ -112,7 +114,7 @@ export const mainnetActions = {
         },
         {
             title: 'Settlement v2 pays every epoch from epoch 4.',
-            detail: "Settlement v2 started with epoch 4, from about October 30, 18:25 UTC, so version 1's limit of 1,500 paid miners an epoch no longer applies. Its first claims open from about November 8, 19:10 UTC. Epoch 3's funding is recovered and paid with epoch 5, as the notice above explains.",
+            detail: "Settlement v2 started with epoch 4, from about October 30, 18:25 UTC, so version 1's limit of 1,500 paid miners an epoch no longer applies. Its first claims opened on November 8, at 19:10 UTC. Epoch 3's funding is recovered, as the notice above explains.",
         },
     ],
     // the closing paragraph, in runs; a run with an href is a link
@@ -124,8 +126,9 @@ export const mainnetActions = {
 };
 
 // The dated notice above the box at the top: epoch 3's delayed payout, and its
-// recovery with epoch 5. Its dates are the epochs' (tests/mainnet-timeline.test.mjs
-// holds them together), and `link` opens its full text in the sn repo.
+// recovery, with the updates that followed. Its dates are the epochs'
+// (tests/mainnet-timeline.test.mjs holds them together), and `link` opens its
+// full text in the sn repo.
 export const mainnetNotice = {
     date: 'October 31, 2026',
     title: 'Epoch 3 payout delayed. Funds are safe.',
@@ -134,6 +137,7 @@ export const mainnetNotice = {
         "Both epochs' funding is safe in the v1 settlement vault: 3,482.26 α for epoch 1 and 4,132.72 α for epoch 3. Carried funding does not expire.",
         "At the end of epoch 4 (around November 6, 18:25 UTC), a recovery root moves these funds to the v2 vault. They are paid out with epoch 5, with epoch 3's funds going to the providers who did epoch 3's work. Claims are expected from around November 15. Epoch 4 is unaffected, and there is nothing you need to do.",
         "Update, November 6: the recovery root was committed at block 9,449,041, and the funds reach the v2 vault after its 48-hour challenge period, around November 8. Changes to the v2 settlement contract now wait 72 hours behind a public timelock, so adding the funds to epoch 5 is scheduled by November 10. The schedule above is unchanged.",
+        "Update, November 11: the recovered funds reached the v2 vault on November 8, at 18:30 UTC. Adding them to epoch 5's payout was not scheduled by November 10, 18:25 UTC, and changes to the v2 settlement contract wait 72 hours, so they are not paid with epoch 5. They stay in the v2 vault until they are added to a later epoch's payout, and this notice will be updated when that is scheduled. Epoch 5's regular payout is unaffected.",
     ],
     link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-10-31-epoch-3-payout-recovery.md' },
 };

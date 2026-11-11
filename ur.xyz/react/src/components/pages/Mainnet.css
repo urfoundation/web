@@ -39,9 +39,11 @@
 .mainnet-page .mainnet-actions-closing a:hover { color: var(--brand-white); }
 .mainnet-page .mainnet-actions a:focus-visible { outline: 2px solid var(--brand-ur); outline-offset: 3px; }
 
-/* the dated notice above the actions: pale blue, with the token's pink edge;
-   when it leads the page it takes the actions' top padding instead */
+/* the dated notices above the actions: pale blue, with the token's pink edge;
+   the first takes the actions' top padding, and each after it, like the
+   actions, sits close under the one before */
 .mainnet-page .mainnet-notice { padding: 88px var(--content-gutter) 0; }
+.mainnet-page .mainnet-notice + .mainnet-notice,
 .mainnet-page .mainnet-notice + .mainnet-actions { padding-top: 24px; }
 .mainnet-page .mainnet-notice-box { max-width: var(--content-width); margin: 0 auto; padding: 24px 32px 22px; border: 1px solid rgba(214, 230, 244, 0.28); border-left: 3px solid var(--brand-ur); background: rgba(214, 230, 244, 0.05); }
 .mainnet-page .mainnet-notice-date { margin: 0; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; line-height: 1.4; text-transform: uppercase; color: var(--brand-ur); }
@@ -207,6 +209,7 @@
 @media (max-width: 820px) {
     .mainnet-page .mainnet-actions { padding-top: 72px; }
     .mainnet-page .mainnet-notice { padding-top: 72px; }
+    .mainnet-page .mainnet-notice + .mainnet-notice,
     .mainnet-page .mainnet-notice + .mainnet-actions { padding-top: 20px; }
     .mainnet-page #mainnet { padding-top: 64px; padding-bottom: 52px; }
     .mainnet-page #settlement { padding-top: 52px; padding-bottom: 52px; }

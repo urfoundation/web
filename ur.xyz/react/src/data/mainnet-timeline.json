@@ -366,6 +366,17 @@
       ]
     },
     {
+      "id": "pro-grant-per-cycle",
+      "date": "2026-11-11",
+      "status": "scheduled",
+      "title": "Pro data follows each network's own cycle, and the provider subsidy counts its revenue once",
+      "detail": "From the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, and each cycle's grant carries that cycle's share of the subscription's revenue. The network operator's provider subsidy counts that revenue once, as the traffic the grant funds is settled. Before, a paid period's revenue could count twice, in full through its 600 GiB credit and again as a share through the monthly grant on the 1st, and a long-running Google Play subscription counted only a share spread over the months since it began. SN25 pool rewards are counted as before: the pool is split by completed usage, and subscription payments are not an input. For traffic since the October 6 cutoff, the provider subsidy pays no USDC and only counts toward the weekly points the network operator awards. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, and nothing granted before the release changes. Customers pay the same.",
+      "sources": [
+        { "label": "How rewards are counted, in the miner guide", "kind": "doc", "ref": "/docs/miner/rewards#how-rewards-are-counted" },
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "" }
+      ]
+    },
+    {
       "id": "epoch-5-claims-with-recovery",
       "date": "2026-11-15T18:25:00Z/2026-11-15T22:25:00Z",
       "status": "planned",

@@ -114,7 +114,7 @@ export const mainnetActions = {
         },
         {
             title: 'Settlement v2 pays every epoch from epoch 4.',
-            detail: "Settlement v2 started with epoch 4, from about October 30, 18:25 UTC, so version 1's limit of 1,500 paid miners an epoch no longer applies. Its first claims opened on November 8, at 19:10 UTC. Epoch 3's funding is recovered, as the notice above explains.",
+            detail: "Settlement v2 started with epoch 4, from about October 30, 18:25 UTC, so version 1's limit of 1,500 paid miners an epoch no longer applies. Its first claims opened on November 8, at 19:10 UTC. Epoch 3's funding is recovered, as the notice at the top explains.",
         },
     ],
     // the closing paragraph, in runs; a run with an href is a link
@@ -125,19 +125,39 @@ export const mainnetActions = {
     ],
 };
 
-// The dated notice above the box at the top: epoch 3's delayed payout, and its
-// recovery, with the updates that followed. Its dates are the epochs'
-// (tests/mainnet-timeline.test.mjs holds them together), and `link` opens its
-// full text in the sn repo.
-export const mainnetNotice = {
-    date: 'October 31, 2026',
-    title: 'Epoch 3 payout delayed. Funds are safe.',
-    paragraphs: [
-        "Epoch 3's payout root was not committed within its window on October 30, because a server step timed out at mainnet scale. That step is now fixed. Epoch 1 had no eligible work to pay out, so its funding carried forward under the protocol's missed-commit rule.",
-        "Both epochs' funding is safe in the v1 settlement vault: 3,482.26 α for epoch 1 and 4,132.72 α for epoch 3. Carried funding does not expire.",
-        "At the end of epoch 4 (around November 6, 18:25 UTC), a recovery root moves these funds to the v2 vault. They are paid out with epoch 5, with epoch 3's funds going to the providers who did epoch 3's work. Claims are expected from around November 15. Epoch 4 is unaffected, and there is nothing you need to do.",
-        "Update, November 6: the recovery root was committed at block 9,449,041, and the funds reach the v2 vault after its 48-hour challenge period, around November 8. Changes to the v2 settlement contract now wait 72 hours behind a public timelock, so adding the funds to epoch 5 is scheduled by November 10. The schedule above is unchanged.",
-        "Update, November 11: the recovered funds reached the v2 vault on November 8, at 18:30 UTC. Adding them to epoch 5's payout was not scheduled by November 10, 18:25 UTC, and changes to the v2 settlement contract wait 72 hours, so they are not paid with epoch 5. They stay in the v2 vault until they are added to a later epoch's payout, and this notice will be updated when that is scheduled. Epoch 5's regular payout is unaffected.",
-    ],
-    link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-10-31-epoch-3-payout-recovery.md' },
-};
+// The dated notices above the box at the top, each in its own box. The first is
+// "the notice at the top" that the milestones and the box point to: epoch 3's
+// delayed payout and its recovery, with the updates that followed. The next is
+// Pro data on each network's own cycle, from November 11, and what that
+// changes in the provider subsidy. Their dates are the epochs' and the milestones'
+// (tests/mainnet-timeline.test.mjs holds them together). `id` is the anchor of
+// the notice's box. `link` opens a notice's full text in the sn repo once that
+// is on sn's main branch, and until then the notice's milestone on this page.
+export const mainnetNotices = [
+    {
+        id: 'notice',
+        date: 'October 31, 2026',
+        title: 'Epoch 3 payout delayed. Funds are safe.',
+        paragraphs: [
+            "Epoch 3's payout root was not committed within its window on October 30, because a server step timed out at mainnet scale. That step is now fixed. Epoch 1 had no eligible work to pay out, so its funding carried forward under the protocol's missed-commit rule.",
+            "Both epochs' funding is safe in the v1 settlement vault: 3,482.26 α for epoch 1 and 4,132.72 α for epoch 3. Carried funding does not expire.",
+            "At the end of epoch 4 (around November 6, 18:25 UTC), a recovery root moves these funds to the v2 vault. They are paid out with epoch 5, with epoch 3's funds going to the providers who did epoch 3's work. Claims are expected from around November 15. Epoch 4 is unaffected, and there is nothing you need to do.",
+            "Update, November 6: the recovery root was committed at block 9,449,041, and the funds reach the v2 vault after its 48-hour challenge period, around November 8. Changes to the v2 settlement contract now wait 72 hours behind a public timelock, so adding the funds to epoch 5 is scheduled by November 10. The schedule above is unchanged.",
+            "Update, November 11: the recovered funds reached the v2 vault on November 8, at 18:30 UTC. Adding them to epoch 5's payout was not scheduled by November 10, 18:25 UTC, and changes to the v2 settlement contract wait 72 hours, so they are not paid with epoch 5. They stay in the v2 vault until they are added to a later epoch's payout, and this notice will be updated when that is scheduled. Epoch 5's regular payout is unaffected.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-10-31-epoch-3-payout-recovery.md' },
+    },
+    {
+        id: 'notice-pro-grant-cycle',
+        date: 'November 11, 2026',
+        title: "Pro data moves to each network's own cycle. SN25 rewards are counted as before.",
+        paragraphs: [
+            "With the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, instead of on the 1st of the month. Each cycle's grant carries that cycle's share of the subscription's revenue, and a payment no longer adds a separate 600 GiB credit.",
+            'SN25 pool rewards are counted as before. The pool is split by completed usage, and subscription payments are not an input to it.',
+            "What changes is the subscription revenue counted by the network operator's provider subsidy, which for traffic since the October 6 cutoff pays no USDC and only counts toward the weekly points the network operator awards. The subsidy counts revenue through the balances that fund settled traffic. Before, a paid period's revenue could count twice, in full through its 600 GiB credit and again as a share through the monthly grant, and a long-running Google Play subscription counted only a share spread over the months since it began. From the release, each period's revenue counts once, through its cycle grants.",
+            "So the subsidy counts less where revenue counted twice, as in a new subscription's first month, and more for long-running Google Play subscriptions. Its timing follows each network's own cycle rather than the 1st. A payment credited during a running cycle, such as a second subscription, adds its revenue to the cycles after it, and the part that overlaps the running cycle is not counted.",
+            "Nothing granted before the release changes. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, when that grant's month ends. Customers pay the same, and there is nothing you need to do.",
+        ],
+        link: { label: 'See the milestone', href: '#pro-grant-per-cycle' },
+    },
+];

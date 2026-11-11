@@ -2,7 +2,7 @@ import React from 'react';
 import Section from '../Section';
 import { EXTERNAL, isExternal } from '../../lib/links';
 import timeline from '../../data/mainnet-timeline.json';
-import { mainnetActions, mainnetAfterEpochs, mainnetBeforeEpochs, mainnetEpochs, mainnetNotice } from '../../data/mainnet';
+import { mainnetActions, mainnetAfterEpochs, mainnetBeforeEpochs, mainnetEpochs, mainnetNotices } from '../../data/mainnet';
 import {
     SETTLEMENT_LABEL,
     STATUS_LABEL,
@@ -48,7 +48,7 @@ export default function MainnetPage({ updated = null, summary = null }) {
 
     return (
         <div className="mainnet-page">
-            {mainnetNotice && <MainnetNotice notice={mainnetNotice} />}
+            {mainnetNotices.map((notice) => <MainnetNotice key={notice.id} notice={notice} />)}
             <MinerActions actions={mainnetActions} />
 
             <Section id="mainnet" eyebrow="SN25 · Bittensor mainnet" title="Mainnet launch timeline" headingLevel="h1">
@@ -104,17 +104,19 @@ export default function MainnetPage({ updated = null, summary = null }) {
 }
 
 /**
- * The dated notice above the box at the top (data/mainnet.js
- * mainnetNotice), with a link to its full text. Like the box's headline,
- * its title is an h2 under the page's single h1.
+ * One of the dated notices above the box at the top (data/mainnet.js
+ * mainnetNotices), anchored at its id, with a link to its full text or to its
+ * milestone. Like the box's headline, its title is an h2 under the page's
+ * single h1.
  */
 function MainnetNotice({ notice }) {
     const external = isExternal(notice.link.href) ? EXTERNAL : {};
+    const headingId = `${notice.id}-heading`;
     return (
-        <section className="mainnet-notice" id="notice" aria-labelledby="notice-heading">
+        <section className="mainnet-notice" id={notice.id} aria-labelledby={headingId}>
             <div className="mainnet-notice-box" role="note">
                 <p className="mainnet-notice-date">Notice · {notice.date}</p>
-                <h2 className="mainnet-notice-title" id="notice-heading">{notice.title}</h2>
+                <h2 className="mainnet-notice-title" id={headingId}>{notice.title}</h2>
                 {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
                 <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">→</span></a>
             </div>

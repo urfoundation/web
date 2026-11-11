@@ -23,7 +23,7 @@ export const DOC_ORDER = Object.freeze(['miner', 'validator', 'operator', 'litep
 export const DOC_CHAPTERS = Object.freeze({
     miner: Object.freeze({
         label: 'Miner guide',
-        chapters: Object.freeze(['install', 'run', 'updates', 'rewards', 'troubleshooting', 'advanced', 'reference']),
+        chapters: Object.freeze(['install', 'run', 'extender', 'updates', 'rewards', 'troubleshooting', 'advanced', 'reference']),
     }),
 });
 

@@ -1070,16 +1070,20 @@
       "lastmod": "2026-11-11"
     },
     "/docs/miner": {
-      "fingerprint": "bb304571be71be73",
-      "lastmod": "2026-10-22"
+      "fingerprint": "63611170616856b0",
+      "lastmod": "2026-11-11"
     },
     "/docs/miner/advanced": {
       "fingerprint": "5915e3107382c2c6",
       "lastmod": "2026-10-22"
     },
+    "/docs/miner/extender": {
+      "fingerprint": "d208ac65be8504e7",
+      "lastmod": "2026-11-11"
+    },
     "/docs/miner/install": {
-      "fingerprint": "2cf02484bd533ffa",
-      "lastmod": "2026-10-22"
+      "fingerprint": "adfcfcf4bb98af5e",
+      "lastmod": "2026-11-11"
     },
     "/docs/miner/reference": {
       "fingerprint": "ebc58c128914af33",
@@ -1090,12 +1094,12 @@
       "lastmod": "2026-10-22"
     },
     "/docs/miner/run": {
-      "fingerprint": "287e047496ca1cb3",
-      "lastmod": "2026-10-22"
+      "fingerprint": "4e57ccc199e1f0cc",
+      "lastmod": "2026-11-11"
     },
     "/docs/miner/troubleshooting": {
-      "fingerprint": "eb4ca841a67b4160",
-      "lastmod": "2026-10-22"
+      "fingerprint": "721a54b1eae13b70",
+      "lastmod": "2026-11-11"
     },
     "/docs/miner/updates": {
       "fingerprint": "97f3ec3923721a02",

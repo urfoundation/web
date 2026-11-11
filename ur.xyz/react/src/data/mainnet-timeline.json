@@ -396,7 +396,7 @@
       "date": "2026-11-27T18:25:00Z",
       "status": "scheduled",
       "title": "Extender pool for intra-platform and intra-network traffic, from epoch 8",
-      "detail": "From block 9,600,028, the first of epoch 8, bytes that no provider carries count for extenders instead. That covers traffic between a client and the network operator's platform, and traffic between devices of one network. The operator's pool spreads them evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, up to the epoch's eligible provider usage, so extenders earn at most half of a pool. Approved by the subnet owner on November 10, it takes effect once the signed amendment entry is published before epoch 8 starts.",
+      "detail": "From block 9,600,028, the first of epoch 8, the part of each contract's traffic that no provider earns counts for extenders instead. That covers traffic between a client and the network operator's platform, and traffic between devices of one network. The operator's pool spreads it evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, up to the epoch's eligible provider usage, so extenders earn at most half of a pool. An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11. Approved by the subnet owner on November 10, it takes effect once the signed amendment entry is published before epoch 8 starts.",
       "sources": [
         { "label": "The amendment, WHITEPAPER.md §8.6", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md" },
         { "label": "Signed amendment entry", "kind": "doc", "ref": "" },

@@ -312,6 +312,11 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     assert.match(pool.detail, /^From block 9,600,028, the first of epoch 8, /);
     assert.match(pool.detail, /at most half of a pool/);
     assert.match(pool.detail, /once the signed amendment entry is published before epoch 8 starts\.$/);
+    // Q7, answered on November 11 (§8.6.2, decision 16): only the part of a contract that no provider earns
+    // goes to the pool, and an extender on a contract keeps its own hop share of it
+    assert.match(pool.detail, /the part of each contract's traffic that no provider earns counts for extenders instead\./);
+    assert.match(pool.detail, /An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11\./);
+    assert.doesNotMatch(pool.detail, /bytes that no provider carries/);
     assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === pool.id)).id, 'after-epoch-7');
     // the signed entry and epoch 8's first block do not exist yet: their sources stay empty, so the page hides them
     assert.deepEqual(pool.sources.filter((s) => s.ref === '').map((s) => s.label), ['Signed amendment entry', "Epoch 8's first block, 9,600,028"]);

@@ -299,3 +299,32 @@ test('the notice gives the epochs\' dates, and links to its full text in the sn 
     // the amounts are the full text's, to the hundredth of an alpha
     assert.match(text, /3,482\.26 α for epoch 1 and 4,132\.72 α for epoch 3/);
 });
+
+test('the extender amendment: the pool begins epoch 8, and the billing change is planned, not done', () => {
+    // approved on November 10 (the sn whitepaper's §8.6): the extender pool starts with epoch 8's first
+    // block, which is the end of epoch 7, the last epoch listed, so the list shows it after epoch 7
+    const pool = events.find((e) => e.id === 'extender-pool-epoch-8');
+    const epoch7 = mainnetEpochs.at(-1);
+    assert.equal(epoch7.number, 7);
+    assert.equal(epoch7.end.block, 9600028);
+    assert.equal(pool.status, 'scheduled');
+    assert.equal(pool.date, epoch7.end.time);
+    assert.match(pool.detail, /^From block 9,600,028, the first of epoch 8, /);
+    assert.match(pool.detail, /at most half of a pool/);
+    assert.match(pool.detail, /once the signed amendment entry is published before epoch 8 starts\.$/);
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === pool.id)).id, 'after-epoch-7');
+    // the signed entry and epoch 8's first block do not exist yet: their sources stay empty, so the page hides them
+    assert.deepEqual(pool.sources.filter((s) => s.ref === '').map((s) => s.label), ['Signed amendment entry', "Epoch 8's first block, 9,600,028"]);
+    // not a key milestone: the summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
+    assert.equal(pool.key, undefined);
+
+    // the billing change: dated the day it was approved, planned until it deploys
+    const billing = events.find((e) => e.id === 'intra-traffic-billing-planned');
+    assert.equal(billing.date, '2026-11-10');
+    assert.equal(billing.status, 'planned');
+    assert.match(billing.detail, /^Approved by the subnet owner on November 10\. Once the billing change deploys, /);
+    // only who pays changes: a friends-and-family provider's credit does not depend on the plan (§8.6.3)
+    assert.match(billing.detail, /Friends-and-family providers are credited for it as before: paid and free traffic count alike\./);
+    assert.match(billing.detail, /Contracts opened before the deploy are not charged\./);
+    assert.equal(billing.key, undefined);
+});

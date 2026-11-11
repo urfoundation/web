@@ -30,7 +30,7 @@ Meteora
 
 # 6. Mainnet
 
-The SN25 mainnet launch timeline at /mainnet, English-only like /about and /reserve: the payout epochs, version 1 then settlement v2 from epoch 4, and each milestone with its status (done, in progress, scheduled or planned) and its on-chain sources. The milestones are data, in react/src/data/mainnet-timeline.json. The footer's Network column links it.
+The SN25 mainnet launch timeline at /mainnet, English-only like /about and /reserve. Dated notices head the page, newest first: react/src/data/mainnet.js lists them in the order they were posted, mainnetNotices sorts them by the day each was posted and within a day the later first, and each links its full text in the sn repo's mainnet/notices. Then the box of what miners need to do, the payout epochs, version 1 then settlement v2 from epoch 4, and each milestone with its status (done, in progress, scheduled or planned) and its on-chain sources, through the extender pool and capture the flag from epoch 8. The milestones are data, in react/src/data/mainnet-timeline.json; tests/mainnet-timeline.test.mjs pins the notices' order and the milestones. The footer's Network column links it.
 
 # Footer
 

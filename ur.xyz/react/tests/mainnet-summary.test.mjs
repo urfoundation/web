@@ -69,15 +69,16 @@ test('the bands are the data\'s epochs, which agree with the epoch clock', () =>
     // each band is one of the list's groups (epoch 6 has the epoch 5 claims); and
     // each group after launch is a band, but for the
     // group after the last epoch, which is a band, the tail, exactly when it holds
-    // a key milestone. The extender pool from epoch 8's first block is not key, so
-    // the list shows it after epoch 7 and the axis still ends with epoch 7
+    // a key milestone. The extender pool and capture the flag from epoch 8's first
+    // block, and capture the flag's first draw and claims, are not key, so the list
+    // shows them after epoch 7 and the axis still ends with epoch 7
     const grouped = groupByEpoch(events, mainnetEpochs);
     const groups = grouped.map((g) => g.id);
     assert.deepEqual(model.bands.map((b) => b.group).filter((g) => !groups.includes(g)), []);
     const after = `after-epoch-${mainnetEpochs.at(-1).number}`;
     for (const group of groups.filter((g) => g !== 'before-launch' && g !== after)) assert.ok(model.bands.some((b) => b.group === group), `${group} is a band`);
     const afterGroup = grouped.find((g) => g.id === after);
-    assert.deepEqual(afterGroup.events.map((e) => e.id), ['extender-pool-epoch-8']);
+    assert.deepEqual(afterGroup.events.map((e) => e.id), ['extender-pool-epoch-8', 'capture-the-flag-epoch-8', 'capture-the-flag-first-draw', 'capture-the-flag-first-claims']);
     assert.equal(model.bands.some((b) => b.group === after), afterGroup.events.some((e) => e.key === true), `${after} is a band only for a key milestone`);
 });
 

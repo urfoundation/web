@@ -96,6 +96,8 @@ gates: install-playwright-browser
 	node --test ../react/tests/price.test.mjs
 	node --test ../scripts/price-gate.test.mjs
 	node ../scripts/sync-price.mjs --check
+	node --test ../scripts/amendments-gate.test.mjs
+	node ../scripts/sync-amendments.mjs --check
 	node ../react/tests/visual-parity.mjs
 	node ../react/tests/network-privacy.mjs
 	node ../react/tests/static-affordances.mjs

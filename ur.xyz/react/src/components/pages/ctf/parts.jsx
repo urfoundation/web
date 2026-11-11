@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
     API_HERE,
     START_URL,
+    ctaHref,
     alpha,
     countdown,
     countryMessage,
@@ -140,7 +141,7 @@ export function Tip({ tip, cls, text, label, near, body, after, cta, pop = false
                     {near && <span className="ctf-act-near">{near}</span>}
                     <span className="ctf-act-do" id={domId}>{body}</span>
                     {after && <span className="ctf-act-near">{after}</span>}
-                    <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={START_URL}>{cta}</a>
+                    <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaHref(cta)}>{cta}</a>
                 </span>
             )}
         </span>
@@ -317,7 +318,7 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
             </div>
             <div className="ctf-cta">
                 <a className="ctf-btn ctf-btn-p" href={START_URL}>{c ? `Start mining in ${c.the}` : 'Start mining'}</a>
-                <a className="ctf-btn ctf-btn-s" href={START_URL}>Run an extender</a>
+                <a className="ctf-btn ctf-btn-s" href={ctaHref('Run an extender')}>Run an extender</a>
                 <p className="ctf-cta-note">Stay online in {where} for at least half the epoch to enter the draw. Your app's payout wallet is used.</p>
                 {picker}
             </div>
@@ -348,7 +349,7 @@ export function EasyWinCard({ m, c, i, mounted, tips, expanded, onExpand }) {
                 <div className="ctf-fc-next">
                     <span className="ctf-act-near">{step.near}</span>
                     <span className="ctf-act-do">{step.act}<b>{step.take}</b>.</span>
-                    <div className="ctf-more-cta"><a className="ctf-btn ctf-btn-p ctf-btn-sm" href={START_URL}>{step.cta}</a><button type="button" className="ctf-btn ctf-btn-s ctf-btn-sm" onClick={() => onExpand(c.code)}>Close</button></div>
+                    <div className="ctf-more-cta"><a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaHref(step.cta)}>{step.cta}</a><button type="button" className="ctf-btn ctf-btn-s ctf-btn-sm" onClick={() => onExpand(c.code)}>Close</button></div>
                 </div>
             )}
         </article>
@@ -460,7 +461,10 @@ export const GridCell = React.memo(function GridCell({ m, c, i, mounted, tipApi,
                         ? <><p className="ctf-more-line">{roleDetail(m, c, 'p')}</p><p className="ctf-more-line">{roleDetail(m, c, 'x')}</p></>
                         : <p className="ctf-more-line">{countryMessage(m, c)} {presenceSentence(m, c)}</p>}
                     <div className="ctf-more-cta ctf-more-cta-3">
-                        <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={START_URL}>{m.drawn && c.x.open && !c.p.open ? 'Run an extender' : m.drawn && c.p.open && !c.x.open ? 'Run a provider' : 'Start mining'}</a>
+                        {(() => {
+                            const cta = m.drawn && c.x.open && !c.p.open ? 'Run an extender' : m.drawn && c.p.open && !c.x.open ? 'Run a provider' : 'Start mining';
+                            return <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaHref(cta)}>{cta}</a>;
+                        })()}
                         <a className="ctf-btn ctf-btn-s ctf-btn-sm" href={countryPath(c.code)}>Country page</a>
                         <button type="button" className="ctf-btn ctf-btn-s ctf-btn-sm" onClick={() => onExpand(c.code)}>Close</button>
                     </div>

@@ -30,8 +30,11 @@ export const API_HERE = `${API_ORIGIN}/sn/ctf/here`;
 export const apiCountry = (code) => `${API_ORIGIN}/sn/ctf/country/${code}`;
 export const OPERATOR_YML = 'https://github.com/urfoundation/sn/blob/main/api/operator.yml';
 export const FLAGS_LICENSE = '/ctf/flags/LICENSE.txt';
-// where the calls to action go: the free URnetwork app (design.html)
+// where the calls to action go: the free URnetwork app (design.html), and for
+// an extender the miner guide's chapter on running one (its TCP port 443)
 export const START_URL = 'https://ur.io';
+export const EXTENDER_URL = '/docs/miner/extender';
+export const ctaHref = (label) => (label === 'Run an extender' ? EXTENDER_URL : START_URL);
 export const flagSrc = (code) => `/ctf/flags/${code}.svg`;
 export const countryPath = (code) => `${HUB_PATH}/${code}`;
 

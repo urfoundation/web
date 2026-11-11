@@ -1,7 +1,7 @@
 import React from 'react';
 import { CTF } from './ctf/data';
 import Board from './ctf/Board';
-import { API_STATE, EPOCH4_SLOT_RAO, FLAGS_LICENSE, OPERATOR_YML, alpha, dayName, utcClock, utcDay } from './ctf/model';
+import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, OPERATOR_YML, alpha, dayName, utcClock, utcDay } from './ctf/model';
 import './Ctf.css';
 
 /**
@@ -94,7 +94,7 @@ function HubQuestions({ m }) {
                 ['How do I win a slot?', <>Run the free URnetwork app as a provider or an extender, keep it online in your country for at least half the epoch, and be online when it ends. Where a slot went unclaimed last epoch, a newcomer wins by default. Where all five were won, a public draw picks five winners.</>],
                 ['How much can I earn?', <>{slotWorth(m)}, and a winner in a country with a pot also takes a fifth of that pot. Amounts change every epoch with the network's emission and with how many people run in each country, and alpha's price moves. Nothing is guaranteed.</>],
                 ['Is it passive income, or a job?', <>Neither, quite. The app runs in the background on a phone or computer you already have, but it earns only while it stays online. It is not a job, with no employer, hours or wage, and not an investment, with no fixed return.</>],
-                ['What is the difference between a provider and an extender?', <>A provider shares your internet connection with the people who use URnetwork. An extender is a relay for people who cannot reach the network directly, for example behind censorship. The desktop app runs both by default, and one device can win in both roles.</>],
+                ['What is the difference between a provider and an extender?', <>A provider shares your internet connection with the people who use URnetwork. An extender is a relay for people who cannot reach the network directly, for example behind censorship. The desktop app runs both by default, and one device can win in both roles. An extender works only where the internet can reach your computer on TCP port 443: <a href={EXTENDER_URL}>Run an extender</a> says how to open it.</>],
                 ['How is the draw kept fair?', <>When the epoch ends, the operator commits the list of eligible miners on chain. A drand round published after that commitment then picks the winners, so nobody can choose them. Every draw can be checked against its census and its round.</>],
                 ['Can my AI assistant read this data?', <>Yes. {live ? 'The numbers on this page are' : `From epoch ${m.firstEpoch}, the numbers on this page are`} public JSON at <a href={API_STATE}>/sn/ctf</a>, documented in <a href={OPERATOR_YML}><code>sn/api/operator.yml</code></a>, with times in UTC and amounts in α. They change once an epoch.</>],
             ]}

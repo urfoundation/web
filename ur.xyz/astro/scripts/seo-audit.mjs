@@ -527,6 +527,43 @@ for (const p of pages.values()) {
   }
 }
 
+// ── capture the flag: 249 country pages, each its own ──
+// Every /ctf/<cc> page is indexable (sn design/ctf/SEO.md §2.1), so none may
+// be another with only the country's name swapped: that template is a doorway
+// in Google's spam policies, and near-duplicates are clustered into one page.
+// The text of each page's <main>, with its own country named out (its name
+// and the forms a sentence uses), must differ from every other's; and the
+// pages are exactly the snapshot's 249 countries.
+{
+  const CTF_SNAPSHOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../react/src/data/ctf-epoch.json");
+  const countryPages = [...pages.values()].filter((p) => /^\/ctf\/[a-z]{2}$/.test(p.urlPath) && !p.redirectStub);
+  if (countryPages.length || pages.has("/ctf")) {
+    const countries = existsSync(CTF_SNAPSHOT) ? JSON.parse(readFileSync(CTF_SNAPSHOT, "utf8")).countries : [];
+    const byCode = new Map(countries.map((c) => [c.code, c]));
+    if (countryPages.length !== countries.length) err(`/ctf: ${countryPages.length} country pages for the snapshot's ${countries.length} countries`);
+    const mainText = (html) => decodeHtmlEntities(
+      ((html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "")
+        .replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ")
+        .replace(/<[^>]+>/g, " "),
+    ).replace(/\s+/g, " ").trim();
+    const seen = new Map();
+    for (const p of countryPages) {
+      const c = byCode.get(p.urlPath.slice("/ctf/".length));
+      if (!c) {
+        err(`${p.urlPath}: no such country in react/src/data/ctf-epoch.json`);
+        continue;
+      }
+      if (p.noindex) err(`${p.urlPath}: a country page is noindex`);
+      const the = c.sentence_name;
+      const names = [c.name, the, the.charAt(0).toUpperCase() + the.slice(1), the.replace(/^the /, "")].sort((a, b) => b.length - a.length);
+      let text = mainText(p.html);
+      for (const name of names) text = text.split(name).join("\u0000");
+      if (seen.has(text)) err(`${p.urlPath}: differs from ${seen.get(text)} by the country's name alone`);
+      else seen.set(text, p.urlPath);
+    }
+  }
+}
+
 // ── document images nothing shows ──
 // The asset generator published every image in docs/, including a 3.3 MB
 // picture (/docs/res/ur.png and its WebP) no page used. An image under /docs/

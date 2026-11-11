@@ -428,9 +428,10 @@ http {
             return 301 /docs$docpath;
         }
 
-        # The about, build, investor, mainnet, price and reserve pages are
-        # English-only too: their localized paths 301 to the page.
-        location ~ ^/(?:ru|ar|zh|de|es)/(?<en_page>about|build|investors|mainnet|price|reserve)(?<en_rest>/.*)?$ {
+        # The about, build, capture the flag (/ctf and its country pages),
+        # investor, mainnet, price and reserve pages are English-only too:
+        # their localized paths 301 to the page.
+        location ~ ^/(?:ru|ar|zh|de|es)/(?<en_page>about|build|ctf|investors|mainnet|price|reserve)(?<en_rest>/.*)?$ {
             return 301 /$en_page$en_rest$is_args$args;
         }
 

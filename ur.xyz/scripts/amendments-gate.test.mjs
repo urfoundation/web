@@ -50,6 +50,7 @@ const replaced = (text, from, to) => {
     assert.ok(text.includes(from), `no ${from}`);
     return text.replace(from, to);
 };
+const char = (code) => String.fromCodePoint(code);
 
 test('the file sn published first passes, and so does the tracked one', () => {
     assert.deepEqual(checkAmendments(LAUNCH), []);
@@ -71,6 +72,9 @@ test('a well-made signed file passes', () => {
     assert.deepEqual(checkAmendments(signed(entry(v1()), entry(v2()), entry(v2(8, { no: 2 })), entry(v1(9)), entry(v2(12, { no: 2 })))), []);
     // The other recovery byte, and the largest s readers take.
     assert.deepEqual(checkAmendments(signed(entry(v1(), { signature: `0x${'11'.repeat(32)}${HALF_ORDER}1c` }))), []);
+    // A comment may say anything YAML can read, a no-break space or § included.
+    assert.deepEqual(checkAmendments(`${SIGNED}# 5${char(0xa0)}GiB, § 2.4\n`), []);
+    assert.deepEqual(checkAmendments(replaced(SIGNED, 'sn: 25', `sn: 25 # sn${char(0x3000)}25`)), []);
 });
 
 // Every way a file can be wrong, each with words its refusal must contain.
@@ -131,13 +135,31 @@ const BROKEN = {
     'a kind not moving on': [signed(entry(v1(8)), entry(v2(8)), entry(v1(8))), /the v1 entry from epoch 8 for no 1 is not after the entry of its kind for its operator from epoch 8/],
     'a tab': [replaced(LAUNCH, 'sn: 25', 'sn:\t25'), /tab/],
     'carriage returns': [LAUNCH.replaceAll('\n', '\r\n'), /carriage return/],
+    // Only spaces are blanks, and nothing YAML refuses or reads as a line break gets
+    // in: either could hide from this gate what readers see, or show it what they do not.
+    'a no-break space after a value': [replaced(LAUNCH, 'sn: 25', `sn: 25${char(0xa0)}`), new RegExp(`sn is 25${char(0xa0)},`)],
+    'an ideographic space after a value': [replaced(LAUNCH, 'sn: 25', `sn: 25${char(0x3000)}`), new RegExp(`sn is 25${char(0x3000)},`)],
+    'a line of no-break space': [replaced(LAUNCH, '#\n', `#\n${char(0xa0)}\n`), /line 5: not a "key: value" line/],
+    'a no-break space before a comment': [replaced(LAUNCH, '#\n', `#\n${char(0xa0)}# a note\n`), /line 5: not a "key: value" line/],
+    'a no-break space after a line': [replaced(SIGNED, `"${v1()}"`, `"${v1()}"${char(0xa0)}`), /line 12: an entry starts "- line:"/],
+    'a no-break space after a signature': [replaced(SIGNED, `"${SIGNATURE}"\n`, `"${SIGNATURE}"${char(0xa0)}\n`), /line 13: a signature is written in double quotes/],
+    'a form feed': [replaced(LAUNCH, 'sn: 25', `sn: 25${char(0xc)}`), /line 1: U\+000C, a control character/],
+    'a vertical tab on its own line': [`${LAUNCH}${char(0xb)}\n`, /line 11: U\+000B/],
+    'a control character in a comment': [`${LAUNCH}# a${char(0x1)}b\n`, /line 11: U\+0001/],
+    'a delete in a comment': [`${LAUNCH}# a${char(0x7f)}b\n`, /line 11: U\+007F/],
+    'a C1 control in a comment': [`${LAUNCH}# a${char(0x90)}b\n`, /line 11: U\+0090/],
+    'entries hidden in a comment by next-line characters': [`${LAUNCH}# a note${char(0x85)}signed_amendments:${char(0x85)}  - line: "${v1()}"${char(0x85)}    signature: "${SIGNATURE}"\n`, /line 11: U\+0085, a control character or one YAML reads as a line break/],
+    'entries hidden in a comment by line separators': [`${LAUNCH}# a note${char(0x2028)}signed_amendments:${char(0x2028)}  - line: "${v1()}"${char(0x2028)}    signature: "${SIGNATURE}"\n`, /line 11: U\+2028/],
+    'a paragraph separator': [`${LAUNCH}# a${char(0x2029)}b\n`, /line 11: U\+2029/],
+    'a byte-order mark': [`${char(0xfeff)}${LAUNCH}`, /line 1: a byte-order mark/],
+    'a noncharacter': [`${LAUNCH}# ${char(0xfffe)}\n`, /line 11: U\+FFFE/],
     'a document marker': [`---\n${LAUNCH}`, /only the entries under signed_amendments are indented or start with "-": ---/],
     'two documents': [`${LAUNCH}---\n${LAUNCH}`, /start with "-": ---/],
     'a stray line': [`${LAUNCH}stray\n`, /not a "key: value" line/],
     'a line indented under sn': [replaced(LAUNCH, 'sn: 25\n', 'sn: 25\n  more: 1\n'), /only the entries under signed_amendments are indented/],
     'an error page': ['<!doctype html>\n<html>not a file</html>\n', /not a "key: value" line/],
     'an empty file': ['', /names no sn/],
-    'broken UTF-8': [`${LAUNCH}# �\n`, /UTF-8/],
+    'broken UTF-8': [`${LAUNCH}# ${char(0xfffd)}\n`, /UTF-8/],
     'too large': [`${LAUNCH}#${' '.repeat(256 << 10)}\n`, /larger than/],
 };
 
@@ -234,11 +256,14 @@ TOOL
 chmod +x "$3"
 `;
 
+/** This environment without git's own variables, so that git uses the repository it runs in. */
+const withoutGit = () => Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_')));
+
 function sync(context, args = [], env = {}) {
     const bin = path.join(context.root, 'bin');
     fs.mkdirSync(bin, { recursive: true });
     fs.writeFileSync(path.join(bin, 'go'), STAND_IN, { mode: 0o755 });
-    const { SN_DIR, ...inherited } = process.env; // the script's default must find the checkout
+    const { SN_DIR, ...inherited } = withoutGit(); // the script's default must find the checkout
     return spawnSync(process.execPath, [path.join(context.site, 'scripts/sync-amendments.mjs'), ...args], {
         encoding: 'utf8',
         env: { ...inherited, PATH: `${bin}${path.delimiter}${process.env.PATH}`, STAND_IN_SAW: path.join(context.root, 'saw.yml'), ...env },
@@ -392,6 +417,60 @@ test('--check passes what a sync leaves and refuses anything else', (t) => {
     assert.deepEqual(published(context.site), before);
 });
 
+test('every copy rolled back together still fails, against the versions git holds', (t) => {
+    const context = launchSite(t);
+    const git = (...args) => {
+        const run = spawnSync('git', [
+            '-c', 'user.name=amendments gate', '-c', 'user.email=amendments-gate@example.invalid',
+            '-c', 'commit.gpgsign=false', '-c', 'core.hooksPath=/dev/null', ...args,
+        ], { cwd: context.root, encoding: 'utf8', env: withoutGit() });
+        assert.equal(run.status, 0, run.stderr);
+        return run.stdout.trim();
+    };
+    const check = () => sync(context, ['--check'], { STAND_IN_DOES_NOT_BUILD: '1' });
+    git('init', '-q');
+    git('add', '-A');
+    git('commit', '-q', '-m', 'the launch file');
+    checkout(context, SIGNED);
+    const synced = sync(context);
+    assert.equal(synced.status, 0, synced.stderr);
+    git('add', '-A');
+    git('commit', '-q', '-m', "epoch 8's entries");
+    const commit = git('rev-parse', 'HEAD').slice(0, 8);
+    assert.equal(check().status, 0);
+
+    // The three copies agree with each other, as after a revert or an old checkout,
+    // and --check still fails, before the rollback is committed and after.
+    const write = (text) => PUBLISHED.forEach(file => fs.writeFileSync(path.join(context.site, file), text));
+    const dropped = new RegExp(`the v1 entry from epoch 8 for no 1, entry 1, is published in commit ${commit}, and this file drops it`);
+    for (const [text, reason] of [
+        [LAUNCH, dropped],
+        [signed(entry(v1())), /the v2 entry from epoch 8 for no 1, entry 2, is published in commit [0-9a-f]{8}, and this file drops it/],
+        [signed(entry(v2()), entry(v1())), /entry 1, is published in commit [0-9a-f]{8}, and this file changes it or puts another entry in its place/],
+    ]) {
+        write(text);
+        const run = check();
+        assert.equal(run.status, 1);
+        assert.match(run.stderr, reason);
+    }
+    write(LAUNCH);
+    git('commit', '-q', '-am', 'roll back');
+    const committed = check();
+    assert.equal(committed.status, 1);
+    assert.match(committed.stderr, dropped);
+
+    // A checkout as old cannot make the rollback stick, and syncing the entries again
+    // puts them back.
+    checkout(context, LAUNCH);
+    const stale = sync(context);
+    assert.equal(stale.status, 1);
+    assert.match(stale.stderr, dropped);
+    checkout(context, SIGNED);
+    const restored = sync(context);
+    assert.equal(restored.status, 0, restored.stderr);
+    assert.equal(check().status, 0);
+});
+
 // ── sn's own amendment tool ──────────────────────────────────────────────────
 
 // The checkout the sync builds the tool from, found the same way.
@@ -467,13 +546,17 @@ func main() {
 }
 `;
 
-/** The launch file with epoch 8's entries signed by a generated key, and that key's address. */
+/**
+ * The launch file with epoch 8's entries signed by a generated key, and that key's
+ * address: { signer, text }, or { skip } with the reason the forger cannot run, as
+ * when the sn package it is written against has changed.
+ */
 function forge(t) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'amendments-gate-forger-'));
     t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
     fs.writeFileSync(path.join(dir, 'forger.go'), FORGER);
     const run = spawnSync('go', ['run', path.join(dir, 'forger.go')], { cwd: SN_DIR, encoding: 'utf8' });
-    assert.equal(run.status, 0, run.stderr);
+    if (run.error || run.status !== 0) return { skip: `the forger did not run against ${SN_DIR}: ${run.error?.message ?? run.stderr.trim()}` };
     const [signer, ...file] = run.stdout.split('\n');
     return { signer, text: `${LAUNCH}${file.join('\n')}` };
 }
@@ -497,32 +580,43 @@ test("sn's own tool verifies the tracked file and the file with no entries, and 
     assert.deepEqual(published(context.site), before);
 });
 
-test("sn's own tool refuses a forged or unsigned copy, and the sync publishes neither", (t) => {
+test("sn's own tool refuses a forged or unsigned copy, each for its own reason, and the sync publishes none", (t) => {
     const { tool, skip } = snTool();
     if (skip) return t.skip(skip);
-    const { signer, text: forged } = forge(t);
+    const forgery = forge(t);
+    if (forgery.skip) return t.skip(forgery.skip);
+    const { signer, text: forged } = forgery;
     // The gate reads it as well made: only the signatures give it away.
     assert.deepEqual(checkAmendments(forged), []);
     const refused = verify(t, tool, forged);
     assert.equal(refused.status, 1);
     assert.ok(refused.stderr.includes(`signed by ${signer}`), refused.stderr);
 
-    // The same signature in its other form (s in the upper half), one taken off, and
-    // one that is no signature at all.
+    // The first entry's signature in its other form (s in the upper half), taken off,
+    // and replaced by one that is no signature at all. The tool reads the entries in
+    // order, so each is refused for what was done to it, not for the forgery.
     const order = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n;
     const twin = forged.replace(/signature: "0x([0-9a-f]{64})([0-9a-f]{64})(1b|1c)"/, (_, r, s, v) =>
         `signature: "0x${r}${(order - BigInt(`0x${s}`)).toString(16).padStart(64, '0')}${v === '1b' ? '1c' : '1b'}"`);
     const unsigned = forged.replace(/\n {4}signature: "0x[0-9a-f]{130}"/, '');
     const zeros = forged.replace(/0x[0-9a-f]{130}/, `0x${'0'.repeat(130)}`);
-    for (const text of [twin, unsigned, zeros]) {
+    for (const [text, reason] of [
+        [twin, /s is in the upper half of the curve order/],
+        [unsigned, /an entry has a line and a signature/],
+        [zeros, /recovery byte 0, not 27 or 28/],
+    ]) {
         assert.notEqual(text, forged);
         assert.notDeepEqual(checkAmendments(text), []);
-        assert.equal(verify(t, tool, text).status, 1, text);
+        const run = verify(t, tool, text);
+        assert.equal(run.status, 1, text);
+        assert.match(run.stderr, reason);
     }
 
+    // The sync publishes none of them. The gate stops what it can read as wrong
+    // before the tool runs, and the tool stops the forgery.
     const context = launchSite(t);
     const before = published(context.site);
-    for (const text of [forged, twin, unsigned]) {
+    for (const text of [forged, twin, unsigned, zeros]) {
         checkout(context, text);
         const run = sync(context, [], { STAND_IN_TOOL: tool });
         assert.equal(run.status, 1);
@@ -530,5 +624,7 @@ test("sn's own tool refuses a forged or unsigned copy, and the sync publishes ne
         assert.deepEqual(published(context.site), before);
     }
     checkout(context, forged);
-    assert.ok(sync(context, [], { STAND_IN_TOOL: tool }).stderr.includes(`signed by ${signer}`));
+    const forgedRun = sync(context, [], { STAND_IN_TOOL: tool });
+    assert.match(forgedRun.stderr, /amendment verify: /);
+    assert.ok(forgedRun.stderr.includes(`signed by ${signer}`), forgedRun.stderr);
 });

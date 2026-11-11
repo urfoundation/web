@@ -11,6 +11,12 @@
  * they take, the entries in the order they take effect, and every entry already
  * published kept in its place.
  *
+ * It must never read the file otherwise than YAML does, or it could count entries
+ * that readers do not see, or miss some they do. So it takes no character YAML
+ * refuses or reads as a line break, and only spaces as blanks. It also refuses some
+ * files readers would take (a tab, even in a comment, as the price gate does, or a
+ * byte-order mark): that fails safe.
+ *
  * Signatures are not checked here, nor the carry contract's EIP-55 checksum, which
  * takes Keccak-256. That is the amendment tool's work, which scripts/sync-amendments.mjs
  * runs when it has the sn checkout. An entry whose line was edited after signing
@@ -61,11 +67,23 @@ const FIELD = /^([^\s:#-][^\s:]*):(?: +([^\s#].*?))?(?: +#.*)?$/;
 const ENTRY = /^( *)- line: "([^"\\]*)"(?: +#.*)?$/;
 const ENTRY_FIELD = /^( +)([^\s:#-][^\s:]*):/;
 const QUOTED_SIGNATURE = /^ +signature: "([^"\\]*)"(?: +#.*)?$/;
+// What YAML refuses or reads as a line break, anywhere: control characters (a tab
+// and a carriage return among them), U+0085, U+2028 and U+2029, which it reads as
+// line breaks, the byte-order mark and the two noncharacters U+FFFE and U+FFFF.
+const UNREADABLE = /[\x00-\x09\x0b-\x1f\x7f-\x9f\u2028\u2029\ufeff\ufffe\uffff]/;
 
 class Refusal extends Error {}
 
 function refuse(line, message) {
     throw new Refusal(`line ${line}: ${message}`);
+}
+
+function unreadable(char) {
+    if (char === '\t') return 'a tab';
+    if (char === '\r') return 'a carriage return';
+    if (char === '\ufeff') return 'a byte-order mark';
+    const code = char.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
+    return `U+${code}, a control character or one YAML reads as a line break`;
 }
 
 /**
@@ -85,9 +103,11 @@ function readFile(text) {
     };
     text.split('\n').forEach((raw, index) => {
         const line = index + 1;
-        if (/[\t\r]/.test(raw)) refuse(line, 'a tab or carriage return');
-        const body = raw.trimEnd();
-        if (body.trim() === '' || body.trimStart().startsWith('#')) return;
+        const bad = UNREADABLE.exec(raw);
+        if (bad) refuse(line, unreadable(bad[0]));
+        // Spaces are the only blanks: YAML reads no other character as one.
+        const body = raw.replace(/ +$/, '');
+        if (/^ *(#|$)/.test(body)) return;
 
         if (!/^[ -]/.test(body)) {
             const match = FIELD.exec(body);
@@ -243,27 +263,19 @@ function checkOrder(entries, problems) {
  * Readers take a new file only if it keeps every entry of the last one, unchanged
  * and in its place, and adds only later ones (amendment.Extends): a file that drops
  * or changes an entry is a rollback, and one that puts an entry before those could
- * change epochs they have already decided.
+ * change epochs they have already decided. `published` says where the last one was.
  */
-function checkKeeps(file, previous, problems) {
-    let last;
-    try {
-        last = readFile(previous);
-    } catch (err) {
-        if (!(err instanceof Refusal)) throw err;
-        problems.push(`the last published file cannot be read: ${err.message}`);
-        return;
-    }
+function checkKeeps(file, last, published, problems) {
     last.entries.forEach((entry, i) => {
+        const kept = file.entries[i];
+        if (kept && kept.line === entry.line && kept.signature === entry.signature) return;
         let name = `"${entry.line}"`;
         try {
             name = describe(readLine(entry.line));
         } catch (err) {
             if (!(err instanceof Refusal)) throw err;
         }
-        const kept = file.entries[i];
-        if (!kept) problems.push(`${name}, entry ${i + 1}, is already published, and this file drops it`);
-        else if (kept.line !== entry.line || kept.signature !== entry.signature) problems.push(`${name}, entry ${i + 1}, is already published, and this file changes it or puts another entry in its place`);
+        problems.push(`${name}, entry ${i + 1}, is ${published}, and this file ${kept ? 'changes it or puts another entry in its place' : 'drops it'}`);
     });
 }
 
@@ -276,12 +288,32 @@ export function amendmentEntries(text) {
 }
 
 /**
+ * Why `text` is a rollback of `earlier`, a version published `where`: each entry of
+ * it that this file does not keep, unchanged and in its place. Empty when it keeps
+ * them all, and when the gate cannot read either file.
+ */
+export function rollbacks(text, earlier, where) {
+    let file;
+    let last;
+    try {
+        file = readFile(text);
+        last = readFile(earlier);
+    } catch (err) {
+        if (!(err instanceof Refusal)) throw err;
+        return [];
+    }
+    const problems = [];
+    checkKeeps(file, last, `published in ${where}`, problems);
+    return problems;
+}
+
+/**
  * What is wrong with this file, as a list of reasons to refuse it; empty when it may
  * be published. `previous` is the text of the file published last, if any.
  */
 export function checkAmendments(text, { previous } = {}) {
     if (Buffer.byteLength(text, 'utf8') > MAX_FILE_BYTES) return [`larger than ${MAX_FILE_BYTES} bytes`];
-    if (text.includes('�')) return ['not valid UTF-8'];
+    if (text.includes('\uFFFD')) return ['not valid UTF-8'];
     let file;
     try {
         file = readFile(text);
@@ -308,6 +340,13 @@ export function checkAmendments(text, { previous } = {}) {
         if (signature) problems.push(`line ${entry.signatureAt}: the signature ${signature}`);
     }
     if (read.length === file.entries.length) checkOrder(read, problems);
-    if (previous !== undefined) checkKeeps(file, previous, problems);
+    if (previous !== undefined) {
+        try {
+            checkKeeps(file, readFile(previous), 'already published', problems);
+        } catch (err) {
+            if (!(err instanceof Refusal)) throw err;
+            problems.push(`the last published file cannot be read: ${err.message}`);
+        }
+    }
     return problems;
 }

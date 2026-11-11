@@ -26,16 +26,19 @@
  *
  * Nothing is written unless the file passes the publish gate.
  * scripts/amendments-gate.mjs holds it to what readers accept, and refuses a file
- * that drops or changes an entry already published, or puts one before them.
- * Signatures are the sn repo's to check: with a checkout that has cli/amendment,
- * its `verify` runs on the exact bytes about to publish, and a refusal stops the
- * publish. Without one, a file with signed entries publishes only if it is what
- * was published last.
+ * that drops or changes an entry already published, or puts one before them:
+ * an entry in the tracked copy, or in any version of it git holds. Signatures are
+ * the sn repo's to check: with a checkout that has cli/amendment, its `verify`
+ * runs on the exact bytes about to publish, and a refusal stops the publish.
+ * Without one, a file with signed entries publishes only if it is what was
+ * published last.
  *
  * With --check it writes nothing and fails unless the tracked copies are what a
- * sync would leave: the build's gates run this, because nothing in the build
- * syncs. Like sync-price.mjs, run it by hand when sn/amendments.yml changes and
- * commit the three copies:
+ * sync would leave and keep every entry git has seen published: the build's gates
+ * run this, because nothing in the build syncs. Every copy rolled back together,
+ * by a revert or an old checkout, still agrees with itself, so git's history of
+ * the tracked copy is what it is held to. Like sync-price.mjs, run it by hand when
+ * sn/amendments.yml changes and commit the three copies:
  *
  *   node scripts/sync-amendments.mjs
  *   SN_DIR=/path/to/sn node scripts/sync-amendments.mjs
@@ -45,7 +48,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PUBLISHED_CHAIN, amendmentEntries, checkAmendments } from './amendments-gate.mjs';
+import { PUBLISHED_CHAIN, amendmentEntries, checkAmendments, rollbacks } from './amendments-gate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SN_DIR = process.env.SN_DIR || path.resolve(ROOT, '../../sn');
@@ -110,11 +113,36 @@ function verifySignatures(bytes) {
     }
 }
 
-/** --check: the copies are the tracked file's bytes, and it passes the gate. */
+/**
+ * Every version of the tracked copy that git holds, newest first, with its commit:
+ * none outside a git checkout. Each was published in its time.
+ */
+function committedVersions() {
+    const rel = path.relative(ROOT, CANONICAL);
+    const log = spawnSync('git', ['log', '--full-history', '--no-show-signature', '--format=%H', '--', rel], { cwd: ROOT, encoding: 'utf8' });
+    if (log.error || log.status !== 0) return [];
+    return log.stdout.split('\n').filter(Boolean).flatMap((commit) => {
+        // the commit that deleted the file, if one did, holds no version of it
+        const show = spawnSync('git', ['show', `${commit}:./${rel}`], { cwd: ROOT, encoding: 'utf8' });
+        return show.error || show.status !== 0 ? [] : [{ commit, text: show.stdout }];
+    });
+}
+
+/** Why this file is a rollback of a version git holds: the newest one it fails to keep. */
+function rolledBack(text) {
+    for (const { commit, text: version } of committedVersions()) {
+        const reasons = rollbacks(text, version, `commit ${commit.slice(0, 8)}`);
+        if (reasons.length > 0) return reasons;
+    }
+    return [];
+}
+
+/** --check: the copies are the tracked file's bytes, it passes the gate, and it keeps what git holds. */
 function check() {
     if (!fs.existsSync(CANONICAL)) refuse([`no ${path.relative(ROOT, CANONICAL)}`, 'run scripts/sync-amendments.mjs']);
     const bytes = fs.readFileSync(CANONICAL);
-    const problems = checkAmendments(bytes.toString('utf8'));
+    const text = bytes.toString('utf8');
+    const problems = [...checkAmendments(text), ...rolledBack(text)];
     for (const dir of PUBLIC_DIRS) {
         const file = path.join(dir, 'amendments.yml');
         if (!fs.existsSync(file) || !fs.readFileSync(file).equals(bytes)) {
@@ -137,7 +165,7 @@ function main() {
     const changed = !last || !last.equals(bytes);
 
     // Fail loudly on a file readers would refuse rather than publishing it.
-    const problems = checkAmendments(text, { previous: last?.toString('utf8') });
+    const problems = [...checkAmendments(text, { previous: last?.toString('utf8') }), ...rolledBack(text)];
     if (problems.length > 0) refuse(problems);
 
     const entries = amendmentEntries(text).length;

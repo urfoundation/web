@@ -18,7 +18,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { mainnetActions, mainnetEpochs, mainnetNotice, SECONDS_PER_BLOCK } from '../src/data/mainnet.js';
+import { mainnetActions, mainnetEpochs, mainnetNotices, SECONDS_PER_BLOCK } from '../src/data/mainnet.js';
 import {
     EXPLORER_PLACEHOLDERS,
     REF_FORMATS,
@@ -53,8 +53,8 @@ test('the file has the explorers and the events, and nothing else', () => {
 
 test('every milestone has a unique id, a readable date, a known status, a title and a detail', () => {
     const ids = new Set();
-    // ids the page itself uses: the sections and the epoch groups
-    const reserved = new Set(['actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
+    // ids the page itself uses: the notices, the sections and the epoch groups
+    const reserved = new Set([...mainnetNotices.map((n) => n.id), 'actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
     for (const event of events) {
         const fields = Object.keys(event).filter((key) => key !== 'approximate' && key !== 'key').sort();
         assert.deepEqual(fields, ['date', 'detail', 'id', 'sources', 'status', 'title'], `${event.id}: fields`);
@@ -106,7 +106,8 @@ test('every source has a label and a known kind, and a ref that is empty or well
             linked.add(key);
             const link = sourceLink(source, explorers);
             assert.ok(link, `${where}: no link`);
-            assert.ok(new URL(link.href).protocol === 'https:' || link.href.startsWith('/'), `${where}: ${link.href}`);
+            // one of this site's pages first: new URL() throws on a path with no origin
+            assert.ok(link.href.startsWith('/') || new URL(link.href).protocol === 'https:', `${where}: ${link.href}`);
             assert.ok(!/[{}]/.test(link.href), `${where}: a placeholder is left in ${link.href}`);
         }
     }
@@ -267,7 +268,9 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
     // epoch 3 stayed on version 1; settlement v2 started with epoch 4, at about 18:25 on October 30
     const [, , , epoch3, epoch4] = mainnetEpochs;
     assert.equal(epoch3.settlement, 'v1');
-    assert.match(text(payments), /Epoch 3's funding is recovered, as the notice above explains\./);
+    // the epoch 3 notice is the one at the top, as the milestones say; another notice may follow it
+    assert.equal(mainnetNotices[0].id, 'notice');
+    assert.match(text(payments), /Epoch 3's funding is recovered, as the notice at the top explains\./);
     assert.doesNotMatch(text(payments), /paid with epoch 5/);
     assert.equal(epoch4.settlement, 'v2');
     assert.equal(epoch4.start.time, '2026-10-30T18:25:00Z');
@@ -291,6 +294,10 @@ test('the box at the top gives the timeline\'s dates, and links only pages the s
 });
 
 test('the notice gives the epochs\' dates, and links to its full text in the sn repo', () => {
+    // epoch 3's notice, the first, at the top of the page
+    const mainnetNotice = mainnetNotices[0];
+    assert.equal(mainnetNotice.id, 'notice');
+    assert.equal(mainnetNotice.title, 'Epoch 3 payout delayed. Funds are safe.');
     const text = mainnetNotice.paragraphs.join(' ');
     // dated the day it was posted, the day its full text's file name starts with
     assert.equal(mainnetNotice.date, 'October 31, 2026');
@@ -465,4 +472,79 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     // nothing of the plan is left
     assert.doesNotMatch(`${billing.title} ${billing.detail}`, /\bto draw\b|\bonce the billing change deploys\b|\bplanned\b|\bwill be added\b/i);
     assert.equal(billing.key, undefined);
+});
+
+test('Pro data on each network\'s own cycle: a milestone and a notice for the subsidy\'s revenue, with SN25 rewards counted as before', () => {
+    // the network operator's server release of November 11 (server d96add0d6, PRO-GRANT-CYCLE.md, "Accounting
+    // notes" and "Cutover"): scheduled until it has rolled out, then done and dated by its rollout
+    const cycle = events.find((e) => e.id === 'pro-grant-per-cycle');
+    assert.ok(cycle, 'the milestone is listed');
+    assert.equal(cycle.status, 'scheduled');
+    assert.equal(cycle.date, '2026-11-11');
+    assert.equal(whenText(parseWhen(cycle.date), { approxStart: isApproximate(cycle) }), 'Wed Nov 11');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === cycle.id)).id, 'epoch-5');
+    // after the billing change of the same morning, before epoch 5's claims
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(cycle.id), ids.indexOf('intra-traffic-billing-planned') + 1);
+    assert.equal(cycle.key, undefined);
+    // the miner guide's rule for SN25 rewards, and the notice's full text, linked once it is on sn's main branch
+    assert.deepEqual(cycle.sources, [
+        { label: 'How rewards are counted, in the miner guide', kind: 'doc', ref: '/docs/miner/rewards#how-rewards-are-counted' },
+        { label: 'The full notice in the sn repo', kind: 'doc', ref: '' },
+    ]);
+    assert.equal(cycle.title, "Pro data follows each network's own cycle, and the provider subsidy counts its revenue once");
+    assert.match(cycle.detail, /^From the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, and each cycle's grant carries that cycle's share of the subscription's revenue\. /);
+    // the subsidy counts a balance's revenue only for the settled traffic it funded, and the period's own
+    // balance now holds no data, so the period's revenue counts once, through its cycle grants
+    assert.match(cycle.detail, / The network operator's provider subsidy counts that revenue once, as the traffic the grant funds is settled\. /);
+    // before: the 600 GiB credit carried the period's full revenue and the monthly grant a share of it, and a
+    // Play renewal's window starts at the subscription's first start, which spread one period's revenue thin
+    assert.match(cycle.detail, / Before, a paid period's revenue could count twice, in full through its 600 GiB credit and again as a share through the monthly grant on the 1st, and a long-running Google Play subscription counted only a share spread over the months since it began\. /);
+    // the SN25 pool weighs completed work only (server model/st_provider_usage.go), as the miner guide says
+    assert.match(cycle.detail, / SN25 pool rewards are counted as before: the pool is split by completed usage, and subscription payments are not an input\. /);
+    const rewards = fs.readFileSync(path.join(__dirname, '../../docs/miner/rewards.md'), 'utf8');
+    assert.match(rewards, /^## How rewards are counted$/m);
+    assert.match(rewards, /\*\*Paid and free traffic of the same size earn the same credit\.\*\* Account balances, reservations, subscription payments and unfinished contracts are not proof of work\./);
+    // past the provider earning cutoff, the subsidy only weighs the operator block points
+    // (server model/operator_block_points.go); the cutoff is the timeline's own first milestone
+    assert.match(cycle.detail, / For traffic since the October 6 cutoff, the provider subsidy pays no USDC and only counts toward the weekly points the network operator awards\. /);
+    assert.equal(events.find((e) => e.id === 'provider-earnings-move-to-sn25').date, '2026-10-06T00:00:00Z');
+    // the cutover: a network holding the calendar grant of November 1 starts its chain when that grant's month ends
+    assert.match(cycle.detail, / A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, and nothing granted before the release changes\. Customers pay the same\.$/);
+    // it does not say the release has rolled out, and it publishes no subsidy setting or wider plan
+    assert.doesNotMatch(`${cycle.title} ${cycle.detail}`, /\bnow\b|\blive\b|since November 11|remov|\$\s?\d|\d\s?%|\bfifth\b/i);
+
+    // the notice: after epoch 3's, which stays the notice at the top that the milestones point to
+    assert.equal(mainnetNotices.length, 2);
+    assert.equal(new Set(mainnetNotices.map((n) => n.id)).size, mainnetNotices.length);
+    for (const notice of mainnetNotices) {
+        assert.deepEqual(Object.keys(notice).sort(), ['date', 'id', 'link', 'paragraphs', 'title'], `${notice.id}: fields`);
+        assert.match(notice.id, /^notice(?:-[a-z0-9]+)*$/, `${notice.id}: a slug that starts with notice`);
+        assert.ok(!ids.includes(notice.id), `${notice.id}: a milestone's id`);
+    }
+    const [first, notice] = mainnetNotices;
+    assert.equal(first.id, 'notice');
+    assert.equal(notice.id, 'notice-pro-grant-cycle');
+    // dated the day of the release
+    assert.equal(notice.date, 'November 11, 2026');
+    assert.equal(notice.title, "Pro data moves to each network's own cycle. SN25 rewards are counted as before.");
+    const [what, sn25, subsidy, effect, when] = notice.paragraphs;
+    assert.equal(notice.paragraphs.length, 5);
+    assert.match(what, /^With the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, instead of on the 1st of the month\. /);
+    assert.match(what, / a payment no longer adds a separate 600 GiB credit\.$/);
+    assert.equal(sn25, 'SN25 pool rewards are counted as before. The pool is split by completed usage, and subscription payments are not an input to it.');
+    assert.match(subsidy, /^What changes is the subscription revenue counted by the network operator's provider subsidy, which for traffic since the October 6 cutoff pays no USDC and only counts toward the weekly points the network operator awards\. /);
+    assert.match(subsidy, / From the release, each period's revenue counts once, through its cycle grants\.$/);
+    // for providers: less where revenue counted twice, more for long-running Play, on each network's own cycle;
+    // a period credited inside a running cycle adds its revenue only to the cycles after it
+    assert.match(effect, /^So the subsidy counts less where revenue counted twice, as in a new subscription's first month, and more for long-running Google Play subscriptions\. /);
+    assert.match(effect, / Its timing follows each network's own cycle rather than the 1st\. /);
+    assert.match(effect, / A payment credited during a running cycle, such as a second subscription, adds its revenue to the cycles after it, and the part that overlaps the running cycle is not counted\.$/);
+    // the milestone's cutover, in the same words
+    assert.match(when, /^Nothing granted before the release changes\. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, when that grant's month ends\. /);
+    assert.match(when, / Customers pay the same, and there is nothing you need to do\.$/);
+    assert.doesNotMatch(`${notice.title} ${notice.paragraphs.join(' ')}`, /\bnow\b|\blive\b|since November 11|remov|\$\s?\d|\d\s?%|\bfifth\b/i);
+    // its full text goes in the sn repo, and until it is on sn's main branch the notice links to its milestone
+    // on this page, never to a file that does not exist yet
+    assert.deepEqual(notice.link, { label: 'See the milestone', href: `#${cycle.id}` });
 });

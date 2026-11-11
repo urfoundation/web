@@ -9,12 +9,14 @@
  * The phases, from the snapshot:
  *   prelaunch  before epoch 8, the first CTF epoch, starts: no draw, no pots
  *   first      the first epoch has started and no root covers it yet
+ *   drawing    the first epoch has ended and its root is not committed yet
  *   drawn      last epoch (the latest with a committed root) had its draw
  *   undrawn    last epoch had no census in time, so every slot carried
  * Without a draw last epoch the draw figures are null (sn/api/operator.yml):
  * the pages then say nothing of winning by default and show no chance to win.
- * `pending` is an ended epoch whose root is not committed yet, beside any phase
- * after the first epoch.
+ * `pending` is an ended epoch whose root is not committed yet (its census and
+ * drand round, as far as they have happened): the draw of the first epoch in
+ * `drawing`, and later ones beside `drawn` or `undrawn`.
  *
  * Amounts are integers of rao (1 α = 10^9 rao), as the snapshot keeps them;
  * they are formatted only for display.
@@ -144,7 +146,7 @@ function roleOf(r, slot) {
 /** The pages' model of a snapshot. */
 export function buildModel(snap) {
     const last = snap.last_epoch;
-    const phase = snap.prelaunch ? 'prelaunch' : !last ? 'first' : last.drawn ? 'drawn' : 'undrawn';
+    const phase = snap.prelaunch ? 'prelaunch' : !last ? (snap.pending_draw ? 'drawing' : 'first') : last.drawn ? 'drawn' : 'undrawn';
     const drawn = phase === 'drawn';
     const slot = last ? last.slot : null;
     const threshold = slot === null ? null : BIG_POT_SLOTS * slot;
@@ -221,6 +223,7 @@ export function hubDescription(m) {
     if (m.phase === 'drawn') return `${lead} This epoch: ${int(m.totals.openP)} countries with open provider slots and ${alpha(m.last.carried)} α in pots.`;
     if (m.phase === 'undrawn') return `${lead} Epoch ${m.last.epoch} had no draw, so every slot carried: ${alpha(m.last.carried)} α in pots.`;
     if (m.phase === 'first') return `${lead} Epoch ${m.epoch} is the first, and its draw follows the epoch's end, about ${utcDay(m.drawAt)}.`;
+    if (m.phase === 'drawing') return `${lead} Epoch ${m.firstEpoch}, the first, has ended, and its draw is under way.`;
     return `${lead} Capture the flag starts with epoch ${m.firstEpoch} on ${utcDay(m.startsAt)}: see every country's slots.`;
 }
 
@@ -245,9 +248,11 @@ export function countryDescription(m, c, updated) {
             : `${c.The} this epoch: no draw last epoch, so every slot carried, with ${pots}.`;
         forms = [`${lead} Stay online for half the epoch to win. Updated ${updated}.`, `${lead} Updated ${updated}.`, lead];
     } else {
-        const start = m.phase === 'prelaunch'
-            ? `${c.The} has five provider and five extender reward slots each epoch from epoch ${m.firstEpoch}, ${utcDay(m.startsAt)}.`
-            : `${c.The} has five provider and five extender reward slots in epoch ${m.epoch}, the first, drawn about ${utcDay(m.drawAt)}.`;
+        const start = {
+            prelaunch: () => `${c.The} has five provider and five extender reward slots each epoch from epoch ${m.firstEpoch}, ${utcDay(m.startsAt)}.`,
+            first: () => `${c.The} has five provider and five extender reward slots in epoch ${m.epoch}, the first, drawn about ${utcDay(m.drawAt)}.`,
+            drawing: () => `${c.The} has five provider and five extender reward slots each epoch; epoch ${m.firstEpoch}'s, the first, are being drawn.`,
+        }[m.phase]();
         const seen = !m.presence || c.online === null ? '' : c.online > 0
             ? ` ${plural(c.online, 'provider was', 'providers were')} online there on ${dayName(m.presence.day)}.`
             : ` No provider was online there on ${dayName(m.presence.day)}.`;
@@ -263,6 +268,9 @@ export function countryMessage(m, c) {
     }
     if (m.phase === 'first') {
         return `Epoch ${m.epoch} is capture the flag's first: ${c.the} has five provider slots and five extender slots, drawn after the epoch ends, about ${utcTime(m.drawAt)}.`;
+    }
+    if (m.phase === 'drawing') {
+        return `Epoch ${m.firstEpoch}, capture the flag's first, has ended and its draw is under way: the winners and pots in ${c.the} appear here once its root is committed. Each epoch ${c.the} has five provider slots and five extender slots.`;
     }
     if (m.phase === 'undrawn') {
         return `Epoch ${m.last.epoch} had no draw, so all ten slots in ${c.the} carried into its pots: ${alpha(c.p.pot)} α for providers and ${alpha(c.x.pot)} α for extenders.`;
@@ -283,6 +291,7 @@ export function roleLine(m, c, role) {
     const name = role === 'p' ? 'provider' : 'extender';
     if (m.phase === 'prelaunch') return `5 slots each epoch from epoch ${m.firstEpoch}`;
     if (m.phase === 'first') return `5 slots this epoch · drawn about ${utcTime(m.drawAt)}`;
+    if (m.phase === 'drawing') return `5 slots each epoch · epoch ${m.firstEpoch}'s draw under way`;
     if (m.phase === 'undrawn') return `no draw last epoch · pot ${alpha(r.pot)} α`;
     return r.open
         ? `${r.won} of 5 won last epoch · pot ${alpha(r.pot)} α · not fully captured, a new ${name} wins by default`

@@ -23,6 +23,7 @@ import Board from '@react/components/pages/ctf/Board.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
 import { API_STATE, HUB_TITLE, SITE, hubDescription } from '@react/components/pages/ctf/model.js';
 import { ctfOgImage } from '@react/components/pages/ctf/og.js';
+import { epochBounds } from '@react/lib/epoch.js';
 import en from '@react/i18n/en.js';
 import { LASTMOD_TOKEN } from '../lib/lastmod.js';
 
@@ -40,7 +41,8 @@ const jsonLd = [{
     isAccessibleForFree: true,
     creator: { '@id': `${SITE}/#org` },
     spatialCoverage: { '@type': 'Place', name: 'Worldwide' },
-    temporalCoverage: `${CTF.startsAt ? CTF.startsAt.slice(0, 10) : '2026-11-27'}/..`,
+    // from the first epoch's start, on the site's time basis, onwards
+    temporalCoverage: `${new Date(epochBounds(CTF.firstEpoch).startMs).toISOString().slice(0, 10)}/..`,
     variableMeasured: ['Provider slots won', 'Extender slots won', 'Units in the draw', 'Provider pot (alpha)', 'Extender pot (alpha)', 'Chance to win'],
     distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: API_STATE }],
 }];

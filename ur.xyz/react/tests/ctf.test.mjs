@@ -133,7 +133,11 @@ test('every phase\'s answer imports to a snapshot that keeps the invariants', ()
     assert.equal(MODELS.drawn.phase, 'drawn');
     assert.equal(MODELS.undrawn.phase, 'undrawn');
     assert.equal(MODELS.first.phase, 'first');
+    // the first epoch's draw under way: epoch 9 runs, and the first is still 8
+    assert.equal(MODELS.pending.phase, 'drawing');
     assert.equal(MODELS.pending.pending.epoch, 8);
+    assert.match(hubDescription(MODELS.pending), /Epoch 8, the first, has ended/);
+    assert.ok(MODELS.pending.countries.every((c) => !/Epoch 9 is/.test(countryMessage(MODELS.pending, c))));
     // the API's own figures are checked, then derived again by the page
     const answer = drawnAnswer();
     for (const c of answer.countries) {

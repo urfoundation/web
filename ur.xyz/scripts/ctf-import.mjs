@@ -6,7 +6,7 @@
 // is in the HTML that search engines and AI crawlers read, and a page changes
 // (and its sitemap <lastmod> with it) only when its data does. The import runs
 // after each epoch's census and root, and the site is rebuilt and deployed
-// from the result (README "Capture the flag").
+// from the result (SITEMAP.md, "Capture the flag").
 //
 // The snapshot keeps the answer's facts in the page's terms: amounts are
 // integers of rao (the answer's `rao`; its `alpha` strings say the same), a
@@ -388,7 +388,14 @@ async function main() {
         snapshot = prelaunch({ names, presence: presenceFrom(history, dayOf(iso(now))), now, bounds: epochBounds(FIRST_EPOCH) });
     } else {
         const from = opt('--from');
-        const api = from ? readJson(from) : await (await fetch(opt('--url') || API_URL, { headers: { accept: 'application/json' } })).json();
+        let api;
+        if (from) api = readJson(from);
+        else {
+            const url = opt('--url') || API_URL;
+            const res = await fetch(url, { headers: { accept: 'application/json' } });
+            if (!res.ok) throw new Error(`GET ${url}: ${res.status} ${res.statusText}`);
+            api = await res.json();
+        }
         snapshot = normalize(api, presenceFrom(history, dayOf(api.as_of)));
     }
     const problems = snapshotProblems(snapshot);

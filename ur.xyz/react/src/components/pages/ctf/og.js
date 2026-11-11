@@ -13,6 +13,7 @@ export function ctfCard(m) {
     let footer;
     if (m.phase === 'prelaunch') footer = `From epoch ${m.firstEpoch} · ${utcDay(m.startsAt)}`;
     else if (m.phase === 'first') footer = `Epoch ${m.epoch} · first draw ≈ ${utcTime(m.drawAt)}`;
+    else if (m.phase === 'drawing') footer = `Epoch ${m.firstEpoch}'s draw under way`;
     else if (m.drawn) footer = `Epoch ${m.epoch} · ${int(m.totals.openP)} countries with open provider slots`;
     else footer = `Epoch ${m.epoch} · ${alpha(m.last.carried)} α in pots`;
     return { kicker: 'Capture the flag', title: 'Earn crypto by sharing your internet in 249 countries', footer };

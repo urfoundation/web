@@ -234,12 +234,19 @@ function ChanceTip({ m, c, role, tips }) {
     );
 }
 
-/** The countries for the picker: name → code, A–Z (rendered once the page runs, so the static page carries no list). */
+/**
+ * The picker: a country by its name, its sentence name or its code, chosen
+ * from the list or typed. It changes the card only when the choice is made (an
+ * entry of the list, Enter, or leaving the field), as the design's change
+ * event did: typing "Niger" on the way to "Nigeria", or "al" on the way to
+ * "Algeria", must not jump to Niger or Albania. The list is rendered once the
+ * page runs, so the static page carries no 249 options.
+ */
 export function CountryPicker({ m, mounted, onPick }) {
     const [value, setValue] = useState('');
     const pick = (text) => {
         const v = text.trim().toLowerCase();
-        const hit = m.countries.find((c) => c.name.toLowerCase() === v || c.short.toLowerCase() === v || c.code === v);
+        const hit = v && m.countries.find((c) => c.name.toLowerCase() === v || c.short.toLowerCase() === v || c.code === v);
         if (hit) {
             setValue('');
             onPick(hit.code);
@@ -255,8 +262,14 @@ export function CountryPicker({ m, mounted, onPick }) {
                 placeholder="Type a country"
                 autoComplete="off"
                 value={value}
-                onChange={(event) => { setValue(event.target.value); pick(event.target.value); }}
+                onChange={(event) => {
+                    setValue(event.target.value);
+                    // an entry of the list replaces the text whole; typing inserts it
+                    const kind = event.nativeEvent?.inputType;
+                    if (!kind || kind === 'insertReplacementText') pick(event.target.value);
+                }}
                 onKeyDown={(event) => { if (event.key === 'Enter') pick(value); }}
+                onBlur={() => pick(value)}
             />
             {mounted && <datalist id="ctf-countries">{m.az.map((c) => <option key={c.code} value={c.name} />)}</datalist>}
         </div>

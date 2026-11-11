@@ -86,9 +86,11 @@ function CountryQuestions({ m, c }) {
     } else if (m.phase === 'undrawn') {
         earn = <>Yes, in small amounts. Epoch {m.last.epoch} had no draw, so every slot carried: the pots in {the} are now <b>{alpha(c.p.pot)} α</b> for providers and <b>{alpha(c.x.pot)} α</b> for extenders. {slotWorth(m)}, and each winner takes its slot and a fifth of its role's pot. Rewards are paid in alpha, whose value changes, and nothing is guaranteed.</>;
     } else {
-        const when = m.phase === 'prelaunch'
-            ? <>once capture the flag starts with epoch {m.firstEpoch}, at about {utcClock(m.startsAt)} on {utcDay(m.startsAt)}</>
-            : <>from epoch {m.epoch}, capture the flag's first, which is drawn about {utcTime(m.drawAt)}</>;
+        const when = {
+            prelaunch: <>once capture the flag starts with epoch {m.firstEpoch}, at about {utcClock(m.startsAt)} on {utcDay(m.startsAt)}</>,
+            first: <>from epoch {m.epoch}, capture the flag's first, which is drawn about {utcTime(m.drawAt)}</>,
+            drawing: <>from epoch {m.firstEpoch}, capture the flag's first, whose draw is under way</>,
+        }[m.phase];
         earn = <>Yes, in small amounts, {when}. Each epoch {the} has five provider slots and five extender slots. {slotWorth(m)}. A slot nobody wins rolls into the country's pot, and each winner takes its slot and a fifth of its role's pot. Rewards are paid in alpha, whose value changes, and nothing is guaranteed.</>;
     }
     let advice;

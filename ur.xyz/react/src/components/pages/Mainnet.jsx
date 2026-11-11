@@ -71,7 +71,7 @@ export default function MainnetPage({ updated = null, summary = null }) {
                     Version 1 launched on October 8 and settles epochs 1 to 3. It pays only the providers the validator has measured, and that measurement is capped at about 1,500 providers an epoch, so most miners receive no version 1 share.
                 </p>
                 <p>
-                    Settlement v2 pays by usage and removes that cap. It was planned to take over from epoch 3, but its pool was not registered before epoch 3 began on October 23, so version 1 settles epoch 3 too. Settlement v2 is now targeting epoch 4, starting around October 30 at 18:25 UTC, pending final production checks and the on-chain pool registration before that epoch starts. The first v2 epoch would finish around November 6, with the first v2 claims no earlier than November 8, after the root is submitted and its challenge period ends. These dates are estimates from block production, and activation is confirmed only once the registration has finalized.
+                    Settlement v2 pays by usage and removes that cap. It was planned to take over from epoch 3, but its pool was not registered before epoch 3 began on October 23, so version 1 settles epoch 3 too. Its pool was registered on October 29, and settlement v2 has paid every epoch since epoch 4, which began around October 30 at 18:25 UTC. The first v2 epoch finished around November 6, and its claims opened on November 8, after its root was committed and its challenge period ended.
                 </p>
                 <ol className="mainnet-epochs" aria-label="Payout epochs">
                     {mainnetEpochs.map((epoch) => {

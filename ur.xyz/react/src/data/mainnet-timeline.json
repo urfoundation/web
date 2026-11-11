@@ -138,91 +138,30 @@
     {
       "id": "settlement-v2-release-checks",
       "date": "2026-10-16",
-      "status": "planned",
-      "title": "Settlement v2 release checks",
-      "detail": "The rollout dates that follow hold if the settlement v2 release passes its final checks by the morning of October 16.",
-      "sources": []
-    },
-    {
-      "id": "operator-services-updated",
-      "date": "2026-10-16",
-      "status": "planned",
-      "title": "Network operator services updated, v2 off",
-      "detail": "During the day, the network operator's services move to the settlement v2 release, with v2 still switched off.",
+      "status": "done",
+      "title": "Settlement v2 release not ready by October 16",
+      "detail": "The settlement v2 release had not passed its final checks by the morning of October 16, so the rollout dates planned after it did not hold. The release went out from October 22 to 25, too late for epoch 3.",
       "sources": []
     },
     {
       "id": "epoch-1-closes",
-      "date": "2026-10-16T18:09:00Z/2026-10-16T18:33:00Z",
-      "status": "scheduled",
-      "title": "Epoch 1 closes on version 1",
-      "detail": "The close window is 120 blocks, from block 9,297,628 to 9,297,748. The epoch 1 payout root is due by block 9,298,828, around 22:09 UTC.",
-      "sources": [
-        { "label": "Epoch 1 close", "kind": "evm_tx", "ref": "" },
-        { "label": "Epoch 1 payout root", "kind": "evm_tx", "ref": "" }
-      ]
-    },
-    {
-      "id": "connect-service-updated",
-      "date": "2026-10-17T08:35:00Z",
-      "status": "planned",
-      "title": "Connect service updated, v2 off",
-      "detail": "The network operator's connect service follows its other services, ahead of the validator.",
-      "sources": []
-    },
-    {
-      "id": "v2-validator-starts",
-      "date": "2026-10-17T15:48:00Z/2026-10-17T16:08:00Z",
-      "status": "planned",
-      "title": "Settlement v2 validator starts, v2 off",
-      "detail": "The validator runs its new release on unchanged settings, after the connect service.",
-      "sources": []
-    },
-    {
-      "id": "v2-contracts-deployed",
-      "date": "2026-10-17",
+      "date": "2026-10-16T18:09:48Z",
       "status": "done",
-      "key": true,
-      "approximate": true,
-      "title": "Settlement v2 contracts deployed",
-      "detail": "vault2, which holds the funds, and STSettlement2 are on chain beside the unchanged version 1 contracts. Deploying them does not activate settlement v2: the v2 pool must also be registered.",
+      "title": "Epoch 1 closes on version 1",
+      "detail": "Epoch 1 closed at block 9,297,631, within its 120-block close window, and the settlement vault took in its 3,482.26 α. Epoch 1 had no eligible work to pay out, so no payout root was committed by block 9,298,828, and its funding carried forward (see the notice at the top).",
       "sources": [
-        { "label": "vault2", "kind": "evm_address", "ref": "0xe4865eb1bebdf5c6a10c9d37f3ccdd59aee8f20c" },
-        { "label": "STSettlement2", "kind": "evm_address", "ref": "" },
-        { "label": "STSettlement2 implementation", "kind": "evm_address", "ref": "" },
-        { "label": "vault2 created", "kind": "evm_tx", "ref": "" },
-        { "label": "Escrow registered", "kind": "evm_tx", "ref": "" },
-        { "label": "STSettlement2 implementation created", "kind": "evm_tx", "ref": "" },
-        { "label": "STSettlement2 created", "kind": "evm_tx", "ref": "" },
-        { "label": "vault2 linked to STSettlement2", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 1 close, block 9,297,631", "kind": "evm_tx", "ref": "0xa57407ac020ab2592e1f8a324c06b9064d24befe5acfcdd524c0e77434fab5a6" }
       ]
     },
     {
       "id": "first-v1-claims",
-      "date": "2026-10-18T18:09:00Z",
-      "status": "scheduled",
-      "title": "First version 1 claims (epoch 1)",
-      "detail": "The epoch 1 payout root can finalize from block 9,312,028 at the earliest, and claims open then. As explained above, version 1 does not pay every miner.",
+      "date": "2026-10-18T18:09:48Z",
+      "status": "done",
+      "title": "Epoch 1 finalized without a payout root",
+      "detail": "Epoch 1 had no payout root, so it had no version 1 claims. Its 3,482.26 α carried forward under the protocol's missed-commit rule, and it is recovered with epoch 3's funding (see the notice at the top).",
       "sources": [
-        { "label": "Epoch 1 finalized", "kind": "evm_tx", "ref": "" },
-        { "label": "First version 1 claim", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 1 finalized, block 9,312,031", "kind": "evm_tx", "ref": "0x900e7f9ffa6524ecfd8b42c04846641124ea0118194039a15eaae78e018a601d" }
       ]
-    },
-    {
-      "id": "validator-adopts-v2-settings",
-      "date": "2026-10-18/2026-10-19",
-      "status": "planned",
-      "title": "Validator adopts its settlement v2 settings",
-      "detail": "Kept clear of the epoch 1 finalization on the evening of October 18.",
-      "sources": []
-    },
-    {
-      "id": "operator-switches-to-v2-contracts",
-      "date": "2026-10-19/2026-10-20",
-      "status": "planned",
-      "title": "Network operator switches to the v2 contracts",
-      "detail": "The network operator's servers switch to the settlement v2 contracts on October 19, and checks run on October 20. Apps pin vault2 from October 18 to 20.",
-      "sources": []
     },
     {
       "id": "v2-pool-registration-window",
@@ -233,17 +172,68 @@
       "sources": []
     },
     {
+      "id": "v2-validator-starts",
+      "date": "2026-10-22T20:48:38Z",
+      "status": "done",
+      "title": "Settlement v2 validator starts, v2 off",
+      "detail": "The validator started its settlement v2 release, on unchanged settings.",
+      "sources": []
+    },
+    {
+      "id": "v2-contracts-deployed",
+      "date": "2026-10-23T05:55:24Z/2026-10-23T07:51:36Z",
+      "status": "done",
+      "key": true,
+      "title": "Settlement v2 contracts deployed",
+      "detail": "Six deployment steps on Bittensor's EVM, in blocks 9,344,278 to 9,344,859, put vault2, which holds the funds, STSettlement2 and a claim batcher on chain beside the unchanged version 1 contracts. Deploying them does not activate settlement v2: the v2 pool must also be registered.",
+      "sources": [
+        { "label": "vault2", "kind": "evm_address", "ref": "0xe4865eb1bebdf5c6a10c9d37f3ccdd59aee8f20c" },
+        { "label": "STSettlement2", "kind": "evm_address", "ref": "0xB5e3e23CD1A733410d769b0C95e1c4CA25e821b0" },
+        { "label": "STSettlement2's first implementation", "kind": "evm_address", "ref": "0x23667cc6dfa46d305bdabcb214af9397ea7e07e7" },
+        { "label": "Claim batcher", "kind": "evm_address", "ref": "0x14174e7c5671ce1499aef9c68d74bebffa58c41a" },
+        { "label": "vault2 created, block 9,344,278", "kind": "evm_tx", "ref": "0xee0ee166e1dcac96d795536b5e7f0b8777e8bbbf6575d733579cbc42960df7ad" },
+        { "label": "Escrow registered, block 9,344,278", "kind": "evm_tx", "ref": "0xb90cb8ff4589c54eaf7be4b4f17db790238b2a82d73664c87768c19d62275395" },
+        { "label": "STSettlement2 implementation created, block 9,344,354", "kind": "evm_tx", "ref": "0x50f2f371acc7d3f848c8438dbaba48982bf5668ddc40a8b4f8d039f323123395" },
+        { "label": "STSettlement2 created, block 9,344,841", "kind": "evm_tx", "ref": "0x02197b63075fbb0158edbc6e56203519bfb9f9d90b8eaeb4017316c3997f339d" },
+        { "label": "vault2 linked to STSettlement2, block 9,344,851", "kind": "evm_tx", "ref": "0x4279688d3dcd20a66c9eb2ed7c380b5445e036569086b69df96e095d2e1a851c" },
+        { "label": "Claim batcher created, block 9,344,859", "kind": "evm_tx", "ref": "0xbccb2158b68020f8b7da7e28270af7c9fc3f0ee37816cb3ff585c7c07a1a0e04" }
+      ]
+    },
+    {
+      "id": "validator-adopts-v2-settings",
+      "date": "2026-10-23T09:03:57Z",
+      "status": "done",
+      "title": "Validator adopts its settlement v2 settings",
+      "detail": "The validator restarted on its settlement v2 settings, after the v2 contracts were deployed that morning.",
+      "sources": []
+    },
+    {
       "id": "epoch-3-begins-on-v1",
       "date": "2026-10-23T18:09:00Z",
       "status": "done",
       "approximate": true,
       "title": "Epoch 3 begins on version 1",
-      "detail": "Epoch 3 starts at block 9,348,028 without a v2 pool registered, so version 1 settles it. Epoch 2 closes on version 1, with its payout root due by around 22:09 UTC.",
+      "detail": "Epoch 3 starts at block 9,348,028 without a v2 pool registered, so version 1 settles it. Epoch 2 was not closed in its 120-block close window, so its emission was deferred to epoch 3's close.",
       "sources": [
         { "label": "Epoch 3's first block, 9,348,028", "kind": "evm_block", "ref": "9348028" },
-        { "label": "Epoch 2 close", "kind": "evm_tx", "ref": "" },
-        { "label": "Epoch 2 payout root", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 2's emission deferred, block 9,348,551", "kind": "evm_tx", "ref": "0xf8000f667d6adde3c96906afcbcfe005ad1553e1f990e407244d306ce77c3a9c" }
       ]
+    },
+    {
+      "id": "operator-services-updated",
+      "date": "2026-10-23/2026-10-24",
+      "status": "done",
+      "title": "Network operator services updated, v2 off",
+      "detail": "The network operator's services moved to the settlement v2 release with v2 still switched off: the api on October 23, the others on October 24.",
+      "sources": []
+    },
+    {
+      "id": "connect-service-updated",
+      "date": "2026-10-24",
+      "status": "done",
+      "title": "Connect service updated, v2 off",
+      "detail": "The network operator's connect service moved to the settlement v2 release with its other services.",
+      "sources": []
     },
     {
       "id": "v2-pool-registered",
@@ -251,20 +241,28 @@
       "status": "done",
       "key": true,
       "title": "Settlement v2 pool registered",
-      "detail": "The governance Safe registered network operator 1's pool in the v2 vault before epoch 4 began, with epoch 4 as its first v2 epoch. This was the activation of settlement v2.",
+      "detail": "The governance Safe registered network operator 1's pool in the v2 vault on October 29 at 03:11 UTC, before epoch 4 began, with epoch 4 as its first v2 epoch. This was the activation of settlement v2.",
       "sources": [
-        { "label": "Registration through the governance Safe", "kind": "evm_tx", "ref": "" }
+        { "label": "Registration through the governance Safe, block 9,386,659", "kind": "evm_tx", "ref": "0xca18bba7a7db0718f285c734e013c4d16d8b4f4d1de330209c28989d8b8b0c7b" }
       ],
       "approximate": true
     },
     {
+      "id": "operator-switches-to-v2-contracts",
+      "date": "2026-10-25",
+      "status": "done",
+      "title": "Network operator switches to the v2 contracts",
+      "detail": "The network operator's servers on all six of its hosts switched to the settlement v2 contracts, ahead of the v2 pool registration.",
+      "sources": []
+    },
+    {
       "id": "last-v1-claims",
-      "date": "2026-10-25T18:09:00Z",
-      "status": "scheduled",
-      "title": "Version 1 claims (epoch 2)",
-      "detail": "The epoch 2 payout root can finalize from block 9,362,428 at the earliest. The same version 1 limit applies.",
+      "date": "2026-10-25T18:26:00Z",
+      "status": "done",
+      "title": "Epoch 2 finalized without a payout root",
+      "detail": "Epoch 2 was not closed in its close window, so its emission stayed on the pool and was taken in at epoch 3's close: epoch 3's 4,132.72 α covers about two weeks. With no funding and no payout root, epoch 2 had no version 1 claims.",
       "sources": [
-        { "label": "Epoch 2 finalized", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 2 finalized, block 9,362,431", "kind": "evm_tx", "ref": "0x2b64fb6dc89c4dbe46afd71fe5c1f2549968c82f4495414c6bbd9a55c54cee45" }
       ]
     },
     {
@@ -274,20 +272,19 @@
       "key": true,
       "approximate": true,
       "title": "Settlement v2 active: epoch 4 begins",
-      "detail": "From block 9,398,428, settlement v2 pays epoch 4 and every epoch after it. Epoch 3 closed on version 1 without a payout root; its funding is recovered and paid with epoch 5 (see the notice at the top).",
+      "detail": "From block 9,398,428, settlement v2 pays epoch 4 and every epoch after it. Epoch 3 closed on version 1 without a payout root; its funding is recovered (see the notice at the top).",
       "sources": [
         { "label": "Epoch 4's first block, 9,398,428", "kind": "evm_block", "ref": "9398428" }
       ]
     },
     {
       "id": "last-v1-claims-epoch-3",
-      "date": "2026-11-01T18:25:00Z",
+      "date": "2026-11-01T18:26:00Z",
       "status": "done",
-      "approximate": true,
       "title": "Epoch 3 finalized without a payout root",
-      "detail": "Epoch 3's payout root was not committed in its window, so it had no version 1 claims. Its 4,132.72 α carried forward with epoch 1's 3,482.26 α, and both are recovered and paid with epoch 5 (see the notice at the top).",
+      "detail": "Epoch 3's payout root was not committed in its window, so it had no version 1 claims. Its 4,132.72 α carried forward with epoch 1's 3,482.26 α, and both are recovered (see the notice at the top).",
       "sources": [
-        { "label": "Epoch 3 finalized", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 3 finalized, block 9,412,831", "kind": "evm_tx", "ref": "0xa08e2dbb850025d7d47ac5dc0880bb16db28d34622fe62af15a9e8e9b3113d98" }
       ]
     },
     {
@@ -325,36 +322,37 @@
     },
     {
       "id": "first-v2-claim",
-      "date": "2026-11-08T18:25:00Z/2026-11-08T22:25:00Z",
-      "status": "planned",
+      "date": "2026-11-08T19:10:00Z/2026-11-08T19:11:48Z",
+      "status": "done",
       "key": true,
-      "title": "First settlement v2 claims, earliest",
-      "detail": "The first v2 root can finalize at block 9,463,434, 14,400 blocks after its commit, and claims follow once it has. An open challenge or delayed finalization can push claims later.",
+      "title": "First settlement v2 claims",
+      "detail": "Epoch 4's root, the first v2 root, finalized at block 9,463,438, 14,404 blocks after its commit, and the first claims followed at block 9,463,447.",
       "sources": [
-        { "label": "First v2 root finalized", "kind": "evm_tx", "ref": "" },
-        { "label": "First v2 claim", "kind": "evm_tx", "ref": "" }
+        { "label": "First v2 root finalized, block 9,463,438", "kind": "evm_tx", "ref": "0x6001380acdf1d850e6dbfc1e4bf22bac9d1e59c9d1075d56b1697c797ef26147" },
+        { "label": "First v2 claims, block 9,463,447", "kind": "evm_tx", "ref": "0x7b049eec195ec9f03554e8b4f45bfda830fcf4e89bc446fcdfc113265a03eafe" }
       ]
     },
     {
       "id": "epoch-3-recovery-scheduled",
-      "date": "2026-11-08T19:30:00Z/2026-11-10T18:25:00Z",
-      "status": "planned",
-      "title": "Recovered funds scheduled into epoch 5",
-      "detail": "Once the recovery reaches the v2 vault, the governance Safe schedules adding it to epoch 5's payout through the 72-hour timelock. It must be scheduled by about November 10, 18:25 UTC to take effect before epoch 5 closes; otherwise the recovered payout moves to epoch 6. The recovery's record on the v2 settlement contract was scheduled on November 6 and can take effect from November 9, 21:19 UTC.",
+      "date": "2026-11-10T18:25:00Z",
+      "status": "done",
+      "approximate": true,
+      "title": "Recovered funds not scheduled into epoch 5",
+      "detail": "The recovery reached the v2 vault on November 8 at 18:30 UTC. Adding it to epoch 5's payout had to be scheduled through the 72-hour timelock by about November 10, 18:25 UTC, to take effect before epoch 5 closes. It was not scheduled, so the recovered funds are not paid with epoch 5 (see the notice at the top). The recovery's record on the v2 settlement contract was scheduled on November 6 and has been ready to take effect since November 9, 21:19 UTC.",
       "sources": [
-        { "label": "Recovery record scheduled", "kind": "evm_tx", "ref": "0xd6d37a32a7f1d09cb1837f0be5ccebd58fe8baf554e41eaa9a63c052e6de2dd7" },
-        { "label": "Assignment scheduled", "kind": "evm_tx", "ref": "" },
-        { "label": "Added to epoch 5", "kind": "evm_tx", "ref": "" }
+        { "label": "Recovery root finalized, block 9,463,231", "kind": "evm_tx", "ref": "0xc9fa804023288aefdb381d0c19dd8f1ef8559530715b045f87475e695a51d6f9" },
+        { "label": "Recovery claimed into the v2 vault, block 9,463,236", "kind": "evm_tx", "ref": "0x18c4e8d3f72ceaea1b6f275b54b27786967a834822e3ae1539d084bc06a7ea28" },
+        { "label": "Recovery taken into the v2 vault's escrow, block 9,463,240", "kind": "evm_tx", "ref": "0xaa66b41505da170231e52a36db68c12198990241a3b1977663bce76d90ce93dc" },
+        { "label": "Recovery record scheduled", "kind": "evm_tx", "ref": "0xd6d37a32a7f1d09cb1837f0be5ccebd58fe8baf554e41eaa9a63c052e6de2dd7" }
       ]
     },
     {
       "id": "fp2-modern-provider-gate",
       "date": "2026-11-11T00:00:00Z",
-      "status": "scheduled",
+      "status": "done",
       "key": true,
-      "approximate": false,
-      "title": "Modern provider gate turns on",
-      "detail": "Quality and Speed admit only providers verified as modern. The gate turns on automatically at 00:00 UTC, three weeks later than the October 21 first planned.",
+      "title": "Modern provider gate retired: modern providers are drawn first",
+      "detail": "The gate that would have admitted only providers verified as modern to Quality and Speed did not turn on: on October 28 the subnet owner replaced it with priority. Within each band, providers verified as modern are drawn first and other providers fill what is left, so those keep their Quality and Speed membership. Priority reached the network operator's services that evening, from 22:37 to 23:20 UTC.",
       "sources": []
     },
     {
@@ -371,8 +369,8 @@
       "id": "epoch-5-claims-with-recovery",
       "date": "2026-11-15T18:25:00Z/2026-11-15T22:25:00Z",
       "status": "planned",
-      "title": "Epoch 5 claims, with the recovered epoch 1 and 3 funding",
-      "detail": "Epoch 5 ends at block 9,499,228. Its root pays epoch 3's recovered funding to the providers who did epoch 3's work, in proportion to their usage, and adds epoch 1's to the regular payout. Claims follow its 14,400-block challenge period.",
+      "title": "Epoch 5 claims",
+      "detail": "Epoch 5 ends at block 9,499,228, and claims follow its 14,400-block challenge period. The recovered epoch 1 and 3 funding is not part of epoch 5's payout: adding it was not scheduled in time (see the notice at the top).",
       "sources": [
         { "label": "Epoch 5 ledger root", "kind": "evm_tx", "ref": "" }
       ]

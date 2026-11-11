@@ -348,6 +348,16 @@
       ]
     },
     {
+      "id": "intra-traffic-billing-planned",
+      "date": "2026-11-10",
+      "status": "planned",
+      "title": "Same-network and friends-and-family traffic to draw on the data balance",
+      "detail": "Approved by the subnet owner on November 10. Once the billing change deploys, traffic between devices of one network and traffic to a provider in friends-and-family mode draw on the sending network's data balance, as other traffic does, on the free plan or a paid one. Friends-and-family providers are credited for it as before: paid and free traffic count alike. Contracts opened before the deploy are not charged. The deploy is planned for as soon as it is ready, and its date will be added here.",
+      "sources": [
+        { "label": "The amendment, WHITEPAPER.md §8.6.7", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md" }
+      ]
+    },
+    {
       "id": "fp2-modern-provider-gate",
       "date": "2026-11-11T00:00:00Z",
       "status": "scheduled",
@@ -379,6 +389,18 @@
         { "label": "The signed price in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/price.yml" },
         { "label": "Epoch 7's first block, 9,549,628", "kind": "evm_block", "ref": "" },
         { "label": "First priced deposit", "kind": "evm_tx", "ref": "" }
+      ]
+    },
+    {
+      "id": "extender-pool-epoch-8",
+      "date": "2026-11-27T18:25:00Z",
+      "status": "scheduled",
+      "title": "Extender pool for intra-platform and intra-network traffic, from epoch 8",
+      "detail": "From block 9,600,028, the first of epoch 8, bytes that no provider carries count for extenders instead. That covers traffic between a client and the network operator's platform, and traffic between devices of one network. The operator's pool spreads them evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, up to the epoch's eligible provider usage, so extenders earn at most half of a pool. Approved by the subnet owner on November 10, it takes effect once the signed amendment entry is published before epoch 8 starts.",
+      "sources": [
+        { "label": "The amendment, WHITEPAPER.md §8.6", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md" },
+        { "label": "Signed amendment entry", "kind": "doc", "ref": "" },
+        { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
       ]
     }
   ]

@@ -232,6 +232,9 @@ function sourcesFor(urlPath) {
     if (name === 'mainnet') {
         return ['react/src/components/pages/Mainnet.jsx', 'react/src/components/pages/mainnet/timeline.js', 'react/src/data/mainnet-timeline.json', 'react/src/data/mainnet.js', 'astro/src/pages/mainnet.astro'];
     }
+    if (name === 'ctf' || name.startsWith('ctf/')) {
+        return ['react/src/components/pages/Ctf.jsx', 'react/src/components/pages/CtfCountry.jsx', 'react/src/components/pages/ctf/model.js', 'react/src/data/ctf-epoch.json', 'astro/src/pages/ctf.astro', 'astro/src/pages/ctf/[cc].astro'];
+    }
     if (name === 'research/methodology') {
         return ['react/src/components/pages/ResearchMethodology.jsx', 'react/src/components/ResearchLoops.jsx', 'react/src/data/research-methodology.js', 'astro/src/pages/research/methodology.astro'];
     }

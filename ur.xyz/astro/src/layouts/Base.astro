@@ -76,13 +76,15 @@ const ORG_ID = `${SITE_ORIGIN}/#org`;
 const X_HANDLE = 'urnetwork';
 
 // Breadcrumbs follow the URL: the home page of the page's language, the
-// section a page sits in (Docs, the Investor Centre, Research), then the page itself,
-// named without the site suffix (" — UR", " | UR", " — UR Docs").
+// section a page sits in (Docs, the Investor Centre, Research, Capture the
+// flag), then the page itself, named without the site suffix (" — UR",
+// " | UR", " — UR Docs").
 const homeUrl = lang && lang !== 'en' ? new URL(`/${lang}`, SITE_ORIGIN).href : `${SITE_ORIGIN}/`;
 const PARENTS = [
     { prefix: '/docs/', name: 'Docs', path: '/docs' },
     { prefix: '/investors/', name: 'Investor Centre', path: '/investors' },
     { prefix: '/research/', name: 'Research', path: '/research' },
+    { prefix: '/ctf/', name: 'Capture the flag', path: '/ctf' },
 ];
 const parent = PARENTS.find((p) => basePath.startsWith(p.prefix));
 const pageName = breadcrumbName || title.replace(/\s+[—–|-]\s+UR(?:\s+Docs)?\s*$/u, '');

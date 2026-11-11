@@ -85,6 +85,7 @@ gates: install-playwright-browser
 	node --test ../react/tests/reserve-multisig.test.mjs
 	node --test ../react/tests/mainnet-timeline.test.mjs
 	node --test ../react/tests/mainnet-summary.test.mjs
+	node --test ../react/tests/ctf.test.mjs
 	node --test ../react/tests/research-report.test.mjs
 	node --test ../react/tests/research-methodology.test.mjs
 	node --test ../react/tests/research-competition.test.mjs

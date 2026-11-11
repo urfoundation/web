@@ -1,0 +1,77 @@
+---
+// /ctf/<cc> — a country's capture the flag page, one for each of the 249
+// ISO 3166-1 codes (sn design/ctf/SEO.md §2 and §6). Every page is
+// indexable and carries its own country's data from the epoch's snapshot,
+// never only its name: what is open there and what its pots hold after a
+// draw, before it the providers the network's dashboard counted online there
+// (the seo-audit refuses two country pages that differ by the country's name
+// alone).
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/CtfCountry.jsx), rendered to static HTML. Its
+// islands are the live bar with the country's card, and the country's other
+// big pots (ctf/CountryIslands.jsx); their first render is this one. The
+// paths are lowercase codes in the clean form publicPathFor publishes
+// (/ctf/ke). English-only, like the hub.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../../components/DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../../components/FooterStatic.astro';
+import CtfCountryPage from '@react/components/pages/CtfCountry.jsx';
+import { CountryEasyWins, CountryLive } from '@react/components/pages/ctf/CountryIslands.jsx';
+import { CTF } from '@react/components/pages/ctf/data.js';
+import { SITE, apiCountry, countryDescription, countryTitle } from '@react/components/pages/ctf/model.js';
+import { ctfOgImage } from '@react/components/pages/ctf/og.js';
+import en from '@react/i18n/en.js';
+import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
+
+import '@react/components/Nav.css';
+
+export function getStaticPaths() {
+    return CTF.countries.map((c) => ({ params: { cc: c.code } }));
+}
+
+const { cc } = Astro.params;
+const c = CTF.byCode.get(cc);
+const title = countryTitle(c);
+const url = `${SITE}/ctf/${cc}`;
+// "Updated" in the description is the day the page last changed, as on the page
+const description = countryDescription(CTF, c, LASTMOD_TOKEN);
+// A page about a country (by its ISO 3166-1 code), part of the hub's dataset;
+// Base.astro adds the BreadcrumbList from breadcrumbName.
+const jsonLd = [{
+    '@type': 'WebPage',
+    '@id': `${url}#page`,
+    url,
+    name: title.replace(/ \| UR$/, ''),
+    description,
+    dateModified: LASTMOD_TOKEN,
+    inLanguage: 'en',
+    about: { '@type': 'Country', name: c.name, identifier: cc.toUpperCase() },
+    isPartOf: { '@id': `${SITE}/ctf#dataset` },
+    publisher: { '@id': `${SITE}/#org` },
+}];
+---
+<Base
+    title={title}
+    description={description}
+    breadcrumbName={c.short}
+    lang="en"
+    jsonLd={jsonLd}
+    alternate={{ href: apiCountry(cc), type: 'application/json' }}
+    ogImage={ctfOgImage(CTF)}
+>
+    <div class="app">
+        <DisclaimerStatic t={en} />
+        <NavIsland activeRoute="ctf" lang="en" client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            <CtfCountryPage code={cc} updated={LASTMOD_TOKEN}>
+                <CountryLive slot="live" code={cc} client:idle={{ timeout: 1500 }} />
+                <CountryEasyWins slot="easyWins" code={cc} client:visible={{ rootMargin: '200px' }} />
+            </CtfCountryPage>
+        </main>
+
+        <FooterStatic t={en} lang="en" />
+    </div>
+</Base>

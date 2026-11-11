@@ -24,7 +24,11 @@
  *   node ../scripts/generate-agent-assets-llms.mjs build/main   (from astro/)
  *
  * The files stay small on purpose: one line per page, and llms-full.txt only
- * carries documents an agent would otherwise fetch one by one.
+ * carries documents an agent would otherwise fetch one by one. Capture the
+ * flag's 249 country pages (/ctf/<cc>) are the exception to "every page": a
+ * line each would break llms.txt's 16 KiB budget (seo-audit.mjs), so its
+ * section lists the hub, the URL pattern of the country pages, the JSON API
+ * they are built from and the API's OpenAPI document.
  */
 
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -58,6 +62,18 @@ const MACHINE_FILES = [
     ['/price.rss', 'Price sheet changes (RSS)', 'a feed of changes to the published price sheet'],
 ];
 const SOURCE_REPO = 'https://github.com/urfoundation/sn';
+// Capture the flag: the hub, its country pages' pattern, and the operator API
+// the pages are built from (sn/api/operator.yml, served at /sn/openapi.yml).
+const CTF_HUB = '/ctf';
+const isCtfCountry = (u) => /^\/ctf\/[a-z]{2}$/.test(u);
+const CTF_API = 'https://api.bringyour.com';
+const CTF_LINES = [
+    `- Each country's page: ${SITE}/ctf/<cc>, for each of the 249 lowercase ISO 3166-1 alpha-2 codes (${SITE}/ctf/ke is Kenya's)`,
+    `- [Capture the flag state (JSON)](${CTF_API}/sn/ctf): every country's slots, pots and chance to win, this epoch and last; public, CORS-open, amounts in alpha and rao, times in UTC`,
+    `- One country (JSON): ${CTF_API}/sn/ctf/country/<cc>, with its history since the first epoch; the open pots ranked: ${CTF_API}/sn/ctf/top?role=provider|extender|any`,
+    `- [Operator API (OpenAPI 3.1)](${SOURCE_REPO}/blob/main/api/operator.yml): the routes and their fields, also served at ${CTF_API}/sn/openapi.yml`,
+    `- [Design](${SOURCE_REPO}/blob/main/CAPTURETHEFLAG.md): how the slots, the draw and the pots work`,
+];
 // the section boundary in llms-full.txt; no embedded document may contain it
 const SECTION_MARK = '<!-- source:';
 
@@ -183,7 +199,7 @@ export function buildLlms(distDir) {
     );
 
     const siteLines = en
-        .filter(([u]) => !u.startsWith('/docs') && !LEGAL.includes(u))
+        .filter(([u]) => !u.startsWith('/docs') && !LEGAL.includes(u) && u !== CTF_HUB && !isCtfCountry(u))
         .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
         .map(([u, p]) => {
             const label = u === '/' ? 'Home' : pageName(p.html, p.title);
@@ -206,6 +222,11 @@ export function buildLlms(distDir) {
         ...SITEMAP_FILES.filter((f) => existsSync(path.join(distDir, f))).map((f) => `- [${FILE_LABELS[f] || f}](${SITE}${f})`),
         ...LEGAL.filter((u) => pages.has(u)).map((u) => `- [${shortTitle(pages.get(u).title)}](${SITE}${u})${twinOf(u)}: ${pages.get(u).description}`),
     ];
+
+    const ctfHub = pages.get(CTF_HUB);
+    const ctfSection = ctfHub
+        ? `\n## Capture the flag\n\n- [${pageName(ctfHub.html, ctfHub.title)}](${SITE}${CTF_HUB}): ${ctfHub.description}\n${CTF_LINES.join('\n')}\n`
+        : '';
 
     const machineLines = MACHINE_FILES
         .filter(([f]) => existsSync(path.join(distDir, f)))
@@ -235,7 +256,7 @@ ${[...machineLines, securityLine].filter(Boolean).join('\n')}
 ## Pages
 
 ${siteLines.join('\n')}
-
+${ctfSection}
 ## Docs
 
 - [Documentation index](${SITE}/docs)

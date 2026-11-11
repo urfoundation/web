@@ -714,7 +714,7 @@ for (const rel of ["llms.txt", "llms-full.txt", "litepaper.md"]) {
 {
   const llmsPath = path.join(DIST, "llms.txt");
   const llms = existsSync(llmsPath) ? readFileSync(llmsPath, "utf8") : "";
-  for (const f of ["/llms-full.txt", "/litepaper.md", "/operators.yml", "/price.yml", "/price.rss", "/.well-known/security.txt"]) {
+  for (const f of ["/llms-full.txt", "/litepaper.md", "/operators.yml", "/price.yml", "/price.rss", "/amendments.yml", "/.well-known/security.txt"]) {
     if (existsSync(path.join(DIST, f)) && !llms.includes(`(${siteOrigin}${f})`)) err(`llms.txt: does not list ${f}`);
   }
   const mailto = existsSync(secPath) ? (readFileSync(secPath, "utf8").match(/^Contact:\s*(mailto:\S+)/m) || [])[1] : null;

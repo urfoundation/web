@@ -273,14 +273,17 @@ operators: {
             date: '2026年8月24日至10月24日',
             title: '2026年8月至10月研究报告',
             body: '这项研究的目标是让每个人在日常使用中都获得最好的加密和最快的速度，让你的互联网变得更好。报告在一条时间线上展示了朝这一目标迈进的39项经过测量的改动、每类改进各自走了多远，以及研究是如何进行的。',
-            cta: '阅读报告（英文）'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: '阅读报告',
+            ctaEnglish: '阅读报告（英文）'
         },
         methodology: {
             tag: '方法论',
             topic: '三个研究循环',
             title: '自我改进的研究循环',
             body: '实验室、公开竞赛和志愿者现场节点各自如何改进网络，并同时改进下一轮的测量方式。三者遵循同一套原则：冻结的基线、实测的噪声，以及记录在案的每一次尝试。',
-            cta: '阅读方法论（英文）',
+            cta: '阅读方法论',
+            ctaEnglish: '阅读方法论（英文）',
             loops: [
                 { name: '实验室', detail: 'PERFVAR · 每次变更' },
                 { name: '竞赛', detail: 'Apex SN1 · 每周' },

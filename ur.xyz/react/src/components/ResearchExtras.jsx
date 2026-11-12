@@ -3,6 +3,7 @@ import './ResearchExtras.css';
 import { openResearchArea, researchAreaId } from './research-areas.js';
 import { APEX_COMPETITION, competitionPhase, competitionResultsText, countdown, sentenceGap } from './research-competition.js';
 import ResearchLoops, { ResearchLoopsKey } from './ResearchLoops';
+import { groupPageHref } from '../../../astro/src/lib/route-localization.js';
 
 /**
  * Research page extras — the algo-competition card, the algorithm areas,
@@ -309,21 +310,31 @@ function withLink(text, placeholder, href, label, className) {
 }
 
 /**
+ * Where a research card leads in `lang`, and what its call to action says: the
+ * page in the reader's language once its page group is translated, else the
+ * English page, whose call to action says it is in English (`ctaEnglish`).
+ */
+function cardLink(path, lang, copy) {
+    const translated = groupPageHref(path, lang);
+    return translated ? { href: translated, cta: copy.cta } : { href: path, cta: copy.ctaEnglish };
+}
+
+/**
  * The research report's card, under the page's intro: the latest report, as a
- * link to its page. The report is English-only, so the card links the English
- * page from every language, and the translations' call to action says so.
- * The path is the report's (router RESEARCH_REPORT_SLUGS).
+ * link to its page in the reader's language (cardLink). The path is the
+ * report's (router RESEARCH_REPORT_SLUGS).
  */
 export const RESEARCH_REPORT_HREF = '/research/2026-q3-report';
 
-export function ResearchReportCard({ t }) {
+export function ResearchReportCard({ t, lang = 'en' }) {
     const r = t.research.report;
+    const link = cardLink(RESEARCH_REPORT_HREF, lang, r);
     return (
-        <a className="research-report-card" href={RESEARCH_REPORT_HREF}>
+        <a className="research-report-card" href={link.href}>
             <span className="research-report-card-tag">{r.tag} · {r.date}</span>
             <h2 className="research-report-card-title">{r.title}</h2>
             <p className="research-report-card-body">{r.body}</p>
-            <span className="research-report-card-cta">{r.cta} <span aria-hidden="true">→</span></span>
+            <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">→</span></span>
         </a>
     );
 }
@@ -331,10 +342,8 @@ export function ResearchReportCard({ t }) {
 /**
  * The research methodology's card, under the report's: the three research
  * loops' rings as its hero (ResearchLoops.jsx, turning in CSS), then a link to
- * /research/methodology, where the same rings head the page. The methodology
- * is English-only, so the card links the English page from every language,
- * and the translations' call to action says so, as the report card's does.
- * The rings and their key repeat what the text says, so they are hidden from
+ * /research/methodology in the reader's language (cardLink), where the same
+ * rings head the page. The rings and their key repeat what the text says, so they are hidden from
  * assistive technology here; the page labels its drawing.
  */
 export const RESEARCH_METHODOLOGY_HREF = '/research/methodology';
@@ -342,11 +351,12 @@ export const RESEARCH_METHODOLOGY_HREF = '/research/methodology';
 // the dictionaries name the loops innermost first; each takes its ring's colour
 const METHOD_LOOP_KEYS = ['lab', 'competition', 'field'];
 
-export function ResearchMethodologyCard({ t }) {
+export function ResearchMethodologyCard({ t, lang = 'en' }) {
     const m = t.research.methodology;
     const loops = m.loops.map((l, i) => ({ ...l, key: METHOD_LOOP_KEYS[i] }));
+    const link = cardLink(RESEARCH_METHODOLOGY_HREF, lang, m);
     return (
-        <a className="research-method-card" href={RESEARCH_METHODOLOGY_HREF}>
+        <a className="research-method-card" href={link.href}>
             <div className="research-method-card-hero">
                 <ResearchLoops />
                 <ResearchLoopsKey loops={loops} hidden />
@@ -355,7 +365,7 @@ export function ResearchMethodologyCard({ t }) {
                 <span className="research-report-card-tag">{m.tag} · {m.topic}</span>
                 <h2 className="research-report-card-title">{m.title}</h2>
                 <p className="research-report-card-body">{m.body}</p>
-                <span className="research-report-card-cta">{m.cta} <span aria-hidden="true">→</span></span>
+                <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">→</span></span>
             </div>
         </a>
     );

@@ -189,6 +189,27 @@ async function groupDictionary(group, code) {
 // word, so trailing punctuation only counts when a space or the end follows.
 const PROSE_WORD = /(?:^|[\s(“"'])[a-z]{2,}(?=$|[\s)”"']|[,.;:!?](?:$|\s))/;
 
+// Units of measure, written the same in every language (a closed list): a
+// unit right after a figure ("457.6 ms", "2,552.3→543.7 ms", "12 GiB") or a
+// fragment that is a unit alone ("ms", beside a figure in its own element) is
+// no English prose.
+const UNITS = [
+    'ns', 'µs', 'μs', 'ms', 's', 'min', 'h', 'd',
+    '%', '‰', 'pp', 'x', '×',
+    'B', 'KB', 'kB', 'MB', 'GB', 'TB', 'KiB', 'MiB', 'GiB', 'TiB',
+    'bps', 'kbps', 'Kbps', 'Mbps', 'Gbps', 'B/s', 'KB/s', 'MB/s', 'GB/s', 'KiB/s', 'MiB/s', 'GiB/s', 'Mbit/s', 'Gbit/s',
+    'α', 'TAO', 'rao',
+];
+const UNIT = `(?:${UNITS.slice().sort((a, b) => b.length - a.length).map((u) => u.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')).join('|')})`;
+const UNIT_AFTER_FIGURE = new RegExp(`(\\d)\\s?${UNIT}(?![\\p{L}\\p{N}])`, 'gu');
+const UNIT_ALONE = new RegExp(`^${UNIT}$`, 'u');
+
+/** A sentence without the units of measure beside its figures (see UNITS). */
+export function withoutUnits(text) {
+    if (UNIT_ALONE.test(text.trim())) return '';
+    return text.replace(UNIT_AFTER_FIGURE, '$1');
+}
+
 /**
  * A translated page's English (see the top): each sentence that is prose of
  * its English twin, or an English dictionary value this language translates
@@ -203,7 +224,7 @@ export function englishOnPage(html, english, { allowed = new Set(), keysOf = new
         const id = `${source}\u0000${text}`;
         if (seen.has(id) || allowed.has(text)) continue;
         seen.add(id);
-        const prose = english.has(text) && PROSE_WORD.test(text);
+        const prose = english.has(text) && PROSE_WORD.test(withoutUnits(text));
         const keys = keysOf.get(text);
         const label = keys && keys.every((key) => translations.has(key) && translations.get(key) !== text);
         if (prose || label) out.push({ source, text, why: label ? `English for ${keys.join(', ')}` : 'identical to the English page' });

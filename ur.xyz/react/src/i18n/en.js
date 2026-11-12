@@ -294,13 +294,15 @@ operators: {
         metaTitle: 'Research: Open algorithms, data and audits — UR',
         metaDescription: 'UR research in the open: routing, matching, transfer and reward algorithms with source and anonymized data, the Apex SN1 latency competition, and audits.',
         intro:   'The protocol is a decentralized-native, multi-IP, multi-transport system designed to scale to millions of miners per network operator. Each algorithm area below is published with its source and, where applicable, anonymized data sets for independent analysis.',
-        // the card for the research report (an English page), under the intro
+        // the card for the research report, under the intro
         report: {
             tag: 'Report',
             date: 'August 24 – October 24, 2026',
             title: 'August–October 2026 Research Report',
             body: 'The research aims to give everyone the best encryption and the best speed, for everyday use, that makes your internet better. The report follows 39 measured changes toward that on one timeline, how far each kind of gain went, and how the research was done.',
-            cta: 'Read the report'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'Read the report',
+            ctaEnglish: 'Read the report (in English)'
         },
         methodology: {
             tag: 'Methodology',
@@ -308,6 +310,7 @@ operators: {
             title: 'Self-improving research loops',
             body: 'How the lab, the open competition and the volunteer field nodes each improve the network, and improve how the next round is measured. All three share one discipline: a frozen baseline, measured noise, and every attempt on the record.',
             cta: 'Read the methodology',
+            ctaEnglish: 'Read the methodology (in English)',
             loops: [
                 { name: 'Lab', detail: 'PERFVAR · every change' },
                 { name: 'Competition', detail: 'Apex SN1 · weekly' },

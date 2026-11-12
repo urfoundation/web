@@ -275,14 +275,17 @@ operators: {
             date: '24. August bis 24. Oktober 2026',
             title: 'Forschungsbericht August–Oktober 2026',
             body: 'Die Forschung soll allen die beste Verschlüsselung und die beste Geschwindigkeit für den Alltag bieten, die dein Internet besser machen. Der Bericht zeigt auf einer Zeitleiste 39 gemessene Änderungen auf diesem Weg, wie weit jede Art von Verbesserung gekommen ist und wie die Forschung durchgeführt wurde.',
-            cta: 'Bericht lesen (auf Englisch)'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'Bericht lesen',
+            ctaEnglish: 'Bericht lesen (auf Englisch)'
         },
         methodology: {
             tag: 'Methodik',
             topic: 'Drei Forschungsschleifen',
             title: 'Selbstverbessernde Forschungsschleifen',
             body: 'Wie das Labor, der offene Wettbewerb und die freiwilligen Feldknoten jeweils das Netzwerk verbessern und zugleich die Messung der nächsten Runde. Alle drei folgen einer Disziplin: eine eingefrorene Baseline, gemessenes Rauschen und jeder Versuch im Protokoll.',
-            cta: 'Methodik lesen (auf Englisch)',
+            cta: 'Methodik lesen',
+            ctaEnglish: 'Methodik lesen (auf Englisch)',
             loops: [
                 { name: 'Labor', detail: 'PERFVAR · bei jeder Änderung' },
                 { name: 'Wettbewerb', detail: 'Apex SN1 · wöchentlich' },

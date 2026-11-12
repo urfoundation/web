@@ -3,8 +3,8 @@
 // the 249 ISO 3166-1 codes of the epoch's snapshot: the page is
 // components/routes/CtfCountryRoute.astro, which [lang]/ctf/[cc].astro renders
 // in the other site languages. A page that reads like another country page's
-// but for the name, with no local note, is noindex (components/routes/ctf-paths.js
-// decides it from this build's snapshot; the seo-audit checks the built pages).
+// but for the name is noindex (components/routes/ctf-paths.js decides it from
+// this build's snapshot; the seo-audit decides again and checks the built pages).
 import CtfCountryRoute from '../../components/routes/CtfCountryRoute.astro';
 import { ctfCountryPaths } from '../../components/routes/ctf-paths.js';
 

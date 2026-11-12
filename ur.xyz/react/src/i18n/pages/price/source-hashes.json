@@ -1,0 +1,28 @@
+{
+  "about": "sha256 (first 12 hex) of the English each translation was made from, per language and key. Checked by tests/i18n-staleness.mjs; after updating a translation run `node tests/i18n-staleness.mjs --unit price --accept <lang> <key> ...` (from react/).",
+  "ru": {
+    "meta.datasetName": "a6a117418baf",
+    "meta.feedTitle": "8a2307e77a7f",
+    "meta.title": "5270f1400947"
+  },
+  "ar": {
+    "meta.datasetName": "a6a117418baf",
+    "meta.feedTitle": "8a2307e77a7f",
+    "meta.title": "5270f1400947"
+  },
+  "zh": {
+    "meta.datasetName": "a6a117418baf",
+    "meta.feedTitle": "8a2307e77a7f",
+    "meta.title": "5270f1400947"
+  },
+  "de": {
+    "meta.datasetName": "a6a117418baf",
+    "meta.feedTitle": "8a2307e77a7f",
+    "meta.title": "5270f1400947"
+  },
+  "es": {
+    "meta.datasetName": "a6a117418baf",
+    "meta.feedTitle": "8a2307e77a7f",
+    "meta.title": "5270f1400947"
+  }
+}

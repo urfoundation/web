@@ -1,0 +1,12 @@
+---
+// /build, Build on UR, in the site's other languages: the same route as the English
+// page (components/routes/BuildRoute.astro), built per language once the
+// `build` page group is localized.
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+import BuildRoute from '../../components/routes/BuildRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('build');
+}
+---
+<BuildRoute lang={Astro.params.lang} />

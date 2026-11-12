@@ -1,9 +1,29 @@
 {
   "about": "The day each page of the ur.xyz page group reserve (react/src/i18n/pages/reserve/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
+    "/ar/reserve": {
+      "fingerprint": "5b7b7c4bae395f82",
+      "lastmod": "2026-11-12"
+    },
+    "/de/reserve": {
+      "fingerprint": "3651320b78eb744f",
+      "lastmod": "2026-11-12"
+    },
+    "/es/reserve": {
+      "fingerprint": "ff48b8e58268d9b0",
+      "lastmod": "2026-11-12"
+    },
     "/reserve": {
       "fingerprint": "2169c502532f3e07",
       "lastmod": "2026-10-24"
+    },
+    "/ru/reserve": {
+      "fingerprint": "1d37fa7fc5047c7c",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/reserve": {
+      "fingerprint": "f96afa7f6d25b9fb",
+      "lastmod": "2026-11-12"
     }
   }
 }

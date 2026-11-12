@@ -1,4 +1,9 @@
 import React, { useEffect, useRef } from 'react';
+import { loadPageCopy } from '../../../i18n/page-copy.js';
+import { rich } from './rich.jsx';
+
+const copy = await loadPageCopy('investors/our-letter-to-bittensor');
+const RTL = new Set(['ar']);
 
 /**
  * The letter's network-stack exhibit: the live product and three research
@@ -11,8 +16,16 @@ import React, { useEffect, useRef } from 'react';
  * so the scaled preview and the zoomed copy can never differ. React renders
  * the diagram once and never touches it again, so moving it is safe; the
  * effect's cleanup puts it back where React left it.
+ *
+ * Its words are the letter unit's (react/src/i18n/pages/investors/
+ * our-letter-to-bittensor/, `stack`), in the page's language. On a
+ * right-to-left page the dialog's viewport stays left to right, which the
+ * scroll and zoom arithmetic below assumes, and the diagram carries its own
+ * direction so it reads right to left in the preview and in the dialog alike.
  */
-export default function NetworkStackExhibit() {
+export default function NetworkStackExhibit({ lang = 'en' }) {
+    const t = copy(lang).stack;
+    const rtl = RTL.has(lang);
     const figureRef = useRef(null);
 
     useEffect(() => {
@@ -218,29 +231,29 @@ export default function NetworkStackExhibit() {
 
     return (
         <figure className="letter-exhibit letter-stack-exhibit" style={{ '--stack-intrinsic-width': '840px' }} ref={figureRef}>
-            <figcaption id="network-stack-caption" className="letter-visually-hidden">The live ur.io product and three current research programmes all draw on the UR Subnet.</figcaption>
+            <figcaption id="network-stack-caption" className="letter-visually-hidden">{t.caption}</figcaption>
             <div className="letter-stack-frame">
                 <div className="letter-stack-scroll" data-stack-preview="">
-                <div className="letter-stack">
-                    <div className="letter-stack__group-label letter-stack__group-label--live">Live product</div>
-                    <div className="letter-stack__group-label letter-stack__group-label--research">Current research</div>
+                <div className="letter-stack" dir={rtl ? 'rtl' : undefined}>
+                    <div className="letter-stack__group-label letter-stack__group-label--live">{t.liveLabel}</div>
+                    <div className="letter-stack__group-label letter-stack__group-label--research">{t.researchLabel}</div>
 
                     <section className="letter-stack__programme">
                         <strong>ur.io</strong>
-                        <b>350k+ monthly active users</b>
-                        <span>Live usage creates<br />network demand.</span>
+                        <b>{t.urio.stat}</b>
+                        <span>{rich(t.urio.text)}</span>
                     </section>
                     <section className="letter-stack__programme">
-                        <strong>Project Bastion</strong>
-                        <span>How do we unlock<br />enterprise network<br />connectivity?</span>
+                        <strong>{t.bastion.name}</strong>
+                        <span>{rich(t.bastion.text)}</span>
                     </section>
                     <section className="letter-stack__programme">
-                        <strong>Project Stargate</strong>
-                        <span>Can one open index<br />support model training<br />and live retrieval?</span>
+                        <strong>{t.stargate.name}</strong>
+                        <span>{rich(t.stargate.text)}</span>
                     </section>
                     <section className="letter-stack__programme">
-                        <strong>Project Meridian</strong>
-                        <span>How do we create<br />dedicated identity<br />for agents?</span>
+                        <strong>{t.meridian.name}</strong>
+                        <span>{rich(t.meridian.text)}</span>
                     </section>
 
                     <div className="letter-stack__connector" aria-hidden="true">
@@ -249,12 +262,12 @@ export default function NetworkStackExhibit() {
 
                     <section className="letter-stack__subnet">
                         <div>
-                            <span className="letter-stack__subnet-label">UR Subnet</span>
-                            <strong>Shared provider and validation layer</strong>
-                            <small>One infrastructure supports live demand and all three research programmes, through quality scoring and an incentive market.</small>
+                            <span className="letter-stack__subnet-label">{t.subnetLabel}</span>
+                            <strong>{t.subnetTitle}</strong>
+                            <small>{t.subnetText}</small>
                         </div>
-                        <div className="letter-stack__stat"><strong>100k+</strong><span>residential miners</span></div>
-                        <div className="letter-stack__stat"><strong>100+</strong><span>countries</span></div>
+                        <div className="letter-stack__stat"><strong>100k+</strong><span>{t.minersLabel}</span></div>
+                        <div className="letter-stack__stat"><strong>100+</strong><span>{t.countriesLabel}</span></div>
                     </section>
                 </div>
                 </div>
@@ -264,22 +277,22 @@ export default function NetworkStackExhibit() {
                     aria-haspopup="dialog"
                     aria-controls="network-stack-dialog"
                     aria-describedby="network-stack-caption"
-                    aria-label="Open expanded network stack diagram"
+                    aria-label={t.expandAria}
                     data-stack-open=""
                 ></button>
             </div>
 
             <dialog className="letter-stack-dialog" id="network-stack-dialog" aria-labelledby="network-stack-dialog-title">
                 <div className="letter-stack-dialog__toolbar">
-                    <span id="network-stack-dialog-title">Network stack</span>
+                    <span id="network-stack-dialog-title">{t.dialogTitle}</span>
                     <div className="letter-stack-dialog__actions">
-                        <div className="letter-stack-dialog__zoom" role="group" aria-label="Diagram zoom controls">
-                            <button type="button" aria-label="Zoom out" data-stack-zoom-out="">−</button>
-                            <button type="button" aria-label="Fit diagram to window" data-stack-zoom-fit="">Fit</button>
-                            <button type="button" aria-label="Zoom in" data-stack-zoom-in="">+</button>
+                        <div className="letter-stack-dialog__zoom" role="group" aria-label={t.zoomAria}>
+                            <button type="button" aria-label={t.zoomOutAria} data-stack-zoom-out="">−</button>
+                            <button type="button" aria-label={t.fitAria} data-stack-zoom-fit="">{t.fit}</button>
+                            <button type="button" aria-label={t.zoomInAria} data-stack-zoom-in="">+</button>
                         </div>
                         <form method="dialog">
-                            <button className="letter-stack-dialog__close" type="submit" aria-label="Close expanded diagram"></button>
+                            <button className="letter-stack-dialog__close" type="submit" aria-label={t.closeAria}></button>
                         </form>
                     </div>
                 </div>
@@ -287,8 +300,9 @@ export default function NetworkStackExhibit() {
                     className="letter-stack-dialog__viewport"
                     role="group"
                     tabIndex={0}
-                    aria-label="Zoomable network stack diagram. Pinch, drag, or use the zoom controls."
+                    aria-label={t.viewportAria}
                     data-stack-dialog-content=""
+                    dir={rtl ? 'ltr' : undefined}
                 >
                     <div className="letter-stack-dialog__canvas" data-stack-dialog-canvas=""></div>
                 </div>

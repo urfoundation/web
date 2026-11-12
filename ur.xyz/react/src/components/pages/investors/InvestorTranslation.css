@@ -1,0 +1,35 @@
+/* The note a translated investor page opens with (shared.jsx,
+   TranslationNotice): the English is the authoritative version, linked. It
+   sits in each page's header, on the site's dark ground, and only translated
+   pages render it. Logical properties, so it mirrors right to left. */
+.investor-translation {
+    max-width: 68ch;
+    margin: 22px 0 0;
+    padding: 10px 14px;
+    border-inline-start: 2px solid var(--brand-ur);
+    border-radius: 2px;
+    background: rgba(214, 230, 244, 0.05);
+    color: rgba(214, 230, 244, 0.82);
+    font-size: 0.84rem;
+    line-height: 1.55;
+    text-align: start;
+}
+
+.investor-translation a {
+    color: var(--brand-white);
+    text-decoration: underline;
+    text-decoration-color: var(--brand-ur);
+    text-underline-offset: 0.18em;
+}
+
+.investor-translation a:hover { text-decoration-thickness: 2px; }
+
+.investor-translation a:focus-visible {
+    outline: 2px solid var(--brand-ur);
+    outline-offset: 3px;
+}
+
+@media print {
+    .investor-translation { border-color: #999; background: none; color: #333; }
+    .investor-translation a { color: inherit; }
+}

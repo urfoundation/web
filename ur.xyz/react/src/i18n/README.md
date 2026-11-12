@@ -35,7 +35,9 @@ The site speaks English (at the bare path) and Russian, Arabic, Chinese, German 
   ```
 
   Until a group is localized its pages are English-only: no `/<lang>/` page is built, nginx answers `/<lang>/<page>`
-  with a 301 to the English page, and nothing links or clusters a translation.
+  with a 301 to the English page that no browser keeps (`Cache-Control: no-store`: the translation may come with the
+  next build), and nothing links or clusters a translation. A `/<lang>/` URL that is no page in either language is a
+  404 with that language's not-found page.
 
 ## Copy units
 
@@ -147,5 +149,18 @@ Makefile.
 - **A new group:** a directory under `pages/` with its `group.js`, an import in `PAGE_GROUPS`
   (`astro/src/lib/route-localization.js`), and its page roots in nginx's localized-page rule
   (`web/web/nginx/nginx.conf.j2`).
-- **Retired paths.** A redirect from a retired URL belongs in nginx (`/<lang>/docs/whitepaper` and
-  `/<lang>/investors/august-investment-letter` follow their successor into the language when it is built).
+- **Retired paths.** A redirect from a retired URL belongs in nginx, to the successor in the URL's language
+  (`/de/community` → `/de/about`; `/<lang>/docs/whitepaper` and `/<lang>/investors/august-investment-letter` follow
+  their successor into the language when it is built).
+- **Links in a page's copy.** A link to another page of the site goes to it in the page's language once it has
+  translations: pass the href through `groupPageHref(href, lang) || href` (`astro/src/lib/route-localization.js`;
+  its `?query` and `#fragment` stay). A link that leaves the translation by the reader's choice, such as the English
+  original a translated document links, says so with `data-lang-choice="en"`: every page records the choice, as the
+  language switchers do (`LANG_CHOICE_SCRIPT` in Base.astro), so the stored language does not send the reader back.
+- **The stored-language redirect.** A visitor who chose a language (`ur.xyz.lang`) and opens a translated page's
+  English URL is sent to the translation by a script in its head (`storedLanguageRedirectScript`). Only a page with
+  translations carries it, never the not-found page, and it never makes the same redirect twice within ten seconds,
+  which ends a loop it cannot see (a 301 to English a browser kept from an older config). `tests/redirect-loops.mjs`,
+  in `make gates`, runs the site's nginx server block over the build and drives Chromium through every page family
+  with each language stored, the language switcher on a missing page and a profile with the old config's 301s
+  cached; it needs nginx.

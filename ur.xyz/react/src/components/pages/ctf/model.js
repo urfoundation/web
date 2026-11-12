@@ -183,6 +183,7 @@ export function buildModel(snap) {
         epoch: snap.current_epoch.epoch,
         firstEpoch: snap.first_epoch,
         startsAt: snap.prelaunch ? snap.prelaunch.starts_at : null,
+        startBlock: snap.prelaunch ? snap.prelaunch.start_block : null,
         drawAt: snap.current_epoch.draw_at,
         asOf: snap.as_of,
         last,
@@ -264,6 +265,33 @@ export function countryTitle(c, lang = 'en') {
     const values = place(c);
     const forms = [full, plain, short].map((t) => say(t, values));
     return forms.find((t) => graphemes(t) <= TITLE_MAX) || forms[forms.length - 1];
+}
+
+/**
+ * The note at the top of the hub before capture the flag starts: the props of
+ * its island (ctf/Countdown.jsx), its words in the model's language and the
+ * start, from the snapshot's prelaunch block, the one source of the start. Null
+ * in every other phase, so a build of a snapshot from after the start leaves
+ * the note out.
+ */
+export function startNote(m) {
+    if (m.phase !== 'prelaunch') return null;
+    const t = T(m).start;
+    const f = F(m);
+    return {
+        lang: m.lang,
+        first: m.firstEpoch,
+        startsAt: m.startsAt,
+        note: say(t.note, { first: m.firstEpoch, block: f.int(m.startBlock), day: f.dayName(m.startsAt.slice(0, 10)), clock: f.utcClock(m.startsAt) }),
+        live: say(t.live, { first: m.firstEpoch }),
+        words: {
+            in: t.in,
+            units: [t.days, t.hours, t.minutes, t.seconds],
+            blocks: t.blocks,
+            go: t.go,
+            about: t.about,
+        },
+    };
 }
 
 /** The hub's meta description, from the data. */

@@ -56,6 +56,19 @@ export default {
         intro: 'Jedes Land hat pro Epoche (eine Woche) zehn Slots: fünf für Provider und fünf für Extender. Ein Slot, den niemand gewinnt, wandert in den Topf dieses Landes, und jeder Gewinner dort erhält seinen Slot und ein Fünftel des Topfes. {rule}',
     },
 
+    start: {
+        note: 'Capture the Flag beginnt mit Epoche {first} bei Block {block}, etwa am {day} um {clock}.',
+        live: 'Capture the Flag läuft seit Epoche {first}.',
+        in: 'Start in etwa',
+        days: 'Tage',
+        hours: 'Stunden',
+        minutes: 'Minuten',
+        seconds: 'Sekunden',
+        blocks: 'Blöcke bis zum Start',
+        go: 'Läuft',
+        about: 'Noch etwa {time} bis zum Start.',
+    },
+
     rule: {
         drawn: 'Wo ein Slot nicht vergeben wurde, gewinnt ein neuer Miner, der die halbe Epoche online bleibt, ohne Auslosung.',
         open: 'Die Auslosung jedes Landes bestimmt bis zu fünf Gewinner pro Rolle, und bei fünf oder weniger Teilnehmern gewinnt jeder einen Slot.',

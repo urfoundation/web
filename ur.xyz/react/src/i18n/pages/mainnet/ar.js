@@ -8,6 +8,8 @@
 // timelock القفل الزمني; vault خزنة; capture the flag «الاستيلاء على العلم» (the apps' name); draw القرعة (never
 // يانصيب, رهان or مقامرة: it is not a lottery); entry مشارك; slot خانة; pot الرصيد المتراكم; carry forward
 // يُرحَّل; relay تمرير; an IP address block نطاق, a chain block كتلة.
+// A token that starts or ends with a slash (/29, /48, /64, 1/n) is wrapped in the isolates \u2066…\u2069, so
+// it reads left to right inside the Arabic; "IPv6 /64" needs none.
 export default {
     meta: {
         title: 'الجدول الزمني لإطلاق SN25 على الشبكة الرئيسية | UR',

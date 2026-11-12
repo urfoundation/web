@@ -106,6 +106,9 @@ gates: install-playwright-browser
 	node ../react/tests/visual-parity.mjs
 	node ../react/tests/network-privacy.mjs
 	node ../react/tests/static-affordances.mjs
+	# the site's nginx server block over the build, in Chromium: no redirect
+	# loop, on real and missing pages, with any language stored (needs nginx)
+	node ../react/tests/redirect-loops.mjs build/$(UR_ENV_DIR)
 	node scripts/link-audit.mjs build/$(UR_ENV_DIR)
 	node scripts/seo-audit.mjs build/$(UR_ENV_DIR)
 	node scripts/page-dates.mjs build/$(UR_ENV_DIR) --check

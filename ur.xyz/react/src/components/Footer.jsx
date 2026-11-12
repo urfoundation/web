@@ -55,6 +55,7 @@ export default function Footer() {
                     {code === 'en' && <a href="/dashboard">Dashboard</a>}
                     {code === 'en' && <a href="/reserve">Reserve</a>}
                     {code === 'en' && <a href="/mainnet">Mainnet</a>}
+                    {code === 'en' && <a href="/ctf">Capture the flag</a>}
                 </nav>
 
                 <nav className="footer-column" aria-label={t.footer.resources}>

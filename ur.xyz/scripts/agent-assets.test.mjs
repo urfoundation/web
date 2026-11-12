@@ -49,7 +49,7 @@ test('publishedImages is what the documents show, resolved as their pages resolv
 });
 
 /** A synthetic build: the pages buildLlms reads and the machine-readable files. */
-function fixtureBuild(run) {
+function fixtureBuild(run, more = () => {}) {
     const dist = mkdtempSync(path.join(tmpdir(), 'ur-agent-assets-'));
     const page = (urlPath, title, description, graph = []) => {
         const file = path.join(dist, urlPath === '/' ? 'index.html' : `${urlPath.slice(1)}.html`);
@@ -71,6 +71,7 @@ function fixtureBuild(run) {
         file('price.yml', 'sn: 25\n');
         file('price.rss', '<rss version="2.0"></rss>\n');
         file('amendments.yml', 'sn: 25\n');
+        more(page);
         run(buildLlms(dist));
     } finally {
         rmSync(dist, { recursive: true, force: true });
@@ -92,6 +93,23 @@ test('llms.txt lists the machine-readable files, the source repository and the s
         ]) {
             assert.ok(machine.includes(url), `the Machine-readable section does not list ${url}`);
         }
+    });
+});
+
+test('llms.txt lists capture the flag\'s hub, its country pages\' pattern, its API and the API\'s document, not the 249 country pages', () => {
+    fixtureBuild(({ llms }) => {
+        const section = llms.slice(llms.indexOf('## Capture the flag'), llms.indexOf('## Docs'));
+        assert.ok(section.startsWith('## Capture the flag'), 'no Capture the flag section');
+        assert.match(section, /^- \[Capture the flag\]\(https:\/\/ur\.xyz\/ctf\): Fixture hub description\.$/m);
+        for (const url of ['https://ur.xyz/ctf/<cc>', 'https://api.bringyour.com/sn/ctf)', 'https://api.bringyour.com/sn/ctf/country/<cc>', 'https://github.com/urfoundation/sn/blob/main/api/operator.yml', 'https://api.bringyour.com/sn/openapi.yml']) {
+            assert.ok(section.includes(url), `the Capture the flag section does not name ${url}`);
+        }
+        assert.ok(!/\]\(https:\/\/ur\.xyz\/ctf\/[a-z]{2}\)/.test(llms), 'a country page is listed');
+        const pages = llms.slice(llms.indexOf('## Pages'), llms.indexOf('## Capture the flag'));
+        assert.ok(!pages.includes('https://ur.xyz/ctf'), 'the hub is listed among the pages too');
+    }, (page) => {
+        page('/ctf', 'Earn crypto by sharing your internet in 249 countries | UR', 'Fixture hub description.', [{ '@type': 'BreadcrumbList', itemListElement: [{ name: 'UR' }, { name: 'Capture the flag' }] }]);
+        for (const cc of ['ke', 'ng']) page(`/ctf/${cc}`, `Earn crypto in ${cc} | UR`, `Fixture ${cc} description.`);
     });
 });
 

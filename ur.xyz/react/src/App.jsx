@@ -24,6 +24,8 @@ import InvestorsPage from './components/pages/Investors';
 import BuildPage from './components/pages/Build';
 import ReservePage from './components/pages/Reserve';
 import MainnetPage from './components/pages/Mainnet';
+import CtfPage from './components/pages/Ctf';
+import CtfCountryPage from './components/pages/CtfCountry';
 import DashboardPage from './components/pages/Dashboard';
 import ResearchReportPage from './components/pages/ResearchReport';
 import ResearchMethodologyPage from './components/pages/ResearchMethodology';
@@ -32,6 +34,8 @@ import { useRoute } from './router';
 const Terms = () => <LegalSection doc="terms" />;
 const Privacy = () => <LegalSection doc="privacy" />;
 const Vdp = () => <LegalSection doc="vdp" />;
+// capture the flag: the hub at /ctf, a country's page at /ctf/<cc>
+const Ctf = ({ route }) => (route.slug ? <CtfCountryPage code={route.slug} /> : <CtfPage />);
 
 /** Map route names to their section component. */
 const SECTION_COMPONENTS = {
@@ -50,6 +54,7 @@ const SECTION_COMPONENTS = {
     build:      BuildPage,
     reserve:    ReservePage,
     mainnet:    MainnetPage,
+    ctf:        Ctf,
     // a research report, /research/<slug> (router RESEARCH_REPORT_SLUGS)
     'research-report': ResearchReportPage,
     // the research methodology, /research/methodology

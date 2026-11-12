@@ -169,6 +169,11 @@ done
 expect_response ur.xyz /investors 200
 expect_response ur.xyz /reserve 200
 expect_response ur.xyz /mainnet 200
+expect_response ur.xyz /ctf 200
+expect_response ur.xyz /ctf/ke 200
+expect_response ur.xyz /ctf/flags/ke.svg 200
+expect_response ur.xyz /de/ctf 301 /ctf
+expect_response ur.xyz /de/ctf/ke 301 /ctf/ke
 expect_response ur.xyz /research/2026-q3-report 200
 expect_response ur.xyz /de/research/2026-q3-report 301 /research/2026-q3-report
 expect_response ur.xyz /research/methodology 200

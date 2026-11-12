@@ -54,9 +54,10 @@ export const LEGAL_ROUTES = ['terms', 'privacy', 'vdp'];
  * have no translations, so they exist at the bare path only. /reserve is the
  * Network Capacity Reserve dashboard and /mainnet the SN25 mainnet launch
  * timeline, both linked from the footer. /dashboard is the live stats page, standalone
- * and unlinked until launch.
+ * and unlinked until launch. /ctf is capture the flag, with a page per country
+ * at /ctf/<cc> (the route's slug, a lowercase ISO 3166-1 alpha-2 code).
  */
-export const PAGE_ROUTES = ['about', 'investors', 'build', 'reserve', 'mainnet', 'dashboard'];
+export const PAGE_ROUTES = ['about', 'investors', 'build', 'reserve', 'mainnet', 'dashboard', 'ctf'];
 
 /**
  * The research reports: English-only documents under the translated research
@@ -104,6 +105,7 @@ export function parseRoute(pathname) {
     if (bare.startsWith('investors/')) {
         return { name: 'investors', slug: bare.slice('investors/'.length) };
     }
+    if (/^ctf\/[a-z]{2}$/.test(bare)) return { name: 'ctf', slug: bare.slice('ctf/'.length) };
 
     if (bare === 'docs') return { name: 'docs', slug: null };
     if (bare.startsWith('docs/')) {

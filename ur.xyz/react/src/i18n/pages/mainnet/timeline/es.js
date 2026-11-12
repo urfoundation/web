@@ -256,9 +256,9 @@ export default {
         },
         'sn25-gamma-payments': {
             title: 'Pagos con Gamma disponibles en SN25',
-            detail: 'En el bloque 9.483.859, la multisig del propietario de la subred publicó el primer servicio de Gamma en SN25 y activó Gamma para SN25, en una sola llamada. Gamma, una función del runtime de Subtensor activada en toda la red el 9 de noviembre, es el crédito de una subred para pagar servicios, valorado en dólares estadounidenses: un comprador acuña gamma de SN25, uno por dólar, quemando alfa de SN25 comprado con TAO o tomado del stake, y un servicio publicado en SN25 lo gasta en lo que el comprador pide. Cada acuñación quema alfa de SN25. Gamma no se puede transferir ni canjear, y el gamma de SN25 solo paga servicios en SN25. El primero es el de URnetwork, uno de los lugares donde puedes pagar con él: planes Pro y datos, por API. Aprobado por el propietario de la subred el 11 de noviembre.',
+            detail: 'En el bloque 9.483.859, la multifirma del propietario de la subred publicó el primer servicio de Gamma en SN25 y activó Gamma para SN25, en una sola llamada. Gamma, una función del runtime de Subtensor activada en toda la red el 9 de noviembre, es el crédito de una subred para pagar servicios, valorado en dólares estadounidenses: un comprador acuña gamma de SN25, uno por dólar, quemando alfa de SN25 comprado con TAO o tomado del stake, y un servicio publicado en SN25 lo gasta en lo que el comprador pide. Cada acuñación quema alfa de SN25. Gamma no se puede transferir ni canjear, y el gamma de SN25 solo paga servicios en SN25. El primero es el de URnetwork, uno de los lugares donde puedes pagar con él: planes Pro y datos, por API. Aprobado por el propietario de la subred el 11 de noviembre.',
             sources: [
-                'Publicado y activado por la multisig del propietario de la subred, extrínseco 9483859-0021',
+                'Publicado y activado por la multifirma del propietario de la subred, extrínseco 9483859-0021',
                 'Pagar con Gamma, en ur.io',
             ],
         },

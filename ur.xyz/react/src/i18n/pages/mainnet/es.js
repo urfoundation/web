@@ -11,7 +11,7 @@
 export default {
     meta: {
         title: 'Cronología del lanzamiento de SN25 en la red principal | UR',
-        description: 'Lanzamiento de SN25 por época: versión 1 desde el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y Captura la bandera desde la época 8 (27 de noviembre).',
+        description: 'Lanzamiento de SN25 en la red principal: versión 1 el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y Captura la bandera desde la época 8 (27 de noviembre).',
         breadcrumb: 'Red principal',
     },
 

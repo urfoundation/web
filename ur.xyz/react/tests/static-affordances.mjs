@@ -17,7 +17,11 @@
 //                         search, the picker; the tap to open a card is not
 //                         drawn at all) is disabled until it runs, and the
 //                         hydrated board finds a country, opens on the
-//                         visitor's (/sn/ctf/here) and lets a tap open a card
+//                         visitor's (/sn/ctf/here) and lets a tap open a card;
+//                         before capture the flag starts, the note above the
+//                         hub's heading says when in the HTML (Russian and
+//                         Arabic too), and on the visitor's clock it counts
+//                         down and turns live at the start, holding its size
 //
 // Usage (from astro/, after a build):  node ../react/tests/static-affordances.mjs
 import { chromium } from 'playwright-core';
@@ -27,6 +31,8 @@ import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OFFLINE_CHROMIUM_ARGS } from './offline-chromium.mjs';
+import { SNAPSHOT } from './ctf-fixtures.mjs';
+import { buildModel, localModel, startNote } from '../src/components/pages/ctf/model.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UR_ENV = process.env.UR_ENV || 'main';
@@ -189,6 +195,52 @@ async function main() {
             await page.waitForTimeout(1000);
             check(await cell.evaluate((el) => el.classList.contains('ctf-expanded') && el.querySelector('.ctf-cell-more') !== null).catch(() => false), '/ctf on a tablet opens a country\'s card on a tap');
             await context.close();
+        }
+        {
+            // capture the flag before it starts: the note above the hub's heading, in the HTML in every language and
+            // counting down on the visitor's clock; once the snapshot is from after the start, no note
+            const notes = Object.fromEntries(['en', 'ru', 'ar'].map((lang) => [lang, startNote(localModel(buildModel(SNAPSHOT), lang))]));
+            if (!notes.en) {
+                const { page, close } = await open(browser, `${base}/ctf`, false);
+                check(await page.locator('.ctf-start').count() === 0, '/ctf after the start has no countdown note');
+                await close();
+            } else {
+                for (const [lang, note] of Object.entries(notes)) {
+                    const { page, close } = await open(browser, `${base}${lang === 'en' ? '' : `/${lang}`}/ctf`, false);
+                    const said = await page.textContent('.ctf-start [role="status"]').catch(() => '');
+                    const first = await page.evaluate(() => {
+                        const start = document.querySelector('.ctf-start');
+                        const h1 = document.querySelector('h1');
+                        return Boolean(start && h1 && start.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING);
+                    });
+                    check(said === note.note && first, `/${lang === 'en' ? '' : `${lang}/`}ctf without JavaScript says above its heading when capture the flag starts: ${note.note}`);
+                    if (lang === 'en') check(await page.textContent('.ctf-start-tiles').catch(() => '') === `--${note.words.units[0]}:--${note.words.units[1]}:--${note.words.units[2]}:--${note.words.units[3]}`, '/ctf without JavaScript shows no figure it cannot know');
+                    await close();
+                }
+                // hydrated, three days before the start on the visitor's clock, then past it
+                const start = Date.parse(notes.en.startsAt);
+                const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+                const page = await context.newPage();
+                await page.clock.install({ time: start - 3 * 86_400_000 });
+                await page.route(/bringyour\.com/, (r) => r.fulfill({ json: {} }).catch(() => r.abort()));
+                await page.goto(`${base}/ctf`, { waitUntil: 'networkidle' });
+                await page.waitForSelector('.ctf-start.ctf-start-on', { timeout: 8000 }).catch(() => {});
+                const box = async () => page.evaluate(() => {
+                    const r = document.querySelector('.ctf-start').getBoundingClientRect();
+                    return { height: r.height, h1: document.querySelector('h1').getBoundingClientRect().top + window.scrollY };
+                });
+                const before = await box();
+                const figures = await page.$$eval('.ctf-start-num', (els) => els.map((el) => el.textContent));
+                check(JSON.stringify(figures) === '["03","00","00","00"]', `/ctf counts down on the visitor's clock: ${figures.join(' : ')}`);
+                check(await page.textContent('.ctf-start .ctf-sr').catch(() => '') === 'Starts in about 3 days.', '/ctf says the time left in words for a screen reader');
+                check(/≈ 21,600$/.test(await page.textContent('.ctf-start-blocks b').catch(() => '')), '/ctf counts the blocks left, one every 12 seconds');
+                await page.clock.fastForward(3 * 86_400_000 + 1000);
+                await page.waitForSelector('.ctf-start[data-phase="live"]', { timeout: 5000 }).catch(() => {});
+                const after = await box();
+                check(await page.textContent('.ctf-start [role="status"]').catch(() => '') === notes.en.live && await page.locator('.ctf-start .ctf-sr').count() === 0, `/ctf turns live at the start, not a count below zero: ${notes.en.live}`);
+                check(Math.abs(after.height - before.height) < 0.5 && Math.abs(after.h1 - before.h1) < 0.5, `/ctf's note holds its size as it turns live (${before.height} → ${after.height} px)`);
+                await context.close();
+            }
         }
         {
             const { page, close } = await open(browser, `${base}/reserve`, false);

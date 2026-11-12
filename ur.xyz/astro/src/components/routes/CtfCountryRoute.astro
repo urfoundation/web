@@ -13,7 +13,9 @@
 // page's language: its words the `ctf` copy unit, the country's names (in a
 // list, in a title, "in <country>") the `ctf/names` unit. Its islands are the
 // live bar with the country's card, and the country's other big pots
-// (ctf/CountryIslands.jsx); their first render is this one. The paths are
+// (ctf/CountryIslands.jsx), and until capture the flag starts the hub's note in
+// its compact form (ctf/Countdown.jsx, when the browser is idle, within a
+// second); their first render is this one. The paths are
 // lowercase codes in the clean form publicPathFor publishes (/ctf/ke,
 // /ru/ctf/ke). `noindex` is the build's decision (ctf-paths.js), the same in
 // every language: a page that reads like another but for the country's name
@@ -24,8 +26,9 @@ import NavIsland from '../../islands/NavIsland.jsx';
 import FooterStatic from '../FooterStatic.astro';
 import CtfCountryPage from '@react/components/pages/CtfCountry.jsx';
 import { CountryEasyWins, CountryLive } from '@react/components/pages/ctf/CountryIslands.jsx';
+import Countdown from '@react/components/pages/ctf/Countdown.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
-import { SITE, apiCountry, countryDescription, countryTitle, localModel } from '@react/components/pages/ctf/model.js';
+import { SITE, apiCountry, countryDescription, countryTitle, localModel, startNote } from '@react/components/pages/ctf/model.js';
 import { pagePath } from '@react/components/pages/ctf/links.js';
 import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
 import { getDict } from '../../lib/i18n.js';
@@ -49,6 +52,9 @@ const title = countryTitle(c, lang);
 const url = `${SITE}${pagePath(lang, `/ctf/${cc}`)}`;
 // "Updated" in the description is the day the page last changed, as on the page
 const description = countryDescription(m, c, LASTMOD_TOKEN);
+// the hub's note until capture the flag starts, compact; the same on every country page, so it changes nothing
+// of which pages read alike (ctf-paths.js), and null once the snapshot is from after the start
+const note = startNote(m);
 // A page about a country (by its ISO 3166-1 code), part of the hub's dataset in
 // the same language; Base.astro adds the BreadcrumbList from breadcrumbName.
 const jsonLd = [{
@@ -82,6 +88,7 @@ const jsonLd = [{
 
         <main class="section-page">
             <CtfCountryPage code={cc} lang={lang} updated={LASTMOD_TOKEN}>
+                {note && <Countdown slot="countdown" {...note} compact client:idle={{ timeout: 1000 }} />}
                 <CountryLive slot="live" code={cc} {...islandLang} client:idle={{ timeout: 1500 }} />
                 <CountryEasyWins slot="easyWins" code={cc} {...islandLang} client:visible={{ rootMargin: '200px' }} />
             </CtfCountryPage>

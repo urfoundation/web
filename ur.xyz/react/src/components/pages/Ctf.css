@@ -161,6 +161,17 @@
     .ctf-page .ctf-start-burst, .ctf-page .ctf-start-track { display: none; }
 }
 
+/* a country page's note, compact: one band, the flag and the tiles smaller, no notches and no blocks left */
+.ctf-page .ctf-start-compact { --ctf-start-digit: clamp(22px, 1.9vw, 26px); --ctf-flag-w: 30px; --ctf-flag-h: 22px; grid-template-areas: "pole line clock"; gap: 8px 32px; padding-block: 14px 14px; padding-inline: 18px 24px; border-radius: 14px; background: radial-gradient(ellipse 200px 120px at 0% 100%, rgba(237, 143, 255, 0.11), transparent 70%), #151215; }
+[dir="rtl"] .ctf-page .ctf-start-compact { background: radial-gradient(ellipse 200px 120px at 100% 100%, rgba(237, 143, 255, 0.11), transparent 70%), #151215; }
+.ctf-page .ctf-start-compact .ctf-start-pole { min-height: 60px; }
+.ctf-page .ctf-start-compact .ctf-start-line { font-size: 17px; line-height: 1.35; }
+.ctf-page .ctf-start-compact .ctf-start-count { gap: 6px; }
+.ctf-page .ctf-start-compact .ctf-start-tiles { gap: 4px; }
+.ctf-page .ctf-start-compact .ctf-start-unit { gap: 5px; }
+.ctf-page .ctf-start-compact .ctf-start-num { border-radius: 7px; }
+.ctf-page .ctf-start-compact .ctf-start-uname { font-size: 8.5px; letter-spacing: 0.04em; }
+
 /* the live bar: wraps instead of scrolling; hairline separators come from the 1px gap */
 .ctf-page .ctf-live { display: flex; flex-wrap: wrap; gap: 1px; background: var(--ctf-line); border: 1px solid var(--ctf-line); border-radius: 12px; overflow: hidden; }
 .ctf-page .ctf-live > * { background: #0d0d0d; flex: 1 1 auto; }
@@ -408,6 +419,7 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
     .ctf-page .ctf-shell { width: calc(100% - 48px); }
     /* the note stacks: the sentence, the countdown and the blocks left, beside the pole */
     .ctf-page .ctf-start { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "pole line" "pole clock" "pole blocks"; align-items: start; justify-items: start; gap: 18px 26px; }
+    .ctf-page .ctf-start-compact { --ctf-start-digit: clamp(22px, 3.2vw, 28px); grid-template-areas: "pole line" "pole clock"; gap: 12px 20px; }
     .ctf-page .ctf-touch-block { display: block; }
     /* three to a row, and a row's last items share its width, so no cell is left empty */
     .ctf-page .ctf-live > * { flex: 1 1 calc(33.3% - 1px); min-width: 0; }
@@ -454,6 +466,8 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
     .ctf-page .ctf-shell { width: calc(100% - 32px); }
     .ctf-page .ctf-start { --ctf-start-digit: clamp(22px, 7.4vw, 32px); --ctf-flag-w: 34px; --ctf-flag-h: 25px; gap: 16px 14px; padding-block: 20px 18px; padding-inline: 14px 16px; border-radius: 16px; }
     .ctf-page .ctf-hdr.ctf-hdr-noted { padding-top: 40px; }
+    .ctf-page .ctf-start-compact { --ctf-start-digit: clamp(18px, 6vw, 24px); --ctf-flag-w: 26px; --ctf-flag-h: 19px; gap: 12px 12px; padding-block: 14px 14px; padding-inline: 12px 14px; border-radius: 14px; }
+    .ctf-page .ctf-start-compact .ctf-start-line { font-size: 15.5px; }
     .ctf-page .ctf-start-line { font-size: 17px; }
     .ctf-page .ctf-start-tiles { gap: 3px; }
     .ctf-page .ctf-start-num { border-radius: 8px; }
@@ -525,5 +539,5 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
 
 /* a narrow phone (400px and below): the countdown's unit names set closer, so the longest clear their neighbours */
 @media (max-width: 400px) {
-    .ctf-page .ctf-start-uname { font-size: 8px; letter-spacing: 0.02em; }
+    .ctf-page .ctf-start-uname, .ctf-page .ctf-start-compact .ctf-start-uname { font-size: 8px; letter-spacing: 0.02em; }
 }

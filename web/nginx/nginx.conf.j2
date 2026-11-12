@@ -437,34 +437,39 @@ http {
         # corpus copies (/docs/legal/*, /<lang>/docs/legal/*) are the same
         # document, so they 301 there in one hop, in the copy's language when
         # the build has the page in it. Ahead of the localized-page rule below,
-        # which would add a hop.
+        # which would add a hop. A 301 to English for want of a translation is
+        # never cached (see the localized-page rule).
         location ~ ^/docs/legal/(?<legal_doc>terms|privacy|vdp)(?:\.html|/)?$ {
             return 301 /$legal_doc;
         }
 
         location ~ ^/(?<legal_lang>ru|ar|zh|de|es)/docs/legal/(?<legal_doc>terms|privacy|vdp)(?:\.html|/)?$ {
-            if (-f $document_root/$legal_lang/$legal_doc.html) {
-                return 301 /$legal_lang/$legal_doc;
+            if (!-f $document_root/$legal_lang/$legal_doc.html) {
+                add_header 'Cache-Control' 'no-store' always;
+                return 301 /$legal_doc;
             }
-            return 301 /$legal_doc;
+            return 301 /$legal_lang/$legal_doc;
         }
 
         # The retired aliases' translations: /<lang>/docs/whitepaper and
         # /<lang>/investors/august-investment-letter 301 in one hop to their
-        # successor in that language when the build has it, else in English. The
-        # build may write meta-refresh stubs at those paths; this answers first.
+        # successor in that language when the build has it, else in English,
+        # uncached. The build may write meta-refresh stubs at those paths; this
+        # answers first.
         location ~ ^/(?<alias_lang>ru|ar|zh|de|es)/docs/whitepaper(?:\.html|/)?$ {
-            if (-f $document_root/$alias_lang/docs/litepaper.html) {
-                return 301 /$alias_lang/docs/litepaper$is_args$args;
+            if (!-f $document_root/$alias_lang/docs/litepaper.html) {
+                add_header 'Cache-Control' 'no-store' always;
+                return 301 /docs/litepaper$is_args$args;
             }
-            return 301 /docs/litepaper$is_args$args;
+            return 301 /$alias_lang/docs/litepaper$is_args$args;
         }
 
         location ~ ^/(?<alias_lang>ru|ar|zh|de|es)/investors/august-investment-letter(?:\.html|/)?$ {
-            if (-f $document_root/$alias_lang/investors/our-letter-to-bittensor.html) {
-                return 301 /$alias_lang/investors/our-letter-to-bittensor$is_args$args;
+            if (!-f $document_root/$alias_lang/investors/our-letter-to-bittensor.html) {
+                add_header 'Cache-Control' 'no-store' always;
+                return 301 /investors/our-letter-to-bittensor$is_args$args;
             }
-            return 301 /investors/our-letter-to-bittensor$is_args$args;
+            return 301 /$alias_lang/investors/our-letter-to-bittensor$is_args$args;
         }
 
         # The page groups' pages in another language (ur.xyz
@@ -474,10 +479,15 @@ http {
         # under the translated /research). /<lang>/<page> serves the translated
         # page when the build has it, and 301s to the English page until its
         # group is localized; its .html and trailing-slash forms go to the
-        # right one of those in one hop. The build writes no redirect stub at
-        # these paths (a stub here would be served as a page).
+        # right one of those in one hop. No cache keeps the 301 to English: the
+        # translation may come with any build, and a browser that kept the 301
+        # would then send a visitor who chose the language back to English,
+        # which the stored-language redirect sends to the translation: a loop.
+        # The build writes no redirect stub at these paths (a stub here would
+        # be served as a page).
         location ~ ^/(?<page_lang>ru|ar|zh|de|es)(?<page_path>/(?:about|build|ctf|dashboard|docs|investors|mainnet|price|reserve|terms|privacy|vdp|research/[^/]+?)(?:/[^/]+?)*?)(?<page_variant>\.html|/+)?$ {
             if (!-f $document_root/$page_lang$page_path.html) {
+                add_header 'Cache-Control' 'no-store' always;
                 return 301 $page_path$is_args$args;
             }
             if ($page_variant) {

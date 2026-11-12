@@ -167,8 +167,9 @@ for host in ur.xyz preview.ur.xyz; do
 done
 
 # A page group's page in another language (ur.xyz react/src/i18n/pages/):
-# served when the build has it, else a 301 to the English page; its
-# trailing-slash and .html forms go to the right one of those in one hop.
+# served when the build has it, else a 301 to the English page that no cache
+# keeps (the translation may come with a later build); its trailing-slash and
+# .html forms go to the right one of those in one hop.
 expect_localized_page() {
     local lang=$1
     local path=$2
@@ -181,6 +182,7 @@ expect_localized_page() {
         expect_response ur.xyz "/$lang$path.html" 301 "https://ur.xyz/$lang$path"
     else
         expect_response ur.xyz "/$lang$path" 301 "$path"
+        expect_header ur.xyz "/$lang$path" Cache-Control no-store
         expect_response ur.xyz "/$lang$path?smoke=1" 301 "$path?smoke=1"
         expect_response ur.xyz "/$lang$path/" 301 "$path"
         expect_response ur.xyz "/$lang$path.html" 301 "$path"
@@ -201,15 +203,19 @@ for lang in ru ar zh de es; do
         expect_localized_page "$lang" "$path"
     done
     # the docs corpus copies of the legal documents, and the retired aliases,
-    # go to their page in one hop, in the language when the build has it
+    # go to their page in one hop, in the language when the build has it; a
+    # 301 to English for want of the translation is never cached
     for doc in terms privacy vdp; do
         if [[ -f "/www/preview.ur.xyz/$lang/$doc.html" ]]; then target="/$lang/$doc"; else target="/$doc"; fi
         expect_response ur.xyz "/$lang/docs/legal/$doc" 301 "$target"
+        [[ "$target" == "/$lang/"* ]] || expect_header ur.xyz "/$lang/docs/legal/$doc" Cache-Control no-store
     done
     if [[ -f "/www/preview.ur.xyz/$lang/docs/litepaper.html" ]]; then target="/$lang/docs/litepaper"; else target=/docs/litepaper; fi
     expect_response ur.xyz "/$lang/docs/whitepaper" 301 "$target"
+    [[ "$target" == "/$lang/"* ]] || expect_header ur.xyz "/$lang/docs/whitepaper" Cache-Control no-store
     if [[ -f "/www/preview.ur.xyz/$lang/investors/our-letter-to-bittensor.html" ]]; then target="/$lang/investors/our-letter-to-bittensor"; else target=/investors/our-letter-to-bittensor; fi
     expect_response ur.xyz "/$lang/investors/august-investment-letter" 301 "$target"
+    [[ "$target" == "/$lang/"* ]] || expect_header ur.xyz "/$lang/investors/august-investment-letter" Cache-Control no-store
     # a miss under the language's prefix is a 404 with that language's
     # not-found page when the build has it, else the English one
     expect_response ur.xyz "/$lang/no-such-page" 404

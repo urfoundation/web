@@ -35,7 +35,7 @@ export default {
         label: 'Кошелёк резерва',
         copy: 'Копировать',
         copied: 'Скопировано',
-        copyTarget: 'адрес кошелька',
+        copyTarget: '— адрес кошелька',
         copiedStatus: 'Скопировано в буфер обмена',
         viewOnTaostats: 'Открыть в Taostats',
     },

@@ -15,7 +15,7 @@ description: Повседневная работа майнера UR. Запус
 provider start
 ```
 
-Команда показывает короткое живое представление (Connecting, Connected, ● Mining) и работает, пока вы не остановите её нажатием Ctrl-C. Подробный журнал пишется в `miner.log` в `~/.urnetwork`; добавьте `-v`, чтобы видеть его в терминале.
+Команда показывает краткую сводку в реальном времени (Connecting, Connected, ● Mining) и работает, пока вы не остановите её нажатием Ctrl-C. Подробный журнал пишется в `miner.log` в `~/.urnetwork`; добавьте `-v`, чтобы вместо этого видеть его в терминале.
 
 Первый запуск на новом устройстве спрашивает разрешения перед его регистрацией и сохраняет его идентичность в `~/.urnetwork`. Каждый следующий запуск использует эту идентичность. В скрипте, где некому ответить, добавьте `--allow-client-registration` к первому запуску. `provider provide` — та же команда с полным выводом журнала, для скриптов и служб.
 
@@ -83,7 +83,7 @@ provider service stop
 provider service uninstall       # your sign-in and identity are kept
 ```
 
-На сервере или чтобы майнить для всех пользователей компьютера в Linux или macOS, используйте общесистемную службу, работающую от root, с состоянием в `/var/lib/urnetwork`: `sudo provider setup --system` или `sudo provider service install --system`. Добавляйте `--system` к остальным командам `provider service`, чтобы управлять ею. В Windows общесистемной службы нет. В Linux пользовательская служба не может слушать TCP-порт 443 для экстендера майнера; `sudo "$(command -v provider)" service install --system --as="$USER"` запускает майнер как системную службу, которая остаётся вашим пользователем и может слушать этот порт. См. [Разрешите майнеру слушать порт 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443). Для множества машин `provider setup --yes --auth-code-file=<path>` выполняет настройку без вопросов; шаг с выплатами он пропускает, поэтому затем [задайте кошелёк для выплат](/docs/miner/rewards#set-your-payout-wallet).
+На сервере или чтобы майнить для всех пользователей компьютера в Linux или macOS, используйте общесистемную службу, работающую от root, с состоянием в `/var/lib/urnetwork`: `sudo provider setup --system` или `sudo provider service install --system`. Добавляйте `--system` к остальным командам `provider service`, чтобы управлять ею. В Windows общесистемной службы нет. В Linux пользовательская служба не может слушать TCP-порт 443 для экстендера майнера; `sudo "$(command -v provider)" service install --system --as="$USER"` запускает майнер как системную службу, которая работает от имени вашего пользователя и может слушать этот порт. См. [Разрешите майнеру слушать порт 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443). Для множества машин `provider setup --yes --auth-code-file=<path>` выполняет настройку без вопросов; шаг с выплатами он пропускает, поэтому затем [задайте кошелёк для выплат](/docs/miner/rewards#set-your-payout-wallet).
 
 В Linux и Windows `provider service install` не добавит второй майнер рядом с майнером установщика. В macOS он не видит агента установщика, поэтому если вы использовали установщик для macOS, продолжайте пользоваться `urnet-tools` и не устанавливайте вторую службу.
 

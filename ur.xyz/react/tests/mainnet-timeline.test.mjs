@@ -605,12 +605,70 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
+test('providers without UDP or IPv6: a milestone and a notice for the apps\' release, with SN25 rewards counted as before', () => {
+    // the network operator's FP2-PROTOCOL.md (server), D11.7: a /mainnet note when the apps that carry the
+    // limited window ship (its §10 step 5). Done, and dated by that release, to the day; the notice is dated
+    // the same day and its full text in the sn repo is named by it
+    const milestone = events.find((e) => e.id === 'providers-without-udp-or-ipv6');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'done');
+    assert.equal(milestone.approximate, undefined);
+    assert.equal(isApproximate(milestone), false);
+    assert.match(milestone.date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(milestone.key, undefined);
+    const fullText = `https://github.com/urfoundation/sn/blob/main/mainnet/notices/${milestone.date}-providers-without-udp-or-ipv6.md`;
+    assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
+    assert.equal(milestone.title, 'Providers without UDP or IPv6 are offered for the traffic they carry');
+    // the release is named by the milestone's own day
+    const day = new Date(`${milestone.date}T00:00:00Z`);
+    const releaseDay = `${day.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })} ${day.getUTCDate()}`;
+    assert.ok(milestone.detail.startsWith(`From the apps' release of ${releaseDay}, clients are offered a provider whose quality-probe checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. `));
+    // the providers the hard UDP gate kept out (FP2-PROTOCOL.md §1, measured on Main on November 12)
+    assert.match(milestone.detail, / on November 12, about 20,700 providers failed their checks only because of their HTTP\/3 loads\. /);
+    // compatible placement (§7.2), the limited window and its merged races (§7.4-7.5), overflow (§6.3)
+    assert.match(milestone.detail, / Clients never send UDP to a provider that does not carry it\. /);
+    assert.match(milestone.detail, / Each app keeps a few of these providers beside its usual ones and races them for the TCP connections they can carry, and it turns to them where a location has too few providers that carry UDP\. /);
+    // old clients keep the hard gate (§5.4)
+    assert.match(milestone.detail, / Apps from before the release keep the old selection\. /);
+    // §1 non-goals: SN25 reads no URL outcome (qualityprobe/H3.md, "SN25")
+    assert.match(milestone.detail, / SN25 scoring, weights and payouts read none of the quality probe's checks and do not change: pool rewards are still split by completed usage, so these providers earn more only through the traffic they now carry\.$/);
+    // it names the release by its day, not as one still to come, and gives no share or price
+    assert.doesNotMatch(`${milestone.title} ${milestone.detail}`, /\bnext (?:app )?release\b|\d\s?%|\$\s?\d|\bGB\b/i);
+    // in date order, so it follows the milestones of its day
+    const ids = events.map((e) => e.id);
+    const index = ids.indexOf(milestone.id);
+    assert.ok(parseWhen(events[index - 1].date).start.ms <= parseWhen(milestone.date).start.ms);
+    assert.ok(parseWhen(milestone.date).start.ms <= parseWhen(events[index + 1].date).start.ms);
+
+    const notice = mainnetNotices.find((n) => n.id === 'notice-providers-without-udp-or-ipv6');
+    assert.ok(notice, 'the notice is listed');
+    // dated the day of the release, as the milestone is
+    assert.equal(noticeDay(notice), day.getTime());
+    assert.equal(notice.title, 'Providers without UDP or IPv6 are offered for the traffic they carry. SN25 rewards are counted as before.');
+    assert.equal(notice.paragraphs.length, 5);
+    const [before, change, evidence, sn25, status] = notice.paragraphs;
+    assert.match(before, /^The network operator's quality probe loads test sites through every provider over HTTPS \(TCP\), over HTTP\/3 \(QUIC, which runs over UDP\) where a site serves it, and over IPv6 where a provider's connections prove it\. A check passes only when every load passes\. /);
+    assert.match(before, / On November 12, about 20,700 providers failed their checks only because of their HTTP\/3 loads\.$/);
+    assert.ok(change.startsWith(`From the apps' release of ${releaseDay}, clients are offered a provider whose checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Clients never send UDP to a provider that does not carry it. `));
+    assert.match(change, / Each app keeps a few of these providers beside its usual ones, and they join the race for every TCP connection they can carry\. The apps also turn to them where a location has too few providers that carry UDP\.$/);
+    // no negative evidence means capable (D7.4), and labels follow the 8-hour window (§3.5)
+    assert.match(evidence, /^Only failed checks count against a provider: one with no failed check over UDP or IPv6 is offered for both, as before, and one that regains UDP or IPv6 is offered for it again within 8 hours\. /);
+    assert.match(evidence, / apps from before the release keep the old selection\.$/);
+    assert.match(sn25, /^SN25 scoring, weights and payouts read none of the quality probe's checks, and none of it changes: pool rewards are still split by completed usage\. /);
+    // the provider status's reason (D11.6, §5.5), and nothing to do
+    assert.match(status, /^A provider's status in the apps now says how many of its checks failed only over HTTP\/3 \(UDP\), or only over IPv6, and what it is offered for\. There is nothing you need to do\. /);
+    assert.doesNotMatch(`${notice.title} ${notice.paragraphs.join(' ')}`, /\bnext (?:app )?release\b|\d\s?%|\$\s?\d|\bGB\b/i);
+    // its full text is in the sn repo, as the milestone's is
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+});
+
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the extenders' share of
-    // November 12, then capture the flag and Pro data, both of November 11, the later-posted first, then
-    // epoch 3's of October 31. The data lists them in the order they were posted, the other way round, so
-    // this order is the sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the providers without UDP or
+    // IPv6 and the extenders' share, both of November 12, then capture the flag and Pro data, both of
+    // November 11, the later-posted first, then epoch 3's of October 31. The data lists them in the order
+    // they were posted, the other way round, so this order is the sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
+        ['notice-providers-without-udp-or-ipv6', 'November 12, 2026'],
         ['notice-extender-relay-share', 'November 12, 2026'],
         ['notice-capture-the-flag', 'November 11, 2026'],
         ['notice-pro-grant-cycle', 'November 11, 2026'],
@@ -636,7 +694,7 @@ test('the notices at the top run newest first, by the day each was posted', () =
         assert.ok(Number.isNaN(noticeDay(posted('x', date))), `"${date}" should not read`);
         assert.throws(() => newestFirst([posted('x', date)]), /is not a day such as "November 11, 2026"/, `"${date}"`);
     }
-    // with four notices at the top, the milestones and the box name the one they point to
+    // with five notices at the top, the milestones and the box name the one they point to
     const pointers = [...events.map((e) => e.detail), ...mainnetActions.steps.map((s) => s.detail)];
     for (const text of pointers) assert.doesNotMatch(text, /\bthe notice at the top\b/);
     assert.equal(pointers.filter((text) => text.includes('the epoch 3 notice at the top')).length, 7);

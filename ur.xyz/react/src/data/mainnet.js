@@ -130,9 +130,10 @@ export const mainnetActions = {
 // in the order they were posted: a new notice goes at the end. The page shows
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
-// posted, the later first. So it shows the extenders' share on the contracts
-// they can relay, of November 12, then capture the flag from epoch 8 and Pro
-// data on each network's own cycle, both of November 11, then epoch 3's delayed
+// posted, the later first. So it shows the providers without UDP or IPv6,
+// offered for the traffic they carry, and the extenders' share on the contracts
+// they can relay, both of November 12, then capture the flag from epoch 8 and
+// Pro data on each network's own cycle, both of November 11, then epoch 3's delayed
 // payout and its recovery, with the updates that followed, which the milestones
 // and the box point to as "the epoch 3 notice at the top". Their dates are the
 // epochs' and the milestones' (tests/mainnet-timeline.test.mjs holds them
@@ -191,6 +192,19 @@ const NOTICES = [
             "SN25 pool rewards are still split by completed usage, and the network operator's provider subsidy, which for traffic since the October 6 cutoff only counts toward the weekly points it awards, follows the same hops. Contracts created before the release keep their hops. There is nothing you need to do.",
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md' },
+    },
+    {
+        id: 'notice-providers-without-udp-or-ipv6',
+        date: 'November 12, 2026',
+        title: 'Providers without UDP or IPv6 are offered for the traffic they carry. SN25 rewards are counted as before.',
+        paragraphs: [
+            "The network operator's quality probe loads test sites through every provider over HTTPS (TCP), over HTTP/3 (QUIC, which runs over UDP) where a site serves it, and over IPv6 where a provider's connections prove it. A check passes only when every load passes. So a provider that carries no UDP, or whose IPv6 fails, failed its checks, and clients were offered it rarely, if at all, even for the traffic it carries. On November 12, about 20,700 providers failed their checks only because of their HTTP/3 loads.",
+            "From the apps' release of November 12, clients are offered a provider whose checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Clients never send UDP to a provider that does not carry it. Each app keeps a few of these providers beside its usual ones, and they join the race for every TCP connection they can carry. The apps also turn to them where a location has too few providers that carry UDP.",
+            "Only failed checks count against a provider: one with no failed check over UDP or IPv6 is offered for both, as before, and one that regains UDP or IPv6 is offered for it again within 8 hours. The network operator's hosted proxies carry the same change, and apps from before the release keep the old selection.",
+            "SN25 scoring, weights and payouts read none of the quality probe's checks, and none of it changes: pool rewards are still split by completed usage. A provider offered for the traffic it carries serves more of it, so it earns more through that traffic alone.",
+            "A provider's status in the apps now says how many of its checks failed only over HTTP/3 (UDP), or only over IPv6, and what it is offered for. There is nothing you need to do. A provider that carries no UDP can carry it again by updating to the latest release, since some older builds do not route UDP, and by checking that its network does not block UDP.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-providers-without-udp-or-ipv6.md' },
     },
 ];
 

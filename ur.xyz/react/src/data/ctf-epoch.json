@@ -1,14 +1,26 @@
 {
-  "about": "The capture the flag pages (ur.xyz/ctf and /ctf/<cc>): a snapshot of GET https://api.bringyour.com/sn/ctf, written by scripts/ctf-import.mjs; do not edit it by hand. Amounts are integers of rao (1 alpha is 10^9 rao). A role's won, units and near_misses, and a country's near_misses, are null without a draw last epoch. online, seen_days, last_seen and peak are the providers the dashboard counted online in the country at the end of a day (react/public/dashboard/history.json): on the presence day, the days of the window with any, the last of them, and the most.",
-  "schema": "ur.xyz/ctf-epoch/v1",
-  "source": "https://api.bringyour.com/sn/ctf",
+  "about": "The capture the flag pages (ur.xyz/ctf and /ctf/<cc>): every network operator of the operator list (https://ur.xyz/operators.yml) combined, from each one's snapshot of its GET <api_url>/sn/ctf (react/src/data/ctf-operators/<domain>.json), written by scripts/ctf-import.mjs; do not edit it by hand. `operators` lists them all, in the list's order: those included, and any left out with the reason. Per country and role the slots won, the units and near misses of the draws, the pots and the awards are the included operators' sums; with more than one, each role also keeps every included operator's own figures (ops, in the order of operators), since each operator draws among its own miners. Amounts are integers of rao (1 alpha is 10^9 rao). A role's won, units and near_misses, and a country's near_misses, are null without a draw last epoch. online, seen_days, last_seen and peak are the providers the dashboard counted online in the country at the end of a day (react/public/dashboard/history.json): on the presence day, the days of the window with any, the last of them, and the most.",
+  "schema": "ur.xyz/ctf-epoch/v2",
+  "source": "https://ur.xyz/operators.yml",
   "as_of": "2026-11-11T00:00:00Z",
   "first_epoch": 8,
   "prelaunch": {
     "start_block": 9600028,
     "starts_at": "2026-11-27T18:25:24Z"
   },
-  "pool": null,
+  "operators": [
+    {
+      "domain": "bringyour.com",
+      "api_url": "https://api.bringyour.com",
+      "no": null,
+      "pool_id": null,
+      "status": "prelaunch",
+      "reason": null,
+      "as_of": null,
+      "drawn": null,
+      "slot": null
+    }
+  ],
   "current_epoch": {
     "epoch": 8,
     "start_block": 9600028,

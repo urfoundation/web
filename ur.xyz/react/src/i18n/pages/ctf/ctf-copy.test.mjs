@@ -22,7 +22,8 @@
 //   and A–Z, node's ICU permitting), complete, and each form a plain phrase;
 //   where the site departs from CLDR (format.js REGION_NAMES: 香港, 澳门 and
 //   台湾 in Chinese, Гонконг and Макао in Russian, Hongkong and Macau in
-//   German, Latin American CLDR's names in Spanish), every form says so, or is
+//   German, هونغ كونغ and ماكاو in Arabic, Hong Kong, Macao and Latin
+//   American CLDR's names in Spanish), every form says so, or is
 //   a shorter name of its own ("Georgia del Sur") that keeps nothing of
 //   CLDR's.
 //
@@ -279,10 +280,10 @@ test('the countries\' names are CLDR\'s, complete, in each language\'s A–Z, wi
 
 test('where the site names a place otherwise than CLDR, every form says the site\'s name', () => {
     // Chinese: Hong Kong, Macao and Taiwan as the English site names them (香港, 澳门, 台湾), never CLDR's 特别行政区
-    // forms or a 中国… prefix; Russian and German: Hong Kong and Macao by their short names, as the English site
-    // (Гонконг, Макао; Hongkong, Macau), never the SAR forms; Spanish: the Latin American name (es-419). The short
-    // forms say the site's name too, unless the short name is a shorter one of their own that keeps nothing of
-    // CLDR's (Spanish short.gs, "Georgia del Sur"). format.js REGION_NAMES
+    // forms or a 中国… prefix; Russian, German, Arabic and Spanish: Hong Kong and Macao by their short names, as the
+    // English site (Гонконг, Макао; Hongkong, Macau; هونغ كونغ, ماكاو; Hong Kong, Macao), never the SAR forms; Spanish
+    // also the Latin American name (es-419). The short forms say the site's name too, unless the short name is a
+    // shorter one of their own that keeps nothing of CLDR's (Spanish short.gs, "Georgia del Sur"). format.js REGION_NAMES
     for (const [lang, own] of Object.entries(REGION_NAMES)) {
         for (const [CODE, name] of Object.entries(own)) {
             const code = CODE.toLowerCase();
@@ -299,7 +300,8 @@ test('where the site names a place otherwise than CLDR, every form says the site
     const REPLACED = {
         ru: /\(САР\)/u,
         de: /Sonderverwaltungsregion/u,
-        es: /Côte d’Ivoire|Timor-Leste|Islas Aland|Sandwich|Rumanía|Arabia Saudí(?!\p{L})/u,
+        ar: /إدارية خاصة|الإدارية الخاصة|هونغ كونغ الصينية/u,
+        es: /Côte d’Ivoire|Timor-Leste|Islas Aland|Sandwich|Rumanía|Arabia Saudí(?!\p{L})|RAE de|Bosnia y Herzegovina|Islas menores/u,
     };
     for (const [lang, re] of Object.entries(REPLACED)) {
         for (const key of ['name', 'short', 'in', 'inShort']) {

@@ -4,7 +4,7 @@ description: شغّل مشغّل URnetwork بملف تنفيذي واحد، وا
 
 # كيف تصبح مشغّل شبكة
 
-يشغّل مشغّل الشبكة خوادم شبكة الخصوصية UR: خدمتَي API وconnect اللتين يتصل بهما المستخدمون والمُعدِّنون، ونقطة النهاية `/verify` التي يجتازها المُصادِقون، وخط معالجة الحقب الذي يسوّي مكافآت مُعدِّنيه على **Bittensor SN25 (netuid 25)**. يجلب المشغّل مستخدميه ومنتجاته الخاصة (فتطبيقات ur.io تعود إلى أحد المشغّلين)، ويودِع α إشارةً مدعومة بالإيرادات إلى طلب حقيقي، ويثبّت في كل حقبة تسوية قائمة مدفوعات Merkle التي تقسّم مجمّعه بين مُعدِّنيه. يبلّغ المشغّل عن الاستخدام الذي يتبعه هذا التقسيم، لكنه لا يحتفظ أبدًا بـ α يخص أي طرف آخر: فخزينة التسوية غير القابلة للتغيير هي التي تملك المجمّع، ويطالب كل مُعدِّن بحصته منها مباشرة.
+يشغّل مشغّل الشبكة خوادم شبكة الخصوصية UR: خدمتَي API وConnect اللتين يتصل بهما المستخدمون والمُعدِّنون، ونقطة النهاية `/verify` التي يجتازها المُصادِقون، وخط معالجة الحقب الذي يسوّي مكافآت مُعدِّنيه على **Bittensor SN25 (netuid 25)**. يجلب المشغّل مستخدميه ومنتجاته الخاصة (فتطبيقات ur.io تعود إلى أحد المشغّلين)، ويودِع α إشارةً مدعومة بالإيرادات إلى طلب حقيقي، ويثبّت في كل حقبة تسوية قائمة مدفوعات Merkle التي تقسّم مجمّعه بين مُعدِّنيه. يبلّغ المشغّل عن الاستخدام الذي يتبعه هذا التقسيم، لكنه لا يحتفظ أبدًا بـ α يخص أي طرف آخر: فخزينة التسوية غير القابلة للتغيير هي التي تملك المجمّع، ويطالب كل مُعدِّن بحصته منها مباشرة.
 
 تشغّل نقطة الدخول [`server/cli/all/main.go`](https://github.com/urnetwork/server/blob/main/cli/all/main.go) كلًّا من API وConnect وعامل مهام الإنتاج (taskworker) معًا. تنشر ملفًا تنفيذيًا واحدًا للمشغّل؛ وتبقى PostgreSQL وRedis وتخزين المُخرَجات (artifacts) ومدخل TLS العام (ingress) خدماتٍ داعمة. للاطلاع على الآلية اقرأ [الورقة المختصرة](/docs/litepaper)؛ وللأدوار الأخرى راجع [كيف تشغّل مُعدِّنًا](/docs/miner) و[كيف تشغّل مُصادِقًا](/docs/validator).
 
@@ -54,7 +54,7 @@ sudo install -d -o root -g urnetwork -m 0750 /etc/urnetwork
 ```text
 /usr/local/bin/ur-operator
 /etc/urnetwork/operator.env
-/etc/urnetwork/durable-volumes.json   # external declaration for artifact storage
+/etc/urnetwork/durable-volumes.json  # external declaration for artifact storage
 /srv/urnetwork-data/                 # separately mounted persistent filesystem
   operator-blob/                     # preprovisioned artifact root
   operator-identity/                 # external volume marker and root lease
@@ -66,9 +66,9 @@ sudo install -d -o root -g urnetwork -m 0750 /etc/urnetwork
       tls.yml
       provider_egress_probe.yml
       sn.yml                         # reviewed earnings/activation declaration
-      operator-gas-authority.yml      # independently provisioned public approval
+      operator-gas-authority.yml     # independently provisioned public approval
       mmdb/
-        geolite2.mmdb                 # real GeoLite2-City database
+        geolite2.mmdb                # real GeoLite2-City database
         places.yml                   # place export from the same database
     all/                             # optional resources shared by environments
   vault/

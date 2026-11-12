@@ -21,7 +21,15 @@ export default {
         browseDocs:   'Explorar documentación',
         search:       'Buscar',
         ctaAria:    'Costo de uso — el precio actual de la red',
-        denomAria:  'Moneda del precio'
+        denomAria:  'Moneda del precio',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'Acerca de',
+        build:       'Construir',
+        investors:   'Inversores',
+        dashboard:   'Panel',
+        liveDashboard: 'Panel en vivo',
+        ctf:         'Captura la bandera'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'Subred UR en Telegram',
         socialDiscord:  'Discord de URnetwork',
         socialGithub:   'Subred UR en GitHub',
-        productsAria:   'Productos de URnetwork en ur.io'
+        productsAria:   'Productos de URnetwork en ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'Construye sobre UR',
+        reserve:       'Reserva',
+        mainnet:       'Red principal',
+        investorCentre:  'Centro para inversores'
     },
 
     disclaimer: {

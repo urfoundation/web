@@ -20,7 +20,15 @@ export default {
         browseDocs:   '浏览文档',
         search:       '搜索',
         ctaAria:    '使用成本——当前网络价格',
-        denomAria:  '价格计价单位'
+        denomAria:  '价格计价单位',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       '关于',
+        build:       '构建',
+        investors:   '投资者',
+        dashboard:   '数据面板',
+        liveDashboard: '实时数据面板',
+        ctf:         '夺旗'
     },
 
     footer: {
@@ -45,7 +53,12 @@ export default {
         socialTelegram: 'UR 子网的 Telegram',
         socialDiscord:  'URnetwork 的 Discord',
         socialGithub:   'UR 子网的 GitHub',
-        productsAria:   'ur.io 上的 URnetwork 产品'
+        productsAria:   'ur.io 上的 URnetwork 产品',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     '在 UR 上构建',
+        reserve:       '储备',
+        mainnet:       '主网',
+        investorCentre:  '投资者中心'
     },
 
     disclaimer: {

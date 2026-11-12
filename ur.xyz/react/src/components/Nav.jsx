@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './Nav.css';
 import { useLanguage, LANG_ORDER } from '../i18n';
 import { buildPath, navigate, useRoute } from '../router';
+import { groupPageHref } from '../../../astro/src/lib/route-localization.js';
 
 const NETWORK_LINKS = [
     'operators',
@@ -125,12 +126,12 @@ function NetworkMenu({ code, route, t, mobile = false }) {
                         {t.nav[name]}
                     </a>
                 ))}
-                {/* the stats dashboard and capture the flag are English-only, like /reserve */}
-                {code === 'en' && (
-                    <a href="/dashboard" className={route.name === 'dashboard' ? 'is-active' : ''} aria-current={route.name === 'dashboard' ? 'page' : undefined}>Dashboard</a>
+                {/* the stats dashboard and capture the flag, in a language once their pages are translated */}
+                {groupPageHref('/dashboard', code) && (
+                    <a href={groupPageHref('/dashboard', code)} className={route.name === 'dashboard' ? 'is-active' : ''} aria-current={route.name === 'dashboard' ? 'page' : undefined}>{t.nav.dashboard}</a>
                 )}
-                {code === 'en' && (
-                    <a href="/ctf" className={route.name === 'ctf' ? 'is-active' : ''} aria-current={route.name === 'ctf' ? 'page' : undefined}>Capture the flag</a>
+                {groupPageHref('/ctf', code) && (
+                    <a href={groupPageHref('/ctf', code)} className={route.name === 'ctf' ? 'is-active' : ''} aria-current={route.name === 'ctf' ? 'page' : undefined}>{t.nav.ctf}</a>
                 )}
             </div>
         </details>
@@ -138,12 +139,12 @@ function NetworkMenu({ code, route, t, mobile = false }) {
 }
 
 
-// The call to action for /dashboard, top right on English pages (hidden below 1020px,
-// where the drawer's Network menu lists Dashboard).
-function DashboardCta() {
+// The call to action for /dashboard, top right in a language with the dashboard
+// (hidden below 1020px, where the drawer's Network menu lists Dashboard).
+function DashboardCta({ href, label }) {
     return (
-        <a className="nav-cta" href="/dashboard">
-            <i aria-hidden="true" />Live dashboard<span className="nav-cta-arrow" aria-hidden="true">→</span>
+        <a className="nav-cta" href={href}>
+            <i aria-hidden="true" />{label}<span className="nav-cta-arrow" aria-hidden="true">→</span>
         </a>
     );
 }
@@ -154,7 +155,12 @@ export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
     const route = activeRoute ? { name: activeRoute, slug: null } : detectedRoute;
     // a research report or the methodology is a page of the research section: the link shows it
     const inResearch = route.name === 'research' || route.name === 'research-report' || route.name === 'research-methodology';
-    const resolvedAboutHref = aboutHref ?? (code === 'en' ? '/about' : null);
+    const resolvedAboutHref = aboutHref ?? groupPageHref('/about', code);
+    const buildHref = groupPageHref('/build', code);
+    const investorsHref = groupPageHref('/investors', code);
+    const dashboardHref = groupPageHref('/dashboard', code);
+    // the docs are linked in every language: translated once the docs group is localized
+    const docsHref = groupPageHref('/docs', code) || '/docs';
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuButtonRef = useRef(null);
@@ -245,14 +251,14 @@ export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
                     <nav className="nav-links" aria-label={t.nav.primaryNav}>
                         <NetworkMenu code={code} route={route} t={t} />
                         <a href={buildPath({ name: 'research', slug: null }, code)} className={inResearch ? 'is-active' : ''} aria-current={route.name === 'research' ? 'page' : undefined}>{t.nav.research}</a>
-                        {code === 'en' && <a href="/build" className={route.name === 'build' ? 'is-active' : ''} aria-current={route.name === 'build' ? 'page' : undefined}>Build</a>}
-                        {code === 'en' && <a href="/investors" className={route.name === 'investors' ? 'is-active' : ''} aria-current={route.name === 'investors' ? 'page' : undefined}>Investors</a>}
-                        {resolvedAboutHref && <a href={resolvedAboutHref} className={route.name === 'about' ? 'is-active' : ''} aria-current={route.name === 'about' ? 'page' : undefined}>About</a>}
-                        <a href={"/docs"} className={route.name === 'docs' || route.name === 'api' ? 'is-active' : ''} aria-current={route.name === 'docs' || route.name === 'api' ? 'page' : undefined}>{t.nav.docs}</a>
+                        {buildHref && <a href={buildHref} className={route.name === 'build' ? 'is-active' : ''} aria-current={route.name === 'build' ? 'page' : undefined}>{t.nav.build}</a>}
+                        {investorsHref && <a href={investorsHref} className={route.name === 'investors' ? 'is-active' : ''} aria-current={route.name === 'investors' ? 'page' : undefined}>{t.nav.investors}</a>}
+                        {resolvedAboutHref && <a href={resolvedAboutHref} className={route.name === 'about' ? 'is-active' : ''} aria-current={route.name === 'about' ? 'page' : undefined}>{t.nav.about}</a>}
+                        <a href={docsHref} className={route.name === 'docs' || route.name === 'api' ? 'is-active' : ''} aria-current={route.name === 'docs' || route.name === 'api' ? 'page' : undefined}>{t.nav.docs}</a>
                     </nav>
 
                     <div className="nav-actions">
-                        {code === 'en' && <DashboardCta />}
+                        {dashboardHref && <DashboardCta href={dashboardHref} label={t.nav.liveDashboard} />}
                         <LanguageSelector />
                         <button
                             type="button"
@@ -286,10 +292,10 @@ export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
                 <nav className="nav-drawer-links" aria-label={t.nav.mobileNav}>
                     <NetworkMenu code={code} route={route} t={t} mobile />
                     <a href={buildPath({ name: 'research', slug: null }, code)} className={inResearch ? 'is-active' : ''} aria-current={route.name === 'research' ? 'page' : undefined}>{t.nav.research}</a>
-                    {code === 'en' && <a href="/build" className={route.name === 'build' ? 'is-active' : ''} aria-current={route.name === 'build' ? 'page' : undefined}>Build</a>}
-                    {code === 'en' && <a href="/investors" className={route.name === 'investors' ? 'is-active' : ''} aria-current={route.name === 'investors' ? 'page' : undefined}>Investors</a>}
-                    {resolvedAboutHref && <a href={resolvedAboutHref} className={route.name === 'about' ? 'is-active' : ''} aria-current={route.name === 'about' ? 'page' : undefined}>About</a>}
-                    <a href={"/docs"} className={route.name === 'docs' || route.name === 'api' ? 'is-active' : ''} aria-current={route.name === 'docs' || route.name === 'api' ? 'page' : undefined}>{t.nav.docs}</a>
+                    {buildHref && <a href={buildHref} className={route.name === 'build' ? 'is-active' : ''} aria-current={route.name === 'build' ? 'page' : undefined}>{t.nav.build}</a>}
+                    {investorsHref && <a href={investorsHref} className={route.name === 'investors' ? 'is-active' : ''} aria-current={route.name === 'investors' ? 'page' : undefined}>{t.nav.investors}</a>}
+                    {resolvedAboutHref && <a href={resolvedAboutHref} className={route.name === 'about' ? 'is-active' : ''} aria-current={route.name === 'about' ? 'page' : undefined}>{t.nav.about}</a>}
+                    <a href={docsHref} className={route.name === 'docs' || route.name === 'api' ? 'is-active' : ''} aria-current={route.name === 'docs' || route.name === 'api' ? 'page' : undefined}>{t.nav.docs}</a>
                 </nav>
                 <div className="nav-drawer-foot">
                     <nav className="nav-drawer-langs" aria-label={t.footer.languagesAria}>

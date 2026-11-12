@@ -1,0 +1,69 @@
+{
+  "about": "The day each page of the ur.xyz page group docs (react/src/i18n/pages/docs/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
+  "pages": {
+    "/docs": {
+      "fingerprint": "a3d7bdb86b8ded9a",
+      "lastmod": "2026-11-12"
+    },
+    "/docs/litepaper": {
+      "fingerprint": "6f93e7c8693999ba",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner": {
+      "fingerprint": "9e66ea4068fca886",
+      "lastmod": "2026-11-12"
+    },
+    "/docs/miner/advanced": {
+      "fingerprint": "5915e3107382c2c6",
+      "lastmod": "2026-10-22"
+    },
+    "/docs/miner/extender": {
+      "fingerprint": "d208ac65be8504e7",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/install": {
+      "fingerprint": "adfcfcf4bb98af5e",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/reference": {
+      "fingerprint": "ebc58c128914af33",
+      "lastmod": "2026-10-22"
+    },
+    "/docs/miner/rewards": {
+      "fingerprint": "a80cef42fcdff894",
+      "lastmod": "2026-10-22"
+    },
+    "/docs/miner/run": {
+      "fingerprint": "4e57ccc199e1f0cc",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/troubleshooting": {
+      "fingerprint": "721a54b1eae13b70",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/updates": {
+      "fingerprint": "7ff3e36f70b5498e",
+      "lastmod": "2026-11-12"
+    },
+    "/docs/operator": {
+      "fingerprint": "da0e99cd16f3c48b",
+      "lastmod": "2026-10-21"
+    },
+    "/docs/validator": {
+      "fingerprint": "379ef84ea8d1a11b",
+      "lastmod": "2026-10-07"
+    },
+    "/privacy": {
+      "fingerprint": "a14ca6884f5119cc",
+      "lastmod": "2026-09-25"
+    },
+    "/terms": {
+      "fingerprint": "4b2c884bb4f4da33",
+      "lastmod": "2026-10-07"
+    },
+    "/vdp": {
+      "fingerprint": "c5ed84b60e9ab960",
+      "lastmod": "2026-08-14"
+    }
+  }
+}

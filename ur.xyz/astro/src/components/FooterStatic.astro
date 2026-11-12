@@ -1,7 +1,7 @@
 ---
 import '@react/components/Footer.css';
 import { LANGS, LANG_CODES } from '../lib/i18n.js';
-import { LANG_STORAGE_KEY, localizedPathFor } from '../lib/route-localization.js';
+import { LANG_STORAGE_KEY, groupPageHref, localizedPathFor } from '../lib/route-localization.js';
 
 interface Props { t: any; lang: string; }
 const { t, lang } = Astro.props;
@@ -22,17 +22,21 @@ function path(name: string, slug: string | null = null) {
     if (name === 'docs' && slug) return `${prefix}/docs/${slug}`;
     return `${prefix}/${name}`;
 }
+// A page group's page (lib/route-localization.js): in another language it is
+// linked once its group is localized. The docs and the legal pages are linked
+// in every language, in English until the docs group is localized.
+const pageHref = (p: string) => groupPageHref(p, lang);
+const docsHref = (p: string) => groupPageHref(p, lang) || p;
 ---
 <footer class="footer">
     <div class="footer-directory">
         <nav class="footer-column" aria-label={t.footer.learn}>
             <h2>{t.footer.learn}</h2>
-            {/* docs are English-only — a localized href only reached them through a redirect stub */}
-            <a href="/docs">{t.nav.docs}</a>
-            {lang === 'en' && <a href="/build">Build on UR</a>}
+            <a href={docsHref('/docs')}>{t.nav.docs}</a>
+            {pageHref('/build') && <a href={pageHref('/build')}>{t.footer.buildOnUr}</a>}
             <a href={path('research')}>{t.nav.research}</a>
-            {lang === 'en' && <a href="/about">About</a>}
-            <a href="/docs/litepaper">{t.nav.whitepaper}</a>
+            {pageHref('/about') && <a href={pageHref('/about')}>{t.nav.about}</a>}
+            <a href={docsHref('/docs/litepaper')}>{t.nav.whitepaper}</a>
         </nav>
 
         <nav class="footer-column" aria-label={t.nav.network}>
@@ -40,19 +44,17 @@ function path(name: string, slug: string | null = null) {
             <a href={path('operators')}>{t.nav.operators}</a>
             <a href={path('miners')}>{t.nav.miners}</a>
             <a href={path('validators')}>{t.nav.validators}</a>
-            {/* the dashboard, the Network Capacity Reserve, the mainnet launch
-                timeline and capture the flag are English-only, like /about */}
-            {lang === 'en' && <a href="/dashboard">Dashboard</a>}
-            {lang === 'en' && <a href="/reserve">Reserve</a>}
-            {lang === 'en' && <a href="/mainnet">Mainnet</a>}
-            {lang === 'en' && <a href="/ctf">Capture the flag</a>}
+            {pageHref('/dashboard') && <a href={pageHref('/dashboard')}>{t.nav.dashboard}</a>}
+            {pageHref('/reserve') && <a href={pageHref('/reserve')}>{t.footer.reserve}</a>}
+            {pageHref('/mainnet') && <a href={pageHref('/mainnet')}>{t.footer.mainnet}</a>}
+            {pageHref('/ctf') && <a href={pageHref('/ctf')}>{t.nav.ctf}</a>}
         </nav>
 
         <nav class="footer-column" aria-label={t.footer.resources}>
             <h2>{t.footer.resources}</h2>
             <a href={`${path('home')}#launch-video`}>{t.footer.launchVideo}</a>
             <a href={BRAND_KIT} target="_blank" rel="noopener noreferrer">{t.footer.brandKit}</a>
-            {lang === 'en' && <a href="/investors">Investor Centre</a>}
+            {pageHref('/investors') && <a href={pageHref('/investors')}>{t.footer.investorCentre}</a>}
             {/* machine-readable site map for agents (the llms.txt convention) */}
             <a href="/llms.txt">llms.txt</a>
         </nav>
@@ -76,11 +78,10 @@ function path(name: string, slug: string | null = null) {
 
     <div class="footer-utility">
         <p>© {year} UR Foundation</p>
-        {/* the legal documents are English-only: one page each, no /<lang>/ variants */}
         <nav class="footer-legal" aria-label={t.footer.legal}>
-            <a href="/terms">{t.footer.terms}</a>
-            <a href="/privacy">{t.footer.privacy}</a>
-            <a href="/vdp">{t.footer.vdp}</a>
+            <a href={docsHref('/terms')}>{t.footer.terms}</a>
+            <a href={docsHref('/privacy')}>{t.footer.privacy}</a>
+            <a href={docsHref('/vdp')}>{t.footer.vdp}</a>
         </nav>
         <nav class="footer-langs" aria-label={t.footer.languagesAria}>
             {LANG_CODES.map(code => (

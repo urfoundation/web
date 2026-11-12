@@ -149,7 +149,7 @@ export default {
         signedBefore:          '周期 {epoch} 之前的各周期沿用此前的费率。',
         signedBeforeInitial:   '在周期 {epoch} 开始之前，初始阶段 0 α 的费率继续有效。',
         sourcingTitle:         'α 来源承诺',
-        sourcingPays:          '自首个定价周期起，网络运营商以其收入在公开市场上购买的 α 支付每一笔 SN25 需求存款，不使用以任何其他方式获得的 α。',
+        sourcingPays:          '自首个定价周期起，网络运营商 1 以其收入在公开市场上购买的 α 支付其每一笔 SN25 需求存款，不使用以任何其他方式获得的 α。',
         sourcingRoute:         '每一笔购买都在链上进行。USDC 在 Solana 上通过 Jupiter 兑换为 TAO，经 LayerZero 跨链转入 Bittensor，再由存款钱包质押为 SN25 的 α：',
         sourcingUsdcWallet:    'USDC 钱包（Solana）：',
         sourcingDepositWallet: '存款钱包（Bittensor）：',

@@ -151,7 +151,7 @@ export default {
         signedBefore:          'Für Epochen vor Epoche {epoch} gilt der bisherige Tarif.',
         signedBeforeInitial:   'Bis zum Beginn von Epoche {epoch} gilt weiterhin der Tarif der Anfangsphase von 0 α.',
         sourcingTitle:         'Beschaffungszusage',
-        sourcingPays:          'Ab der ersten bepreisten Epoche bezahlt der Netzbetreiber jede Nachfrage-Einlage von SN25 mit Alpha, das er mit seinen Einnahmen am offenen Markt gekauft hat. Alpha, das er auf anderem Weg erhalten hat, setzt er nicht ein.',
+        sourcingPays:          'Ab der ersten bepreisten Epoche bezahlt Netzbetreiber 1 jede seiner Nachfrage-Einlagen von SN25 mit Alpha, das er mit seinen Einnahmen am offenen Markt gekauft hat. Alpha, das er auf anderem Weg erhalten hat, setzt er nicht ein.',
         sourcingRoute:         'Jeder Kauf erfolgt On-Chain. USDC wird auf Solana über Jupiter gegen TAO getauscht, über LayerZero nach Bittensor übertragen und von der Einlagen-Wallet in SN25-Alpha gestakt:',
         sourcingUsdcWallet:    'USDC-Wallet (Solana):',
         sourcingDepositWallet: 'Einlagen-Wallet (Bittensor):',

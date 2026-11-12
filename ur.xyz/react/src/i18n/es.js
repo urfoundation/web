@@ -151,7 +151,7 @@ export default {
         signedBefore:          'Las épocas anteriores a la época {epoch} conservan la tarifa previa.',
         signedBeforeInitial:   'Hasta que comience la época {epoch}, sigue vigente la tarifa del período inicial, de 0 α.',
         sourcingTitle:         'Compromiso de procedencia',
-        sourcingPays:          'Desde la primera época con precio, el operador de red paga cada depósito de demanda de SN25 con α comprado en el mercado abierto con sus ingresos. No usa α obtenido de ninguna otra forma.',
+        sourcingPays:          'Desde la primera época con precio, el operador de red 1 paga cada uno de sus depósitos de demanda de SN25 con α comprado en el mercado abierto con sus ingresos. No usa α obtenido de ninguna otra forma.',
         sourcingRoute:         'Cada compra es on-chain. El USDC se intercambia por TAO en Solana a través de Jupiter, se transfiere a Bittensor mediante LayerZero y la billetera de depósitos lo pone en stake como α de SN25:',
         sourcingUsdcWallet:    'Billetera de USDC (Solana):',
         sourcingDepositWallet: 'Billetera de depósitos (Bittensor):',

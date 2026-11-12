@@ -66,6 +66,12 @@ export const NOT_FOUND_PATH = '/404';
 // The visitor's explicit language choice, written by the language switcher.
 export const LANG_STORAGE_KEY = 'ur.xyz.lang';
 
+// The stored-language redirect's last target and when it went there
+// (sessionStorage, "<target> <ms>"), and how long a repeat of it counts as a
+// loop: the redirect makes the same one again only after this long.
+export const LANG_REDIRECT_GUARD_KEY = 'ur.xyz.lang.redirect';
+export const LANG_REDIRECT_GUARD_MS = 10000;
+
 const LANG_PREFIX = new RegExp(`^/(${NON_EN_SITE_LANG_CODES.join('|')})(?=/|$)`);
 
 const exactPaths = (group) => group.paths.filter(p => !p.endsWith('/*'));
@@ -189,6 +195,17 @@ export function createRouteLocalization(groups) {
      * static pages: it has to run before the first paint, so it cannot wait for
      * a module. The route data is embedded; a storage failure (private mode,
      * blocked cookies) leaves the page alone.
+     *
+     * A page carries it only when it has translations (Base.astro), never the
+     * not-found page: nginx serves that at every missing URL, and a missing
+     * /docs/<x> reads like a docs page to the family rule here.
+     *
+     * It never makes the same redirect twice within LANG_REDIRECT_GUARD_MS:
+     * it records its target and the time in sessionStorage, and stays on the
+     * page when the visitor is back from that target so soon. That ends a loop
+     * it cannot see from the page, such as a 301 from /<lang>/<page> to the
+     * English page that a browser cached under an older server config, after
+     * one round trip, on the English page.
      */
     function storedLanguageRedirectScript() {
         const langs = JSON.stringify(NON_EN_SITE_LANG_CODES);
@@ -197,13 +214,18 @@ export function createRouteLocalization(groups) {
         const family = LOCALIZED_PATH_PREFIXES.length
             ? `&&!/^(?:${LOCALIZED_PATH_PREFIXES.map(escapeRegExp).join('|')})[^\\/]+$/.test(p)`
             : '';
+        const guard = JSON.stringify(LANG_REDIRECT_GUARD_KEY);
         return [
             '(function(){try{',
             `var l=localStorage.getItem(${JSON.stringify(LANG_STORAGE_KEY)});`,
             `if(${langs}.indexOf(l)<0)return;`,
             "var p=location.pathname.replace(/\\/index\\.html$/,'/').replace(/\\.html$/,'').replace(/\\/$/,'')||'/';",
             `if(${paths}.indexOf(p)<0${family})return;`,
-            "location.replace('/'+l+(p==='/'?'':p)+location.search+location.hash);",
+            // the same redirect again this soon is a loop: stay
+            `var t='/'+l+(p==='/'?'':p),n=Date.now(),g=(sessionStorage.getItem(${guard})||'').split(' ');`,
+            `if(g[0]===t&&n-g[1]>=0&&n-g[1]<${LANG_REDIRECT_GUARD_MS})return;`,
+            `sessionStorage.setItem(${guard},t+' '+n);`,
+            'location.replace(t+location.search+location.hash);',
             '}catch(e){}})();',
         ].join('');
     }

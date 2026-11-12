@@ -211,10 +211,10 @@ const jsonLdText = JSON.stringify({ '@context': 'https://schema.org', '@graph': 
     <script type="application/ld+json" set:html={jsonLdText} />
 
     {/* A visitor who chose another language reads the page in it: the script
-        redirects a translated English page to its /<lang>/ twin and does
-        nothing on a page without translations (it was inlined by the home and
-        section pages, which are exactly the translated ones). */}
-    <script is:inline set:html={storedLanguageRedirectScript()} />
+        redirects a translated English page to its /<lang>/ twin. Only a page
+        with translations carries it, never the not-found page, which nginx
+        serves at every missing URL (lib/route-localization.js). */}
+    {localized && <script is:inline set:html={storedLanguageRedirectScript()} />}
 
     <!-- Page-specific head extras. -->
     <slot name="head" />

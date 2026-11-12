@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+    LANG_REDIRECT_GUARD_KEY,
+    LANG_REDIRECT_GUARD_MS,
     LOCALIZED_BASE_PATHS,
     PAGE_GROUPS,
     basePathFor,
@@ -97,15 +99,26 @@ test('a stored language choice moves only bare URLs of translated pages', () => 
     }
 });
 
+// A browser tab's sessionStorage.
+function memoryStorage() {
+    const items = new Map();
+    return { getItem: (key) => (items.has(key) ? items.get(key) : null), setItem: (key, value) => { items.set(key, String(value)); } };
+}
+
+// Runs an inline redirect script as a page's <head> would, with the stored
+// choice `stored`, the tab's sessionStorage `session` and the clock at `now`.
+// Returns the URL it sends the page to, or null when the page stays.
+function runRedirect(script, pathname, stored, { search = '', hash = '', throws = false, session = memoryStorage(), now = 1_000_000 } = {}) {
+    let replaced = null;
+    const localStorage = { getItem: () => { if (throws) throw new Error('blocked'); return stored; } };
+    const location = { pathname, search, hash, replace: (url) => { replaced = url; } };
+    new Function('localStorage', 'sessionStorage', 'location', 'Date', script)(localStorage, session, location, { now: () => now });
+    return replaced;
+}
+
 test('the inline redirect script agrees with storedLanguageTarget', () => {
     const script = storedLanguageRedirectScript();
-    const run = (pathname, stored, { search = '', hash = '', throws = false } = {}) => {
-        let replaced = null;
-        const localStorage = { getItem: () => { if (throws) throw new Error('blocked'); return stored; } };
-        const location = { pathname, search, hash, replace: (url) => { replaced = url; } };
-        new Function('localStorage', 'location', script)(localStorage, location);
-        return replaced;
-    };
+    const run = (pathname, stored, options) => runRedirect(script, pathname, stored, options);
     for (const lang of [null, 'en', 'de', 'ar', 'xx']) {
         for (const path of [...TRANSLATED, ...ENGLISH_ONLY, '/de/miners', '/zh', '/index.html', '/miners.html', '/miners/']) {
             assert.equal(run(path, lang), storedLanguageTarget(path, lang), `${lang} ${path}`);
@@ -113,6 +126,27 @@ test('the inline redirect script agrees with storedLanguageTarget', () => {
     }
     assert.equal(run('/research', 'es', { search: '?q=1', hash: '#papers' }), '/es/research?q=1#papers');
     assert.equal(run('/research', 'es', { throws: true }), null);
+});
+
+test('the inline redirect script never makes the same redirect twice in a row within the guard time', () => {
+    const script = storedLanguageRedirectScript();
+    const session = memoryStorage();
+    const at = 5_000_000;
+    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at }), '/de/miners');
+    assert.equal(session.getItem(LANG_REDIRECT_GUARD_KEY), `/de/miners ${at}`);
+    // back from /de/miners at once (a 301 to the English page, cached under an
+    // older server config): a loop, so the page stays
+    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + 40 }), null);
+    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + LANG_REDIRECT_GUARD_MS - 1 }), null);
+    // another target, or the same one after the guard time, is a redirect again
+    assert.equal(runRedirect(script, '/operators', 'de', { session, now: at + 100 }), '/de/operators');
+    assert.equal(runRedirect(script, '/operators', 'es', { session, now: at + 200 }), '/es/operators');
+    assert.equal(runRedirect(script, '/operators', 'es', { session, now: at + 200 + LANG_REDIRECT_GUARD_MS }), '/es/operators');
+    // a record from the future (the clock went back) does not hold the page
+    assert.equal(runRedirect(script, '/operators', 'es', { session, now: at }), '/es/operators');
+    // without a sessionStorage to keep the guard in, the page stays
+    const blocked = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+    assert.equal(runRedirect(script, '/miners', 'de', { session: blocked }), null);
 });
 
 test('every English page belongs to one page group, and each group names its pages', () => {
@@ -178,12 +212,7 @@ test('a group builds its translated pages only once it is localized', () => {
 
 test('the inline redirect script follows a localized family too', () => {
     const script = localized.storedLanguageRedirectScript();
-    const run = (pathname, stored) => {
-        let replaced = null;
-        const location = { pathname, search: '', hash: '', replace: (url) => { replaced = url; } };
-        new Function('localStorage', 'location', script)({ getItem: () => stored }, location);
-        return replaced;
-    };
+    const run = (pathname, stored) => runRedirect(script, pathname, stored);
     for (const lang of [null, 'en', 'de', 'ar', 'xx']) {
         for (const path of ['/', '/about', '/ctf', '/ctf/ke', '/ctf/ke.html', '/ctf/flags/ke.svg', '/ctf/', '/build', '/404', '/de/ctf/ke', '/miners']) {
             assert.equal(run(path, lang), localized.storedLanguageTarget(path, lang), `${lang} ${path}`);

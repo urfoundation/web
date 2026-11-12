@@ -1,10 +1,14 @@
 ---
-// /<lang>/terms: the terms page in another language, a page of the docs group
-// (react/src/i18n/pages/docs/group.js), built once that group is localized.
-// Until then nothing is built here: nginx serves a /<lang>/ page when the build
-// has one and otherwise answers /<lang>/terms with a 301 to /terms, so a redirect
-// stub built here would be served in place of that 301.
+// /<lang>/terms: the translation of the legal page /terms, built in every
+// language once the docs page group is localized. It says that the English
+// page is the authoritative text and links it (components/LegalPage.astro).
+import LegalPage from '../../components/LegalPage.astro';
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+
 export function getStaticPaths() {
-    return [];
+    return localizedStaticPaths('docs');
 }
+
+const { lang } = Astro.params;
 ---
+<LegalPage lang={lang} doc="terms" />

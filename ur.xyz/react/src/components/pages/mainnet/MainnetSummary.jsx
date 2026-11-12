@@ -1,6 +1,8 @@
 import React from 'react';
 import { useClock } from '../../../lib/network.js';
+import { interpolate } from '../../../i18n/format.js';
 import { axisNow } from './summary.js';
+import { runs } from './timeline.js';
 
 // "now" moves about a pixel an hour on a desktop axis: a minute's tick is plenty
 const CLOCK_TICK_MS = 60_000;
@@ -16,17 +18,21 @@ const CLOCK_TICK_MS = 60_000;
  * hydration (lib/network.js useClock), so the two agree; "now", and the
  * progress up to it, appear on the next tick, as the landing page's epoch
  * clock does. Everything else is static, and reads the same without script.
+ * Its words are the model's (`model.t`), in the page's language, so the
+ * island loads no copy of its own.
  */
 export default function MainnetSummary({ model }) {
     const clock = useClock(CLOCK_TICK_MS);
     const now = axisNow(model, clock);
     const pin = now ? now.pin : null;
+    const words = model.t.summary;
+    const arrow = model.t.labels.arrow;
 
     return (
         <div className="mainnet-summary" data-lanes={model.lanes}>
-            <h2 className="mainnet-summary-title" id="glance-heading">At a glance</h2>
+            <h2 className="mainnet-summary-title" id="glance-heading">{words.title}</h2>
             <figure className="mainnet-summary-figure" aria-labelledby="glance-heading">
-                <ol className="mainnet-summary-bands" aria-label="Payout epochs and key milestones">
+                <ol className="mainnet-summary-bands" aria-label={words.figureAria}>
                     {model.bands.map((band, index) => {
                         // the band's milestones in date order, the spans among the
                         // markers, so the tab order follows the axis
@@ -50,15 +56,19 @@ export default function MainnetSummary({ model }) {
                                         {band.short
                                             ? <><span aria-hidden="true">{band.short}</span><span className="mainnet-visually-hidden">{band.name}</span></>
                                             // a week on the narrowest screens: "E5", over the full name a screen reader reads
-                                            : <><span className="mainnet-summary-name-full">{band.name}</span><span className="mainnet-summary-name-abbr" aria-hidden="true">{`E${band.number}`}</span></>}
+                                            : <><span className="mainnet-summary-name-full">{band.name}</span><span className="mainnet-summary-name-abbr" aria-hidden="true">{band.abbr}</span></>}
                                     </span>
                                     <span className="mainnet-visually-hidden">: </span>
                                     <span className="mainnet-summary-days">
-                                        {band.tail && <span className="mainnet-visually-hidden">from </span>}
-                                        {band.days}
-                                        {band.tail && <span aria-hidden="true"> →</span>}
+                                        {/* the tail's first day, read as "from Nov 27" and drawn running on */}
+                                        {band.tail
+                                            ? runs(words.from, { days: DAYS }).map((part, i) => (part === DAYS
+                                                ? <React.Fragment key={i}>{band.days}</React.Fragment>
+                                                : <span key={i} className="mainnet-visually-hidden">{part}</span>))
+                                            : band.days}
+                                        {band.tail && <span aria-hidden="true">{` ${arrow}`}</span>}
                                     </span>
-                                    <span className="mainnet-visually-hidden">, {settlementOf(model, band)}</span>
+                                    <span className="mainnet-visually-hidden">, {words.settledBy[band.settlement] || ''}</span>
                                 </div>
                                 <span className="mainnet-summary-track" aria-hidden="true">
                                     {now && <span className="mainnet-summary-elapsed" style={{ '--elapsed': now.elapsed[index] }} />}
@@ -83,9 +93,12 @@ export default function MainnetSummary({ model }) {
                                 )}
                                 {pin && pin.band === index && (
                                     <div className="mainnet-summary-now" data-flip={pin.flip ? '' : undefined} style={{ '--at': pin.at }}>
-                                        <span className="mainnet-summary-now-label">Now</span>
+                                        <span className="mainnet-summary-now-label">{words.now}</span>
                                         <span className="mainnet-visually-hidden">
-                                            : {pin.text}{pin.epoch != null && `, ${Math.floor(pin.progress * 100)}% through epoch ${pin.epoch}`}
+                                            {': '}
+                                            {pin.epoch != null
+                                                ? interpolate(words.nowIn, { time: pin.text, percent: Math.floor(pin.progress * 100), number: pin.epoch })
+                                                : interpolate(words.nowAt, { time: pin.text })}
                                         </span>
                                     </div>
                                 )}
@@ -94,23 +107,23 @@ export default function MainnetSummary({ model }) {
                     })}
                 </ol>
                 <figcaption className="mainnet-summary-legend">
-                    <ul aria-label="Bands">
+                    <ul aria-label={words.bandsAria}>
                         {model.settlements.map(({ settlement, label }) => (
                             <li key={settlement}><span className="mainnet-summary-swatch" data-settlement={settlement} aria-hidden="true" />{label}</li>
                         ))}
                         {model.spans.map((span) => (
-                            <li key={span.id}><span className="mainnet-summary-swatch" data-span={span.look} aria-hidden="true" />{span.title}, {span.days}</li>
+                            <li key={span.id}><span className="mainnet-summary-swatch" data-span={span.look} aria-hidden="true" />{runs(words.legendSpan, { title: span.title, days: span.days })}</li>
                         ))}
                     </ul>
-                    <ul aria-label="Markers">
-                        <li><span className="mainnet-summary-swatch" data-now="" aria-hidden="true" />Now</li>
+                    <ul aria-label={words.markersAria}>
+                        <li><span className="mainnet-summary-swatch" data-now="" aria-hidden="true" />{words.now}</li>
                         {model.looks.map(({ look, label }) => (
                             <li key={look}><span className="mainnet-summary-dot" data-look={look} aria-hidden="true" />{label}</li>
                         ))}
                     </ul>
                 </figcaption>
             </figure>
-            <ol className="mainnet-summary-dates" aria-label="Key dates">
+            <ol className="mainnet-summary-dates" aria-label={words.datesAria}>
                 {model.markers.map((mark) => (
                     <li key={mark.id}>
                         <a href={`#${mark.id}`} className="mainnet-summary-date">
@@ -128,8 +141,5 @@ export default function MainnetSummary({ model }) {
     );
 }
 
-/** "settled by version 1": what pays a band, for a screen reader. */
-function settlementOf(model, band) {
-    const label = model.settlements.find((s) => s.settlement === band.settlement)?.label;
-    return label ? `settled by ${label.charAt(0).toLowerCase()}${label.slice(1)}` : '';
-}
+// where the tail's days go in summary.from
+const DAYS = Symbol('days');

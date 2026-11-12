@@ -1,18 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import './Explorer.css';
-import { listedDocs, docGroups } from '../lib/docs';
-import { DOC_PAGE_PATHS } from '../lib/docs-shared';
+import { docGroupsIn, docHrefIn, docsCopy, listedDocsIn } from '../lib/docs-i18n';
 import { buildSearchIndex, searchDocs } from '../lib/docs-search';
-import { buildPath, navigate, useRoute } from '../router';
+import { navigate, useRoute } from '../router';
 import { useLanguage } from '../i18n';
 
 /**
- * Where a document lives for a reader in `code`: /docs/<slug> (with the
- * language prefix the SPA routes), or the document's own page for the ones
- * published outside /docs (the legal documents, English-only at /terms, …).
+ * Where a document lives for a reader in `code`: /docs/<slug>, or the
+ * document's own page for the ones published outside /docs (the legal
+ * documents, /terms, …), with the language's prefix once the docs pages are
+ * translated (lib/docs-i18n.js).
  */
 export function docHref(doc, code) {
-    return DOC_PAGE_PATHS[doc.slug] || buildPath({ name: 'docs', slug: doc.slug }, code);
+    return docHrefIn(doc.slug, code);
 }
 
 /** A click the page should route itself: not a new-tab, new-window or download click. */
@@ -37,13 +37,14 @@ export function isPlainClick(e) {
 export default function Explorer({ children, initialSlug = null }) {
     const route = useRoute();
     const { code, t } = useLanguage();
+    const words = docsCopy(code);
     const [query, setQuery] = useState('');
     // On mobile the sidebar is collapsed by default so the content is the
     // first thing you see; this toggles it open.
     const [navOpen, setNavOpen] = useState(false);
 
     // what the sidebar lists (an unlisted document is not searchable either)
-    const searchIndex = useMemo(() => buildSearchIndex(listedDocs, d => docHref(d, code)), [code]);
+    const searchIndex = useMemo(() => buildSearchIndex(listedDocsIn(code), d => docHref(d, code)), [code]);
 
     const results = useMemo(() => searchDocs(searchIndex, query), [query, searchIndex]);
 
@@ -77,22 +78,22 @@ export default function Explorer({ children, initialSlug = null }) {
                 </span>
             </button>
 
-            <aside id="explorer-sidebar" className="explorer-sidebar" aria-label="Documentation navigation">
+            <aside id="explorer-sidebar" className="explorer-sidebar" aria-label={words.nav.label}>
                 <div className="explorer-search">
                     <input
                         type="search"
                         className="explorer-search-input"
-                        placeholder="Search docs"
+                        placeholder={words.search.placeholder}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        aria-label="Search docs"
+                        aria-label={words.search.label}
                     />
                 </div>
 
                 {results && (
-                    <div className="explorer-results" role="listbox" aria-label="Search results">
+                    <div className="explorer-results" role="listbox" aria-label={words.search.results}>
                         {results.length === 0 && (
-                            <div className="explorer-results-empty">No matches.</div>
+                            <div className="explorer-results-empty">{words.search.none}</div>
                         )}
                         {results.map((r, i) => (
                             <button
@@ -101,7 +102,7 @@ export default function Explorer({ children, initialSlug = null }) {
                                 className="explorer-result"
                                 onClick={() => onPickResult(r)}
                             >
-                                <span className="explorer-result-kind kind-doc">DOC</span>
+                                <span className="explorer-result-kind kind-doc">{words.search.kind}</span>
                                 <span className="explorer-result-body">
                                     <span className="explorer-result-title">{r.title}</span>
                                     {r.subtitle && (
@@ -114,8 +115,8 @@ export default function Explorer({ children, initialSlug = null }) {
                 )}
 
                 {!results && (
-                    <nav className="explorer-nav" aria-label="Documentation sections">
-                        {docGroups.map(group => (
+                    <nav className="explorer-nav" aria-label={words.nav.sections}>
+                        {docGroupsIn(code).map(group => (
                             <div key={group.id} className="explorer-group">
                                 <div className="explorer-group-label">{group.label}</div>
                                 <ul className="explorer-group-list">

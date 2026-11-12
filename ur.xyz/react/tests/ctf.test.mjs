@@ -1,7 +1,14 @@
 // Capture the flag's pages (ur.xyz/ctf and /ctf/<cc>): their data, the epoch's
-// snapshot (src/data/ctf-epoch.json, written by scripts/ctf-import.mjs from
-// GET /sn/ctf), and the pure model the pages and their islands render from
+// snapshot (src/data/ctf-epoch.json, written by scripts/ctf-import.mjs: every
+// network operator's GET /sn/ctf of the operator list, combined), and the
+// pure model the pages and their islands render from
 // (src/components/pages/ctf/model.js).
+//
+// The operators: the import reads the published list, keeps each operator's
+// snapshot and adds them up; with one operator the aggregate is that
+// operator's figures, with two the sums and each operator's own draws, and an
+// operator it cannot read, or one at another epoch, is left out with the
+// reason, while none read writes nothing.
 //
 // The snapshot's invariants are pinned on the committed file: the 249 codes,
 // pots never below zero, at most five winners per role (exactly min(5, units)
@@ -25,7 +32,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { COUNTRY_COUNT, UNINHABITED, apiProblems, normalize, parseNames, prelaunch, presenceFrom, sentenceName, serialize, snapshotProblems } from '../../scripts/ctf-import.mjs';
+import { COUNTRY_COUNT, OPERATOR_DIR, OPERATORS_FILE, UNINHABITED, aggregate, apiProblems, normalize, parseNames, parseOperatorList, prelaunch, presenceFrom, sentenceName, serialize, snapshotProblems } from '../../scripts/ctf-import.mjs';
 import {
     HUB_TITLE,
     buildModel,
@@ -53,6 +60,9 @@ import {
     staticSeed,
     uninhabitedSentence,
     localModel,
+    opsLine,
+    opsList,
+    slotFigure,
     waveDelay,
     winEstimate,
 } from '../src/components/pages/ctf/model.js';
@@ -63,7 +73,7 @@ import { ctfNames, formats } from '../src/components/pages/ctf/i18n.js';
 import { ctaLink, pagePath } from '../src/components/pages/ctf/links.js';
 import group from '../src/i18n/pages/ctf/group.js';
 import { buildPath, parseRoute } from '../src/router.js';
-import { SLOT, SNAPSHOT, amount, drawnAnswer, firstAnswer } from './ctf-fixtures.mjs';
+import { OP, OP2, SLOT, SLOT2, SNAPSHOT, amount, combined, drawnAnswer, firstAnswer } from './ctf-fixtures.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -74,12 +84,21 @@ const LANGS = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
 // every phase the pages render: the committed snapshot and the import of each kind of answer
 const PHASES = {
     committed: SNAPSHOT,
-    first: normalize(firstAnswer(), null),
-    pending: normalize(firstAnswer({ pending: true }), null),
-    drawn: normalize(drawnAnswer(), null),
-    undrawn: normalize(drawnAnswer({ drawn: false }), null),
+    first: combined(firstAnswer()),
+    pending: combined(firstAnswer({ pending: true })),
+    drawn: combined(drawnAnswer()),
+    undrawn: combined(drawnAnswer({ drawn: false })),
 };
 const MODELS = Object.fromEntries(Object.entries(PHASES).map(([k, s]) => [k, buildModel(s)]));
+// and with two operators, the second with its own slot and draws
+const SECOND = { no: 2, slot: SLOT2, vary: 7 };
+const TWO = {
+    first: combined(firstAnswer(), firstAnswer({ no: 2 })),
+    drawn: combined(drawnAnswer(), drawnAnswer(SECOND)),
+    undrawn: combined(drawnAnswer({ drawn: false }), drawnAnswer({ ...SECOND, drawn: false })),
+    mixed: combined(drawnAnswer(), drawnAnswer({ ...SECOND, drawn: false })),
+};
+const TWO_MODELS = Object.fromEntries(Object.entries(TWO).map(([k, s]) => [k, buildModel(s)]));
 
 test('the committed snapshot keeps the pages\' invariants', () => {
     assert.deepEqual(snapshotProblems(SNAPSHOT), []);
@@ -138,14 +157,16 @@ test('the pre-launch import reads the server\'s country table and the dashboard\
     assert.deepEqual(presence.meta, { source: 'https://ur.xyz/dashboard', day: '2026-11-10', days: 2 });
     assert.deepEqual(presence.byCode.ad, { online: 1, seen_days: 2, last_seen: '2026-11-10', peak: 2 });
     assert.deepEqual(presence.byCode.cd, { online: 0, seen_days: 0, last_seen: null, peak: 0 });
-    const s = prelaunch({ names, presence, now: Date.UTC(2026, 10, 11), bounds: { startBlock: 9_600_028, endBlock: 9_650_428, startMs: Date.UTC(2026, 10, 27, 18, 25, 24), endMs: Date.UTC(2026, 11, 4, 18, 25, 24) } });
+    const s = prelaunch({ names, presence, now: Date.UTC(2026, 10, 11), bounds: { startBlock: 9_600_028, endBlock: 9_650_428, startMs: Date.UTC(2026, 10, 27, 18, 25, 24), endMs: Date.UTC(2026, 11, 4, 18, 25, 24) }, operators: [OP, OP2] });
     assert.equal(s.countries.find((c) => c.code === 'cd').online, 0);
     assert.equal(s.countries.find((c) => c.code === 'ci').seen_days, 0);
     assert.equal(s.prelaunch.starts_at, '2026-11-27T18:25:24Z');
+    // every listed operator takes part from the start; none has been read
+    assert.deepEqual(s.operators.map((o) => [o.domain, o.status, o.no]), [[OP.domain, 'prelaunch', null], [OP2.domain, 'prelaunch', null]]);
 });
 
 test('every phase\'s answer imports to a snapshot that keeps the invariants', () => {
-    for (const [phase, snap] of Object.entries(PHASES)) {
+    for (const [phase, snap] of Object.entries({ ...PHASES, ...Object.fromEntries(Object.entries(TWO).map(([k, v]) => [`two ${k}`, v])) })) {
         assert.deepEqual(snapshotProblems(snap), [], phase);
     }
     assert.equal(MODELS.drawn.phase, 'drawn');
@@ -182,12 +203,14 @@ test('the import refuses an answer that breaks operator.yml\'s arithmetic', () =
         ['carried that is not the pots', (a) => { a.last_epoch.amounts.carried = amount(a.last_epoch.amounts.carried.rao + 5); }],
         ['a slot that is not fresh / 2490', (a) => { a.last_epoch.amounts.slot = amount(SLOT + 1); }],
         ['an uninhabited territory marked inhabited', (a) => { a.countries.find((c) => c.code === 'aq').inhabited = true; }],
+        ['a pool that is not its operator\'s', (a) => { a.pool.pool_id += 1; }],
+        ['winners without a draw', (a) => { a.last_epoch.drawn = false; }],
     ];
     for (const [what, mutate] of broken) {
         const answer = drawnAnswer();
         mutate(answer);
         assert.ok(apiProblems(answer).length > 0, `the import accepted ${what}`);
-        assert.throws(() => normalize(answer, null), /not a valid GET \/sn\/ctf/, what);
+        assert.throws(() => normalize(answer, null, OP), /not a valid GET \/sn\/ctf/, what);
     }
     const undrawn = drawnAnswer({ drawn: false });
     undrawn.countries[7].providers.units = 3;
@@ -225,7 +248,169 @@ test('a later draw pending after a drawn epoch is refused: the pages would be an
     answer.current_epoch = { ...answer.current_epoch, epoch: 10 };
     answer.pending_draw = { epoch: 9, census_hash: null, census_block: null, round: null };
     assert.deepEqual(apiProblems(answer), [], 'the answer itself is valid');
-    assert.match(snapshotProblems(normalize(answer, null)).join(' '), /epoch 9's draw is pending after a drawn epoch/);
+    assert.match(snapshotProblems(normalize(answer, null, OP)).join(' '), /epoch 9's draw is pending after a drawn epoch/);
+});
+
+test('the import reads the operator list the site publishes', () => {
+    const list = parseOperatorList(fs.readFileSync(OPERATORS_FILE, 'utf8'));
+    assert.ok(list.length >= 1);
+    assert.deepEqual(list.map((op) => Object.keys(op)), list.map(() => ['domain', 'api_url']));
+    // the committed snapshot lists the published operators, in the list's order
+    assert.deepEqual(SNAPSHOT.operators.map((o) => [o.domain, o.api_url]), list.map((op) => [op.domain, op.api_url]));
+    const two = 'schema: urnetwork-operators-v1\noperators:\n  - domain: bringyour.com\n    api_url: https://api.bringyour.com\n    connect_url: wss://connect.bringyour.com\n  - domain: example.org\n    api_url: https://api.example.org/\n    connect_url: wss://connect.example.org\n';
+    assert.deepEqual(parseOperatorList(two), [OP, OP2], 'a trailing slash is dropped');
+    for (const [what, text] of [
+        ['another schema', two.replace('urnetwork-operators-v1', 'urnetwork-operators-v2')],
+        ['no operator', 'schema: urnetwork-operators-v1\noperators: []\n'],
+        ['an API over http', two.replace('https://api.example.org/', 'http://api.example.org')],
+        ['a domain twice', two.replace('example.org\n', 'bringyour.com\n')],
+    ]) assert.throws(() => parseOperatorList(text), Error, what);
+});
+
+test('with one operator the aggregate is that operator\'s figures, and it keeps the operator\'s own snapshot', () => {
+    for (const [phase, answer] of Object.entries({ first: firstAnswer(), pending: firstAnswer({ pending: true }), drawn: drawnAnswer(), undrawn: drawnAnswer({ drawn: false }) })) {
+        const own = normalize(answer, null, OP);
+        assert.deepEqual(own.operator, { no: 1, domain: OP.domain, api_url: OP.api_url });
+        assert.equal(own.source, 'https://api.bringyour.com/sn/ctf');
+        const all = aggregate([{ op: OP, snapshot: own }], null);
+        for (const key of Object.keys(own)) {
+            if (['about', 'schema', 'source', 'operator', 'pool'].includes(key)) continue;
+            assert.deepEqual(all[key], own[key], `${phase}: ${key}`);
+        }
+        assert.deepEqual(all.operators, [{ domain: OP.domain, api_url: OP.api_url, no: 1, pool_id: 2 ** 32 + 1, status: 'included', reason: null, as_of: own.as_of, drawn: own.last_epoch ? own.last_epoch.drawn : null, slot: own.last_epoch ? own.last_epoch.slot : null }]);
+        assert.ok(all.countries.every((c) => !('ops' in c.providers)), `${phase}: one operator's roles are its own`);
+    }
+    // the pages read the same from the aggregate as from the operator's own snapshot
+    const one = buildModel(normalize(drawnAnswer(), null, OP));
+    for (const c of MODELS.drawn.countries) {
+        const o = one.byCode.get(c.code);
+        assert.deepEqual([c.p.won, c.p.slots, c.p.open, c.p.held, c.p.chance, c.p.est, c.avail, c.big, c.flags], [o.p.won, o.p.slots, o.p.open, o.p.held, o.p.chance, o.p.est, o.avail, o.big, o.flags], c.code);
+    }
+    // the operators' own snapshots: each included operator's, which add up to the aggregate (none before the start)
+    const files = fs.existsSync(OPERATOR_DIR) ? fs.readdirSync(OPERATOR_DIR).sort() : [];
+    const included = SNAPSHOT.operators.filter((o) => o.status === 'included');
+    assert.deepEqual(files, included.map((o) => `${o.domain}.json`).sort());
+    if (included.length) {
+        const kept = included.map((o) => {
+            const text = fs.readFileSync(path.join(OPERATOR_DIR, `${o.domain}.json`), 'utf8');
+            const snapshot = JSON.parse(text);
+            assert.equal(text, serialize(snapshot), `${o.domain}: as the import writes it`);
+            assert.equal(snapshot.operator.domain, o.domain);
+            return { op: { domain: o.domain, api_url: o.api_url }, snapshot };
+        });
+        const left = SNAPSHOT.operators.filter((o) => o.status === 'left_out').map((o) => ({ op: { domain: o.domain, api_url: o.api_url }, reason: o.reason, no: o.no }));
+        const all = aggregate([...kept, ...left].sort((a, b) => SNAPSHOT.operators.findIndex((o) => o.domain === a.op.domain) - SNAPSHOT.operators.findIndex((o) => o.domain === b.op.domain)), null);
+        const strip = (s) => ({ ...s, countries: s.countries.map(({ online, seen_days, last_seen, peak, ...c }) => c), presence: null });
+        assert.deepEqual(strip(all), strip(SNAPSHOT), 'the committed aggregate is its operators\' snapshots added up');
+    }
+});
+
+test('two operators add up: slots, pots, awards, flags and entries, with each operator\'s own draw', () => {
+    const a = TWO.drawn;
+    const [one, two] = [normalize(drawnAnswer(), null, OP), normalize(drawnAnswer(SECOND), null, OP2)];
+    assert.deepEqual(a.operators.map((o) => [o.domain, o.no, o.status, o.slot]), [[OP.domain, 1, 'included', SLOT], [OP2.domain, 2, 'included', SLOT2]]);
+    assert.equal(a.totals.flags_held, one.totals.flags_held + two.totals.flags_held);
+    for (const key of ['carried', 'awarded', 'won', 'fresh', 'slot']) assert.equal(a.last_epoch[key], one.last_epoch[key] + two.last_epoch[key], key);
+    a.countries.forEach((c, i) => {
+        for (const role of ['providers', 'extenders']) {
+            const [r1, r2] = [one.countries[i][role], two.countries[i][role]];
+            for (const key of ['won', 'units', 'near_misses', 'pot', 'awarded']) assert.equal(c[role][key], r1[key] + r2[key], `${c.code} ${role} ${key}`);
+            assert.deepEqual(c[role].ops, [r1, r2]);
+        }
+    });
+    const m = TWO_MODELS.drawn;
+    assert.equal(m.multi, true);
+    assert.equal(m.roleSlots, 10);
+    assert.equal(m.totals.flagsTotal, 2 * 249);
+    assert.equal(slotFigure(m), '0.030–0.048');
+    // a role is open where either operator left a slot of it; held where both filled theirs; the chance is each draw's
+    for (const c of m.countries) {
+        for (const role of ['p', 'x']) {
+            const r = c[role];
+            assert.equal(r.slots, 10);
+            assert.equal(r.open, r.ops.some((o) => o.won < 5));
+            assert.equal(r.held, r.ops.every((o) => o.won === 5));
+            assert.deepEqual(r.ops.map((o) => o.chance), r.ops.map((o) => chanceOf(o.units)));
+            assert.equal(r.chance, Math.max(...r.ops.map((o) => chanceOf(o.units))));
+            assert.deepEqual(r.ops.map((o) => o.est), [winEstimate(SLOT, r.ops[0].pot), winEstimate(SLOT2, r.ops[1].pot)]);
+        }
+        assert.equal(c.flags, [0, 1].filter((i) => c.p.ops[i].held && c.x.ops[i].held).length);
+    }
+    const held = m.countries.find((c) => c.p.held && c.p.ops[0].units !== c.p.ops[1].units);
+    assert.ok(held, 'a role both operators filled, from different draws');
+    const list = opsList(m, held.p);
+    assert.equal(list, held.p.ops.map((o) => `${pct(o.chance)} at ${o.operator}`).join(' · '));
+    assert.match(roleLine(m, held, 'p'), /^10 of 10 won last epoch/);
+    assert.equal(opsLine(m, held.p), `By operator: ${list}.`);
+    assert.match(roleDetail(m, held, 'p'), new RegExp(`at every operator\\..*${list.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.$`));
+    const open = m.countries.find((c) => c.p.open && c.p.ops.every((o) => o.open));
+    assert.match(opsList(m, open.p), /^open at bringyour\.com, about \d+\.\d\d α · open at example\.org, about \d+\.\d\d α$/);
+    assert.match(nextStep(m, open).near, / of 20 slots here| left early/);
+    // the open slots a sentence counts are the role's slots at every operator that drew, less those won
+    assert.match(countryMessage(m, open), new RegExp(`^${open.p.slots - open.p.won} provider slots? `));
+    assert.match(countryDescription(m, open, DAY), new RegExp(`: ${open.p.slots - open.p.won} provider and ${open.x.slots - open.x.won} extender slots open`));
+    const allHeld = m.countries.find((c) => !c.p.open && !c.x.open);
+    if (allHeld) assert.match(countryMessage(m, allHeld), /at every operator, so a newcomer needs its operator's draw\. Chance to win as a provider: .* at bringyour\.com · .* at example\.org; as an extender:/);
+    // one operator's page names no operator
+    for (const c of MODELS.drawn.countries) assert.equal(opsList(MODELS.drawn, c.p), null);
+    // an operator without a draw beside one with it: its slots carried, the pages say so
+    const mixed = TWO_MODELS.mixed;
+    assert.equal(mixed.drawn, true);
+    const c = mixed.countries.find((x) => x.p.ops[0].won < 5);
+    assert.equal(c.p.slots, 5);
+    assert.match(opsList(mixed, c.p), /no draw at example\.org$/);
+    // before the first root the slot counts are five at each operator
+    const first = TWO_MODELS.first;
+    assert.equal(roleLine(first, first.byCode.get('ke'), 'p'), '10 slots this epoch · drawn about Dec 4, 18:25 UTC');
+    assert.match(countryDescription(first, first.byCode.get('ke'), DAY), /^Kenya has 10 provider and 10 extender reward slots in epoch 8/);
+    assert.match(hubDescription(first), /^10 provider and 10 extender reward slots in every country/);
+});
+
+test('an operator that cannot be read, or is not at the others\' epoch, is left out with the reason; none read writes nothing', () => {
+    const drawn = { op: OP, snapshot: normalize(drawnAnswer(), null, OP) };
+    const down = aggregate([drawn, { op: OP2, reason: 'GET https://api.example.org/sn/ctf: 503 Service Unavailable' }], null);
+    assert.deepEqual(snapshotProblems(down), []);
+    assert.deepEqual(down.operators.map((o) => [o.domain, o.status, o.reason]), [[OP.domain, 'included', null], [OP2.domain, 'left_out', 'GET https://api.example.org/sn/ctf: 503 Service Unavailable']]);
+    // the figures are the one read
+    const one = aggregate([drawn], null);
+    assert.deepEqual({ ...down, operators: null }, { ...one, operators: null });
+    const m = buildModel(down);
+    assert.deepEqual(m.leftOut.map((o) => o.domain), [OP2.domain]);
+    assert.equal(m.multi, false);
+    // an operator whose first root is not committed yet, beside a drawn one
+    const behind = aggregate([drawn, { op: OP2, snapshot: normalize(firstAnswer({ pending: true, no: 2 }), null, OP2) }], null);
+    assert.match(behind.operators[1].reason, /no committed root yet/);
+    // an operator whose answer is an epoch old
+    const old = drawnAnswer({ no: 2 });
+    old.current_epoch = { ...old.current_epoch, epoch: 8, start_block: 9_600_028, end_block: 9_650_427 };
+    old.last_epoch = { ...old.last_epoch, epoch: 7 };
+    assert.match(aggregate([drawn, { op: OP2, snapshot: normalize(old, null, OP2) }], null).operators[1].reason, /from epoch 8, the others' from epoch 9/);
+    // an answer off the protocol's schedule: an epoch far from its time, or blocks that are not the epoch's
+    const far = drawnAnswer({ no: 2 });
+    far.current_epoch = { ...far.current_epoch, epoch: 900, start_block: 9_247_228 + 899 * 50_400, end_block: 9_247_228 + 900 * 50_400 - 1 };
+    const farOut = aggregate([drawn, { op: OP2, snapshot: normalize(far, null, OP2) }], null);
+    assert.match(farOut.operators[1].reason, /^its epoch 900 is not the epoch of its time/);
+    assert.equal(farOut.current_epoch.epoch, 9, 'one operator off the schedule does not move the epoch');
+    const skewed = drawnAnswer({ no: 2 });
+    skewed.current_epoch = { ...skewed.current_epoch, start_block: 1 };
+    assert.match(aggregate([drawn, { op: OP2, snapshot: normalize(skewed, null, OP2) }], null).operators[1].reason, /^its epoch 9 runs from block 1 /);
+    // one pool counted once: a second domain answering for the same pool is left out
+    const twin = aggregate([drawn, { op: OP2, snapshot: normalize(drawnAnswer(), null, OP2) }], null);
+    assert.deepEqual(twin.operators.map((o) => o.status), ['included', 'left_out']);
+    assert.match(twin.operators[1].reason, /same pool as bringyour\.com \(pool 4294967297\)/);
+    assert.equal(twin.last_epoch.carried, drawn.snapshot.last_epoch.carried);
+    // a reason is one line, cut short
+    const long = aggregate([drawn, { op: OP2, reason: `GET x: ${'y'.repeat(400)}\nsecond line` }], null).operators[1].reason;
+    assert.ok(long.length <= 300 && !long.includes('\n'), long);
+    // a snapshot that breaks the pages' invariants (a draw pending after a drawn epoch)
+    const late = drawnAnswer({ no: 2 });
+    late.pending_draw = { epoch: 8, census_hash: null, census_block: null, round: null };
+    assert.match(aggregate([drawn, { op: OP2, snapshot: normalize(late, null, OP2) }], null).operators[1].reason, /breaks the pages' invariants: epoch 8's draw is pending/);
+    assert.throws(() => aggregate([{ op: OP, reason: 'GET https://api.bringyour.com/sn/ctf: 503 Service Unavailable' }], null), /no operator could be included:\n {2}bringyour\.com: GET/);
+    // the aggregate keeps its own invariants: a role's figures that are not its operators' sum are refused
+    const broken = structuredClone(TWO.drawn);
+    broken.countries[3].providers.pot += 1;
+    assert.match(snapshotProblems(broken).join(' '), /not the operators' sum/);
 });
 
 test('a country page says what its dashboard counts and its last epoch add, and a territory without people says so', () => {
@@ -304,7 +489,7 @@ test('after a draw, an open role wins by default and a fully captured one shows 
 
 test('titles fit 60 graphemes and descriptions 175 characters, and none repeats, in every phase', () => {
     assert.ok(graphemes(HUB_TITLE) <= 60, HUB_TITLE);
-    for (const [phase, m] of Object.entries(MODELS)) {
+    for (const [phase, m] of Object.entries({ ...MODELS, ...Object.fromEntries(Object.entries(TWO_MODELS).map(([k, v]) => [`two ${k}`, v])) })) {
         const titles = new Set([HUB_TITLE]);
         const descriptions = new Set([hubDescription(m)]);
         assert.ok(hubDescription(m).length <= 175, `${phase}: ${hubDescription(m)}`);
@@ -492,7 +677,10 @@ test('a page links to the pages in its language where they are translated', () =
     assert.equal(pagePath('en', '/ctf/ke'), '/ctf/ke');
     assert.equal(pagePath('ru', '/ctf/ke'), group.localized ? '/ru/ctf/ke' : '/ctf/ke');
     assert.equal(pagePath('ar', '/ctf'), group.localized ? '/ar/ctf' : '/ctf');
-    assert.equal(ctaLink('de', 'start'), 'https://ur.io');
+    // Start mining and Run a provider open the miner guide in the page's language; Run an extender its chapter
+    assert.equal(ctaLink('de', 'start'), '/de/docs/miner');
+    assert.equal(ctaLink('ar', 'p'), '/ar/docs/miner');
+    assert.equal(ctaLink('en', 'start'), '/docs/miner');
     assert.match(ctaLink('de', 'x'), /^(\/de)?\/docs\/miner\/extender$/);
     assert.equal(ctaLink('en', 'x'), '/docs/miner/extender');
 });

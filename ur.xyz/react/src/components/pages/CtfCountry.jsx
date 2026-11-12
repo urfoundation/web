@@ -3,7 +3,7 @@ import { CTF } from './ctf/data';
 import { CountryEasyWins, CountryLive } from './ctf/CountryIslands';
 import Countdown from './ctf/Countdown';
 import { Flag } from './ctf/parts';
-import { countryMessage, lastEpochFacts, localModel, neighbours, presenceSentence, startNote, uninhabitedSentence } from './ctf/model';
+import { chanceText, countryMessage, lastEpochFacts, localModel, neighbours, presenceSentence, startNote, uninhabitedSentence } from './ctf/model';
 import { ctfCopy, formats, interpolate, place } from './ctf/i18n';
 import { pagePath } from './ctf/links';
 import { BOLD, rich } from './ctf/rich';
@@ -52,7 +52,7 @@ export default function CtfCountryPage({ code, lang = 'en', updated = null, live
                 <header className={note ? 'ctf-hdr ctf-hdr-noted' : 'ctf-hdr'}>
                     <nav className="ctf-crumbs" aria-label={t.country.crumbs}><a href={hub}>{t.program}</a><span aria-hidden="true">›</span><span aria-current="page">{c.short}</span></nav>
                     <h1>{rich(t.country.h1, values)}</h1>
-                    <p className="ctf-mission">{rich(t.country.mission, values)}</p>
+                    <p className="ctf-mission">{m.many ? f.count(t.country.missionMany, m.roleSlots, values) : rich(t.country.mission, values)}</p>
                     <p className="ctf-intro">
                         <span className="ctf-answer">{rich(t.country.answer, values)}</span>{t.gap}
                         {asOf}{countryMessage(m, c)}{facts && <>{t.gap}{facts}</>}{empty && <>{t.gap}{empty}</>}{presence && <>{t.gap}{presence}</>}{t.country.disclaimer}
@@ -130,9 +130,9 @@ function CountryQuestions({ m, c }) {
     }
     let advice;
     if (m.drawn && c.p.open && c.x.open) advice = rich(t.roleBoth, values);
-    else if (m.drawn && c.x.open) advice = rich(t.roleX, { ...values, pct: f.pct(c.p.chance) }, BOLD);
-    else if (m.drawn && c.p.open) advice = rich(t.roleP, { ...values, pct: f.pct(c.x.chance) }, BOLD);
-    else if (m.drawn) advice = rich(t.roleHeld, { ...values, pp: f.pct(c.p.chance), xp: f.pct(c.x.chance) }, BOLD);
+    else if (m.drawn && c.x.open) advice = rich(t.roleX, { ...values, pct: chanceText(m, c.p) }, BOLD);
+    else if (m.drawn && c.p.open) advice = rich(t.roleP, { ...values, pct: chanceText(m, c.x) }, BOLD);
+    else if (m.drawn) advice = rich(t.roleHeld, { ...values, pp: chanceText(m, c.p), xp: chanceText(m, c.x) }, BOLD);
     else {
         const online = c.online !== null && m.presence && rich(t.roleOnline, {
             day: f.dayName(m.presence.day),

@@ -565,3 +565,15 @@ a.brand{color:var(--ink);text-decoration:none;width:fit-content;padding:4px 8px;
 @media (max-width:620px){[dir="rtl"] .nav{-webkit-mask-image:none;mask-image:none}}
 /* Arabic is not letter-spaced: tracking breaks its joined script */
 :lang(ar) *{letter-spacing:0!important}
+/* ---------- A panel without its data (2026-11-12): a read failed or timed out (above all Bittensor mainnet, which a
+   filtered network may keep the page from reaching), so the panel keeps its title and a short note takes the place
+   of its figures, charts and lists until the data arrives (page.js UR.need). .wait: the read is still on its way ---------- */
+section[data-tab] .pn.na:not(.world)>:not(.ph),section[data-tab] .pn.na .ph>:not(.pt),section[data-tab] .world.na :is(.gl,.side>:not(.ph)){display:none}
+section[data-tab] .pn.na .ph{margin-bottom:8px}
+section[data-tab] .world.na{display:block;padding:22px 24px 24px}
+section[data-tab] .world.na .side{padding:0;border:0}
+section[data-tab] .pn.na::after{content:attr(data-na);display:block;font-size:13px;line-height:1.5;color:var(--muted)}
+section[data-tab] :is(.pn.wait :is(.big,.mid,.fig .v,.fig .d,.dl,.sub),.fig .wait){color:transparent!important;border-radius:6px;background:linear-gradient(90deg,#1b1b1b 25%,#262626 50%,#1b1b1b 75%);background-size:200% 100%;animation:shim 1.3s linear infinite}
+section[data-tab] :is(.pn.wait :is(.big,.mid,.fig .v,.fig .d,.dl,.sub),.fig .wait):empty{display:inline-block;min-width:5ch;min-height:1em;vertical-align:middle}
+section[data-tab] .pn.wait :is(svg,canvas,.t tbody,.wl,.lk-list){opacity:.08}
+@media (max-width:620px){section[data-tab] .world.na{padding:26px 0}}

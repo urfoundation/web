@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import {
-    API_HERE,
-    START_URL,
     countryMessage,
     drawLine,
     findCountry,
     flagSrc,
     isCellTip,
     nextStep,
+    opsLine,
     presenceSentence,
     roleDetail,
     roleLine,
+    slotFigure,
     uninhabitedSentence,
 } from './model';
 import { ctfCopy, formats, place } from './i18n';
@@ -28,7 +28,9 @@ import { BOLD, rich } from './rich';
  * text arrive after. A control that needs the script (sorting, the filters,
  * the search, Shuffle, the picker) is disabled in the static page and enabled
  * once the island runs. Every part speaks its model's language (`m.lang`,
- * ctf/model.js localModel) and links to the pages in it.
+ * ctf/model.js localModel) and links to the pages in it. With more than one
+ * network operator a role's per-operator facts (its odds, an open slot) are
+ * listed by operator, and the slots are five at each (ctf/model.js).
  */
 
 export const cx = (...names) => names.filter(Boolean).join(' ');
@@ -44,10 +46,11 @@ export function Chevron() {
     return <svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.4" /></svg>;
 }
 
-export function Pips({ won, role, big = false }) {
+/** A role's slots as pips, the won ones filled: five, or five at each operator. */
+export function Pips({ won, role, slots = 5, big = false }) {
     return (
         <span className={cx('ctf-pips', big && 'ctf-big')} aria-hidden="true">
-            {[0, 1, 2, 3, 4].map((i) => <i key={i} className={cx('ctf-pip', won !== null && i < won && `ctf-${role}`)} />)}
+            {Array.from({ length: slots }, (_, i) => <i key={i} className={cx('ctf-pip', won !== null && i < won && `ctf-${role}`)} />)}
         </span>
     );
 }
@@ -108,13 +111,13 @@ export function useMounted() {
     return mounted;
 }
 
-/** The visitor's country from GET /sn/ctf/here (nothing is stored), when it is one of the 249. */
+/** The visitor's country from GET /sn/ctf/here at the first operator (nothing is stored), when it is one of the 249. */
 export function useHere(m, enabled = true) {
     const [here, setHere] = useState(null);
     useEffect(() => {
-        if (!enabled) return undefined;
+        if (!enabled || !m.api.here) return undefined;
         const ctl = new AbortController();
-        fetch(API_HERE, { signal: ctl.signal, cache: 'no-store', credentials: 'omit' })
+        fetch(m.api.here, { signal: ctl.signal, cache: 'no-store', credentials: 'omit' })
             .then((r) => (r.ok ? r.json() : null))
             .then((answer) => {
                 const code = typeof answer?.country === 'string' ? answer.country.toLowerCase() : null;
@@ -231,12 +234,12 @@ export function LiveBar({ m, now, mounted = false, focus = null, onFocus = null,
         it(say(t.pending, { epoch: m.pending.epoch }), m.pending.census_block ? say(t.census, { block: f.int(m.pending.census_block) }) : t.waiting, 'pending');
     }
     if (m.drawn) {
-        it(t.slot, `${f.alpha(m.slot, 3)} α`);
+        it(t.slot, `${slotFigure(m)} α`);
         it(t.carried, `${f.alpha(m.last.carried)} α`);
         it(t.paid, f.count(t.paidValue, m.last.won, { amount: f.alpha(m.last.awarded) }));
         items.push(
             <FocusControl key="held" m={m} arg="held" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it ctf-it-btn" title={t.heldTitle}>
-                <span className="ctf-label ctf-it-hint">{t.held}<Chevron /></span><b>{say(t.heldValue, { count: f.int(m.totals.flagsHeld) })}</b>
+                <span className="ctf-label ctf-it-hint">{t.held}<Chevron /></span><b>{say(t.heldValue, { count: f.int(m.totals.flagsHeld), total: f.int(m.totals.flagsTotal) })}</b>
             </FocusControl>,
             <div className="ctf-it ctf-it-group" role="group" aria-labelledby="ctf-nc-label" key="nfc">
                 <span className="ctf-label" id="ctf-nc-label">{t.notFully}</span>
@@ -249,12 +252,12 @@ export function LiveBar({ m, now, mounted = false, focus = null, onFocus = null,
             </div>,
         );
     } else if (m.phase === 'undrawn') {
-        it(t.slot, `${f.alpha(m.slot, 3)} α`);
+        it(t.slot, `${slotFigure(m)} α`);
         it(t.carried, `${f.alpha(m.last.carried)} α`);
         it(say(t.undrawn, { epoch: m.last.epoch }), t.undrawnValue);
     } else {
         if (m.phase === 'prelaunch') it(t.firstDraw, say(t.approx, { time: f.utcTime(m.drawAt) }));
-        it(t.slots, t.slotsValue);
+        it(t.slots, say(t.slotsValue, { count: f.int(m.roleSlots) }));
         it(t.countries, t.countriesValue);
     }
     const tag = say(m.phase === 'prelaunch' || (m.phase === 'first' && !m.pending) ? t.tagFirst : t.tag, { epoch: m.epoch });
@@ -267,6 +270,14 @@ export function LiveBar({ m, now, mounted = false, focus = null, onFocus = null,
 }
 
 // ── a country's card ────────────────────────────────────────────────────────
+
+/** A fully captured role's chance to win, as a tip: its operator's draw, or the best of the operators' with each listed. */
+function chanceBody(m, c, role) {
+    const t = ctfCopy(m.lang).chance;
+    const P = role === 'p';
+    const body = m.multi ? (P ? t.pBodyMany : t.xBodyMany) : (P ? t.pBody : t.xBody);
+    return rich(body, { ...place(c), pct: formats(m.lang).pct(c[role].chance) }, BOLD);
+}
 
 function ChanceTip({ m, c, role, tips }) {
     const t = ctfCopy(m.lang).chance;
@@ -281,7 +292,7 @@ function ChanceTip({ m, c, role, tips }) {
             cls="ctf-chance ctf-ex"
             text={f.pct(r.chance)}
             label={P ? t.pLabel : t.xLabel}
-            body={rich(P ? t.pBody : t.xBody, { ...place(c), pct: f.pct(r.chance) }, BOLD)}
+            body={chanceBody(m, c, role)}
             after={drawLine(m, r)}
             cta={role}
         />
@@ -368,8 +379,14 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
                         {['p', 'x'].map((role) => (
                             <div className="ctf-role" key={role}>
                                 <span className="ctf-label">{role === 'p' ? all.live.providers : all.live.extenders}</span>
-                                <Pips won={c[role].won} role={role} big />
-                                <span className="ctf-mono ctf-role-txt">{roleLine(m, c, role)}{c[role].held && <>{all.gap}<ChanceTip m={m} c={c} role={role} tips={tips} /></>}</span>
+                                {/* a role's slots as pips, five at each operator; past two operators' ten, as a count */}
+                                {(c[role].won === null ? m.roleSlots : c[role].slots) <= 10
+                                    ? <Pips won={c[role].won} role={role} slots={c[role].won === null ? m.roleSlots : c[role].slots} big />
+                                    : <span className="ctf-mono ctf-role-count" aria-hidden="true">{`${c[role].won ?? 0}/${c[role].won === null ? m.roleSlots : c[role].slots}`}</span>}
+                                <span className="ctf-mono ctf-role-txt">
+                                    {roleLine(m, c, role)}{c[role].held && <>{all.gap}<ChanceTip m={m} c={c} role={role} tips={tips} /></>}
+                                    {m.multi && m.drawn && <span className="ctf-role-ops">{opsLine(m, c[role])}</span>}
+                                </span>
                             </div>
                         ))}
                     </div>
@@ -377,7 +394,7 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
                 {anyClosed && <p className="ctf-touch-block ctf-me-note">{t.chanceNote}</p>}
             </div>
             <div className="ctf-cta">
-                <a className="ctf-btn ctf-btn-p" href={START_URL}>{c ? rich(t.startIn, place(c)).join('') : t.start}</a>
+                <a className="ctf-btn ctf-btn-p" href={ctaLink(m.lang, 'start')}>{c ? rich(t.startIn, place(c)).join('') : t.start}</a>
                 <a className="ctf-btn ctf-btn-s" href={ctaLink(m.lang, 'x')}>{t.runExtender}</a>
                 <p className="ctf-cta-note">{rich(t.stay, where)}</p>
                 {picker}
@@ -455,8 +472,9 @@ function RoleRow({ m, c, role, tip }) {
             <>
                 <span className="ctf-rpot" title={P ? t.pPot : t.xPot}>{f.alpha(r.pot)} α</span>
                 <Tip m={m} tip={tip(`${role}:${c.code}`)} low cls="ctf-chance ctf-win" text={t.open} label={P ? t.pNotFully : t.xNotFully}
-                    near={f.count(P ? t.pUnclaimed : t.xUnclaimed, SLOTS_OPEN(r))}
+                    near={f.count(P ? t.pUnclaimed : t.xUnclaimed, SLOTS_OPEN(r), { total: r.slots })}
                     body={rich(P ? t.pRun : t.xRun, { ...place(c), amount: f.alpha(r.est) }, BOLD)}
+                    after={opsLine(m, r)}
                     cta={role} />
             </>
         );
@@ -464,7 +482,7 @@ function RoleRow({ m, c, role, tip }) {
         const ch = all.chance;
         chip = (
             <Tip m={m} tip={tip(`${role}c:${c.code}`)} low cls="ctf-chance ctf-ex" text={f.pct(r.chance)} label={P ? ch.pLabel : ch.xLabel}
-                body={rich(P ? ch.pBody : ch.xBody, { ...place(c), pct: f.pct(r.chance) }, BOLD)}
+                body={chanceBody(m, c, role)}
                 after={drawLine(m, r)} cta={role} />
         );
     } else if (m.potsKnown) {
@@ -474,13 +492,13 @@ function RoleRow({ m, c, role, tip }) {
         <div className={cx('ctf-rrow', P ? 'ctf-p-row' : 'ctf-x-row')}>
             <span className="ctf-rl" aria-hidden="true">{P ? t.letterP : t.letterX}</span>
             <CellPips won={r.won} role={role} />
-            {m.drawn && <span className="ctf-rcount" aria-hidden="true">{r.won}/5</span>}
+            {m.drawn && <span className="ctf-rcount" aria-hidden="true">{r.won}/{r.slots}</span>}
             {chip}
         </div>
     );
 }
 
-const SLOTS_OPEN = (r) => 5 - r.won;
+const SLOTS_OPEN = (r) => r.slots - r.won;
 
 /** What a cell says to a screen reader in place of its pips and chips. */
 function cellSummary(m, c) {
@@ -492,6 +510,7 @@ function cellSummary(m, c) {
         return say(t.summary, {
             p: c.p.won,
             x: c.x.won,
+            total: c.p.slots,
             amount: f.alpha(c.awarded),
             pRole: role(c.p, t.pOpenSr, t.pChanceSr),
             xRole: role(c.x, t.xOpenSr, t.xChanceSr),

@@ -28,7 +28,7 @@ import CtfCountryPage from '@react/components/pages/CtfCountry.jsx';
 import { CountryEasyWins, CountryLive } from '@react/components/pages/ctf/CountryIslands.jsx';
 import Countdown from '@react/components/pages/ctf/Countdown.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
-import { SITE, apiCountry, countryDescription, countryTitle, localModel, startNote } from '@react/components/pages/ctf/model.js';
+import { SITE, countryDescription, countryTitle, localModel, startNote } from '@react/components/pages/ctf/model.js';
 import { pagePath } from '@react/components/pages/ctf/links.js';
 import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
 import { getDict } from '../../lib/i18n.js';
@@ -77,7 +77,7 @@ const jsonLd = [{
     breadcrumbName={c.short}
     lang={lang}
     jsonLd={jsonLd}
-    alternate={{ href: apiCountry(cc), type: 'application/json' }}
+    alternate={m.api.country(cc) ? { href: m.api.country(cc), type: 'application/json' } : null}
     ogImage={ctfOgImage(m)}
     ogImageAlt={ctfCardAlt(m)}
     noindex={noindex}

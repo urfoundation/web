@@ -4,24 +4,39 @@
 // chance to win min(1, 5 / entries), the win estimate a slot and a fifth of
 // the pot, available both pots and ten slots, and totals that count the
 // countries. The figures are made up (a country's units follow the providers
-// the dashboard counted there); only their consistency is real.
+// the dashboard counted there); only their consistency is real. An answer can
+// be a second network operator's (`no`), with its own slot and draws, and
+// combined() adds operators' answers up as the import does for the pages.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { aggregate, normalize } from '../../scripts/ctf-import.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const SNAPSHOT = JSON.parse(fs.readFileSync(path.join(__dirname, '../src/data/ctf-epoch.json'), 'utf8'));
 export const SLOT = 48_025_660; // CAPTURETHEFLAG.md §6, epoch 4's scale
+// a second operator's slot, from its own funding
+export const SLOT2 = 30_000_000;
 const UNINHABITED = ['aq', 'bv', 'gs', 'hm', 'io', 'tf', 'um'];
+
+// the operators of the tests' answers: the published list's one, and a second
+export const OP = { domain: 'bringyour.com', api_url: 'https://api.bringyour.com' };
+export const OP2 = { domain: 'example.org', api_url: 'https://api.example.org' };
+const OPS = [OP, OP2];
+
+/** The pages' snapshot of operators' answers (OP's first, then OP2's), as the import combines them. */
+export function combined(...answers) {
+    return aggregate(answers.map((answer, i) => ({ op: OPS[i], snapshot: normalize(answer, null, OPS[i]) })), null);
+}
 
 export const amount = (rao) => ({ alpha: `${Math.floor(rao / 1e9)}.${String(rao % 1e9).padStart(9, '0')}`, rao });
 
-const base = (epoch, drawAt) => ({
+const base = (epoch, drawAt, no = 1) => ({
     as_of: '2026-12-04T22:24:12Z',
     unit: { token: 'alpha', symbol: 'α', netuid: 25, decimals: 9 },
     pool: {
-        no_id: 1,
-        pool_id: 4294967297,
+        no_id: no,
+        pool_id: 2 ** 32 + no,
         vault: '0xe4865eb1bebdf5c6a10c9d37f3ccdd59aee8f20c',
         carry_contract: '0x981cfe73af944cc61589cdf6f51ccfac4cbd5f54',
         carry_coldkey: '0x48cb91133081290b45bc8350c49f03041e4a4d948e43419f011e636674a2ce57',
@@ -33,20 +48,24 @@ const base = (epoch, drawAt) => ({
     links: { page: 'https://ur.xyz/ctf', chance_to_win: 'https://ur.xyz/ctf#chance-to-win' },
 });
 
-/** Epoch 9 in progress, epoch 8 drawn (or, with drawn false, closed without a census, so every slot carried). */
-export function drawnAnswer({ drawn = true } = {}) {
+/**
+ * Epoch 9 in progress, epoch 8 drawn (or, with drawn false, closed without a
+ * census, so every slot carried): operator `no`'s, with its `slot`, its units
+ * moved by `vary` in some countries so that its draws differ from another's.
+ */
+export function drawnAnswer({ drawn = true, no = 1, slot = SLOT, vary = 0 } = {}) {
     const rows = SNAPSHOT.countries.map((c, i) => {
-        const online = c.online || 0;
+        const online = (c.online || 0) + vary * (i % 3);
         const role = (units, carriedSlots, near) => {
             const won = drawn ? Math.min(5, units) : 0;
-            const pot = won === 5 ? 0 : (5 - won) * SLOT * carriedSlots;
+            const pot = won === 5 ? 0 : (5 - won) * slot * carriedSlots;
             return {
                 slots: drawn ? { total: 5, won, open: 5 - won } : null,
                 units: drawn ? units : null,
                 near_misses: drawn ? near : null,
                 pot: amount(pot),
-                awarded: amount(won * SLOT),
-                win_estimate: amount(SLOT + Math.floor(pot / 5)),
+                awarded: amount(won * slot),
+                win_estimate: amount(slot + Math.floor(pot / 5)),
                 entries: drawn ? units + 1 : null,
                 chance_to_win: drawn ? Math.min(1, 5 / (units + 1)) : null,
             };
@@ -62,7 +81,7 @@ export function drawnAnswer({ drawn = true } = {}) {
             flag_held: held,
             open_epochs: providers.awarded.rao + extenders.awarded.rao > 0 ? 0 : 1,
             near_misses: drawn ? providers.near_misses + extenders.near_misses : null,
-            available: amount(providers.pot.rao + extenders.pot.rao + 10 * SLOT),
+            available: amount(providers.pot.rao + extenders.pot.rao + 10 * slot),
             awarded: amount(providers.awarded.rao + extenders.awarded.rao),
             providers,
             extenders,
@@ -72,15 +91,15 @@ export function drawnAnswer({ drawn = true } = {}) {
     const won = sum((r) => (drawn ? r.providers.slots.won + r.extenders.slots.won : 0));
     const awarded = sum((r) => r.awarded.rao);
     const carried = sum((r) => r.providers.pot.rao + r.extenders.pot.rao);
-    const fresh = SLOT * 2490 + 172;
+    const fresh = slot * 2490 + 172;
     return {
-        ...base(9, '2026-12-11T18:25:24Z'),
+        ...base(9, '2026-12-11T18:25:24Z', no),
         last_epoch: {
             epoch: 8,
             drawn,
             root: { status: 'pending', seq: 1, root_index: null, epoch: 8, ledger_hash: `sha256:${'ab'.repeat(32)}`, committed_block: 9651000, finalized_block: null },
             amounts: {
-                funding: amount(fresh), returned: amount(0), owed: amount(0), matured: true, fresh: amount(fresh), slot: amount(SLOT),
+                funding: amount(fresh), returned: amount(0), owed: amount(0), matured: true, fresh: amount(fresh), slot: amount(slot),
                 awarded: amount(awarded), paid: amount(awarded), pending_paid: amount(0), pending_in: amount(0), pending: amount(0),
                 carried_in: amount(0), carried: amount(carried),
             },
@@ -96,11 +115,11 @@ export function drawnAnswer({ drawn = true } = {}) {
     };
 }
 
-/** Epoch 8, the first, in progress (or, with `pending`, ended with its census committed): no root yet. */
-export function firstAnswer({ pending = false } = {}) {
+/** Epoch 8, the first, in progress (or, with `pending`, ended with its census committed): no root yet; operator `no`'s. */
+export function firstAnswer({ pending = false, no = 1 } = {}) {
     const role = () => ({ slots: null, units: null, near_misses: null, pot: amount(0), awarded: amount(0), win_estimate: null, entries: null, chance_to_win: null });
     return {
-        ...base(pending ? 9 : 8, pending ? '2026-12-11T18:25:24Z' : '2026-12-04T18:25:24Z'),
+        ...base(pending ? 9 : 8, pending ? '2026-12-11T18:25:24Z' : '2026-12-04T18:25:24Z', no),
         last_epoch: null,
         pending_draw: pending ? { epoch: 8, census_hash: `sha256:${'cd'.repeat(32)}`, census_block: 9650612, round: 34535980 } : null,
         totals: { countries: 249, flags_held: 0, not_fully_captured: null },

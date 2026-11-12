@@ -105,7 +105,7 @@ export default {
         },
         'first-v1-claims': {
             title: 'Epoche 1 ohne Auszahlungs-Root finalisiert',
-            detail: 'Epoche 1 hatte keinen Auszahlungs-Root und daher keine Claims unter Version 1. Ihre 3,482.26 α wurden nach der Missed-Commit-Regel des Protokolls übertragen und werden mit der Finanzierung von Epoche 3 zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Epoche 1 hatte keinen Auszahlungs-Root und daher keine Claims unter Version 1. Ihre 3,482.26 α wurden nach der Missed-Commit-Regel des Protokolls übertragen und sind mit der Finanzierung von Epoche 3 zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
                 'Epoche 1 finalisiert, Block 9,312,031',
             ],
@@ -180,14 +180,14 @@ export default {
         },
         'settlement-v2-active': {
             title: 'Settlement v2 aktiv: Epoche 4 beginnt',
-            detail: 'Ab Block 9,398,428 zahlt Settlement v2 Epoche 4 und jede Epoche danach. Epoche 3 wurde mit Version 1 ohne Auszahlungs-Root abgeschlossen; ihre Finanzierung wird zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Ab Block 9,398,428 zahlt Settlement v2 Epoche 4 und jede Epoche danach. Epoche 3 wurde mit Version 1 ohne Auszahlungs-Root abgeschlossen; ihre Finanzierung ist zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
                 'Erster Block von Epoche 4, 9,398,428',
             ],
         },
         'last-v1-claims-epoch-3': {
             title: 'Epoche 3 ohne Auszahlungs-Root finalisiert',
-            detail: 'Der Auszahlungs-Root von Epoche 3 wurde nicht in seinem Fenster festgeschrieben, daher hatte sie keine Claims unter Version 1. Ihre 4,132.72 α wurden zusammen mit den 3,482.26 α von Epoche 1 übertragen, und beide werden zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Der Auszahlungs-Root von Epoche 3 wurde nicht in seinem Fenster festgeschrieben, daher hatte sie keine Claims unter Version 1. Ihre 4,132.72 α wurden zusammen mit den 3,482.26 α von Epoche 1 übertragen, und beide sind zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
                 'Epoche 3 finalisiert, Block 9,412,831',
             ],
@@ -269,7 +269,7 @@ export default {
             ],
         },
         'capture-the-flag-presence-sampling': {
-            title: 'Capture the Flag: Präsenzmessung bis zum Ende von Epoche 6',
+            title: 'Capture the Flag: Präsenzmessung spätestens zum Ende von Epoche 6',
             detail: 'Bevor Epoche 6 mit Block 9,549,628 endet, beginnen die Server des Netzbetreibers, jeden Provider und Extender jede Viertelstunde zu erfassen: ob er online ist und die Prüfungen des Betreibers besteht, und in welchem Land er ist. Epoche 7 läuft dann vollständig als Schattenepoche: Nach ihrem Ende erstellt der Betreiber seine Teilnehmerliste, die Auslosung und die Auszahlungen aus den echten Messungen, ohne sie festzuschreiben, und veröffentlicht einen unsignierten Bericht, auf dem die Prüfungen des Validators laufen. Capture the Flag startet nur dann mit Epoche 8, wenn die Messung läuft, sobald Epoche 8 beginnt.',
             sources: [],
         },
@@ -296,7 +296,7 @@ export default {
         },
         'extender-pool-epoch-8': {
             title: 'Extender-Pool für Verkehr innerhalb der Plattform und innerhalb eines Netzwerks, ab Epoche 8',
-            detail: 'Ab Block 9,600,028, dem ersten von Epoche 8, zählt der Teil des Verkehrs jedes Vertrags, den kein Provider verdient, stattdessen für Extender. Das umfasst Verkehr zwischen einem Client und der Plattform des Netzbetreibers sowie Verkehr zwischen Geräten eines Netzwerks. Der Pool des Betreibers verteilt ihn gleichmäßig auf jeden /29-Block (IPv4) oder /48-Block (IPv6), der einen berechtigten Extender enthält, dann gleichmäßig auf die Extender darin, bis zur berechtigten Provider-Nutzung der Epoche, sodass Extender höchstens die Hälfte eines Pools verdienen. Ein Extender, der einen Vertrag trägt, behält seinen eigenen Anteil daran als einer der Hops des Vertrags, wie der Subnet-Eigentümer am 11. November entschieden hat. Am 10. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
+            detail: 'Ab Block 9,600,028, dem ersten von Epoche 8, zählt der Teil des Verkehrs jedes Vertrags, den kein Provider verdient, stattdessen für Extender. Das umfasst Verkehr zwischen einem Client und der Plattform des Netzbetreibers sowie Verkehr zwischen Geräten eines Netzwerks. Der Pool des Betreibers verteilt ihn gleichmäßig auf jeden /29-Adressblock (IPv4) oder /48-Adressblock (IPv6), der einen berechtigten Extender enthält, dann gleichmäßig auf die Extender darin, bis zur berechtigten Provider-Nutzung der Epoche, sodass Extender höchstens die Hälfte eines Pools verdienen. Ein Extender, über den ein Vertrag läuft, behält seinen eigenen Anteil daran als einer der Hops des Vertrags, wie der Subnet-Eigentümer am 11. November entschieden hat. Am 10. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
             sources: [
                 'Die Änderung, WHITEPAPER.md §8.6',
                 'Signierter Amendment-Eintrag',

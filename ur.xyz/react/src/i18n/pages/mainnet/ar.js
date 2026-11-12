@@ -3,8 +3,9 @@
 // Figures keep Western digits and the English separators (9,240,028; 1,076.26 α); the arrows point right to
 // left (←). The terms of all three units (this one, data/ and timeline/): epoch حقبة; settlement v2 التسوية v2;
 // version 1 النسخة 1 (the site's «إصدار» is emission, so a software release is «تحديث»); network operator مشغّل
-// الشبكة; subnet owner مالك الشبكة الفرعية; pool مجمّع; payout root جذر المدفوعات; commit تثبيت / الالتزام بـ;
-// challenge period فترة الاعتراض; claim مطالبة; payout wallet محفظة الدفع; governance Safe محفظة Safe للحوكمة;
+// الشبكة; subnet owner مالك الشبكة الفرعية; pool مجمّع; payout root جذر المدفوعات; commit تثبيت (not الالتزام بـ, which reads as bound by);
+// challenge period فترة الاعتراض; claim مطالبة; claim batcher عقد تجميع المطالبات (مُجمِّع reads as a pool);
+// earnings مستحقات (not أرباح, profits); presence الحضور; recovered (done) استُرِدّ; payout wallet محفظة الدفع; governance Safe محفظة Safe للحوكمة;
 // timelock القفل الزمني; vault خزنة; capture the flag «الاستيلاء على العلم» (the apps' name); draw القرعة (never
 // يانصيب, رهان or مقامرة: it is not a lottery); entry مشارك; slot خانة; pot الرصيد المتراكم; carry forward
 // يُرحَّل; relay تمرير; an IP address block نطاق, a chain block كتلة.
@@ -21,7 +22,7 @@ export default {
         eyebrow: 'SN25 · الشبكة الرئيسية لـ Bittensor',
         title: 'الجدول الزمني لإطلاق الشبكة الرئيسية',
         lede: 'انطلقت الشبكة الفرعية لـ UR، وهي SN25، على الشبكة الرئيسية لـ Bittensor في 8 أكتوبر 2026. يتتبّع هذا الجدول الزمني الإطلاق حسب حقب الدفع، من عقود النسخة 1 حتى أول مطالبة في التسوية v2.',
-        note: 'المعالم الموسومة بـ {scheduled} أو {planned} لم تحدث بعد، وقد تتغير مواعيدها. جميع الأوقات بتوقيت UTC، والوقت الموسوم بـ ≈ تقريبي: معظمها محسوب من أرقام الكتل.',
+        note: 'المعالم الموسومة بـ {scheduled} أو {planned} لم تحدث بعد، وقد تتغير مواعيدها. جميع الأوقات بتوقيت UTC، والوقت الموسوم بـ ≈ تقريبي: معظمها مُقدَّر من أرقام الكتل.',
     },
 
     settlement: {
@@ -38,7 +39,7 @@ export default {
     milestones: {
         eyebrow: 'الجدول الزمني',
         title: 'المعالم',
-        fine: 'وقت المَعلَم المُجدول أو المُخطط تقدير محسوب، من رقم كتلته بمعدل 12 ثانية لكل كتلة أو من الخطة، ويُوسم بـ ≈ ما لم يُحدَّد لوقت دقيق. يتحرك الوقت المُقدَّر قليلًا إذا جاءت الكتل أسرع أو أبطأ. ابتداءً من الحقبة 1، تُغلق كل حقبة خلال 120 كتلة من نهايتها، ويُستحق جذر مدفوعاتها خلال 1,200 كتلة من نهايتها، وتُفتح مطالباتها بعد 14,400 كتلة (نحو يومين) منه. قد تتغير المعالم المُجدولة والمُخططة.',
+        fine: 'وقت المَعلَم المُجدول أو المُخطط تقدير محسوب، من رقم كتلته بمعدل 12 ثانية لكل كتلة أو من الخطة، ويُوسم بـ ≈ ما لم يُحدَّد لوقت دقيق. يتحرك الوقت المُقدَّر قليلًا إذا جاءت الكتل أسرع أو أبطأ. ابتداءً من الحقبة 1، تُغلق كل حقبة خلال 120 كتلة من نهايتها، ويحين موعد تثبيت جذر مدفوعاتها خلال 1,200 كتلة من نهايتها، وتُفتح مطالباتها بعد 14,400 كتلة (نحو يومين) منه. قد تتغير المعالم المُجدولة والمُخططة.',
         updated: 'آخر تحديث {date}.',
     },
 
@@ -79,7 +80,7 @@ export default {
         epochShort: 'ح{number}',
         afterShort: 'بعدها',
         from: 'من {days}',
-        settledBy: { v1: 'تسوية بالنسخة 1', v2: 'التسوية v2' },
+        settledBy: { v1: 'تسوّيها النسخة 1', v2: 'تسوّيها التسوية v2' },
         mark: '{number}. {title}، {when}، {status}',
         span: '{title}، {when}، {status}',
         now: 'الآن',

@@ -2,7 +2,7 @@
 // changing a translation, run `node tests/i18n-staleness.mjs --unit mainnet --accept zh <key> ...` from react/.
 // The terms of all three units (this one, data/ and timeline/): epoch 周期 (a subscription's cycle is 计费周期);
 // settlement v2 结算 v2; version 1 版本 1; network operator 网络运营商; subnet owner 子网所有者; payout root 支付根;
-// commit 提交; challenge period 质疑期; claim 领取; payout wallet 收款钱包; governance Safe 治理 Safe; timelock
+// commit 提交; challenge period 质疑期; claim 领取; earnings 报酬 (not 收益, which reads as returns); payout wallet 收款钱包; governance Safe 治理 Safe; timelock
 // 时间锁; vault 金库; capture the flag 夺旗 (the apps' name); draw 抽签 (never 抽奖, 彩票 or 奖池: it is not a
 // lottery); entry 参与者; slot 槽位; pot 累积池; carry forward 结转; relay 中继. Figures keep the English digits
 // and separators (9,240,028; 1,076.26 α); dates as 11月27日, times as 18:25 UTC.

@@ -105,7 +105,7 @@ export default {
         },
         'first-v1-claims': {
             title: 'Época 1 finalizada sin raíz de pagos',
-            detail: 'La época 1 no tuvo raíz de pagos, así que no tuvo reclamaciones de la versión 1. Sus 3,482.26 α se trasladaron según la regla del protocolo para registros omitidos, y se recuperan con la financiación de la época 3 (consulta el aviso de la época 3 arriba).',
+            detail: 'La época 1 no tuvo raíz de pagos, así que no tuvo reclamaciones de la versión 1. Sus 3,482.26 α se trasladaron según la regla del protocolo para registros omitidos, y se han recuperado con la financiación de la época 3 (consulta el aviso de la época 3 arriba).',
             sources: [
                 'Época 1 finalizada, bloque 9,312,031',
             ],
@@ -180,14 +180,14 @@ export default {
         },
         'settlement-v2-active': {
             title: 'Liquidación v2 activa: empieza la época 4',
-            detail: 'Desde el bloque 9,398,428, la liquidación v2 paga la época 4 y todas las épocas posteriores. La época 3 se cerró con la versión 1 sin raíz de pagos; su financiación se recupera (consulta el aviso de la época 3 arriba).',
+            detail: 'Desde el bloque 9,398,428, la liquidación v2 paga la época 4 y todas las épocas posteriores. La época 3 se cerró con la versión 1 sin raíz de pagos; su financiación se ha recuperado (consulta el aviso de la época 3 arriba).',
             sources: [
                 'Primer bloque de la época 4, 9,398,428',
             ],
         },
         'last-v1-claims-epoch-3': {
             title: 'Época 3 finalizada sin raíz de pagos',
-            detail: 'La raíz de pagos de la época 3 no se registró en su ventana, así que no tuvo reclamaciones de la versión 1. Sus 4,132.72 α se trasladaron junto con los 3,482.26 α de la época 1, y ambos se recuperan (consulta el aviso de la época 3 arriba).',
+            detail: 'La raíz de pagos de la época 3 no se registró en su ventana, así que no tuvo reclamaciones de la versión 1. Sus 4,132.72 α se trasladaron junto con los 3,482.26 α de la época 1, y ambos se han recuperado (consulta el aviso de la época 3 arriba).',
             sources: [
                 'Época 3 finalizada, bloque 9,412,831',
             ],
@@ -296,7 +296,7 @@ export default {
         },
         'extender-pool-epoch-8': {
             title: 'Pool de extensores para el tráfico dentro de la plataforma y dentro de la red, desde la época 8',
-            detail: 'Desde el bloque 9,600,028, el primero de la época 8, la parte del tráfico de cada contrato que no gana ningún proveedor cuenta en su lugar para los extensores. Eso abarca el tráfico entre un cliente y la plataforma del operador de red, y el tráfico entre dispositivos de una misma red. El pool del operador lo reparte a partes iguales entre cada bloque /29 IPv4 o /48 IPv6 que contiene un extensor elegible, y luego a partes iguales entre los extensores de ese bloque, hasta el uso elegible de los proveedores en la época, así que los extensores ganan como mucho la mitad de un pool. Un extensor que transporta un contrato conserva su propia parte de él, como uno de los saltos del contrato, según decidió el propietario de la subred el 11 de noviembre. Aprobado por el propietario de la subred el 10 de noviembre, entra en vigor cuando se publique la entrada de enmienda firmada antes de que empiece la época 8.',
+            detail: 'Desde el bloque 9,600,028, el primero de la época 8, la parte del tráfico de cada contrato que no gana ningún proveedor cuenta en su lugar para los extensores. Eso abarca el tráfico entre un cliente y la plataforma del operador de red, y el tráfico entre dispositivos de una misma red. El pool del operador lo reparte a partes iguales entre cada bloque de direcciones /29 IPv4 o /48 IPv6 que contiene un extensor elegible, y luego a partes iguales entre los extensores de ese bloque, hasta el uso elegible de los proveedores en la época, así que los extensores ganan como mucho la mitad de un pool. Un extensor que transporta un contrato conserva su propia parte de él, como uno de los saltos del contrato, según decidió el propietario de la subred el 11 de noviembre. Aprobado por el propietario de la subred el 10 de noviembre, entra en vigor cuando se publique la entrada de enmienda firmada antes de que empiece la época 8.',
             sources: [
                 'La enmienda, WHITEPAPER.md §8.6',
                 'Entrada de enmienda firmada',

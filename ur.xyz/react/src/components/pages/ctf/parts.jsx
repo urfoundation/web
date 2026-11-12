@@ -341,16 +341,16 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
     const t = all.card;
     const f = formats(m.lang);
     const msg = c ? countryMessage(m, c) : rich(m.phase === 'prelaunch' ? t.nonePrelaunch : t.none, { first: m.firstEpoch }).join('');
-    const anyOpen = c && (c.p.open || c.x.open);
     const anyClosed = c && (c.p.held || c.x.held);
     // before a draw the dashboard's count is what is known of a country; after one, its draw says more
     const presence = c && !m.potsKnown ? presenceSentence(m, c) : null;
     const empty = c ? uninhabitedSentence(c, m.lang) : null;
     const where = c ? { where: c.the, whereIn: place(c).in } : { where: t.where, whereIn: t.whereIn };
+    // its flag waves unless every slot of both roles was won last epoch, as design.html's card does: before a draw
+    // nothing is held, so a country's own page and a visitor's country wave from the start
+    const wave = c && !(c.p.held && c.x.held);
     return (
-        {/* its flag waves unless every slot of both roles was won last epoch, as design.html's card does: before a
-            draw nothing is held, so a country's own page and a visitor's country wave from the start */}
-        <section className={cx('ctf-mine', c && !(c.p.held && c.x.held) && 'ctf-wave')} aria-labelledby="ctf-mine-h">
+        <section className={cx('ctf-mine', wave && 'ctf-wave')} aria-labelledby="ctf-mine-h">
             <div className="ctf-pole"><Flag code={c?.code} size="l" lazy={false} /></div>
             <div className="ctf-me-body">
                 <div className="ctf-label">{label}</div>

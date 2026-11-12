@@ -441,8 +441,8 @@ export default {
         h1: 'Gana cripto {in} con tu conexión a internet',
         mission: 'Cinco slots de proveedor y cinco de extensor {in} cada época (una semana)',
         answer: 'Ejecuta la app gratuita de URnetwork {in} como proveedor o extensor y podrás ganar recompensas semanales en cripto.',
-        asOfDraw: 'Según el sorteo de la época {epoch}, {day}: ',
-        asOfClose: 'Según el cierre de la época {epoch}, {day}: ',
+        asOfDraw: 'Datos del sorteo de la época {epoch} ({day}). ',
+        asOfClose: 'Datos del cierre de la época {epoch} ({day}). ',
         disclaimer: ' Las recompensas se pagan en alpha, el token de la subred 25 de Bittensor, y no están garantizadas.',
         more: 'Más países',
         all: 'Los 249 países',
@@ -503,7 +503,7 @@ export default {
             other: 'Época {epoch} · {count} países con slots de proveedor abiertos',
         },
         undrawn: 'Época {epoch} · {amount} α en fondos',
-        alt: '{kicker}: {title}. {footer}.',
+        alt: '{kicker}. {title}. {footer}.',
     },
 
     dataset: {

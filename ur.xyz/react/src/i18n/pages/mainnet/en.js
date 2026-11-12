@@ -9,9 +9,10 @@
 // Every {name} stays as it is in a translation. A plural node ({ one, other })
 // takes the forms its language needs (i18n/format.js plural); its {count} is a
 // number as the page writes it (9,240,028: figures keep their English digits
-// and separators in every language but Spanish, which writes them as Intl
-// does, 9.240.028, as on /ctf: timeline.js INTL_FIGURES). Dates are written
-// from the `dates` patterns below, never copied into the text.
+// and separators in Arabic and Chinese, and Spanish, German and Russian write
+// them as Intl does, 9.240.028 and 9 240 028, as on /ctf: timeline.js
+// INTL_FIGURES). Dates are written from the `dates` patterns below, never
+// copied into the text.
 export default {
     meta: {
         title: 'SN25 mainnet launch timeline | UR',

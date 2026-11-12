@@ -6,8 +6,9 @@
 // الشبكة; subnet owner مالك الشبكة الفرعية; pool مجمّع; payout root جذر المدفوعات; commit تثبيت (not الالتزام بـ, which reads as bound by);
 // challenge period فترة الاعتراض; claim مطالبة; claim batcher عقد تجميع المطالبات (مُجمِّع reads as a pool);
 // earnings مستحقات (not أرباح, profits); presence الحضور; recovered (done) استُرِدّ; payout wallet محفظة الدفع; governance Safe محفظة Safe للحوكمة;
-// timelock القفل الزمني; vault خزنة; capture the flag «الاستيلاء على العلم» (the apps' name); draw القرعة (never
-// يانصيب, رهان or مقامرة: it is not a lottery); entry مشارك; slot خانة; pot الرصيد المتراكم; carry forward
+// timelock القفل الزمني; vault خزنة; capture the flag «الاستيلاء على العلم» (the apps' name); draw الاختيار العشوائي,
+// to draw اختار عشوائيًا (a public, verifiable random selection: never القرعة, a drawing of lots, and never يانصيب,
+// رهان or مقامرة: it is not a lottery); entry مشارك; slot خانة; pot الرصيد المتراكم; carry forward
 // يُرحَّل; relay تمرير; an IP address block نطاق, a chain block كتلة.
 // A token that starts or ends with a slash (/29, /48, /64, 1/n) is wrapped in the isolates \u2066…\u2069, so
 // it reads left to right inside the Arabic; "IPv6 /64" needs none.

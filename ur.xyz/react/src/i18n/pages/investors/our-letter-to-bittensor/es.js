@@ -46,7 +46,7 @@ export default {
 
     coverage: {
         heading: 'Hoy los mineros se concentran en dos regiones, lo que limita la red a cerca de un millón de usuarios',
-        subheading: 'Dónde están hoy los más de 100k operadores de red y dónde los sitúa un mercado de incentivos',
+        subheading: 'Dónde están hoy los más de 100k proveedores y dónde los sitúa un mercado de incentivos',
         before: {
             eyebrow: 'Antes',
             title: 'Profundidad en dos regiones',

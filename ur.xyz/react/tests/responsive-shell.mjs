@@ -365,11 +365,13 @@ async function auditDashboardLate(browser, base) {
   for (const route of held.splice(0)) await fixture(route);
   await page.waitForFunction(() => {
     const pn = document.querySelector('#c-reg')?.closest('.pn');
-    return pn && !pn.classList.contains('na') && !pn.classList.contains('wait') && document.querySelector('#c-ctry')?.textContent.trim() !== '';
+    return pn && !pn.classList.contains('na') && !pn.classList.contains('wait') && document.querySelectorAll('#c-reg .r').length > 0;
   }, null, { timeout: 15_000 }).catch(() => {});
   const coverage = await panel('#c-reg');
   assert(coverage && !coverage.na && !coverage.wait, `/dashboard (late answers) coverage after its read: ${JSON.stringify(coverage)}`);
-  assert(/^\d+$/.test(await page.textContent('#c-ctry')), '/dashboard (late answers) coverage has no countries count');
+  // what panel 33 feeds: the continents and the country search's list (the count of countries is the stats feed's)
+  const fed = await page.evaluate(() => [document.querySelectorAll('#c-reg .r').length, document.querySelectorAll('#c-list option').length]);
+  assert(fed[0] === 6 && fed[1] > 0, `/dashboard (late answers) coverage after its read: ${fed[0]} continents, ${fed[1]} countries`);
   const epoch = await panel('#oe-figs');
   assert(epoch?.na === unavailable, `/dashboard (late answers) this epoch without the stats feed: ${JSON.stringify(epoch)}`);
 

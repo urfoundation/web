@@ -152,8 +152,11 @@ function after(sentence, parts) {
  */
 function MainnetNotice({ notice, t }) {
     const [open, setOpen] = React.useState(false);
+    // the button states aria-expanded only once script runs: the static HTML, open without script, claims no state
+    const [live, setLive] = React.useState(false);
     const section = React.useRef(null);
     React.useEffect(() => {
+        setLive(true);
         const follow = () => {
             if (noticeAt(window.location.hash) === section.current) setOpen(true);
         };
@@ -174,7 +177,7 @@ function MainnetNotice({ notice, t }) {
             {/* the card answers a tap; its button is the control for the keyboard and a screen reader */}
             <div className="mainnet-notice-box" role="note" onClick={toggle}>
                 <h2 className="mainnet-notice-heading">
-                    <button type="button" className="mainnet-notice-toggle" aria-expanded={open} aria-controls={textId}>
+                    <button type="button" className="mainnet-notice-toggle" aria-expanded={live ? open : undefined} aria-controls={textId}>
                         <span className="mainnet-notice-date">{runs(t.noticeDate, { date: notice.dateText })}</span>
                         <span className="mainnet-notice-title" id={titleId}>{notice.title}</span>
                         <span className="mainnet-notice-more" data-nosnippet="">

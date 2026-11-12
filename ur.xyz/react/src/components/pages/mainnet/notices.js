@@ -7,7 +7,9 @@
  * script every notice is open (the static route's noscript style).
  *
  * The header is a real button (aria-expanded, aria-controls) inside the
- * notice's h2, so the keyboard and a screen reader open it as any button; a
+ * notice's h2, so the keyboard and a screen reader open it as any button (it
+ * states aria-expanded once script runs: without script the notice is open,
+ * and its button claims no state); a
  * tap anywhere on the card does the same, but a tap on a link inside follows
  * the link, and a click that ends a text selection leaves the card as it is.
  * The SPA keeps each notice's state in React; the static page, which renders
@@ -74,6 +76,7 @@ export function wireNotices(doc = document) {
         section.querySelector(TOGGLE)?.setAttribute('aria-expanded', String(open));
     };
     for (const section of doc.querySelectorAll(NOTICE)) {
+        set(section, section.hasAttribute('data-open'));
         section.querySelector('.mainnet-notice-box')?.addEventListener('click', (event) => {
             if (!togglesNotice(event)) return;
             const open = !section.hasAttribute('data-open');

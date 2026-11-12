@@ -1,19 +1,10 @@
 ---
-import { NON_EN_LANGS } from '../../../lib/i18n.js';
-import { docs } from '@react/lib/docs.js';
-import { DOC_PAGE_PATHS } from '@react/lib/docs-shared.js';
-
+// /<lang>/docs/<doc>: a document in another language, a page of the docs group
+// (react/src/i18n/pages/docs/group.js), built once that group is localized.
+// Until then nothing is built here: nginx serves a /<lang>/ page when the build
+// has one and otherwise answers /<lang>/docs/<doc> with a 301 to /docs/<doc>, so
+// a redirect stub built here would be served in place of that 301.
 export function getStaticPaths() {
-    const paths = [];
-    for (const lang of NON_EN_LANGS) {
-        // documents with their own page (/terms, …) have no /docs copy to point at
-        for (const doc of docs.filter(doc => doc.slug && !DOC_PAGE_PATHS[doc.slug])) {
-            paths.push({ params: { lang, slug: doc.slug } });
-        }
-    }
-    return paths;
+    return [];
 }
-
-const { slug } = Astro.params;
-return Astro.redirect(`/docs/${slug}`, 301);
 ---

@@ -24,15 +24,19 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { OFFLINE_CHROMIUM_ARGS } from "./offline-chromium.mjs";
+import { localizedSamples } from "./localized-samples.mjs";
+import { basePathFor } from "../../astro/src/lib/route-localization.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REACT_DIR = path.resolve(__dirname, "..");
 const VITE_BIN = path.join(REACT_DIR, "node_modules/vite/bin/vite.js");
 
-const ROUTES = ["/", "/operators", "/miners", "/validators", "/research", "/docs", "/terms", "/privacy", "/vdp", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology"];
+const ROUTES = ["/", "/operators", "/miners", "/validators", "/research", "/docs", "/terms", "/privacy", "/vdp", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology",
+  // a page of each localized page group, in Arabic (localized-samples.mjs)
+  ...localizedSamples(["ar"])];
 
 const ALLOWED = ["ur.xyz", "ur.io", "bringyour.com", "ur.network", "urnetwork.com"];
-// hosts a single route may contact, for the reason stated on that page
+// hosts a single route may contact, for the reason stated on that page (in any of its languages)
 const ALLOWED_ON_ROUTE = { "/reserve": ["opentensor.ai", "geckoterminal.com"] };
 
 function isLocal(host) {
@@ -41,7 +45,7 @@ function isLocal(host) {
 
 function isAllowed(host, route) {
   if (isLocal(host)) return true;
-  const allowed = [...ALLOWED, ...(ALLOWED_ON_ROUTE[route] || [])];
+  const allowed = [...ALLOWED, ...(ALLOWED_ON_ROUTE[basePathFor(route)] || [])];
   return allowed.some((d) => host === d || host.endsWith("." + d));
 }
 

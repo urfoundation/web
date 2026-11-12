@@ -1369,6 +1369,11 @@
     display: block !important;
 }
 
+/* The verification screen's ad mark is a word in a 54px circle: Russian's
+   (ПРОМО) is the longest and, set in the fallback face Cyrillic takes, needs a
+   smaller size to stay inside it. */
+.build-page .evidence-preview strong:lang(ru){font-size:11px}
+
 /* Right to left (Arabic): the page's text, tabs, readouts and brief mirror
    through the logical properties above; the architecture model keeps its
    drawn geometry (its parts are placed left to right in 3D), so its stage

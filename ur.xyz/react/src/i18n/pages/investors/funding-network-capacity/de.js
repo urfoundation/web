@@ -4,7 +4,7 @@ export default {
         heading: 'Einleitung',
         paragraphs: [
             'UR (SN25) will die Open-Source-Vision von Bittensor unterstützen, indem es einen Marktplatz für private Konnektivität aufbaut: Es koordiniert unabhängige Provider, um die private Netzwerkkapazität aufzubauen, die Betreiber benötigen, um ihre Kunden zu bedienen.',
-            'ur.io ist das erste kundenorientierte Beispiel; die größere Chance ist eine Infrastruktur, die von mehreren Betreibern gemeinsam genutzt wird. Letztlich hat für uns Priorität, ein starkes, zuverlässiges Netzwerk zu schaffen, das jedem Betreiber Wachstum ermöglicht, und private Netzwerke für alle zugänglich zu machen.',
+            'ur.io ist das erste Beispiel, das sich direkt an Kunden richtet; die größere Chance ist eine Infrastruktur, die von mehreren Betreibern gemeinsam genutzt wird. Letztlich hat für uns Priorität, ein starkes, zuverlässiges Netzwerk zu schaffen, das jedem Betreiber Wachstum ermöglicht, und private Netzwerke für alle zugänglich zu machen.',
             'Auf diese Weise bringen Betreiber Produkte, Kunden und Nachfrage ein und unsere unabhängigen Miner liefern Konnektivität, während UR (SN25) Anreize und Verifizierung koordiniert, damit sich nützliches Angebot entwickelt.',
             'Für UR:',
         ],
@@ -18,7 +18,7 @@ export default {
     workingCapital: {
         heading: 'Warum Emissionen als Betriebskapital zurückbehalten?',
         paragraphs: [
-            'Wir erwarten nicht, dass Netzwerkkapazität und Kundennachfrage im perfekten Gleichschritt wachsen. In Gesprächen mit Betreibern suchen diese nach Belegen für ein verlässliches Angebot, BEVOR sie auf dem Subnet starten. Nehmen Sie einen neuen VPN-Betreiber, der vielleicht schon ein Produkt und Kunden hat: Eine breitere Abdeckung oder verlässliche Verfügbarkeit in bestimmten Märkten wird entscheidend sein, um sein Wachstum zu unterstützen. UR muss die Provider, die diese Anforderungen erfüllen können, so schnell wie möglich koordinieren.',
+            'Wir erwarten nicht, dass Netzwerkkapazität und Kundennachfrage im perfekten Gleichschritt wachsen. In Gesprächen mit Betreibern suchen diese nach Belegen für ein verlässliches Angebot, BEVOR sie auf dem Subnet starten. Nehmen wir einen neuen VPN-Betreiber, der vielleicht schon ein Produkt und Kunden hat: Eine breitere Abdeckung oder verlässliche Verfügbarkeit in bestimmten Märkten wird entscheidend sein, um sein Wachstum zu unterstützen. UR muss die Provider, die diese Anforderungen erfüllen können, so schnell wie möglich koordinieren.',
             'SN25 nutzt daher überschüssige Emissionen, also Miner-Emissionen über das hinaus, was direkt an Provider geht, um Miner anzuschieben und die Stärke des Netzwerks zu demonstrieren und so neue Netzbetreiber zu gewinnen.',
         ],
         diagramAlt: 'Betreiber wollen Angebot, bevor die Nachfrage kommt. Kapazität wird aufgebaut, bevor ein Betreiber startet, während der Kundenverkehr später wächst. Die Network Capacity Reserve finanziert die Lücke und wird gegen verifizierte Leistung freigegeben. Betreiber starten mit bereits vorhandener Kapazität; die Reserve trägt die Kosten, bis der Verkehr aufholt, sodass frühe Kunden vom ersten Tag an vollen Service erhalten.',
@@ -44,7 +44,7 @@ export default {
     examples: {
         heading: 'Beispiele',
         items: [
-            'Wenn ein neuer Betreiber bereit ist, Nutzer zu UR zu bringen, ein gedeckeltes Anreizprogramm für Provider für das von ihm benötigte Angebot einrichten. Die Zahlungen hängen von funktionierenden Routen und dauerhaftem Service ab, nicht nur von der Registrierung eines Betreibers.',
+            'Wenn ein neuer Betreiber bereit ist, Nutzer zu UR zu bringen, ein gedeckeltes Anreizprogramm für Provider für das von ihm benötigte Angebot einrichten. Die Zahlungen hängen von funktionierenden Routen und dauerhaftem Service ab, statt bloß von der Registrierung eines Betreibers.',
             'Wenn ur.io oder ein anderer Betreiber zusätzliche Exits in einem Zielmarkt braucht, Provider damit beauftragen, dort qualifizierende Verbindungen aufrechtzuerhalten. Der bestehende Flottenmechanismus misst die Breite routbarer Präfixe; geografische Belohnungen würden eine zusätzliche Standortverifizierung erfordern.',
             'Vorübergehende Anreize bieten, wenn die Nutzung eines Betreibers über das verfügbare Angebot hinaus steigt. Zahlungen, die speziell an Durchsatz oder ausgelieferten Datenverkehr gebunden sind, würden eine stärkere Verifizierung erfordern als die aktuellen Routing-Prüfungen.',
             'Zeitlich begrenzte Zusagen finanzieren, um nützliche Verbindungen zwischen Nachfragespitzen online zu halten, unter der Bedingung erfolgreicher Zufallsverifizierung.',
@@ -53,7 +53,7 @@ export default {
     operations: {
         heading: 'Betrieb der Reserve',
         items: [
-            'Die Reserve ist ein eigenes Multisig, getrennt von den Owner-Emissionen und nicht für Team- oder Betriebskosten verwendet: 5CcHGEqKK3RXeEA2sVycHQAQGrqsyhWaYu9FjGtDVN6nwMwR (SN25-UIDs 170 und 250).',
+            'Die Reserve ist ein eigenes Multisig, getrennt von den Emissionen des Eigentümers und nicht für Team- oder Betriebskosten verwendet: 5CcHGEqKK3RXeEA2sVycHQAQGrqsyhWaYu9FjGtDVN6nwMwR (SN25-UIDs 170 und 250).',
             'Ziele, Teilnahmevoraussetzungen, Messung und Dauer veröffentlichen, wenn überschüssige Miner-Belohnungen eingesetzt werden.',
             'Mittel für angenommene Zusagen reservieren und bestehende Basisbelohnungen berücksichtigen.',
             'Die Leistung verifizieren, die Berechnung der Belohnung veröffentlichen, Zahlungen über das Multisig freigeben und jeden ausgehenden Transfer offenlegen.',

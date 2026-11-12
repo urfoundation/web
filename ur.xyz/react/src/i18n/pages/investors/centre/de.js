@@ -9,7 +9,7 @@ export default {
     updated: 'Aktualisiert am {date}',
     aboutHeading: 'Über UR',
     about: [
-        'Unsere Mission ist es, Privatsphäre für jeden Nutzer zum Standard zu machen, indem wir die Verschlüsselungsschicht für das offene Internet bereitstellen. Wir bauen ein von Nutzern getragenes Netzwerk und eine Suite von Datenschutzprodukten, die Menschen dienen, statt sie zu überwachen.',
+        'Unsere Mission ist es, Privatsphäre für jeden Nutzer zum Standard zu machen, indem wir die Verschlüsselungsschicht für das offene Internet bereitstellen. Wir bauen ein von Nutzern getragenes Netzwerk und eine Suite von Datenschutzprodukten, die darauf ausgelegt sind, Menschen zu dienen, statt sie zu überwachen.',
         'Jeder, überall, sollte frei und privat auf das Internet zugreifen können.',
     ],
     latestHeading: 'Neues von UR',
@@ -40,18 +40,18 @@ export default {
     empty: 'Keine Investorenmaterialien entsprechen diesen Filtern.',
     exploreAria: 'Ressourcen zu Netzwerk und Forschung',
     exploreHeading: 'Das Netzwerk erkunden',
-    exploreText: 'Verfolgen Sie die Netzwerkleistung im UR-Dashboard und sehen Sie Marktdaten des Subnets bei TaoMarketCap und taostats.',
+    exploreText: 'Verfolgen Sie die Netzwerkleistung im UR-Dashboard und sehen Sie Marktdaten des Subnets bei TaoMarketCap und taostats ein.',
     dashboard: 'UR-Dashboard',
     networkLinksAria: 'Datenquellen zum Netzwerk',
-    researchHeading: 'UR recherchieren',
+    researchHeading: 'Zu UR recherchieren',
     researchText: 'Fragen Sie ChatGPT oder Claude nach den Produkten, der Forschung, der Subnet-Entwicklung, den veröffentlichten Updates und den öffentlichen Materialien von UR.',
-    researchLinksAria: 'UR mit KI recherchieren',
+    researchLinksAria: 'Mit KI zu UR recherchieren',
     metrics: {
         heading: 'Kennzahlen',
         items: [
             {
                 label: 'Conviction insgesamt',
-                context: 'Conviction des Owner-Keys: 640K α ($1.41M)',
+                context: 'Conviction des Eigentümerschlüssels: 640.000 α (1,41 Mio. US-Dollar)',
                 change: '+11,7 % in 30 Tagen',
             },
             {

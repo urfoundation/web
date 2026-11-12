@@ -1,7 +1,7 @@
 // German: the investors group's shared copy (see en.js).
 export default {
     categories: {
-        managementUpdate: 'Mitteilung des Managements',
+        managementUpdate: 'Management-Update',
         networkUpdate: 'Netzwerk-Update',
         investorMaterials: 'Investorenmaterialien',
     },
@@ -14,11 +14,11 @@ export default {
     docs: {
         deck: {
             title: 'Einführung in UR (SN25)',
-            summary: 'Wie UR funktioniert, was heute live ist, die Projekte in der Forschung und die Chance für Netzbetreiber, auf dem Subnet aufzubauen, damit sich die Nachfrage verstärkt.',
+            summary: 'Wie UR funktioniert, was heute live ist, die Projekte in der Forschung und die Chance für Netzbetreiber, auf dem Subnet aufzubauen, damit sich die Nachfrage selbst verstärkt.',
             cta: 'Präsentation ansehen',
             readTime: '11 Folien',
             metaTitle: 'Einführung in UR (SN25) | UR',
-            metaDescription: 'Wie UR funktioniert, was heute live ist, die Projekte in der Forschung und die Chance für Netzbetreiber, auf dem Subnet aufzubauen, damit sich die Nachfrage verstärkt.',
+            metaDescription: 'Wie UR funktioniert, was heute live ist, die Projekte in der Forschung und die Chance für Netzbetreiber, auf dem Subnet aufzubauen, damit sich die Nachfrage selbst verstärkt.',
         },
         'our-letter-to-bittensor': {
             title: 'Unser Brief an Bittensor',
@@ -31,12 +31,12 @@ export default {
         'conviction-lock': {
             title: 'UR-Team sperrt 550.000 Alpha dauerhaft',
             headline: 'UR-Team sperrt 550.000 Alpha in unbefristeter Conviction',
-            summary: 'Rund 1,44 Mio. US-Dollar in unbefristeter Conviction gesperrt; damit steigt das insgesamt hinter SN25 gesperrte Alpha auf 27,1 Prozent des Umlaufangebots.',
-            description: 'Das Managementteam von UR hat 550.000 Alpha in unbefristeter Conviction gesperrt; damit steigt das insgesamt hinter SN25 gesperrte Alpha auf 27,1 Prozent des Umlaufangebots.',
+            summary: 'Rund 1,44 Mio. US-Dollar in unbefristeter Conviction gesperrt; damit steigt das insgesamt hinter SN25 gesperrte Alpha auf 27,1 Prozent der Umlaufmenge.',
+            description: 'Das Managementteam von UR hat 550.000 Alpha in unbefristeter Conviction gesperrt; damit steigt das insgesamt hinter SN25 gesperrte Alpha auf 27,1 Prozent der Umlaufmenge.',
             cta: 'Mitteilung lesen',
             readTime: '3 Min. Lesezeit',
             metaTitle: 'UR-Team sperrt 550.000 Alpha dauerhaft | UR',
-            metaDescription: 'Das Managementteam von UR hat 550.000 Alpha in unbefristeter Conviction gesperrt; damit steigt das insgesamt hinter SN25 gesperrte Alpha auf 27,1 Prozent des Umlaufangebots.',
+            metaDescription: 'Das Managementteam von UR hat 550.000 Alpha in unbefristeter Conviction gesperrt; damit steigt das insgesamt hinter SN25 gesperrte Alpha auf 27,1 Prozent der Umlaufmenge.',
         },
         'letter-to-tokenholders-september-2026': {
             title: 'September-Brief an die Token-Inhaber',
@@ -58,12 +58,12 @@ export default {
         'apex-competition': {
             title: 'Routing-Wettbewerb UR x Apex',
             headline: 'UR (SN25) startet offenen Wettbewerb auf Apex (SN1)',
-            summary: 'Ein offener Wettbewerb auf Apex (SN1), betrieben von Macrocosmos, zur Verbesserung der Routing- und Provider-Matching-Algorithmen hinter dem UR-Netzwerk.',
-            description: 'UR (SN25) öffnet sein Routing- und Provider-Matching-Problem für die Forschungsgemeinschaft von Bittensor, mit einem offenen Wettbewerb auf Apex (SN1), betrieben von Macrocosmos.',
+            summary: 'Ein offener Wettbewerb auf Apex (SN1), betrieben von Macrocosmos, zur Verbesserung der Routing- und Provider-Zuordnungsalgorithmen hinter dem UR-Netzwerk.',
+            description: 'UR (SN25) öffnet sein Routing- und Provider-Zuordnungsproblem für die Forschungsgemeinschaft von Bittensor, mit einem offenen Wettbewerb auf Apex (SN1), betrieben von Macrocosmos.',
             cta: 'Mitteilung lesen',
             readTime: '4 Min. Lesezeit',
             metaTitle: 'UR (SN25) startet offenen Wettbewerb auf Apex (SN1) | UR',
-            metaDescription: 'UR (SN25) öffnet sein Routing- und Provider-Matching-Problem für die Bittensor-Forschung mit einem offenen Wettbewerb auf Apex (SN1), betrieben von Macrocosmos.',
+            metaDescription: 'UR (SN25) öffnet sein Routing- und Provider-Zuordnungsproblem für die Bittensor-Forschung mit einem offenen Wettbewerb auf Apex (SN1), betrieben von Macrocosmos.',
         },
         litepaper: {
             title: 'UR-Litepaper',

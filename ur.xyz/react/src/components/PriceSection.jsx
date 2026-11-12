@@ -10,15 +10,18 @@ import { PRICE_FEED_URL, PRICE_SHEET_URL, SOURCING_WALLETS, formatAlphaExact } f
 // browser's.
 
 // USD equivalents: 2 decimals at cents scale, 4 below a cent, and enough to
-// stay above zero under that, so a priced rate never reads as $0.00.
+// stay above zero under that, so a priced rate never reads as $0.00. Spanish
+// writes them as Intl does, with US$ ("0,05 US$", as /reserve does), since a
+// bare "$" also means pesos where Spanish is read; every other language keeps
+// "$" before the figure.
 const formatUsd = (n, locale) => {
     if (!isFinite(n)) return '—';
-    if (n > 0 && n < 0.00005) return '$' + n.toLocaleString(locale, { maximumSignificantDigits: 2 });
     const digits = n >= 0.01 || n === 0 ? 2 : 4;
-    return '$' + n.toLocaleString(locale, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: digits
-    });
+    const options = n > 0 && n < 0.00005
+        ? { maximumSignificantDigits: 2 }
+        : { minimumFractionDigits: 2, maximumFractionDigits: digits };
+    if (locale === 'es') return n.toLocaleString(locale, { style: 'currency', currency: 'USD', ...options });
+    return '$' + n.toLocaleString(locale, options);
 };
 
 /** An address in the code face, whole, breaking if it must only at its middle (as on /reserve). */

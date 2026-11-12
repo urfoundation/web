@@ -29,8 +29,8 @@ export default {
         {
             title: 'Situación actual',
             headline: 'UR llega a Bittensor con una red P2P de privacidad que ya existe hoy y tiene distribución masiva',
-            alt: 'Situación actual: más de 350K usuarios activos mensuales, más de 100K proveedores de red, más de 100 países y $0 de coste de adquisición de clientes.',
-            summary: 'La red ya tiene demanda (350K+ usuarios activos mensuales), oferta (100K+ proveedores de red), cobertura (100+ países) y distribución ($0 de CAC): aplicaciones de consumo operativas en iOS, Android, macOS y el navegador, con Windows y Linux muy pronto. Paga a quienes contribuyen por el ancho de banda, y la subred convierte la capacidad de enrutamiento en un mercado puntuado por confiabilidad, geografía, tiempo de actividad y tráfico real atendido.',
+            alt: 'Situación actual: más de 350K usuarios activos mensuales, más de 100K proveedores de red, más de 100 países y US$0 de costo de adquisición de clientes.',
+            summary: 'La red ya tiene demanda (350K+ usuarios activos mensuales), oferta (100K+ proveedores de red), cobertura (100+ países) y distribución (US$0 de CAC): aplicaciones de consumo operativas en iOS, Android, macOS y el navegador, con Windows y Linux muy pronto. Paga a quienes contribuyen por el ancho de banda, y la subred convierte la capacidad de enrutamiento en un mercado puntuado por confiabilidad, geografía, tiempo de actividad y tráfico real atendido.',
         },
         {
             title: 'La misión',
@@ -66,7 +66,7 @@ export default {
             title: 'Convocatoria de operadores',
             headline: 'Varios negocios listos para construirse sobre UR',
             alt: 'Convocatoria de operadores: seis negocios de ejemplo situados según los usuarios atendidos frente a los datos movidos por cliente, cada uno con un comparable de Web2.',
-            summary: 'Seis propuestas iniciales de ejemplo, situadas según los usuarios atendidos y los datos movidos por cliente, cada una con un comparable de Web2: una VPN de marca blanca (Mozilla VPN, 2 millones de suscriptores), correo empresarial cifrado (Proton, $134 millones de ingresos), la capa de acceso para agentes (Browserbase, valoración de $300 millones), visibilidad en las respuestas de la IA (Profound, valoración de $1.000 millones), verificación de anuncios (DoubleVerify, ~$1.700 millones, cotizada) y búsqueda privada con LLM (DuckDuckGo, $200 millones de ingresos). La tarifa de red es MAU × precio por usuario más GB × precio por GB.',
+            summary: 'Seis propuestas iniciales de ejemplo, situadas según los usuarios atendidos y los datos movidos por cliente, cada una con un comparable de Web2: una VPN de marca blanca (Mozilla VPN, 2 millones de suscriptores), correo empresarial cifrado (Proton, US$134 millones de ingresos), la capa de acceso para agentes (Browserbase, valoración de US$300 millones), visibilidad en las respuestas de la IA (Profound, valoración de US$1.000 millones), verificación de anuncios (DoubleVerify, ~US$1.700 millones, cotizada) y búsqueda privada con LLM (DuckDuckGo, US$200 millones de ingresos). La tarifa de red es MAU × precio por usuario más GB × precio por GB.',
         },
         {
             title: 'Nuestro objetivo',
@@ -84,7 +84,7 @@ export default {
             title: 'Comparables de Web2',
             headline: 'La privacidad empresarial y de consumo son mercados de miles de millones de dólares',
             alt: 'Comparables de Web2: Proton VPN, NordVPN y DuckDuckGo en privacidad de consumo; Zscaler, Cloudflare y Tailscale en privacidad empresarial.',
-            summary: 'Privacidad de consumo: Proton VPN ($134 millones de ingresos), NordVPN (valoración de $3.000 millones) y DuckDuckGo ($200 millones de ingresos), que crecieron con el correo cifrado, la distribución basada en VPN y la búsqueda privada. Privacidad empresarial: Zscaler ($3.360 millones de ARR, 25 % de crecimiento interanual), Cloudflare ($2.810 millones de ingresos, 30 % de crecimiento interanual) y Tailscale (valoración de $1.500 millones), que sustituyeron las VPN perimetrales por confianza cero, extendieron la infraestructura de red al acceso privado y convirtieron las redes en malla impulsadas por desarrolladores en demanda empresarial.',
+            summary: 'Privacidad de consumo: Proton VPN (US$134 millones de ingresos), NordVPN (valoración de US$3.000 millones) y DuckDuckGo (US$200 millones de ingresos), que crecieron con el correo cifrado, la distribución basada en VPN y la búsqueda privada. Privacidad empresarial: Zscaler (US$3.360 millones de ARR, 25 % de crecimiento interanual), Cloudflare (US$2.810 millones de ingresos, 30 % de crecimiento interanual) y Tailscale (valoración de US$1.500 millones), que sustituyeron las VPN perimetrales por confianza cero, extendieron la infraestructura de red al acceso privado y convirtieron las redes en malla impulsadas por desarrolladores en demanda empresarial.',
         },
     ],
 };

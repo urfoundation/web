@@ -1,0 +1,97 @@
+---
+// /ctf in any site language — capture the flag: reward slots in every country
+// (sn CAPTURETHEFLAG.md §9.2; the design is sn's design/ctf/design.html, the
+// build plan design/ctf/SEO.md §2 and §6). The English page (pages/ctf.astro)
+// and its translations (pages/[lang]/ctf.astro) both render this. The page's
+// words are the `ctf` copy unit (react/src/i18n/pages/ctf/), the countries'
+// names the `ctf/names` unit, the shell's (the disclaimer, nav and footer) the
+// site dictionary's.
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/Ctf.jsx), rendered to static HTML from the
+// epoch's snapshot (react/src/data/ctf-epoch.json, scripts/ctf-import.mjs),
+// so every figure is in the HTML that search engines and AI crawlers read.
+// Only the board hydrates (ctf/Board.jsx: the live bar's filters with their
+// view transitions, sorting and the search, the tips, tap to expand, Shuffle
+// and the visitor's country from /sn/ctf/here), with the page's language as a
+// prop. Its first render is this one, and nothing in it varies by build: Easy
+// wins is the epoch's draw and the card shows the biggest open pot, so the
+// page's fingerprint, and its sitemap <lastmod>, change only when the data
+// does.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import CtfPage from '@react/components/pages/Ctf.jsx';
+import Board from '@react/components/pages/ctf/Board.jsx';
+import { CTF } from '@react/components/pages/ctf/data.js';
+import { API_STATE, SITE, hubDescription, hubTitle, localModel } from '@react/components/pages/ctf/model.js';
+import { ctfCopy } from '@react/components/pages/ctf/i18n.js';
+import { pagePath } from '@react/components/pages/ctf/links.js';
+import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
+import { epochBounds } from '@react/lib/epoch.js';
+import { getDict } from '../../lib/i18n.js';
+import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const m = localModel(CTF, lang);
+// the islands' props: English is their default, so the English page's islands carry none, as before
+const islandLang = lang === 'en' ? {} : { lang };
+const copy = ctfCopy(lang);
+const url = `${SITE}${pagePath(lang, '/ctf')}`;
+const description = hubDescription(m);
+// The data as a Dataset (Dataset Search), its distribution the JSON API; a
+// translation's is the same data described in its language.
+const jsonLd = [{
+    '@type': 'Dataset',
+    '@id': `${url}#dataset`,
+    name: copy.dataset.name,
+    description: copy.dataset.description,
+    url,
+    inLanguage: lang,
+    ...(lang === 'en' ? {} : { translationOfWork: { '@id': `${SITE}/ctf#dataset` } }),
+    dateModified: LASTMOD_TOKEN,
+    isAccessibleForFree: true,
+    creator: { '@id': `${SITE}/#org` },
+    spatialCoverage: { '@type': 'Place', name: copy.dataset.coverage },
+    // from the first epoch's start, on the site's time basis, onwards
+    temporalCoverage: `${new Date(epochBounds(CTF.firstEpoch).startMs).toISOString().slice(0, 10)}/..`,
+    variableMeasured: copy.dataset.measured,
+    distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: API_STATE }],
+}];
+---
+<Base
+    title={hubTitle(lang)}
+    description={description}
+    breadcrumbName={copy.program}
+    lang={lang}
+    jsonLd={jsonLd}
+    alternate={{ href: API_STATE, type: 'application/json' }}
+    ogImage={ctfOgImage(m)}
+    ogImageAlt={ctfCardAlt(m)}
+>
+    {/* the board's first chain of requests is the visitor's country */}
+    <link slot="head" rel="preconnect" href="https://api.bringyour.com" crossorigin />
+
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="ctf" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            {/* "Updated" states the sitemap's lastmod: the build fills the
+                token in once the page is fingerprinted (src/lib/lastmod.js) */}
+            <CtfPage lang={lang} updated={LASTMOD_TOKEN}>
+                <Board slot="board" {...islandLang} client:idle={{ timeout: 1500 }} />
+            </CtfPage>
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

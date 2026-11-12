@@ -16,7 +16,7 @@ Los nombres entre paréntesis son otros nombres del mismo comando.
 | `provider setup` | Configura este dispositivo paso a paso: inicio de sesión, registro, dirección de pago, servicio en segundo plano. Se puede volver a ejecutar sin riesgo. `--no-service` omite el servicio, y `--yes --auth-code-file=<path>` lo ejecuta sin preguntas (y omite la dirección de pago). |
 | `provider status` | ¿Está configurado, en ejecución y conectado? Código de salida 0 cuando todo va bien, 3 cuando necesita configuración, 4 cuando no está en ejecución o no está conectado. `--json` para scripts. |
 | `provider doctor` | Por qué no puede iniciar sesión ni conectarse: carpeta de estado, DNS, conexión, TLS, reloj, actualizaciones. |
-| `provider login` (`auth`) | Inicia sesión con un código de autorización, escrito en un aviso oculto. `provider login <auth_code>` toma el código directamente, pero lo deja en el historial de tu shell. `--user_auth='you@example.com'` inicia sesión con el correo de tu cuenta y pide la contraseña. |
+| `provider login` (`auth`) | Inicia sesión con un código de autorización, que se escribe en una solicitud que no lo muestra. `provider login <auth_code>` toma el código directamente, pero lo deja en el historial de tu shell. `--user_auth='you@example.com'` inicia sesión con el correo de tu cuenta y pide la contraseña. |
 | `provider start` (`provide`) | Empieza a minar en esta terminal. El primer inicio en un dispositivo nuevo pregunta antes de registrarlo; `--allow-client-registration` lo registra sin preguntar. `provide` imprime el registro completo en lugar de la vista en directo. |
 | `provider service install` | Ejecuta el minero en segundo plano, con actualizaciones automáticas: en cada arranque en Linux, al iniciar sesión en macOS y en Windows. También `start`, `stop`, `restart`, `status`, `logs --follow` y `uninstall`. |
 | `provider update` | Actualiza a la versión más reciente. `--check` solo comprueba, `--status` muestra la configuración de las actualizaciones automáticas. Consulta [Actualizaciones](/docs/miner/updates). |
@@ -24,7 +24,7 @@ Los nombres entre paréntesis son otros nombres del mismo comando.
 | `provider auth-provide` | Inicia sesión y arranca en un solo comando. |
 | `provider wallet challenge '<coldkey_ss58>'` | Imprime la declaración que hay que firmar para tu wallet de pago. |
 | `provider wallet set '<coldkey_ss58>' …` | Configura tu wallet de pago con una firma o un archivo de seed. Consulta [Cobrar](/docs/miner/rewards#set-your-payout-wallet). |
-| `provider claim --epoch=<epoch> --rpc=<url>` | Comprueba una reclamación de recompensas del pool; añade `--key_file` para enviarla. Consulta [Reclama tus recompensas](/docs/miner/rewards#claim-your-rewards). |
+| `provider claim --epoch=<epoch> --rpc=<url>` | Comprueba una reclamación de recompensas del pool; añade `--key_file` para enviarla. Consulta [Reclamar tus recompensas](/docs/miner/rewards#claim-your-rewards). |
 | `provider network` (`choose_network`) | Muestra el operador vigente. `provider network use <api_url> <connect_url>` elige otro, `provider network reset` vuelve al predeterminado. |
 | `provider operators` | Enumera los operadores de la lista de operadores publicada y tu estado de inicio de sesión con cada uno. |
 | `provider proxy add …` | Añade salidas SOCKS5. Consulta [Varias salidas en un mismo host](/docs/miner/advanced#several-exits-on-one-host). |

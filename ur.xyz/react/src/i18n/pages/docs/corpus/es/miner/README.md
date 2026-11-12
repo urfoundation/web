@@ -8,7 +8,7 @@ description: Empieza a minar en UR en pocos pasos. Qué hace un minero, qué nec
 >
 > - `provider status` dice «development build, never updates itself».
 > - `provider update`, y las actualizaciones automáticas, se niegan con «this is a development build … which never replaces itself with a release».
-> - La comprobación de 10 minutos que revierte una versión nueva que no vuelve conectada nunca se ejecutó.
+> - Nunca llegó a ejecutarse la comprobación de 10 minutos que revierte una versión nueva que no vuelve conectada.
 >
 > La corrección está en la primera versión posterior al 11 de noviembre de 2026, y tu minero no puede instalarla por sí solo. Cuando salga esa versión, descárgala y descomprímela como en [Descarga manual](/docs/miner/install#manual-download) y, en lugar de instalarla, ejecuta su actualización: `./linux/amd64/provider update` con tu carpeta de la tabla (con `sudo` delante para un servicio del sistema), o en Windows `& "$env:TEMP\windows\$Arch\provider.exe" update`. Escribir solo `provider update` ejecuta el minero que tienes, que sigue negándose. La actualización reemplaza el minero que ejecuta tu servicio y lo reinicia.
 >
@@ -85,7 +85,7 @@ irm https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_In
 
 Luego abre una terminal nueva. El instalador pide un código de autorización de tu cuenta de operador (para el operador predeterminado, de tu cuenta de URnetwork en [ur.io](https://ur.io)), registra este dispositivo y empieza a minar.
 
-El instalador llama al comando `urnetwork`, no `provider`. Si lo usaste, escribe `urnetwork` donde esta guía diga `provider`, también en los comandos que el minero imprime para que los copies.
+El instalador le da al comando el nombre `urnetwork`, no `provider`. Si lo usaste, escribe `urnetwork` donde esta guía diga `provider`, también en los comandos que el minero imprime para que los copies.
 
 Para instalar sin instalador, consulta [Descarga manual](/docs/miner/install#manual-download).
 
@@ -97,7 +97,7 @@ provider setup
 
 Te guía por cuatro pasos, y puedes detenerlo y volver a ejecutarlo en cualquier momento; conserva los pasos que ya terminaste:
 
-1. **Iniciar sesión.** Pega un código de autorización de tu cuenta de operador. El aviso oculta lo que pegas.
+1. **Iniciar sesión.** Pega un código de autorización de tu cuenta de operador. La solicitud oculta lo que pegas.
 2. **Registrar este dispositivo.** Un dispositivo nuevo obtiene su propia identidad de minero, guardada en `~/.urnetwork`.
 3. **Dirección de pago.** La dirección de tu coldkey de Bittensor. Setup imprime un mensaje corto; fírmalo en tu app de wallet (Polkadot.js, Talisman o btcli) y pega la firma. Puedes pulsar Enter para omitir este paso y [configurarla más tarde](/docs/miner/rewards#set-your-payout-wallet).
 4. **Mantenerlo en marcha.** Inicia el minero en segundo plano ahora y de nuevo tras cada reinicio (en Windows, cada vez que inicias sesión), y lo mantiene actualizado.
@@ -114,11 +114,11 @@ Un minuto después de que el minero arranque, las líneas Miner, Signed in, Devi
 
 Cuando algo no va bien, `status` imprime el siguiente comando que hay que ejecutar. `provider doctor` busca la causa: la carpeta de estado, el DNS, la conexión, un proxy que inspecciona TLS y el reloj. Consulta [Ejecutar y supervisar](/docs/miner/run) para los registros y para detener e iniciar.
 
-### 4. Haz una copia de seguridad de tu minero
+### 4. Hacer una copia de seguridad de tu minero
 
-Copia la carpeta `~/.urnetwork` en algún lugar privado. Contiene la identidad de este dispositivo y tu historial firmado de la wallet. Si la pierdes, el dispositivo no se puede recuperar, aunque todavía puedas iniciar sesión en tu cuenta. Consulta [Haz una copia de seguridad de tu minero](/docs/miner/run#back-up-your-miner).
+Copia la carpeta `~/.urnetwork` en algún lugar privado. Contiene la identidad de este dispositivo y tu historial firmado de la wallet. Si la pierdes, el dispositivo no se puede recuperar, aunque todavía puedas iniciar sesión en tu cuenta. Consulta [Hacer una copia de seguridad de tu minero](/docs/miner/run#back-up-your-miner).
 
-Eso es todo. Las recompensas se cuentan por época de liquidación, alrededor de una semana en mainnet, y se reclaman cuando la época se cierra: consulta [Cobrar](/docs/miner/rewards). Si algo no funcionó, consulta [Solución de problemas](/docs/miner/troubleshooting).
+Eso es todo. Las recompensas se cuentan por época de liquidación, alrededor de una semana en mainnet, y se reclaman una vez cerrada la época: consulta [Cobrar](/docs/miner/rewards). Si algo no funcionó, consulta [Solución de problemas](/docs/miner/troubleshooting).
 
 ### Paso a paso en lugar de setup
 

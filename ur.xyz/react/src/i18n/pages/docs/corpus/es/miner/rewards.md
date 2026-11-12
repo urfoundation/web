@@ -9,13 +9,13 @@ Tu minero gana por el tráfico que transporta. Esta página cubre las tres parte
 
 Si usaste un instalador, escribe `urnetwork` donde esta página diga `provider`.
 
-## Configura tu wallet de pago
+## Configurar tu wallet de pago
 
 Las recompensas van a una **coldkey** de Bittensor: una dirección ss58 que empieza por `5`. Demuestras que la coldkey es tuya firmando con ella una declaración corta. El operador guarda esa declaración firmada para este dispositivo, así que no basta con una dirección de wallet guardada en el perfil de tu cuenta.
 
 La forma más sencilla es el paso de pago de [`provider setup`](/docs/miner#2-run-setup): imprime el mensaje, lo firmas en tu app de wallet y pegas la firma. Puedes volver a ejecutar `provider setup` más adelante solo para este paso; si usaste un instalador, ejecuta `urnetwork setup --no-service`. Los comandos de abajo hacen lo mismo a mano.
 
-Configura la wallet **después** del primer inicio del dispositivo (`provider setup`, o el primer `provider start`), porque la declaración nombra el dispositivo que registra ese inicio. Antes de eso, `wallet challenge` y `wallet set` fallan con `claim/wallet credential not ready at …/.provider.jwt`.
+Configura la wallet **después** del primer inicio del dispositivo (`provider setup`, o el primer `provider start`), porque la declaración nombra el dispositivo que ese inicio registra. Antes de eso, `wallet challenge` y `wallet set` fallan con `claim/wallet credential not ready at …/.provider.jwt`.
 
 ### Firmar en tu app de wallet (recomendado)
 
@@ -36,7 +36,7 @@ provider wallet set '<coldkey_ss58>' \
 Lo que debe cumplir la firma:
 
 - Sobre la declaración exacta tal como se imprimió, como texto UTF-8 con finales de línea LF y sin salto de línea adicional al final, firmada con sr25519 en el contexto de firma `substrate`. En `--message`, un `\n` literal representa un salto de línea.
-- También se acepta un `signRaw` de la extensión de Polkadot de tipo `bytes`, que envuelve la declaración en `<Bytes>...</Bytes>`.
+- También se acepta un `signRaw` de tipo `bytes` de la extensión de Polkadot, que envuelve la declaración en `<Bytes>...</Bytes>`.
 - Envíala dentro del plazo que imprime el challenge, normalmente cinco minutos.
 
 El comando impreso conserva el operador y el dispositivo que estás usando, así que cópialo en lugar de escribir el tuyo.
@@ -79,21 +79,21 @@ Los validadores miden la calidad del enrutamiento por su cuenta y ponderan los p
 
 Una época de liquidación la fijan los contratos desplegados y la política. En mainnet son 50.400 bloques, unos siete días a 12 segundos por bloque. Cuando una época se cierra, su raíz de pagos se registra y se finaliza antes de que se abran las reclamaciones, así que el trabajo reciente no se puede reclamar de inmediato. El `claim_open_block` que imprime el comando de reclamación, y las ventanas de despliegue publicadas por tu operador, te dicen cuándo.
 
-## Reclama tus recompensas
+## Reclamar tus recompensas
 
 Una reclamación obtiene tu prueba del operador, la comprueba y la envía a la bóveda de liquidación, que paga a tu coldkey. Necesitarás los datos de despliegue publicados por tu operador: su endpoint EVM RPC, la dirección de la bóveda de liquidación y el ID de cadena (964 en mainnet). Iniciar sesión y minar no significan por sí solos que las recompensas de la subred de un operador estén activas; lo dice su despliegue publicado.
 
-### 1. Comprueba la reclamación
+### 1. Comprobar la reclamación
 
 ```bash
 provider claim --epoch='<settlement_epoch>' --rpc='https://<evm-json-rpc>'
 ```
 
-Usa el endpoint EVM RPC de tu operador; puedes repetir `--rpc` para tener respaldos, que se prueban en orden. El minero comprueba la prueba y la raíz de pagos e imprime `epoch`, `no_id`, `coldkey`, `share_bps`, las raíces de pagos, el `contract` de la bóveda, el `claim_open_block` y los datos de la reclamación. Comprueba la coldkey, el contrato y el ID de cadena con el despliegue publicado por tu operador. Una discrepancia en la prueba o en la raíz sale con un error: resuélvela con tu operador antes de enviar.
+Usa el endpoint EVM RPC de tu operador; puedes repetir `--rpc` para tener respaldos, que se prueban en orden. El minero comprueba la prueba y la raíz de pagos e imprime `epoch`, `no_id`, `coldkey`, `share_bps`, las raíces de pagos, el `contract` de la bóveda, el `claim_open_block` y los datos de la reclamación. Comprueba la coldkey, el contrato y el ID de cadena con el despliegue publicado por tu operador. Si la prueba o la raíz no coinciden, el comando sale con un error: resuelve la discrepancia con tu operador antes de enviar.
 
 Sin `--epoch`, el minero elige la época anterior a la actual. Esa época puede estar todavía esperando a que su raíz se finalice, así que puede que la reclamación aún no esté abierta. Indica explícitamente las épocas anteriores sin reclamar.
 
-### 2. Envíala
+### 2. Enviarla
 
 El envío necesita una clave de **relayer** de EVM: una clave secp256k1 aparte con un poco de TAO para el gas en la red Subtensor EVM. Solo paga la comisión; la recompensa sigue yendo a la coldkey de la prueba. Pon su clave hexadecimal de 32 bytes en un archivo privado y pruébala sin enviar nada:
 
@@ -113,7 +113,7 @@ provider claim --epoch='<settlement_epoch>' \
 
 `--key_file` necesita `--rpc`. Cualquier relayer con fondos puede enviar tu prueba: no puede cambiar la coldkey ni recibir la recompensa. La recompensa llega como stake nativo de α en tu coldkey. No hace falta la seed de la coldkey para reclamar.
 
-### 3. Lee el resultado
+### 3. Leer el resultado
 
 | Evento | Significado |
 | --- | --- |

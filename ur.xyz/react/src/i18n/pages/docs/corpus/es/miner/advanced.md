@@ -9,7 +9,7 @@ La mayoría de los mineros no necesitan esta página: el [inicio rápido](/docs/
 
 ## Minar para todos los operadores de la lista
 
-`provider provide --all-operators` mina para todos los operadores de la lista publicada en [ur.xyz/operators.yml](/operators.yml), con un proceso del minero por operador. La forma más sencilla inicia sesión con cada operador usando una **hotkey** de Bittensor, como si fuera una wallet de TAO:
+`provider provide --all-operators` mina para todos los operadores de la lista publicada en [ur.xyz/operators.yml](/operators.yml), con un proceso del minero por operador. La forma más sencilla inicia sesión con cada operador usando una **hotkey** de Bittensor, como wallet de TAO:
 
 ```bash
 provider provide --all-operators --auto-register --hotkey_seed_file=/absolute/private/hotkey.seed
@@ -154,7 +154,7 @@ provider claim-daemon --config=/absolute/path/claim.yml \
   --durable-volumes-sha256='sha256:<reviewed digest>'
 ```
 
-Ejecuta un daemon por cada cola y clave de relayer, y no envíes reclamaciones sueltas ni ejecutes otro daemon con esa clave al mismo tiempo. Conserva la carpeta completa de la cola, incluidos sus archivos auxiliares, después de un envío interrumpido. Una entrada de la cola marcada como `uncertain` necesita conciliar su transacción firmada original. Una entrada de reclamación finalizada muestra que la reclamación fue aceptada; los eventos de pago distinguen las recompensas pagadas del crédito aplazado.
+Ejecuta un daemon por cada cola y clave de relayer, y no envíes reclamaciones sueltas ni ejecutes otro daemon con esa clave al mismo tiempo. Conserva la carpeta completa de la cola, incluidos sus archivos auxiliares, después de un envío interrumpido. Una entrada de la cola marcada como `uncertain` necesita que se concilie su transacción firmada original. Una entrada de reclamación finalizada muestra que la reclamación fue aceptada; los eventos de pago distinguen las recompensas pagadas del crédito aplazado.
 
 Para las cuentas de la liquidación v2, `provider claim-daemon-v2` reclama una cuenta en cuanto su saldo reclamable alcanza `--threshold-rao` (1,9 α de forma predeterminada), y `--claim-now` reclama todo lo reclamable una vez al iniciar. `--v1-config` ejecuta el daemon v1 de arriba en el mismo proceso, compartiendo una sola clave de relayer. Consulta `provider claim-daemon-v2 --help` para ver sus opciones.
 
@@ -164,7 +164,7 @@ De forma predeterminada, cada minero gana en el **pool** de su operador: se paga
 
 ### Quién puede obtener uno
 
-Los validadores solo dan peso a las **200 mejores flotas**; el UID de cualquier otra flota no recibe nada. Las flotas se clasifican por **amplitud de salidas enrutables**, no por tráfico:
+Los validadores solo dan peso a las **200 flotas principales**; el UID de cualquier otra flota no recibe nada. Las flotas se clasifican por **amplitud de salidas enrutables**, no por tráfico:
 
 - Cada dirección de salida por la que un validador enruta un salto de verificación real se reduce a su prefijo de red (un /29 para IPv4, un /48 para IPv6). La puntuación de una flota es el número de prefijos distintos desde los que salen sus dispositivos.
 - Un prefijo compartido con otras flotas del nivel superior se reparte a partes iguales entre ellas, así que muchos dispositivos detrás de una dirección o en un rango pequeño cuentan una vez.
@@ -177,7 +177,7 @@ Para ver dónde estás, la página **Top 200** de ur.io muestra la puntuación y
 ### Lo que cuesta, y los riesgos
 
 - **El registro quema α.** La coldkey de la flota paga la quema de registro actual de la subred, y cada registro nuevo encarece el siguiente. `provider fleet register` muestra la quema actual antes de firmar nada.
-- **Los UID son limitados.** Cuando la subred está llena, un registro nuevo reemplaza al UID con la emisión más baja, una vez terminado el periodo de inmunidad de ese UID. Una flota que sale de las 200 mejores no gana nada, es reemplazada por el siguiente registro y tiene que volver a pagar la quema para regresar.
+- **Los UID son limitados.** Cuando la subred está llena, un registro nuevo reemplaza al UID con la emisión más baja, una vez terminado el periodo de inmunidad de ese UID. Una flota que sale de las 200 principales no gana nada, es reemplazada por el siguiente registro y tiene que volver a pagar la quema para regresar.
 - **Un nivel a la vez.** Un dispositivo vinculado a una flota del nivel superior no gana parte del pool mientras la vinculación esté activa. Si la flota pierde su UID, sus dispositivos vuelven a ganar en el pool de su operador. Las recompensas del pool que un dispositivo ya ganó siguen siendo reclamables.
 - **La vinculación es pública.** Una vinculación publica qué dispositivos pertenecen a tu hotkey y, por tanto, los prefijos de red desde los que salen. Los dispositivos del pool no se vinculan contigo de esta forma.
 
@@ -188,7 +188,7 @@ Necesitas una coldkey de Bittensor con suficiente TAO para la quema, una hotkey 
 1. **Escribe el manifiesto de la flota.** Enumera el ID de cadena de la red, el netuid y el coordinador, un ID de flota, la hotkey de la flota, una generación, y el ID de cliente y la clave pública de cada dispositivo. `provider fleet init` lo construye a partir de los archivos de los mineros, y `provider fleet manifest --manifest=<path>` lo comprueba.
 2. **Registra el UID.** Ejecuta `provider fleet register` con el manifiesto, los archivos de seed de la hotkey y de la coldkey y los endpoints `--substrate`. Sin `--apply` es una ejecución de prueba que indica la quema y la comisión actuales. Añade `--apply` para firmar y difundir, con `--burn_limit_rao` y `--fee_limit_rao` como topes: la cadena rechaza un registro que quemaría más de tu límite.
 3. **Publica el manifiesto.** `provider fleet publish` pone el hash del manifiesto en la cadena desde la hotkey de la flota.
-4. **Vincula cada dispositivo a la hotkey.** Cada vinculación la firman tanto la clave del dispositivo como la hotkey de la flota, así que nadie puede reclamar dispositivos que no ejecuta. Una vinculación empieza no antes de la siguiente época y cubre el rango de épocas que elijas (`--valid_from_epoch`, `--valid_to_epoch`). Puedes:
+4. **Vincula cada dispositivo a la hotkey.** Cada vinculación la firman tanto la clave del dispositivo como la hotkey de la flota, así que nadie puede reclamar dispositivos que no ejecuta. Una vinculación no empieza antes de la siguiente época y cubre el rango de épocas que elijas (`--valid_from_epoch`, `--valid_to_epoch`). Puedes:
    - ejecutar `provider fleet sign` para cada dispositivo, que solo lee archivos locales, y luego pegar su salida en la página Top 200 de ur.io y enviar la transacción que prepara desde tu propia wallet EVM; o
    - ejecutar `provider fleet bind` para cada dispositivo, que envía la vinculación por sí mismo con una clave de relayer de EVM y endpoints `--rpc`.
 5. **Compruébalo y mantenlo.** `provider fleet status` muestra la vinculación de un dispositivo y el UID. `provider fleet revoke` quita un dispositivo a partir de una época futura. Vincula los dispositivos nuevos de la misma forma, y vuelve a vincular antes de la última época de una vinculación.

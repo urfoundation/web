@@ -9,7 +9,7 @@ Las nuevas versiones del minero corrigen problemas y mantienen tu minero compati
 
 ## Actualizaciones automáticas (instaladores)
 
-Todos los instaladores activan las actualizaciones automáticas, salvo en Linux sin sesión de usuario de systemd y en Windows cuando instalas una versión concreta con `-Tag`. De forma predeterminada buscan una versión más reciente en la [página de versiones de build](https://github.com/urnetwork/build/releases) aproximadamente cada 6 horas. Cuando la hay, la descargan, la verifican con el SHA-256 que GitHub publica para ella (una versión sin él no se instala), comprueban que el programa nuevo funciona y lo sustituyen. Un minero que estaba en ejecución se reinicia con la versión nueva; uno que detuviste sigue detenido. Si algo falla, la versión antigua sigue funcionando. Tu identidad en `~/.urnetwork` no se toca, y se conservan tus ajustes de actualización e inicio.
+Todos los instaladores activan las actualizaciones automáticas, salvo en Linux sin sesión de usuario de systemd y en Windows cuando instalas una versión concreta con `-Tag`. De forma predeterminada buscan una versión más reciente en la [página de versiones de build](https://github.com/urnetwork/build/releases) aproximadamente cada 6 horas. Cuando la hay, la descargan, la verifican con el SHA-256 que GitHub publica para ella (una versión sin él no se instala), comprueban que el programa nuevo funciona y lo ponen en lugar del anterior. Un minero que estaba en ejecución se reinicia con la versión nueva; uno que detuviste sigue detenido. Si algo falla, la versión antigua sigue funcionando. Tu identidad en `~/.urnetwork` no se toca, y se conservan tus ajustes de actualización e inicio.
 
 Cómo mantiene cada sistema el calendario:
 

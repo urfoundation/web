@@ -7,7 +7,7 @@ description: El extensor del minero de UR: puertos que abrir, cortafuegos, grupo
 
 Un extensor es un relé que permite a la gente llegar a la red desde lugares donde los servidores del propio operador están bloqueados. Cada minero ejecuta uno junto a su salida, activado de forma predeterminada. Solo funciona cuando internet puede alcanzar tu ordenador en el puerto TCP 443. Si usaste un instalador, escribe `urnetwork` donde esta página diga `provider`.
 
-Un extensor es parte de cada contrato que pasa por él, así que gana una parte de cada contrato que transporta.
+Un extensor es una de las partes de cada contrato que pasa por él, así que gana una parte de cada contrato que transporta.
 
 ## Los puertos
 

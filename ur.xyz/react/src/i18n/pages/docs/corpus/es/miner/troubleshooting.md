@@ -33,9 +33,9 @@ Un archivo descargado con un navegador web queda en cuarentena. Ejecuta `xattr -
 
 ### No aparece nada al pegar el código de autorización
 
-Es intencionado: el aviso oculta el código. Pégalo y pulsa Enter.
+Es intencionado: la solicitud oculta el código. Pégalo y pulsa Enter.
 
-Para desistir, pulsa Ctrl-C: dice `Cancelled.` y no cambia nada. Pulsar Enter con el aviso vacío dice `No auth code was entered`. Ten el código preparado antes de ejecutar `provider login` o `provider setup`.
+Para desistir, pulsa Ctrl-C: dice `Cancelled.` y no cambia nada. Pulsar Enter en la solicitud sin escribir nada dice `No auth code was entered`. Ten el código preparado antes de ejecutar `provider login` o `provider setup`.
 
 ### `That auth code wasn't accepted`
 
@@ -64,7 +64,7 @@ En una red que inspecciona el tráfico cifrado con su propia autoridad de certif
 - *This device isn't signed in yet* (este dispositivo aún no ha iniciado sesión): ejecuta `provider setup` o `provider login`.
 - *This is the first start on this device* (este es el primer inicio en este dispositivo): responde que sí en una terminal, o añade `--allow-client-registration` en un script. Si usaste un instalador, ejecuta `urnet-tools start`: registra un dispositivo nuevo una vez que has iniciado sesión.
 
-`provider provide` solo lo dice cuando el dispositivo no ha iniciado sesión. En un dispositivo que nunca se registró, registra `startup_recovery_required` a menos que añadas `--allow-client-registration`.
+`provider provide` solo lo dice cuando el dispositivo no ha iniciado sesión. En un dispositivo que nunca se registró, escribe `startup_recovery_required` en el registro a menos que añadas `--allow-client-registration`.
 
 En los demás casos, el minero imprime una línea JSON con `"event":"startup_recovery_required"` y sale. Con `provider provide`, como lo ejecutan los instaladores, sale con el código 0 y sigue detenido. `provider start` y el minero en segundo plano de `provider service` salen con el código 1, y el servicio lo reinicia cada 15 a 30 segundos: detenlo con `provider service stop` mientras restauras la carpeta. Esto suele significar que **los archivos de identidad de este dispositivo faltan o no coinciden**, por ejemplo después de pasar a un ordenador nuevo o de restaurar parte de una copia de seguridad. Restaura la carpeta `~/.urnetwork` completa desde tu copia de seguridad. Volver a iniciar sesión no sustituye una identidad perdida, y `--allow-client-registration` tampoco la recupera: solo registra dispositivos nuevos.
 
@@ -119,7 +119,7 @@ El minero vuelve a intentarlo una vez al día. Después de abrir los puertos, re
 
 ### `wallet challenge` o `wallet set` dice `credential not ready`
 
-El dispositivo aún no está registrado. Ejecuta `provider setup`, o inícialo una vez con `provider start` y deja que se registre, y luego configura la wallet. Consulta [Configura tu wallet de pago](/docs/miner/rewards#set-your-payout-wallet).
+El dispositivo aún no está registrado. Ejecuta `provider setup`, o inícialo una vez con `provider start` y deja que se registre, y luego configura la wallet. Consulta [Configurar tu wallet de pago](/docs/miner/rewards#set-your-payout-wallet).
 
 ### Una wallet nueva no aparece enseguida
 
@@ -139,7 +139,7 @@ Guarda la salida y compara el despliegue, la época y los archivos de pago con t
 
 ### Reclamado, pero mi saldo no ha cambiado
 
-Busca `ClaimPaid` o `ClaimPaymentDeferred` en el recibo, y comprueba el stake de α en tu coldkey, no el saldo del relayer. Consulta [Lee el resultado](/docs/miner/rewards#3-read-the-result).
+Busca `ClaimPaid` o `ClaimPaymentDeferred` en el recibo, y comprueba el stake de α en tu coldkey, no el saldo del relayer. Consulta [Leer el resultado](/docs/miner/rewards#3-read-the-result).
 
 ### La conexión se cortó durante una reclamación
 

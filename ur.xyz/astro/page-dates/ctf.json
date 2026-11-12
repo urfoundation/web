@@ -2,7 +2,7 @@
   "about": "The day each page of the ur.xyz page group ctf (react/src/i18n/pages/ctf/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
     "/ar/ctf": {
-      "fingerprint": "427cd9359bddd5c8",
+      "fingerprint": "42d38d48e18ca057",
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/ad": {
@@ -566,8 +566,8 @@
       "lastmod": "2026-11-12"
     },
     "/ctf": {
-      "fingerprint": "fa757af484269575",
-      "lastmod": "2026-11-11"
+      "fingerprint": "1a4b07e338cfa865",
+      "lastmod": "2026-11-12"
     },
     "/ctf/ad": {
       "fingerprint": "1fa50eadd56a6dae",
@@ -1130,7 +1130,7 @@
       "lastmod": "2026-11-11"
     },
     "/de/ctf": {
-      "fingerprint": "b3feee90608ecf5d",
+      "fingerprint": "dbe042a829205865",
       "lastmod": "2026-11-12"
     },
     "/de/ctf/ad": {
@@ -1694,7 +1694,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf": {
-      "fingerprint": "5770bb6eec4b243a",
+      "fingerprint": "e5d29afb1dc7a8da",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/ad": {
@@ -2258,7 +2258,7 @@
       "lastmod": "2026-11-12"
     },
     "/ru/ctf": {
-      "fingerprint": "13843df04a5f1475",
+      "fingerprint": "951b9cbb51982390",
       "lastmod": "2026-11-12"
     },
     "/ru/ctf/ad": {
@@ -2822,7 +2822,7 @@
       "lastmod": "2026-11-12"
     },
     "/zh/ctf": {
-      "fingerprint": "4a26bb435ef02ee6",
+      "fingerprint": "982d104d5e91674c",
       "lastmod": "2026-11-12"
     },
     "/zh/ctf/ad": {

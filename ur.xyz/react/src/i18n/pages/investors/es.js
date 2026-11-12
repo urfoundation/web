@@ -22,11 +22,11 @@ export default {
         },
         'our-letter-to-bittensor': {
             title: 'Nuestra carta a Bittensor',
-            summary: 'Una carta de Jack y Brien sobre el lanzamiento de UR (SN25), el crecimiento de una red global de operadores residenciales y la construcción conjunta de un internet libre y abierto.',
+            summary: 'Una carta de Jack y Brien sobre el lanzamiento de UR (SN25), la expansión de una red global de operadores residenciales y la construcción conjunta de un internet libre y abierto.',
             cta: 'Leer la carta',
             readTime: '6 min de lectura',
             metaTitle: 'Nuestra carta a Bittensor | UR',
-            metaDescription: 'Jack y Brien sobre el lanzamiento de UR (SN25), el crecimiento de una red global de operadores residenciales y la construcción conjunta de un internet libre y abierto.',
+            metaDescription: 'Jack y Brien sobre el lanzamiento de UR (SN25), la expansión de una red global de operadores residenciales y la construcción conjunta de un internet libre y abierto.',
         },
         'conviction-lock': {
             title: 'El equipo de UR bloquea 550.000 alpha a perpetuidad',

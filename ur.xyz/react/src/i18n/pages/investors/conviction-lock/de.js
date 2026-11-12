@@ -11,7 +11,7 @@ export default {
     ],
     body: [
         'Das Managementteam von UR (SN25) hat 550.000 Alpha im Conviction-Mechanismus von Bittensor gesperrt, rund 1,44 Mio. US-Dollar zum Spotpreis am 9. September 2026, im Zustand einer unbefristeten Sperre. Externe Halter hatten bereits vor der Zusage des Teams 323.519 Alpha hinter UR (SN25) gesperrt, rund 844.000 US-Dollar und 7,5 Prozent des Umlaufangebots. Seitdem haben externe Halter weitere 291.974 Alpha gesperrt. Zusammen beläuft sich die Summe nun auf 1.165.493 Alpha, rund 3,04 Mio. US-Dollar und 27,1 Prozent des gesamten umlaufenden SN25-Alpha; das ist die zweitgrößte Gesamtmenge an Alpha, die hinter einem Subnet auf Bittensor gesperrt ist.',
-        'Das Managementteam hat die Sperre unbefristet gesetzt, um seine Überzeugung zu zeigen. Die Position gewinnt nur dann an Wert, wenn das Netzwerk wächst und das Alpha an Wert zulegt. Das ist dieselbe Bedingung für jeden Halter und Validator auf SN25. Die Anreize des Teams stimmen mit denen aller anderen überein, die das Subnet halten und daran arbeiten, denn diese Position kann nur zulegen, wenn das Netzwerk es tut.',
+        'Das Managementteam hat die Sperre unbefristet gesetzt, um seine Überzeugung zu zeigen. Die Position gewinnt nur dann an Wert, wenn das Netzwerk wächst und das Alpha an Wert zulegt. Das ist dieselbe Bedingung für jeden Halter und Validator auf SN25. Die Anreize des Teams stimmen mit denen aller anderen überein, die Alpha des Subnets halten und daran arbeiten, denn diese Position kann nur zulegen, wenn das Netzwerk es tut.',
     ],
     brien: {
         heading: 'Brien Colwell, Core Contributor, sagte:',

@@ -22,11 +22,11 @@ export default {
         },
         'our-letter-to-bittensor': {
             title: 'Unser Brief an Bittensor',
-            summary: 'Ein Brief von Jack und Brien über den Start von UR (SN25), das Wachstum eines globalen Netzwerks von Betreibern aus Privathaushalten und den gemeinsamen Aufbau eines freien und offenen Internets.',
+            summary: 'Ein Brief von Jack und Brien über den Start von UR (SN25), den Ausbau eines globalen Netzwerks von Betreibern aus Privathaushalten und den gemeinsamen Aufbau eines freien und offenen Internets.',
             cta: 'Brief lesen',
             readTime: '6 Min. Lesezeit',
             metaTitle: 'Unser Brief an Bittensor | UR',
-            metaDescription: 'Jack und Brien über den Start von UR (SN25), ein wachsendes globales Netz von Betreibern aus Privathaushalten und den gemeinsamen Aufbau eines freien, offenen Internets.',
+            metaDescription: 'Jack und Brien über den Start von UR (SN25), den Ausbau eines globalen Netzes von Betreibern aus Privathaushalten und den gemeinsamen Aufbau eines freien, offenen Internets.',
         },
         'conviction-lock': {
             title: 'UR-Team sperrt 550.000 Alpha dauerhaft',

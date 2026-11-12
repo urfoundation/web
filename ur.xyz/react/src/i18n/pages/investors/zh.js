@@ -22,11 +22,11 @@ export default {
         },
         'our-letter-to-bittensor': {
             title: '我们致 Bittensor 的信',
-            summary: 'Jack 和 Brien 的一封信，讲述 UR (SN25) 的启动、一个由住宅运营者组成的全球网络的成长，以及携手共建自由开放的互联网。',
+            summary: 'Jack 和 Brien 的一封信，讲述 UR (SN25) 的启动、壮大一个由住宅运营者组成的全球网络，以及携手共建自由开放的互联网。',
             cta: '阅读信函',
             readTime: '6 分钟阅读',
             metaTitle: '我们致 Bittensor 的信 | UR',
-            metaDescription: 'Jack 和 Brien 的一封信，讲述 UR (SN25) 的启动、一个由住宅运营者组成的全球网络的成长，以及携手共建自由开放的互联网。',
+            metaDescription: 'Jack 和 Brien 的一封信，讲述 UR (SN25) 的启动、壮大一个由住宅运营者组成的全球网络，以及携手共建自由开放的互联网。',
         },
         'conviction-lock': {
             title: 'UR 团队永久锁定 550,000 alpha',

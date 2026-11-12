@@ -194,6 +194,16 @@ test('a localized group translates its pages, its family and nothing else', () =
     assert.equal(localized.groupPageHref('/about', 'zh'), '/zh/about');
     assert.equal(localized.groupPageHref('/build', 'zh'), null);
     assert.equal(localized.groupPageHref('/build', 'en'), '/build');
+    // a page's own links: the query and fragment stay; another site's link,
+    // a fragment alone and an English-only page are left to the caller (null)
+    assert.equal(localized.groupPageHref('/ctf/ke#pot', 'de'), '/de/ctf/ke#pot');
+    assert.equal(localized.groupPageHref('/about?ref=home#team', 'ar'), '/ar/about?ref=home#team');
+    assert.equal(localized.groupPageHref('/operators#apps', 'es'), '/es/operators#apps');
+    assert.equal(localized.groupPageHref('/#roles', 'ru'), '/ru#roles');
+    for (const href of ['/build#brief-x', '#epoch-4', '//ur.xyz/about', 'https://github.com/urfoundation', '']) {
+        assert.equal(localized.groupPageHref(href, 'de'), null, href);
+    }
+    assert.equal(localized.groupPageHref('/ctf/ke#pot', 'en'), '/ctf/ke#pot');
     assert.deepEqual(localized.alternatesFor('/es/ctf/ke').map((a) => `${a.hreflang} ${a.path}`), [
         'en /ctf/ke', 'ru /ru/ctf/ke', 'ar /ar/ctf/ke', 'zh /zh/ctf/ke', 'de /de/ctf/ke', 'es /es/ctf/ke', 'x-default /ctf/ke',
     ]);

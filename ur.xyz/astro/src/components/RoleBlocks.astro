@@ -1,5 +1,6 @@
 ---
 import { LANGS } from '../lib/i18n.js';
+import { groupPageHref } from '../lib/route-localization.js';
 
 interface Props { t: any; lang: string; }
 const { t, lang } = Astro.props;
@@ -7,6 +8,8 @@ const prefix = lang && lang !== 'en' ? `/${lang}` : '';
 const roleRoutes = ['operators', 'miners', 'validators'];
 // the "go" arrow points along the reading direction
 const arrow = LANGS[lang]?.dir === 'rtl' ? '←' : '→';
+// the litepaper in the page's language once the docs have it
+const litepaper = groupPageHref('/docs/litepaper', lang) || '/docs/litepaper';
 ---
 <section class="roles" aria-labelledby="roles-title">
     <div class="roles-heading">
@@ -28,8 +31,7 @@ const arrow = LANGS[lang]?.dir === 'rtl' ? '←' : '→';
         })}
     </div>
 
-    {/* the litepaper is English-only, like all the docs: link it directly */}
-    <a class="roles-cta" href="/docs/litepaper">
+    <a class="roles-cta" href={litepaper}>
         {t.homepage.whitepaperCta} <span aria-hidden="true">{arrow}</span>
     </a>
 </section>

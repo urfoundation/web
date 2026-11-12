@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { investorCentre, externalResources, investorResearchPrompt } from '../../../data/investors';
 import { loadPageCopy } from '../../../i18n/page-copy.js';
 import { formatNumber, interpolate, plural } from '../../../i18n/format.js';
+import { groupPageHref } from '../../../../../astro/src/lib/route-localization.js';
 import { rich } from './rich.jsx';
 import { TranslationNotice, categoryLabel, docCopy, docDate, groupCopy, kindLabel, pagePath } from './shared.jsx';
 import './InvestorCentre.css';
@@ -72,9 +73,9 @@ function archiveRows(lang) {
     });
 }
 
-// A row's page in the page's language: the Investor Centre's own documents are
-// translated with it; anything else (the litepaper) is linked as it is.
-const localHref = (lang, href) => (href.startsWith('/investors/') ? pagePath(lang, href) : href);
+// A row's page in the page's language once it has translations: the Investor
+// Centre's own documents and the litepaper; anything else as it is.
+const localHref = (lang, href) => groupPageHref(href, lang) || href;
 
 // What the search box matches: the row's visible text, as the page's script
 // matched each row's textContent before the port.

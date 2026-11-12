@@ -297,14 +297,15 @@ export function ResearchCompetition({ t, copy, initialPhase, lang = 'en' }) {
 }
 
 /**
- * A dictionary sentence with one `{placeholder}` replaced by a link; shown
- * as written when the label is missing or the placeholder is absent.
+ * A dictionary sentence with one `{placeholder}` replaced by a link, to the
+ * page in `lang` when it has translations; shown as written when the label is
+ * missing or the placeholder is absent.
  */
-function withLink(text, placeholder, href, label, className) {
+function withLink(text, placeholder, href, label, className, lang = 'en') {
     const s = String(text || '');
     if (!label || !s.includes(placeholder)) return s;
     return s.split(placeholder).flatMap((part, i) => (i === 0 ? [part] : [
-        <a key={i} className={className} href={href}>{label}</a>,
+        <a key={i} className={className} href={groupPageHref(href, lang) || href}>{label}</a>,
         part,
     ]));
 }
@@ -420,9 +421,10 @@ export function ResearchAreas({ t }) {
 /**
  * The page-level notes after the areas: how the block exports are
  * anonymized, and the program for researchers and builders (its `{vdp}`
- * placeholder renders as the link to the Vulnerability Disclosure Program).
+ * placeholder renders as the link to the Vulnerability Disclosure Program, in
+ * the page's language).
  */
-export function ResearchNotes({ t }) {
+export function ResearchNotes({ t, lang = 'en' }) {
     const { anonymization: a, researchers: r } = t.research;
     return (
         <>
@@ -432,7 +434,7 @@ export function ResearchNotes({ t }) {
             </div>
             <div className="research-subsection" id="researchers">
                 <h2 className="research-subsection-title">{r.title}</h2>
-                <p className="research-subsection-body">{withLink(r.body, '{vdp}', '/vdp', r.vdpLabel, 'research-subsection-link')}</p>
+                <p className="research-subsection-body">{withLink(r.body, '{vdp}', '/vdp', r.vdpLabel, 'research-subsection-link', lang)}</p>
             </div>
         </>
     );

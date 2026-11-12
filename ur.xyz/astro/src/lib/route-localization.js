@@ -149,11 +149,16 @@ export function createRouteLocalization(groups) {
     /**
      * Where the nav and the footer link a page of a page group in `lang`: the
      * page itself in English, its translation once its group is localized, and
-     * nowhere (null: no link) while it is English-only.
+     * nowhere (null: no link) while it is English-only. A page's own links use
+     * it too, as `groupPageHref(href, lang) || href`, so a translated page
+     * links the translations; the href's ?query and #fragment stay, and an
+     * href that is no path on this site (another site's, #fragment) is null.
      */
     function groupPageHref(path, lang) {
         if (!NON_EN_SITE_LANG_CODES.includes(lang)) return path;
-        return hasLocalizedVersion(path) ? localizedPathFor(path, lang) : null;
+        if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//') || !hasLocalizedVersion(path)) return null;
+        const rest = path.search(/[?#]/);
+        return localizedPathFor(path, lang) + (rest < 0 ? '' : path.slice(rest));
     }
 
     /**

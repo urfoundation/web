@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: احصل على المال مقابل التعدين على UR. اضبط محفظة الدفع التي يكسب لها مُعدِّنك، وافهم كيف تُحتسب مكافآت المجمّع لكل حقبة، وطالب بها إلى coldkey الخاص بك.
+description: احصل على المال مقابل التعدين على UR. اضبط محفظة الدفع التي يكسب لها مُعدِّنك، وافهم كيف تُحتسب مكافآت المجمّع لكل حقبة، وطالب بها لتُدفع إلى coldkey الخاص بك.
 ---
 
 # الحصول على المال مقابل التعدين
@@ -25,7 +25,7 @@ description: احصل على المال مقابل التعدين على UR. ا�
 provider wallet challenge '<coldkey_ss58>'
 ```
 
-وقّع البيان المطبوع كما هو بالضبط بذلك coldkey، في محفظة تستطيع توقيع الرسائل الخام باستخدام sr25519، مثل [polkadot.js Apps](https://polkadot.js.org/apps/#/signing) (Developer ← Sign and verify) بحسابك من إضافة Polkadot.js. ثم شغّل أمر `provider wallet set` الذي طبعه التحدي، مع توقيعك. (إن استخدمت مُثبِّتًا، فغيّر `provider` في بدايته إلى `urnetwork`.) يبدو هكذا:
+وقّع البيان المطبوع كما هو بالضبط بذلك coldkey، في محفظة تستطيع توقيع الرسائل الخام باستخدام sr25519، مثل [polkadot.js Apps](https://polkadot.js.org/apps/#/signing) (Developer → Sign and verify) بحسابك من إضافة Polkadot.js. ثم شغّل أمر `provider wallet set` الذي طبعه التحدي، مع توقيعك. (إن استخدمت مُثبِّتًا، فغيّر `provider` في بدايته إلى `urnetwork`.) يبدو هكذا:
 
 ```bash
 provider wallet set '<coldkey_ss58>' \

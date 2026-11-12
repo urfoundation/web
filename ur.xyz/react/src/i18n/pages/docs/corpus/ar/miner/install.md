@@ -61,8 +61,8 @@ curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Prov
 ثم افتح نافذة Terminal جديدة. يحتاج إلى macOS 12 أو أحدث ولا شيء آخر، ويعمل على أجهزة Mac بمعالج Apple silicon وIntel (حتى من طرفية Rosetta، إذ يختار البناء الأصلي). وهو:
 
 - يثبّت `urnetwork` و`urnet-tools` في `~/.local/share/urnetwork-provider/bin` ويضيف ذلك المجلد إلى `PATH` في `~/.zshrc` (وفي `~/.bash_profile` إن كنت تستخدم bash). مرّر `-B` لتركهما دون تغيير؛
-- يشغّل المُعدِّن كوكيل launchd يبدأ عند تسجيل دخولك ويعيد تشغيل المُعدِّن إن تعطّل. قد يعرض macOS إشعار "Background Items Added"؛ وهذا متوقع. يظهر باسم `urnet-tools` ضمن System Settings ← General ← Login Items؛
-- يزيل عنك علامة الحجر الصحي عن التنزيل، ويرفض العمل باستخدام `sudo`.
+- يشغّل المُعدِّن كوكيل launchd يبدأ عند تسجيل دخولك ويعيد تشغيل المُعدِّن إن تعطّل. قد يعرض macOS إشعار "Background Items Added"؛ وهذا متوقع. يظهر باسم `urnet-tools` ضمن System Settings → General → Login Items؛
+- يزيل علامة الحجر الصحي عن الملف المنزَّل نيابةً عنك، ويرفض العمل باستخدام `sudo`.
 
 في macOS، يطبع `--dry-run` كل ما كان سيفعله دون تغيير أي شيء، ويجيب `-y` عن كل سؤال بنفسه. سجل المُعدِّن موجود في `~/Library/Logs/urnetwork/`.
 
@@ -80,7 +80,7 @@ irm https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_In
 - بعد تسجيل دخولك، يسألك هل تريد تشغيل المُعدِّن في الخلفية، الآن وكلما سجّلت الدخول إلى Windows. يعمل مخفيًا، من اختصارات في مجلد Startup، لذا **يتوقف عند تسجيل خروجك**. إن سجّلت الدخول لاحقًا، فشغّل `urnet-tools auto-start on` و`urnet-tools start`؛
 - يثبّت `urnet-tools.cmd` بجانب `urnet-tools.ps1`. إن قال PowerShell "running scripts is disabled"، فاكتب `urnet-tools.cmd` بدلًا من `urnet-tools`.
 
-`urnetwork.exe` غير موقَّع رقميًا، لذا قد يطلب SmartScreen أو Defender التأكيد قبل تشغيله. خيارات Windows بأسلوب PowerShell: `-Tag` و`-AuthCode` و`-NoStart` و`-NoAutoUpdate` و`-AddToStartup` و`-NoStartup` و`-NonInteractive`. تثبيت إصدار برمجي محدد باستخدام `-Tag` يترك التحديثات التلقائية متوقفة. لا يمكن تمرير هذه الخيارات عبر `irm … | iex`: احفظ السكربت وشغّله، مثل `powershell -ExecutionPolicy Bypass -File .\Provider_Install_Win32.ps1 -NoStart`، أو اضبط `$env:URNETWORK_AUTH_CODE` قبل سطر `irm`. يسرد `Get-Help .\Provider_Install_Win32.ps1 -Detailed` جميعها.
+`urnetwork.exe` غير موقَّع رقميًا، لذا قد يطلب SmartScreen أو Defender التأكيد قبل تشغيله. خيارات Windows بأسلوب PowerShell: `-Tag` و`-AuthCode` و`-NoStart` و`-NoAutoUpdate` و`-AddToStartup` و`-NoStartup` و`-NonInteractive`. تثبيت نسخة محددة باستخدام `-Tag` يترك التحديثات التلقائية متوقفة. لا يمكن تمرير هذه الخيارات عبر `irm … | iex`: احفظ السكربت وشغّله، مثل `powershell -ExecutionPolicy Bypass -File .\Provider_Install_Win32.ps1 -NoStart`، أو اضبط `$env:URNETWORK_AUTH_CODE` قبل سطر `irm`. يسرد `Get-Help .\Provider_Install_Win32.ps1 -Detailed` جميعها.
 
 ### الإدارة باستخدام urnet-tools
 
@@ -158,11 +158,11 @@ Move-Item -Force "$env:TEMP\windows\$Arch\provider.exe" "$Dir\provider.exe"
 
 شغّله بالصيغة `& "$Dir\provider.exe"`، أو أضف ذلك المجلد إلى `PATH` لتكتب `provider`. `provider.exe` غير موقَّع رقميًا، لذا قد يطلب SmartScreen أو Defender التأكيد قبل تشغيله.
 
-ثم عُد إلى [البدء السريع](/docs/miner#2-run-setup) وشغّل `provider setup`. تُبقي خدمته الخلفية التثبيت اليدوي محدَّثًا أيضًا؛ راجع [التحديثات](/docs/miner/updates).
+ثم عُد إلى [البدء السريع](/docs/miner#2-run-setup) وشغّل `provider setup`. تُبقي خدمته في الخلفية التثبيت اليدوي محدَّثًا أيضًا؛ راجع [التحديثات](/docs/miner/updates).
 
 ## البناء من المصدر
 
-استخدم إصدار Go الذي يطلبه `sn/go.mod` (حاليًا Go 1.27.3) والمراجعات المطابقة للمستودعات الشقيقة التي تشير إليها توجيهات `replace` فيه. يجب أن يبدو مجلد المصدر هكذا:
+استخدم نسخة Go التي يطلبها `sn/go.mod` (حاليًا Go 1.27.3) والمراجعات المطابقة للمستودعات الشقيقة التي تشير إليها توجيهات `replace` فيه. يجب أن يبدو مجلد المصدر هكذا:
 
 ```text
 urnetwork/

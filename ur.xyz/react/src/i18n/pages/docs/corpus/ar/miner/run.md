@@ -21,7 +21,7 @@ provider start
 
 لا تسجّل إلا جهازًا جديدًا حقًا. لا يستبدل التسجيل أبدًا هوية يملكها المُعدِّن بالفعل، لكن لا تحذف ملفات لتتجاوز خطأً عن هوية مفقودة أو غير مطابقة: راجع [استكشاف الأخطاء وإصلاحها](/docs/miner/troubleshooting#the-miner-stops-straight-away) بدلًا من ذلك.
 
-شغّل كل أوامر المُعدِّن، والخدمة الخلفية، باسم المستخدم نفسه. لكل مستخدم `~/.urnetwork` الخاص به.
+شغّل كل أوامر المُعدِّن، والخدمة في الخلفية، باسم المستخدم نفسه. لكل مستخدم `~/.urnetwork` الخاص به.
 
 ## اختيار مشغّل
 
@@ -83,7 +83,7 @@ provider service stop
 provider service uninstall       # your sign-in and identity are kept
 ```
 
-على خادم، أو للتعدين لكل مستخدمي الحاسوب على Linux أو macOS، استخدم خدمة على مستوى النظام تعمل بصلاحيات root، وحالتها في `/var/lib/urnetwork`: `sudo provider setup --system`، أو `sudo provider service install --system`. أضف `--system` إلى أوامر `provider service` الأخرى لإدارتها. لا توجد خدمة على مستوى النظام في Windows. على Linux، لا تستطيع خدمة المستخدم الاستماع على منفذ TCP رقم 443 لموسِّع المُعدِّن؛ ويشغّله `sudo "$(command -v provider)" service install --system --as="$USER"` كخدمة نظام تبقى باسم مستخدمك ويمكنها الاستماع على ذلك المنفذ. راجع [اسمح للمُعدِّن بالاستماع على المنفذ 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443). لأجهزة كثيرة، يُعدّ `provider setup --yes --auth-code-file=<path>` كل شيء دون أي أسئلة؛ لكنه يتخطى خطوة الدفع، لذا [اضبط محفظة الدفع](/docs/miner/rewards#set-your-payout-wallet) بعد ذلك.
+على خادم، أو للتعدين لكل مستخدمي الحاسوب على Linux أو macOS، استخدم خدمة على مستوى النظام تعمل بصلاحيات root، وحالتها في `/var/lib/urnetwork`: `sudo provider setup --system`، أو `sudo provider service install --system`. أضف `--system` إلى أوامر `provider service` الأخرى لإدارتها. لا توجد خدمة على مستوى النظام في Windows. على Linux، لا تستطيع خدمة المستخدم الاستماع على منفذ TCP رقم 443 لموسِّع المُعدِّن؛ ويشغّله `sudo "$(command -v provider)" service install --system --as="$USER"` كخدمة نظام تبقى باسم مستخدمك ويمكنها الاستماع على ذلك المنفذ. راجع [اسمح للمُعدِّن بالاستماع على المنفذ 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443). لأجهزة كثيرة، يُجري `provider setup --yes --auth-code-file=<path>` الإعداد دون أي أسئلة؛ لكنه يتخطى خطوة الدفع، لذا [اضبط محفظة الدفع](/docs/miner/rewards#set-your-payout-wallet) بعد ذلك.
 
 على Linux وWindows، لن يضيف `provider service install` مُعدِّنًا ثانيًا بجانب مُعدِّن المُثبِّت. على macOS لا يستطيع رؤية وكيل المُثبِّت، لذا إن استخدمت مُثبِّت macOS، فواصل استخدام `urnet-tools` ولا تثبّت خدمة ثانية.
 
@@ -124,7 +124,7 @@ journalctl --user -u ur-miner.service -f
 provider status
 ```
 
-سطر واحد لكل من المُعدِّن، وتسجيل الدخول، وتسجيل الجهاز، والاتصال، والتحديثات، والأمر الذي يجب تشغيله بعد ذلك عندما يكون هناك خلل. ينتهي بالرمز 0 عندما يكون كل شيء على ما يرام، و3 عندما يحتاج الجهاز إلى الإعداد، و4 عندما لا يعمل المُعدِّن أو لا يكون متصلًا. يطبع `provider status --json` الأمر نفسه للسكربتات والمراقبة.
+سطر واحد لكل من المُعدِّن، وتسجيل الدخول، وتسجيل الجهاز، والاتصال، والتحديثات، والأمر الذي يجب تشغيله بعد ذلك عندما يكون هناك خلل. ينتهي بالرمز 0 عندما يكون كل شيء على ما يرام، و3 عندما يحتاج الجهاز إلى الإعداد، و4 عندما لا يعمل المُعدِّن أو لا يكون متصلًا. يطبع `provider status --json` المعلومات نفسها للسكربتات والمراقبة.
 
 ```bash
 provider doctor

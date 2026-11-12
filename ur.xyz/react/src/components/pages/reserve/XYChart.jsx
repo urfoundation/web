@@ -27,6 +27,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
  *            formats this series' tooltip value instead of the chart's
  *   marks    [{ index, label }]: a vertical marker at an index (today)
  *   fmt      tooltip value formatter; axisFmt the y-axis one
+ *   emptyLabel  the tooltip's line for an index where no series has a value
  *   width    the geometry before the container is measured, px
  *   height   optional; otherwise about 0.68 × the width, within 220–300 px
  *
@@ -47,7 +48,7 @@ const f1 = (v) => v.toFixed(1);
 const COMPACT_BELOW = 480; // px: tighter margins, the end label above the point
 const TIP_GAP = 14;
 
-export default function XYChart({ labels, tipLabels, series, fmt, axisFmt, width = 800, height, aria, className = '', marks = [] }) {
+export default function XYChart({ labels, tipLabels, series, fmt, axisFmt, width = 800, height, aria, className = '', marks = [], emptyLabel }) {
     const hostRef = useRef(null);
     const tipRef = useRef(null);
     const tipWidthRef = useRef(200); // the tooltip's last measured width, for placing the next one
@@ -298,7 +299,7 @@ export default function XYChart({ labels, tipLabels, series, fmt, axisFmt, width
             {shown && (
                 <div ref={tipRef} className="xy-tip" style={{ left: tipLeft(shown.left, shown.width, tipWidthRef.current) }} role="status">
                     <p className="xy-tip-label">{(tipLabels || labels)[shown.k]}</p>
-                    {tipRows.length === 0 && <div><span>Nothing this period</span></div>}
+                    {tipRows.length === 0 && <div><span>{emptyLabel}</span></div>}
                     {tipRows.map((s) => (
                         <div key={s.name}>
                             <i

@@ -90,6 +90,8 @@
 .ctf-page .ctf-flag { display: block; flex: none; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); background: #1b1b1b; transform-origin: left center; object-fit: cover; }
 /* the pole stands at the start of the line, so in Arabic the flag waves from its right edge */
 [dir="rtl"] .ctf-page .ctf-flag { transform-origin: right center; }
+/* letter spacing would pull the Arabic letters apart */
+.ctf-page:lang(ar) .ctf-label, .ctf-page:lang(ar) .ctf-crumbs, .ctf-page:lang(ar) .ctf-ribbon, .ctf-page:lang(ar) .ctf-chance { letter-spacing: 0; }
 .ctf-page .ctf-flag-s { width: 36px; height: 27px; }
 .ctf-page .ctf-flag-m { width: 72px; height: 54px; border-radius: 4px; }
 .ctf-page .ctf-flag-l { width: 128px; height: 96px; border-radius: 6px; }

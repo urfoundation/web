@@ -365,7 +365,7 @@ export default {
             many: 'مزوِّدًا',
             other: 'مزوِّد',
         },
-        online: 'متصل',
+        online: 'على الشبكة',
         wonLine: 'فاز {won} · {amount} α',
         noDraw: 'دون قرعة في الحقبة الماضية',
         seen: 'الأيام: {seen}/{days}',

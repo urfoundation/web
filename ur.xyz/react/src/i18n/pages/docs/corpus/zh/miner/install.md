@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: 安装 UR 矿工。适用于 Linux、macOS 和 Windows、带自动更新的安装程序，手动下载，以及从源代码构建 provider。
+description: 安装 UR 矿工。适用于 Linux、macOS 和 Windows 并带自动更新的安装程序、手动下载，以及从源代码构建 provider。
 ---
 
 # 安装矿工
@@ -68,7 +68,7 @@ curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Prov
 
 ### Windows
 
-在普通的 PowerShell 窗口中（不要使用“以管理员身份运行”）：
+在普通的 PowerShell 窗口中（不要使用 “Run as administrator”）：
 
 ```powershell
 irm https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_Install_Win32.ps1 | iex

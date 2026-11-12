@@ -13,7 +13,7 @@ export default {
         heading: 'UR 文档',
         intro: '如何参与 Bittensor SN25 上的 UR 隐私网络：每个角色一份指南，外加解释其所参与机制的 Litepaper。每份文档也以 markdown 格式提供。',
         markdownEnglish: 'markdown 版本为英文。',
-        notice: "> **矿工请注意：如果你的矿工后台服务是由 `provider setup` 或 `provider service install` 设置的，它自 2026.10.22 版本以来就没有自行更新过。** 2026 年 11 月 11 日之后的第一个版本发布后，请手动更新一次：请参阅[如何运行矿工](/docs/miner)顶部的通知。",
+        notice: "> **矿工请注意：如果你的矿工后台服务是由 `provider setup` 或 `provider service install` 设置的，它自 2026.10.22 版本以来就没有自行更新过。** 2026年11月11日之后的第一个版本发布后，请手动更新一次：请参阅[如何运行矿工](/docs/miner)顶部的通知。",
     },
     nav: {
         label: '文档导航',

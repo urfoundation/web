@@ -121,7 +121,7 @@ provider claim --epoch='<settlement_epoch>' \
 | `ClaimPaid` | 该额度已转入你的 coldkey。 |
 | `ClaimPaymentDeferred` | 该额度暂时留在金库中，例如因为它低于最低转账额、价格不可用或转账失败。 |
 
-延期的额度不会过期。一旦可以付款，之后的领取会支付累积的额度，而且任何人都可以通过金库的 `withdrawClaimCredit(bytes32 coldkey)` 方法重试；`snclaim withdraw --vault=v1`（配合 `--coldkey`、`--contract`、`--rpc` 和 `--key_file`）会调用它。再次提交已被接受的领取并不是提款，会因已领取而失败。
+延期的额度不会过期。一旦可以付款，之后的领取会支付累积的额度，而且任何人都可以通过金库的 `withdrawClaimCredit(bytes32 coldkey)` 方法重试付款；`snclaim withdraw --vault=v1`（配合 `--coldkey`、`--contract`、`--rpc` 和 `--key_file`）会调用它。再次提交已被接受的领取并不是提款，会因已领取而失败。
 
 请在权益到期前领取。在主网上是八个周期再加一个宽限周期；此后，未领取的奖励可能会回到同一运营商的池中。到期不会移除已被接受的额度。从结算 v2 的切换周期开始，账户永不过期。
 

@@ -12,8 +12,11 @@
 //   public, verifiable random selection, never with the words of drawing lots
 //   (the owner's decision of 2026-11-12).
 // - Search: in every phase of the data (the committed snapshot and an answer
-//   of each phase, tests/ctf-fixtures.mjs), every title fits 60 graphemes and
-//   every description 175 characters, and none repeats within a language.
+//   of each phase, tests/ctf-fixtures.mjs), with one network operator and with
+//   two (the pages combine every operator of the operator list, and the slot
+//   counts and per-operator lists then take their own forms), every title fits
+//   60 graphemes and every description 175 characters, and none repeats within
+//   a language.
 // - Before a draw no sentence shows a chance (a percentage).
 // - Names: names/<lang>.js is what scripts/ctf-names.mjs writes (CLDR's names
 //   and A–Z, node's ICU permitting), complete, and each form a plain phrase;
@@ -32,7 +35,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { normalize } from '../../../../../scripts/ctf-import.mjs';
 import { namesFiles } from '../../../../../scripts/ctf-names.mjs';
-import { SNAPSHOT, drawnAnswer, firstAnswer } from '../../../../tests/ctf-fixtures.mjs';
+import { SLOT2, SNAPSHOT, combined, drawnAnswer, firstAnswer } from '../../../../tests/ctf-fixtures.mjs';
 import {
     DESCRIPTION_MAX,
     TITLE_MAX,
@@ -179,6 +182,11 @@ const PHASES = {
     pending: normalize(firstAnswer({ pending: true }), null),
     drawn: normalize(drawnAnswer(), null),
     undrawn: normalize(drawnAnswer({ drawn: false }), null),
+    // two operators: before the start (both listed), the first epoch, after a draw and without one
+    twoPrelaunch: { ...SNAPSHOT, operators: [...SNAPSHOT.operators, { ...SNAPSHOT.operators[0], domain: 'example.org', api_url: 'https://api.example.org' }] },
+    twoFirst: combined(firstAnswer(), firstAnswer({ no: 2 })),
+    twoDrawn: combined(drawnAnswer(), drawnAnswer({ no: 2, slot: SLOT2, vary: 7 })),
+    twoUndrawn: combined(drawnAnswer({ drawn: false }), drawnAnswer({ no: 2, slot: SLOT2, vary: 7, drawn: false })),
 };
 const MODELS = Object.fromEntries(Object.entries(PHASES).map(([k, s]) => [k, buildModel(s)]));
 
@@ -226,7 +234,7 @@ test('each language says "wins by default" in words the seo-audit knows, and onl
 
 test('before a draw no sentence in any language claims a default win or shows a chance to win', () => {
     for (const lang of ['en', ...present]) {
-        for (const phase of ['committed', 'first', 'pending', 'undrawn']) {
+        for (const phase of ['committed', 'first', 'pending', 'undrawn', 'twoPrelaunch', 'twoFirst', 'twoUndrawn']) {
             const m = localModel(MODELS[phase], lang);
             for (const c of m.countries) {
                 const said = [countryMessage(m, c), roleLine(m, c, 'p'), roleLine(m, c, 'x'), countryDescription(m, c, DAY), lastEpochFacts(m, c) || '', defaultWinRule(m), presenceSentence(m, c) || '', uninhabitedSentence(c, lang) || ''].join(' ');

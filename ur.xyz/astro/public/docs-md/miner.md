@@ -17,6 +17,8 @@
 
 A UR miner shares your internet connection as an exit for a network operator. Validators check that it really carries traffic, and Bittensor SN25 (netuid 25) pays rewards for that work in the subnet's α token, branded $UR.
 
+Prefer an app? URnetwork's apps are an easy alternative for mining from a phone or computer: install one from [ur.io](https://ur.io), and it mines in the background with URnetwork as its operator. This guide is for the miner program, which runs on Linux, macOS and Windows and can mine for any operator.
+
 This page gets you from nothing to a running miner. The rest of the miner guide goes deeper, one topic per page:
 
 | Page | What it covers |

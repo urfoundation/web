@@ -527,3 +527,9 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
 @media (max-width: 400px) {
     .ctf-page .ctf-start-uname { font-size: 8px; letter-spacing: 0.02em; }
 }
+
+/* More than one network operator: a role has five slots at each, so a grid cell counts its winners ("7/10") in
+   place of five pips at every width, and a country's card lists each operator's figures under a role's line. */
+.ctf-page .ctf-multi .ctf-cell .ctf-cpips, .ctf-page .ctf-multi .ctf-cell.ctf-expanded .ctf-cpips { display: none; }
+.ctf-page .ctf-multi .ctf-cell .ctf-rcount, .ctf-page .ctf-multi .ctf-cell.ctf-expanded .ctf-rcount { display: inline; margin-inline-start: 1px; font: 400 10.5px/1 var(--code-font); color: var(--ctf-soft); }
+.ctf-page .ctf-role-ops { display: block; margin-top: 3px; color: var(--ctf-muted); }

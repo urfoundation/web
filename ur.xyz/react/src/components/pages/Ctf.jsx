@@ -2,7 +2,7 @@ import React from 'react';
 import { CTF } from './ctf/data';
 import Board from './ctf/Board';
 import Countdown from './ctf/Countdown';
-import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, METHOD_URL, OPERATOR_YML, SOURCE_URL, defaultWinRule, localModel, startNote } from './ctf/model';
+import { EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, METHOD_URL, OPERATORS_PATH, OPERATOR_YML, SOURCE_URL, defaultWinRule, localModel, startNote } from './ctf/model';
 import { ctfCopy, formats, interpolate } from './ctf/i18n';
 import { pagePath } from './ctf/links';
 import { rich } from './ctf/rich';
@@ -28,6 +28,10 @@ import './Ctf.css';
  *
  * `updated` is the day the page's content last changed (the sitemap's
  * lastmod), which only the static build knows.
+ *
+ * Capture the flag is part of the SN25 protocol: the page combines every
+ * network operator of the operator list (ctf/model.js), and its fine print
+ * says so, names any operator the import could not read, and links the list.
  */
 export default function CtfPage({ lang = 'en', updated = null, board = null, countdown = null }) {
     const m = localModel(CTF, lang);
@@ -88,14 +92,21 @@ export function Questions({ title, items }) {
     );
 }
 
-/** What a slot is worth, as the data allows: last epoch's, or at epoch 4's scale before the first draw. */
+/**
+ * What a slot is worth, as the data allows: last epoch's (with more than one
+ * operator, whose slots differ, the smallest to the largest), or at epoch 4's
+ * scale before the first draw.
+ */
 export function slotWorth(m) {
     const t = ctfCopy(m.lang).worth;
     const f = formats(m.lang);
-    return m.slot !== null
-        ? rich(t.slot, { slot: f.alpha(m.slot, 3) })
-        : rich(t.scale, { slot: f.alpha(EPOCH4_SLOT_RAO, 3) });
+    if (m.slot === null) return rich(t.scale, { slot: f.alpha(EPOCH4_SLOT_RAO, 3) });
+    if (m.multi && m.slotMin !== m.slotMax) return rich(t.slotMany, { min: f.alpha(m.slotMin, 3), max: f.alpha(m.slotMax, 3) });
+    return rich(t.slot, { slot: f.alpha(m.multi ? m.slotMax : m.slot, 3) });
 }
+
+/** Where the pages link "/sn/ctf": the one operator's state, or with more than one the operator list, which names each API. */
+export const apiHref = (m) => (m.api.state.length === 1 ? m.api.state[0] : OPERATORS_PATH);
 
 function HubQuestions({ m }) {
     const t = ctfCopy(m.lang).hubFaq;
@@ -103,8 +114,9 @@ function HubQuestions({ m }) {
     const live = m.phase !== 'prelaunch';
     const links = {
         ext: (kids) => <a href={pagePath(m.lang, EXTENDER_URL)}>{kids}</a>,
-        api: (kids) => <a href={API_STATE}>{kids}</a>,
+        api: (kids) => <a href={apiHref(m)}>{kids}</a>,
         spec: (kids) => <a href={OPERATOR_YML}>{kids}</a>,
+        list: (kids) => <a href={OPERATORS_PATH}>{kids}</a>,
         code: (kids) => <code>{kids}</code>,
     };
     return (
@@ -129,9 +141,8 @@ export function FinePrint({ m, updated }) {
     const t = all.fine;
     const f = formats(m.lang);
     const links = {
-        api: (kids) => <a href={API_STATE}>{kids}</a>,
-        ur: (kids) => <a href="https://ur.io">{kids}</a>,
-        mail: (kids) => <a href="mailto:support@ur.xyz">{kids}</a>,
+        api: (kids) => <a href={apiHref(m)}>{kids}</a>,
+        list: (kids) => <a href={OPERATORS_PATH}>{kids}</a>,
         method: (kids) => <a href={METHOD_URL}>{kids}</a>,
         source: (kids) => <a href={SOURCE_URL}>{kids}</a>,
         lic: (kids) => <a href={FLAGS_LICENSE}>{kids}</a>,
@@ -140,11 +151,16 @@ export function FinePrint({ m, updated }) {
     return (
         <footer className="ctf-foot">
             {m.potsKnown
-                ? <p>{rich(t.estimate, { slot: f.alpha(m.slot, 3) }, links)}</p>
+                ? <p>{m.multi && m.slotMin !== m.slotMax
+                    ? rich(t.estimateMany, { min: f.alpha(m.slotMin, 3), max: f.alpha(m.slotMax, 3) }, links)
+                    : rich(t.estimate, { slot: f.alpha(m.multi ? m.slotMax : m.slot, 3) }, links)}</p>
                 : <p>{rich(t.published, { first: m.firstEpoch }, links)}</p>}
             <p id="chance-to-win">{rich(t.chance, { drawn: m.drawn && t.chanceDrawn })}</p>
             <p>{t.disclosure}</p>
-            <p>{rich(t.operator, {}, links)}</p>
+            <p>
+                {rich(t.operator, {}, links)}
+                {m.leftOut.length > 0 && f.count(t.leftOut, m.leftOut.length, { names: m.leftOut.map((o) => o.domain).join(all.ops.sep) })}
+            </p>
             <p>
                 {t.data}
                 {m.presence && rich(t.dataPresence, { day: f.dayName(m.presence.day) })}

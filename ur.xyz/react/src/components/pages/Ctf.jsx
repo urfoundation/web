@@ -1,7 +1,8 @@
 import React from 'react';
 import { CTF } from './ctf/data';
 import Board from './ctf/Board';
-import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, METHOD_URL, OPERATOR_YML, SOURCE_URL, defaultWinRule, localModel } from './ctf/model';
+import Countdown from './ctf/Countdown';
+import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, METHOD_URL, OPERATOR_YML, SOURCE_URL, defaultWinRule, localModel, startNote } from './ctf/model';
 import { ctfCopy, formats, interpolate } from './ctf/i18n';
 import { pagePath } from './ctf/links';
 import { rich } from './ctf/rich';
@@ -20,19 +21,24 @@ import './Ctf.css';
  * how the draw works, the questions and the fine print need no script. The
  * board (ctf/Board.jsx: the live bar and its filters, the visitor's country,
  * Easy wins and the grid) is an island, passed in by the static page as
- * `board` and rendered here by the SPA.
+ * `board` and rendered here by the SPA. So is the note above everything else
+ * until capture the flag starts (ctf/Countdown.jsx: when it starts and a
+ * countdown to it), passed in as `countdown`; a snapshot from after the start
+ * has none (model.js startNote).
  *
  * `updated` is the day the page's content last changed (the sitemap's
  * lastmod), which only the static build knows.
  */
-export default function CtfPage({ lang = 'en', updated = null, board = null }) {
+export default function CtfPage({ lang = 'en', updated = null, board = null, countdown = null }) {
     const m = localModel(CTF, lang);
     const t = ctfCopy(m.lang);
     const f = formats(m.lang);
+    const note = startNote(m);
     return (
         <div className="ctf-page">
             <div className="ctf-shell">
-                <header className="ctf-hdr">
+                {note && (countdown || <Countdown {...note} />)}
+                <header className={note ? 'ctf-hdr ctf-hdr-noted' : 'ctf-hdr'}>
                     <div className="ctf-label ctf-label-acc">{t.hub.eyebrow}</div>
                     <h1>{t.program}</h1>
                     <p className="ctf-mission">{t.hub.mission}</p>

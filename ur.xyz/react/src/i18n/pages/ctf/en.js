@@ -86,6 +86,28 @@ export default {
         intro: "Every country has ten slots each epoch (one week): five for providers and five for extenders. A slot nobody wins rolls into that country's pot, and each winner there takes its slot and a fifth of the pot. {rule}",
     },
 
+    // the note at the top of the hub before capture the flag starts, with its countdown on the visitor's clock
+    // (ctf/Countdown.jsx); the build leaves it out once a snapshot from after the start is imported
+    start: {
+        // {first} the first epoch, {block} its first block, {day} the day ("November 27"), {clock} "18:25 UTC"
+        note: 'Capture the flag starts with epoch {first}, at block {block}, about {day}, {clock}.',
+        // what the note says once the start has passed on the visitor's clock
+        live: 'Capture the flag is live from epoch {first}.',
+        // over the countdown's figures (the start is a projection, so about), and under each
+        in: 'Starts in about',
+        days: 'days',
+        hours: 'hours',
+        minutes: 'minutes',
+        seconds: 'seconds',
+        // beside the blocks left to the start
+        blocks: 'Blocks to go',
+        // in the countdown's place once it has started
+        go: 'Live',
+        // the countdown in words for a screen reader, changed at most once a minute: {time} is "15 days",
+        // "20 hours" or "5 minutes" in the page's language (Intl), so it stands where a plain amount of time can
+        about: 'Starts in about {time}.',
+    },
+
     // the rule a newcomer meets: after a draw, or before one
     rule: {
         drawn: 'Where a slot went unclaimed, a new miner who stays online for half the epoch wins by default.',

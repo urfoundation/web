@@ -60,6 +60,107 @@
 .ctf-page .ctf-sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px 20px; flex-wrap: wrap; }
 .ctf-page .ctf-sec-title { display: flex; flex-direction: column; gap: 8px; }
 
+/* the note above everything else until capture the flag starts (ctf/Countdown.jsx): the sentence, the countdown
+   on split tiles in the pixel face, the blocks left with a bar that fills over each block's 12 seconds, and a flag
+   that climbs its pole over the epochs before the start (--ctf-hoist, 0 to 1). Every part keeps its place whatever
+   it shows (the two sentences share one place, and so do the countdown and its live status), so nothing under the
+   note moves when the figures arrive or when it turns live. Without motion nothing rolls, waves, glides or bursts. */
+.ctf-page .ctf-start {
+    --ctf-start-digit: clamp(30px, 3.4vw, 44px);
+    --ctf-flag-w: 46px;
+    --ctf-flag-h: 34px;
+    position: relative;
+    margin-top: 88px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "pole line clock" "pole blocks clock";
+    align-items: center;
+    gap: 16px 44px;
+    padding-block: 24px 22px;
+    padding-inline: 24px 32px;
+    border: 1px solid rgba(237, 143, 255, 0.3);
+    border-radius: 18px;
+    background: radial-gradient(ellipse 300px 220px at 0% 100%, rgba(237, 143, 255, 0.13), transparent 70%), #151215;
+}
+[dir="rtl"] .ctf-page .ctf-start { background: radial-gradient(ellipse 300px 220px at 100% 100%, rgba(237, 143, 255, 0.13), transparent 70%), #151215; }
+.ctf-page .ctf-hdr.ctf-hdr-noted { padding-top: 52px; }
+/* the pole, its finial, and a notch where each of the last epochs before the start begins */
+.ctf-page .ctf-start-pole { grid-area: pole; align-self: stretch; position: relative; width: calc(var(--ctf-flag-w) + 6px); min-height: 118px; }
+.ctf-page .ctf-start-pole::before { content: ""; position: absolute; inset-inline-start: 2px; top: 4px; bottom: 0; width: 3px; border-radius: 2px; background: var(--ctf-muted); }
+.ctf-page .ctf-start-pole::after { content: ""; position: absolute; inset-inline-start: 0; top: 0; width: 7px; height: 7px; border-radius: 50%; background: var(--brand-ui); box-shadow: 0 0 10px rgba(214, 230, 244, 0.45); }
+.ctf-page .ctf-start-notch { position: absolute; inset-inline-start: -1px; width: 9px; height: 1px; background: rgba(214, 230, 244, 0.4); bottom: calc(var(--ctf-flag-h) + (100% - 10px - var(--ctf-flag-h)) / 3); }
+.ctf-page .ctf-start-notch + .ctf-start-notch { bottom: calc(var(--ctf-flag-h) + (100% - 10px - var(--ctf-flag-h)) * 2 / 3); }
+/* the flag's carriage spans the pole under the finial and rises by --ctf-hoist of the rest (a transform, so the
+   page never reflows); as the island starts, the flag glides up from the foot to its place */
+.ctf-page .ctf-start-car { position: absolute; top: 10px; bottom: 0; inset-inline: 0; display: flex; align-items: flex-end; transform: translateY(calc(var(--ctf-hoist) * (var(--ctf-flag-h) - 100%))); transition: transform 1.8s cubic-bezier(0.3, 1.18, 0.4, 1); }
+.ctf-page .ctf-start-flag { position: relative; display: grid; place-items: center; width: var(--ctf-flag-w); height: var(--ctf-flag-h); margin-inline-start: 5px; border-radius: 2px 5px 5px 2px; background: linear-gradient(90deg, transparent 22%, rgba(255, 255, 255, 0.2) 42%, transparent 58%, rgba(16, 16, 16, 0.1) 82%, transparent), linear-gradient(160deg, #F6C4FF, var(--ctf-acc) 55%, #D46FE8); box-shadow: 0 0 22px rgba(237, 143, 255, 0.35); transform-origin: left center; animation: ctf-wave 2.8s ease-in-out infinite; }
+[dir="rtl"] .ctf-page .ctf-start-flag { border-radius: 5px 2px 2px 5px; transform-origin: right center; }
+.ctf-page .ctf-start-flag b { font: 700 calc(var(--ctf-flag-h) * 0.74)/1 var(--ctf-pixel); color: #101010; transform: translateY(0.06em); }
+/* at the start ten pips burst from the flag, five providers' and five extenders' */
+.ctf-page .ctf-start-burst { position: absolute; inset-inline-start: calc(5px + var(--ctf-flag-w) / 2); bottom: calc(var(--ctf-flag-h) / 2); }
+[dir="rtl"] .ctf-page .ctf-start-burst { transform: scaleX(-1); }
+.ctf-page .ctf-start-burst i { position: absolute; left: -3.5px; top: -3.5px; width: 7px; height: 7px; border-radius: 2px; background: var(--ctf-blue); opacity: 0; animation: ctf-burst 1.3s cubic-bezier(0.15, 0.7, 0.3, 1) 0.4s both; }
+.ctf-page .ctf-start-burst i:nth-child(n + 6) { background: var(--ctf-green); }
+.ctf-page .ctf-start-burst i:nth-child(1) { --x: -46px; --y: -30px; --r: -80deg; }
+.ctf-page .ctf-start-burst i:nth-child(2) { --x: 12px; --y: -52px; --r: 120deg; }
+.ctf-page .ctf-start-burst i:nth-child(3) { --x: 58px; --y: -22px; --r: -140deg; }
+.ctf-page .ctf-start-burst i:nth-child(4) { --x: 66px; --y: 30px; --r: 90deg; }
+.ctf-page .ctf-start-burst i:nth-child(5) { --x: 20px; --y: 58px; --r: -60deg; }
+.ctf-page .ctf-start-burst i:nth-child(6) { --x: -28px; --y: -54px; --r: 150deg; }
+.ctf-page .ctf-start-burst i:nth-child(7) { --x: 40px; --y: -48px; --r: -100deg; }
+.ctf-page .ctf-start-burst i:nth-child(8) { --x: 76px; --y: 4px; --r: 70deg; }
+.ctf-page .ctf-start-burst i:nth-child(9) { --x: 48px; --y: 50px; --r: -120deg; }
+.ctf-page .ctf-start-burst i:nth-child(10) { --x: -10px; --y: 64px; --r: 100deg; }
+@keyframes ctf-burst { 0% { opacity: 1; transform: translate(0, 0) scale(0.4) rotate(0deg); } 65% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1) rotate(var(--r)); } }
+.ctf-page .ctf-start[data-last-minute] .ctf-start-flag { animation-duration: 1.4s; }
+.ctf-page .ctf-start[data-phase="live"] .ctf-start-flag { animation-duration: 1.6s; }
+/* the sentence the note says now, over the other, which holds its place unseen */
+.ctf-page .ctf-start-line { grid-area: line; margin: 0; display: grid; font: 400 clamp(19px, 1.85vw, 23px)/1.32 'PPNeueMontreal', sans-serif; letter-spacing: -0.01em; color: var(--ctf-ink); }
+.ctf-page .ctf-start-line > span { grid-area: 1 / 1; }
+.ctf-page .ctf-start-ghost { visibility: hidden; }
+/* the countdown, and in its place once it has started, the status */
+.ctf-page .ctf-start-clock { grid-area: clock; display: grid; }
+.ctf-page .ctf-start-clock > * { grid-area: 1 / 1; }
+.ctf-page .ctf-start-count { display: flex; flex-direction: column; gap: 10px; }
+.ctf-page .ctf-start-tiles { display: flex; align-items: flex-start; gap: 6px; }
+.ctf-page .ctf-start-unit { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+/* a figure's tile, split across the middle like a flip clock's; the pixel face's digits stand high in their
+   line, so the tile pads its top a little more than its foot */
+.ctf-page .ctf-start-num { position: relative; display: flex; direction: ltr; padding: 0.12em 0.14em 0.04em; border: 1px solid rgba(237, 143, 255, 0.4); border-radius: 10px; background: linear-gradient(180deg, #2b1a30, #1e1323 50%, #170f1b 50%, #1f1425); box-shadow: 0 0 24px rgba(237, 143, 255, 0.1), inset 0 1px 0 rgba(255, 225, 255, 0.12); color: var(--ctf-acc); font: 700 var(--ctf-start-digit)/1 var(--ctf-pixel); text-shadow: 0 0 16px rgba(237, 143, 255, 0.5); }
+.ctf-page .ctf-start-num::after { content: ""; position: absolute; inset: 50% 0 auto; height: 1px; background: rgba(16, 16, 16, 0.65); }
+/* one width per digit, so a figure never changes width as it counts; a new digit rolls down into its cell */
+.ctf-page .ctf-start-d { display: block; width: 0.5em; text-align: center; }
+.ctf-page .ctf-start-d > span { display: block; animation: ctf-roll 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes ctf-roll { from { transform: translateY(-40%) scaleY(0.6); opacity: 0; } }
+.ctf-page .ctf-start-sep { padding-top: 0.12em; color: rgba(237, 143, 255, 0.55); font: 700 var(--ctf-start-digit)/1 var(--ctf-pixel); animation: ctf-blink 1s steps(1, end) infinite; }
+@keyframes ctf-blink { 50% { opacity: 0.25; } }
+/* a unit's name, centred under its tile; it may run wider than the tile without widening it */
+.ctf-page .ctf-start-uname { display: flex; justify-content: center; width: 0; font: 400 10px/1.2 var(--code-font); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ctf-faint); white-space: nowrap; }
+/* the last minute: the tiles flare with every second */
+.ctf-page .ctf-start[data-last-minute] .ctf-start-num { animation: ctf-flare 1s ease-out infinite; }
+@keyframes ctf-flare { from { box-shadow: 0 0 40px rgba(237, 143, 255, 0.5), inset 0 1px 0 rgba(255, 225, 255, 0.12); } }
+.ctf-page .ctf-start-go { display: inline-flex; align-items: center; justify-content: center; gap: 0.4em; color: var(--ctf-acc); font: 700 calc(var(--ctf-start-digit) * 1.05)/1 var(--ctf-pixel); letter-spacing: 0.06em; text-transform: uppercase; text-shadow: 0 0 22px rgba(237, 143, 255, 0.5); }
+.ctf-page .ctf-start-go i { flex: none; width: 0.3em; height: 0.3em; border-radius: 50%; background: var(--ctf-acc); animation: ctf-pulse 2s infinite; }
+.ctf-page .ctf-start[data-phase="live"] .ctf-start-count { visibility: hidden; }
+.ctf-page .ctf-start[data-phase="live"] .ctf-start-go { animation: ctf-go 0.9s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes ctf-go { from { opacity: 0; transform: scale(0.88); } }
+/* the blocks left, and a bar that fills over the block counting down; the figure keeps a six-figure width (the
+   pixel face's widest, 888,888, is under 8ch), so the row wraps alike before and after it arrives, and as it ticks */
+.ctf-page .ctf-start-blocks { grid-area: blocks; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.ctf-page .ctf-start-blocks b { display: inline-block; min-width: 8ch; font: 700 15px/1 var(--ctf-pixel); color: var(--ctf-ink); white-space: nowrap; }
+.ctf-page .ctf-start-track { position: relative; width: 64px; height: 3px; border-radius: 2px; background: #2c2830; overflow: hidden; }
+.ctf-page .ctf-start-bar { position: absolute; inset: 0; background: rgba(237, 143, 255, 0.75); transform-origin: left center; animation: ctf-block 12s linear both; }
+[dir="rtl"] .ctf-page .ctf-start-bar { transform-origin: right center; }
+@keyframes ctf-block { from { transform: scaleX(0); } }
+/* the blocks left show once the clock runs, and no more once it has started */
+.ctf-page .ctf-start:not(.ctf-start-on) .ctf-start-blocks, .ctf-page .ctf-start[data-phase="live"] .ctf-start-blocks { visibility: hidden; }
+.ctf-page:lang(ar) .ctf-start-uname, .ctf-page:lang(ar) .ctf-start-go { letter-spacing: 0; }
+@media (prefers-reduced-motion: reduce) {
+    .ctf-page .ctf-start-car { transition: none; }
+    .ctf-page .ctf-start-flag, .ctf-page .ctf-start-d > span, .ctf-page .ctf-start-sep, .ctf-page .ctf-start[data-last-minute] .ctf-start-num, .ctf-page .ctf-start[data-phase="live"] .ctf-start-go, .ctf-page .ctf-start-go i { animation: none; }
+    .ctf-page .ctf-start-burst, .ctf-page .ctf-start-track { display: none; }
+}
+
 /* the live bar: wraps instead of scrolling; hairline separators come from the 1px gap */
 .ctf-page .ctf-live { display: flex; flex-wrap: wrap; gap: 1px; background: var(--ctf-line); border: 1px solid var(--ctf-line); border-radius: 12px; overflow: hidden; }
 .ctf-page .ctf-live > * { background: #0d0d0d; flex: 1 1 auto; }
@@ -305,6 +406,8 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
 /* touch sizes, tablet and mobile (1099px and below): tap to expand replaces hover */
 @media (max-width: 1099px) {
     .ctf-page .ctf-shell { width: calc(100% - 48px); }
+    /* the note stacks: the sentence, the countdown and the blocks left, beside the pole */
+    .ctf-page .ctf-start { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "pole line" "pole clock" "pole blocks"; align-items: start; justify-items: start; gap: 18px 26px; }
     .ctf-page .ctf-touch-block { display: block; }
     /* three to a row, and a row's last items share its width, so no cell is left empty */
     .ctf-page .ctf-live > * { flex: 1 1 calc(33.3% - 1px); min-width: 0; }
@@ -349,6 +452,12 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
 /* mobile: 600px and below */
 @media (max-width: 600px) {
     .ctf-page .ctf-shell { width: calc(100% - 32px); }
+    .ctf-page .ctf-start { --ctf-start-digit: clamp(22px, 7.4vw, 32px); --ctf-flag-w: 34px; --ctf-flag-h: 25px; gap: 16px 14px; padding-block: 20px 18px; padding-inline: 14px 16px; border-radius: 16px; }
+    .ctf-page .ctf-hdr.ctf-hdr-noted { padding-top: 40px; }
+    .ctf-page .ctf-start-line { font-size: 17px; }
+    .ctf-page .ctf-start-tiles { gap: 3px; }
+    .ctf-page .ctf-start-num { border-radius: 8px; }
+    .ctf-page .ctf-start-uname { font-size: 9px; letter-spacing: 0.06em; }
     .ctf-page .ctf-legend .ctf-mob-only { display: inline-flex; }
     .ctf-page .ctf-hdr { padding: 88px 0 20px; gap: 12px; }
     .ctf-page .ctf-intro { font-size: 15.5px; }
@@ -412,4 +521,9 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
     .ctf-page .ctf-more-cta-3 { grid-template-columns: 1fr 1fr; }
     .ctf-page .ctf-steps { grid-template-columns: minmax(0, 1fr); }
     .ctf-page .ctf-steps .ctf-step:last-child { grid-column: auto; }
+}
+
+/* a narrow phone (400px and below): the countdown's unit names set closer, so the longest clear their neighbours */
+@media (max-width: 400px) {
+    .ctf-page .ctf-start-uname { font-size: 8px; letter-spacing: 0.02em; }
 }

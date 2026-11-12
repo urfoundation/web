@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Referencia del minero de UR. Los comandos y opciones de provider, los comandos urnet-tools de los instaladores, los archivos que guarda el minero, variables de entorno y un glosario.
+description: Referencia del minero de UR: comandos y opciones de provider, comandos urnet-tools de los instaladores, archivos del minero, variables de entorno y un glosario.
 ---
 
 # Referencia del minero

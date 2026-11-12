@@ -64,9 +64,11 @@ const RO=new ResizeObserver(es=>es.forEach(e=>{if(e.target._draw)run(e.target._d
 UR.bindDraw=(el,fn)=>{el._draw=fn;RO.observe(el);run(fn)};
 // Whether the panel holding `el` has its data (`ok`), and if not, what it shows instead (page.css .pn.na): its title
 // and a short note, the chain's own (chain) when what it lacks is read from Bittensor mainnet, which the visitor's
-// network may not reach, else the page's. `wait`: not yet, the read is still on its way (its figures shimmer, .wait).
-// Returns ok, so a part can draw only when there is something to draw.
+// network may not reach, else the page's. `wait`: not yet, the read is still on its way (its figures shimmer, .wait),
+// as every panel's is while Grafana's first reads are still out (SNAP.LOADING). Returns ok, so a part can draw only
+// when there is something to draw.
 UR.need=(el,ok,{chain=false,wait=false}={})=>{const pn=el&&el.closest('.pn');ok=!!ok;if(!pn)return ok;
+  if(!chain&&window.SNAP.LOADING)wait=true;
   pn.classList.toggle('na',!ok&&!wait);pn.classList.toggle('wait',!ok&&wait);
   if(ok||wait)delete pn.dataset.na;else pn.dataset.na=chain?TX.chainUnavailable:TX.unavailable;
   return ok};
@@ -97,9 +99,10 @@ function derive(){
   /* SN25: the epoch is the stats feed's (none without it) */
   for(const k of Object.keys(EP))delete EP[k];
   const E0=S.EPOCH;
-  if(E0){Object.assign(EP,{n:E0.n,start:E0.start,end:E0.end,now:NOW});
-    EP.p=(NOW-EP.start)/(EP.end-EP.start);EP.days=(NOW-EP.start)/DAY;
-    const lm=Math.max(0,Math.floor((EP.end-NOW)/6e4)),lh=Math.floor(lm/60),p2=x=>String(x).padStart(2,'0');EP.leftTxt=lh>=24?UR.f(TX.time.leftDays,{days:Math.floor(lh/24),hours:p2(lh%24)}):UR.f(TX.time.leftHours,{hours:lh,minutes:p2(lm%60)})}
+  // its progress and time left by the clock: the stats feed can answer minutes after the page read the rest
+  if(E0){const now=Date.now();Object.assign(EP,{n:E0.n,start:E0.start,end:E0.end,now});
+    EP.p=(now-EP.start)/(EP.end-EP.start);EP.days=(now-EP.start)/DAY;
+    const lm=Math.max(0,Math.floor((EP.end-now)/6e4)),lh=Math.floor(lm/60),p2=x=>String(x).padStart(2,'0');EP.leftTxt=lh>=24?UR.f(TX.time.leftDays,{days:Math.floor(lh/24),hours:p2(lh%24)}):UR.f(TX.time.leftHours,{hours:lh,minutes:p2(lm%60)})}
   const px=(a,b)=>a==null||b==null?null:UR.pct(a,b);
   Object.assign(TOKEN,S.TOKEN,{d24:px(Hs.price[NH-1],Hs.price[NH-25]),d7:(()=>{const p=D.price.filter(v=>v!=null);return p.length>7?px(Hs.price[NH-1],p[p.length-8]):null})()});
   // the reserve, its emission and its routing are Bittensor mainnet's: null while the page can't read it
@@ -107,8 +110,9 @@ function derive(){
     programs:[['Regional Pre-Install','Network coverage','In preparation'],['Additional exit coverage for an existing operator','Network coverage','Indicative'],['Reliability on existing operator routes','Route reliability','Indicative'],['Provider capacity for a second operator','Operator onboarding','Indicative']],
     wallet:S.RESERVE.wallet}:null;
   UR.NEWC={};[1,3,7,30,90].forEach(P=>{const past=S.COUNTRY_PAST[P]||{};UR.NEWC[P]=Object.keys(past).length?COUNTRIES.filter(c=>!past[c.c]).map(c=>c.c):[]});
-  // the last 24 hours carried (the Data carried card), spread per second; else the last full day; 0 without either
-  UR.BPS=(()=>{const h=Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;const a=h.slice(Math.max(0,e-23),e+1).filter(v=>v!=null);return a.length===24?a.reduce((x,y)=>x+y,0):(D.traffic[ND-1]||0)})()*1e12/86400;
+  // the last 24 hours carried (the Data carried card), spread per second, while they end in the last hours (the newest
+  // hour or two can still be empty; without panel 1's 24-hour sum the last 72 are); else the last full day; 0 without either
+  UR.BPS=(()=>{const h=Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;const a=h.slice(Math.max(0,e-23),e+1).filter(v=>v!=null);return a.length===24&&e>=NH-3?a.reduce((x,y)=>x+y,0):(D.traffic[ND-1]||0)})()*1e12/86400;
 }
 run(derive);
 
@@ -120,8 +124,11 @@ UR.setP=p=>{UR.P=p;UR.subs.forEach(run)};
 UR.setOrg=o=>{UR.ORG=o;UR.subs.forEach(run)};
 // a part of the page drawn from the data alone (not the period): now, and again on each refresh
 UR.part=f=>{UR.parts.push(f);run(f)};
-// more data has arrived (loader.js merged it into SNAP): derive again, and draw every part and chart again
-UR.refresh=()=>{run(derive);UR.parts.forEach(run);UR.subs.forEach(run)};
+// more data has arrived (loader.js merged it into SNAP): derive again, and draw every part and chart again; the focus,
+// if the redraw took its element away, goes to the same chart or to the element with the same id
+UR.refresh=()=>{const a=document.activeElement,box=a&&a!==document.body&&a.closest?a.closest('[id]'):null,svg=a&&a.tagName==='svg';
+  run(derive);UR.parts.forEach(run);UR.subs.forEach(run);
+  if(box&&!a.isConnected){const b=document.getElementById(box.id),f=b&&(svg?b.querySelector('svg'):b);if(f&&f.focus)f.focus({preventScroll:true})}};
 // the period's step: an hour (1D), 6 hours (3D) or a day; names the copy's per-step strings
 UR.bucketKey=()=>({1:'hour',3:'sixHours'})[UR.P]||'day';
 UR.windowLab=()=>{const P=UR.P;if(P<=3){return `${fmtDwT(NOW-P*DAY)}, ${hh(NOW-P*DAY)} to ${fmtDwT(NOW)}, ${hh(NOW)}`}return `${fmtD(UR.END-(P-1)*DAY)} to ${fmtD(UR.END)}, the last full day`};

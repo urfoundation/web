@@ -70,9 +70,13 @@ const plain = (o) => JSON.parse(JSON.stringify(o, (k, v) => (typeof v === 'bigin
 
 async function pool(items, n, fn) {
     const out = new Array(items.length);
-    let next = 0;
+    let next = 0, failed = false;
     await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => {
-        while (next < items.length) { const i = next++; out[i] = await fn(items[i], i); }
+        // once an item has failed the whole fails: no more items are started
+        while (next < items.length && !failed) {
+            const i = next++;
+            try { out[i] = await fn(items[i], i); } catch (e) { failed = true; throw e; }
+        }
     }));
     return out;
 }
@@ -180,34 +184,49 @@ async function countriesAt(g, t, panel = 33) {
  * Pull the history up to the end of yesterday (UTC) and merge it into `prev`
  * (the existing history.json, or null). Days already in `prev` are kept;
  * Grafana's figures for the last `days` days replace them, since late data
- * can still settle.
+ * can still settle. Any read that fails fails the whole, unless `soft` (the
+ * browser filling the file's gap): then a series that can't be read is left
+ * as it was, and the history comes back marked `partial` for the page to ask
+ * again later.
  */
-export async function buildHistory({ g = grafana(), prev = null, now = Date.now(), days = ND, chain = true, countries = true, archive = FINNEY_ARCHIVE, log = () => {} } = {}) {
+export async function buildHistory({ g = grafana(), prev = null, now = Date.now(), days = ND, chain = true, countries = true, archive = FINNEY_ARCHIVE, soft = false, log = () => {} } = {}) {
     const today = day(now), end = today - DAY;
     const from = end - (days - 1) * DAY;
     const h = prev ? structuredClone(prev) : { version: 1, days: {}, countries: {}, names: {}, settlePx: {}, tph: null };
+    const part = async (what, fn) => {
+        try {
+            return await fn();
+        } catch (e) {
+            if (!soft) throw e;
+            h.partial = true;
+            log(`${what}: ${e.message}`);
+            return null;
+        }
+    };
 
     const put = (d, k, v) => { if (v != null) (h.days[d] ||= {})[k] = v; };
-    await pool(GAUGES, 4, async ([k, pid, how]) => {
+    await pool(GAUGES, 4, ([k, pid, how]) => part(k, async () => {
         const f = longest(await g.post(pid, from, today, H, Math.ceil((today - from) / H)));
         let vals = byDay(f, how);
         if (k === 'throughput') vals = Object.fromEntries(Object.entries(vals).map(([d, v]) => [d, v / 1e9]));
         for (const [d, v] of Object.entries(vals)) if (d >= iso(from) && d <= iso(end)) put(d, k, v);
         log(`${k}: ${Object.keys(vals).length} days`);
-    });
+    }));
     // daily panels: each point covers the day ending at its timestamp
     for (const [k, pid, scale] of [['traffic', 31, 1e12], ['newNets', 42, 1]]) {
-        const f = longest(await g.post(pid, from + DAY, end + DAY, DAY));
-        if (f) f.t.forEach((t, i) => { const d = iso(day(t) - DAY); if (f.v[i] != null && d >= iso(from) && d <= iso(end)) put(d, k, f.v[i] / scale); });
+        await part(k, async () => {
+            const f = longest(await g.post(pid, from + DAY, end + DAY, DAY));
+            if (f) f.t.forEach((t, i) => { const d = iso(day(t) - DAY); if (f.v[i] != null && d >= iso(from) && d <= iso(end)) put(d, k, f.v[i] / scale); });
+        });
     }
     // hourly throughput, 90 days, for the hour-of-day pattern and the hourly split of data carried
-    {
+    await part('hourly throughput', async () => {
         const f = longest(await g.post(3, today - ND * DAY, today, H, 2200));
         const m = {};
         if (f) f.t.forEach((t, i) => { if (f.v[i] != null) m[Math.floor(t / H) * H] = f.v[i]; });
         const t0 = today - ND * DAY + H;
         h.tph = { t0, v: Array.from({ length: ND * 24 }, (_, i) => (m[t0 + i * H] != null ? +(m[t0 + i * H] / 1e9).toFixed(4) : null)) };
-    }
+    });
     // countries at the end of each day (00:00 UTC of the next); only days not stored yet, the newest first
     const missing = [];
     if (countries) for (let t = end; t >= from; t -= DAY) if (!h.countries[iso(t)]) missing.push(t);
@@ -218,14 +237,16 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
         } catch (e) { log(`countries ${iso(t)}: ${e.message}`); }
     });
     // the α price at each epoch's settlement (its start, which ends the epoch before)
-    const st = await g.stats();
+    const st = (await part('stats', () => g.stats())) || {};
     if (st.epoch_start) {
         for (let s = st.epoch_start * 1000, k = 0; k < 4 && s >= from; s -= EPOCH_MS, k++) {
             if (h.settlePx[s] != null) continue;
-            const f = longest(await g.post(24, s - 2 * H, s + H, H, 10));
-            let best = null;
-            if (f) f.t.forEach((t, i) => { if (f.v[i] != null && t <= s + H && (!best || Math.abs(t - s) < Math.abs(best[0] - s))) best = [t, f.v[i]]; });
-            if (best) h.settlePx[s] = best[1];
+            await part('settlement price', async () => {
+                const f = longest(await g.post(24, s - 2 * H, s + H, H, 10));
+                let best = null;
+                if (f) f.t.forEach((t, i) => { if (f.v[i] != null && t <= s + H && (!best || Math.abs(t - s) < Math.abs(best[0] - s))) best = [t, f.v[i]]; });
+                if (best) h.settlePx[s] = best[1];
+            });
         }
     }
     // every finished epoch: its dates, users and operator deposits (Grafana panels 17 and 18, which
@@ -238,7 +259,10 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
         // each panel has two series: A counts up through the current epoch, B holds the last finished epoch's total
         // from just after it ends. A resets hours after the boundary (and dips mid-epoch), so its maximum over an
         // epoch can pick up the epoch before's total; B, read just after the epoch ends, is that epoch's own figure.
-        const [[uf, ub], [df, db]] = await Promise.all([17, 18].map((pid) => g.post(pid, MAINNET_FROM, today, H, hours).then((fs) => ['A', 'B'].map((r) => fs.find((f) => f.ref === r)))));
+        const panels = await part('epochs', () => Promise.all([17, 18].map((pid) => g.post(pid, MAINNET_FROM, today, H, hours).then((fs) => ['A', 'B'].map((r) => fs.find((f) => f.ref === r))))));
+        // without them (soft), the epochs the history has stay as they were
+        if (!panels) return finish();
+        const [[uf, ub], [df, db]] = panels;
         const after = (f, b) => { if (!f) return null; for (let i = 0; i < f.t.length; i++) if (f.t[i] > b && f.t[i] <= b + DAY && f.v[i] != null) return f.v[i]; return null; };
         const before = (f, a, b) => { let v = null; if (f) f.t.forEach((t, i) => { if (t > a && t <= b && f.v[i] != null) v = f.v[i]; }); return v; };
         const kept = h.epochs || {};
@@ -280,9 +304,13 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
             log(`reserve: ${samples.length}/${blocks.length} days`);
         } catch (e) { log(`reserve history: ${e.message}`); }
     }
-    h.end = iso(end);
-    h.updated = new Date(now).toISOString();
-    return h;
+    return finish();
+
+    function finish() {
+        h.end = iso(end);
+        h.updated = new Date(now).toISOString();
+        return h;
+    }
 }
 
 // ── the live view (browser, on load) ──────────────────────────────────────
@@ -304,19 +332,23 @@ export function liveReads({ g = grafana(), history = null, now = Date.now(), end
     // days the history file doesn't have yet (it's refreshed when the site is deployed) are read here from
     // Grafana: only the gap, without the per-day countries or the archive node's reserve balances
     const gap = history?.end ? Math.round((day(NOW) - DAY - Date.parse(history.end)) / DAY) : ND;
+    // an answer without the figures it is for (no frame, no country) is no answer: it rejects, to be asked again
+    const some = (what) => (v) => (v == null ? Promise.reject(new Error(`${what}: no data`)) : v);
+    const places = (what) => (c) => (Object.keys(c.counts).length ? c : Promise.reject(new Error(`${what}: no countries`)));
     const reads = {
         stats: () => g.stats(),
-        history: () => (gap > 0 ? buildHistory({ g, prev: history, now: NOW, days: Math.min(ND, gap + 2), chain: false, countries: !history }) : Promise.resolve(history)),
-        t24: () => g.post(1, hourEnd - 24 * H, hourEnd, H, 10).then((fs) => last(fs[0])),
-        t72: () => g.post(1, hourEnd - 72 * H, hourEnd, H, 10).then((fs) => last(fs[0])),
-        countries: () => countriesAt(g, NOW),
-        extenders: () => countriesAt(g, NOW, 71),
-        countries1: () => countriesAt(g, NOW - DAY),
-        countries3: () => countriesAt(g, NOW - 3 * DAY),
+        // soft: a series it can't read is left out, and the history comes back partial (the loader asks again)
+        history: () => (gap > 0 ? buildHistory({ g, prev: history, now: NOW, days: Math.min(ND, gap + 2), chain: false, countries: !history, soft: true }) : Promise.resolve(history)),
+        t24: () => g.post(1, hourEnd - 24 * H, hourEnd, H, 10).then((fs) => last(fs[0])).then(some('panel 1')),
+        t72: () => g.post(1, hourEnd - 72 * H, hourEnd, H, 10).then((fs) => last(fs[0])).then(some('panel 1')),
+        countries: () => countriesAt(g, NOW).then(places('panel 33')),
+        extenders: () => countriesAt(g, NOW, 71).then(places('panel 71')),
+        countries1: () => countriesAt(g, NOW - DAY).then(places('panel 33')),
+        countries3: () => countriesAt(g, NOW - 3 * DAY).then(places('panel 33')),
         reserve: () => readReserve({ address: RESERVE_WALLET, endpoints, signal }).then(plain),
         conviction: () => readConviction({ endpoints, signal }),
     };
-    for (const [k, pid] of GAUGES) reads[`hourly.${k}`] = () => g.post(pid, hourEnd - (NH + 1) * H, NOW, H, NH + 2).then(longest);
+    for (const [k, pid] of GAUGES) reads[`hourly.${k}`] = () => g.post(pid, hourEnd - (NH + 1) * H, NOW, H, NH + 2).then(longest).then(some(`panel ${pid}`));
     return reads;
 }
 
@@ -325,10 +357,11 @@ export function liveReads({ g = grafana(), history = null, now = Date.now(), end
  * liveReads' names, a part that hasn't answered left out. A missing part never throws: what it
  * feeds comes back null (a figure, a list, the epoch, the reserve), empty (the countries) or
  * as gaps in a series, and the page shows its panel as unavailable. `history` (the file) stands
- * in until the history read answers. `pending`: the reads the page waits for before it calls a
- * part unavailable (PENDING; the loader names the chain's first reads).
+ * in until the history read answers. `pending`: the chain's reads the page still waits for
+ * (PENDING), and `loading`: Grafana's first reads are still out (LOADING): until then a panel
+ * without its data shimmers rather than call itself unavailable.
  */
-export function assembleLive(answers = {}, { history = null, now = Date.now(), pending = [] } = {}) {
+export function assembleLive(answers = {}, { history = null, now = Date.now(), pending = [], loading = false } = {}) {
     const NOW = now, hourEnd = Math.floor(NOW / H) * H;
     const hourT = Array.from({ length: NH }, (_, i) => hourEnd - (NH - 1 - i) * H);
     const st = answers.stats || null, reserve = answers.reserve || null;
@@ -402,6 +435,7 @@ export function assembleLive(answers = {}, { history = null, now = Date.now(), p
         },
         HISTORY: { end: hist.end, updated: hist.updated, rebuilt: !!answers.history && answers.history !== history },
         PENDING: [...pending],
+        LOADING: !!loading,
     };
 }
 

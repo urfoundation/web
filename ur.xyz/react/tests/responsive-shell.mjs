@@ -4,7 +4,9 @@
 // and locks down the shared navigation contract at the two responsive boundaries.
 // /dashboard, standalone (no site nav or footer), is checked in every language,
 // tab by tab: Grafana answered by tests/dashboard-fixture.mjs, Bittensor mainnet
-// left unreachable, as on a network that blocks it.
+// left unreachable, as on a network that blocks it; and once, how it takes
+// answers that come late: a Grafana read held until the page has drawn, and one
+// refused until the page asks again.
 import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -306,13 +308,80 @@ async function auditDashboard(page, route, lang, profile, errors) {
     assert(state.overflow <= 1, `${route} #${tab} overflows horizontally by ${state.overflow}px at ${profile.width}px`);
     assert(state.waiting === 0, `${route} #${tab} still waits for the unreachable chain`);
     for (const [id, text] of state.unavailable) unavailable.set(id, text);
-    if (tab === 'overview') assert(state.sna === chainLine, `${route} SN25 card says "${state.sna}" for the unreachable chain`);
+    if (tab === 'overview') {
+      assert(state.sna === chainLine, `${route} SN25 card says "${state.sna}" for the unreachable chain`);
+      // the live figures (the stats feed's and the hourly gauges') are drawn
+      const live = await page.evaluate(() => ['#o-users', '#o-prov', '#o-data', '#o-nets', '#c-ctry', '#s-px'].map((id) => [id, document.querySelector(id)?.textContent.trim()]));
+      for (const [id, text] of live) assert(text && text !== '—', `${route} ${id} shows "${text}"`);
+    }
   }
   // with Grafana answering, only the chain's two panels on the SN25 tab lack their data
   const ids = [...unavailable.keys()].sort();
   assert(JSON.stringify(ids) === JSON.stringify(['cv-tot', 'r-bal']), `${route} panels unavailable: ${ids.join(', ') || 'none'}`);
   for (const [id, text] of unavailable) assert(text === chainLine, `${route} ${id} says "${text}" for the unreachable chain`);
   assert(errors.length === 0, `${route} logged errors: ${errors.join(' | ')}`);
+}
+
+// /dashboard's late answers, once (desktop, English). Grafana's panel 33 (the
+// countries now) is held until the page has drawn: its panels shimmer, then fill
+// once it answers. The stats feed is refused once: once nothing else is out, its
+// panels say they couldn't load, then fill when the page asks again (its first
+// retry, 10 s on). Nothing is logged but the refused request and the chain's.
+async function auditDashboardLate(browser, base) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const fixture = dashboardGrafana();
+  const held = [];
+  let holding = true, refused = 0;
+  await page.route(/bringyour\.com|ur\.network|geckoterminal\.com/, (request) => request.fulfill({ json: {} }).catch(() => request.abort()));
+  await page.route('**/__grafana/**', (route) => {
+    const url = new URL(route.request().url());
+    if (holding && /\/panels\/33\/query$/.test(url.pathname)) { held.push(route); return undefined; }
+    if (url.pathname.endsWith('/stats.json') && refused++ === 0) return route.fulfill({ status: 503, body: 'down' });
+    return fixture(route);
+  });
+  const errors = [];
+  page.on('console', (message) => {
+    if (message.type() !== 'error') return;
+    const at = message.location()?.url || '';
+    if (/^Failed to load resource/.test(message.text()) && (/^https:\/\/[^/]*\.opentensor\.ai\//.test(at) || /\/__grafana\/stats\.json$/.test(at))) return;
+    errors.push(message.text());
+  });
+  page.on('pageerror', (error) => errors.push(error.message));
+  const panel = (selector) => page.evaluate((sel) => {
+    const pn = document.querySelector(sel)?.closest('.pn');
+    return pn ? { na: pn.classList.contains('na') ? pn.dataset.na : null, wait: pn.classList.contains('wait') } : null;
+  }, selector);
+  const { unavailable } = dashboardScript('en');
+
+  // the held reads keep the network busy: wait for the page's own draw, not for quiet
+  await page.goto(`${base}/dashboard`, { waitUntil: 'load' });
+  await page.waitForFunction(() => !document.body.classList.contains('is-loading'), null, { timeout: 30_000 });
+  assert(held.length > 0, '/dashboard (late answers) never asked for panel 33');
+  assert((await panel('#c-reg'))?.wait, '/dashboard (late answers) coverage does not wait for its held read');
+  assert((await panel('#oe-figs'))?.wait, '/dashboard (late answers) this epoch does not wait while a read is out');
+
+  holding = false;
+  for (const route of held.splice(0)) await fixture(route);
+  await page.waitForFunction(() => {
+    const pn = document.querySelector('#c-reg')?.closest('.pn');
+    return pn && !pn.classList.contains('na') && !pn.classList.contains('wait') && document.querySelector('#c-ctry')?.textContent.trim() !== '';
+  }, null, { timeout: 15_000 }).catch(() => {});
+  const coverage = await panel('#c-reg');
+  assert(coverage && !coverage.na && !coverage.wait, `/dashboard (late answers) coverage after its read: ${JSON.stringify(coverage)}`);
+  assert(/^\d+$/.test(await page.textContent('#c-ctry')), '/dashboard (late answers) coverage has no countries count');
+  const epoch = await panel('#oe-figs');
+  assert(epoch?.na === unavailable, `/dashboard (late answers) this epoch without the stats feed: ${JSON.stringify(epoch)}`);
+
+  await page.waitForFunction(() => {
+    const pn = document.querySelector('#oe-figs')?.closest('.pn');
+    return pn && !pn.classList.contains('na') && document.querySelector('#oe-figs')?.textContent.trim() !== '';
+  }, null, { timeout: 30_000 }).catch(() => {});
+  const filled = await panel('#oe-figs');
+  assert(filled && !filled.na && !filled.wait, `/dashboard (late answers) this epoch after the retry: ${JSON.stringify(filled)}`);
+  assert(refused >= 2, '/dashboard (late answers) never asked for the stats feed again');
+  assert(errors.length === 0, `/dashboard (late answers) logged errors: ${errors.join(' | ')}`);
+  await page.close();
 }
 
 async function main() {
@@ -341,12 +410,15 @@ async function main() {
         console.log(`PASS  ${route}`);
       }
     }
+    await auditDashboardLate(browser, base);
+    passed += 1;
+    console.log('\nPASS  /dashboard (late answers)');
   } finally {
     await browser.close();
     await new Promise((resolve) => server.close(resolve));
   }
 
-  console.log(`\n${passed}/${ROUTES.length * PROFILES.length} responsive shell checks passed.`);
+  console.log(`\n${passed}/${ROUTES.length * PROFILES.length + 1} responsive shell checks passed.`);
 }
 
 main().catch((error) => {

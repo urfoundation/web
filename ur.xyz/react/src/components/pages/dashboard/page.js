@@ -22,7 +22,9 @@ const L=UR.LIVE,K=UR.TOKEN,EP=UR.EP,S=window.SNAP;
 const when=t=>UR.fmtWhen(t);
 // a series with a figure in it; a panel's data (UR.need); the chain's, which shimmer while its first read is on its way
 const any=a=>!!a&&a.some(v=>v!=null),need=UR.need;
-const onChain=(el,ok,read)=>need(el,ok,{chain:true,wait:!ok&&(S.PENDING||[]).includes(read)});
+// (the chain's own note while nothing from it has arrived; beside a part that did, the page's)
+const chainDown=()=>!S.RESERVE&&!S.EXTRA.conviction;
+const onChain=(el,ok,read)=>need(el,ok,{chain:chainDown(),wait:!ok&&(S.PENDING||[]).includes(read)});
 $$('#snap-at,.snap-at').forEach(e=>e.textContent=UR.f(TX.time.local,{time:when(UR.NOW)}));
 set('#foot-tz',UR.TZ==='utc'?TX.time.zoneUtc:(z=>z?UR.f(TX.time.zone,{zone:z}):TX.time.zoneUnknown)(UR.tzName()));
 
@@ -77,7 +79,9 @@ const latest=(k,agg,P)=>{const h=P<=3,src=h?UR.Hs[k]:UR.D[k],b=h?UR.PERIODS[P].b
 const avgLab=P=>TX.periodAverage['d'+P];
 // live values: users in the last 24 hours, providers online now (stats feed), data carried in the last 24 hours
 const s24=x=>{const h=UR.Hs.traffic;if(x<23)return null;const a=h.slice(x-23,x+1).filter(v=>v!=null);return a.length?a.reduce((p,q)=>p+q,0):null};
-const NOWV=()=>{const h=UR.Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;return{users:L.users24,prov:L.providers,data:s24(e)}};
+// (the data carried only while its 24 hours end in the last hours: without panel 1's sums the last 72 are empty, and
+// an older 24 hours is not the last)
+const NOWV=()=>{const h=UR.Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;return{users:L.users24,prov:L.providers,data:e>=h.length-3?s24(e):null}};
 // the point that ends a chart on the card's live value (daily charts; providers always, as its hourly series is an average)
 const nowPt=k=>{const P=UR.P,v=NOWV(),t=Date.now();if(k==='providers')return{t,v:v.prov,lab:TX.chart.nowOnline};if(P<=3)return null;
   if(k==='users24')return{t,v:v.users,lab:TX.chart.nowLast24};if(k==='traffic')return{t,v:v.data,lab:TX.chart.nowLast24};return null};
@@ -176,7 +180,7 @@ UR.part(()=>{const RS=UR.RESERVE,C=S.EXTRA.conviction,pend=k=>(S.PENDING||[]).in
   set('#s-res',RS?UR.alpha(RS.alpha):rw?'':'—');set('#s-res-d',RS?UR.f(TX.overview.alphaPerDay,{value:nf(RS.inflow)}):'');
   set('#s-lock',C?nf(Math.round(C.total))+' α':cw?'':'—');
   [['#s-px-d',rw],['#s-res',rw],['#s-res-d',rw],['#s-lock',cw]].forEach(([id,w])=>$(id).classList.toggle('wait',w));
-  const off=(!RS&&!rw)||(!C&&!cw),n=$('#s-na');n.hidden=!off;n.textContent=off?TX.chainUnavailable:''});
+  const off=(!RS&&!rw)||(!C&&!cw),n=$('#s-na');n.hidden=!off;n.textContent=off?(chainDown()?TX.chainUnavailable:TX.unavailable):''});
 
 /* ---------- NETWORK ---------- */
 UR.onChange(()=>need($('#n-data'),any(SER('traffic').v)));
@@ -277,7 +281,7 @@ function drawV(){const P=UR.P,past=S.COUNTRY_PAST[P]||{},has=Object.keys(past).l
       <div class="lk-stats">${stat(PG.titles.providersOnline,nf(v))}${stat(TX.country.shareOfAll,pctS(v/UR.PROV*100))}${g!=null?stat(UR.f(TX.country.changeLast,{period:plab()}),UR.signed(g),cls(g)==='fl'?'':cls(g)):stat(PG.titles.countries,m.length)}</div>
       <div><div class="lk-lab">${esc(TX.country.topCountries)}</div><div class="lk-list">${m.slice(0,5).map(x=>row(x,false)).join('')}</div></div>`}
   else{h=`<div class="lk-head"><div><h3>${esc(TX.country.worldwide)}</h3><span class="meta">${esc(TX.country.worldwideHint)}</span></div></div>
-      <div class="lk-stats">${stat(PG.titles.providersOnline,nf(L.providers))}${stat(PG.titles.countries,L.countries)}${stat(PG.titles.cities,nf(L.cities))}</div>
+      <div class="lk-stats">${stat(PG.titles.providersOnline,nf(L.providers))}${stat(PG.titles.countries,L.countries??'—')}${stat(PG.titles.cities,nf(L.cities))}</div>
       <div><div class="lk-lab">${esc(TX.country.topCountries)}</div><div class="lk-list">${cs.slice(0,5).map(x=>row(x,false)).join('')}</div></div>`}
   html('#v-pick',h);
   const x=$('#v-clear');if(x)x.addEventListener('click',()=>{$('#v-search').value='';set('#v-search-m','');if(vPicked)vPicked=null;else ctFocus=null;ctRows();drawV();mapDraw()});

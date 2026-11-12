@@ -1,14 +1,14 @@
 // /dashboard's live data (lib/dashboardData.js) when a source fails: the page reads Grafana and Bittensor mainnet in
 // the visitor's browser, and a filtered network can block either. Each read stands alone (liveReads), the page's data
 // is built from whichever answered (assembleLive) and never throws for one that didn't, and a Grafana request that
-// hangs gives up without holding the others. The browser side (the panels' notes, the retries) is checked by
-// tests/responsive-shell.mjs on the built page, with tests/dashboard-fixture.mjs for Grafana and no chain.
+// hangs gives up without holding the others. The browser side (the panels' notes, a late answer, a retry) is
+// checked by tests/responsive-shell.mjs on the built page, with tests/dashboard-fixture.mjs for Grafana and no chain.
 //
 // Run: node --test tests/dashboard-live.test.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { CHAIN_READS, assembleLive, buildLive, grafana, liveReads } from '../src/lib/dashboardData.js';
+import { CHAIN_READS, assembleLive, buildHistory, buildLive, grafana, liveReads } from '../src/lib/dashboardData.js';
 import { COUNTRIES, grafanaPanel, grafanaStats } from './dashboard-fixture.mjs';
 
 const history = JSON.parse(readFileSync(new URL('../public/dashboard/history.json', import.meta.url), 'utf8'));
@@ -100,4 +100,32 @@ test('at most six Grafana requests are out at once', async () => {
     const g = grafana('http://fixture', { fetchImpl: slow });
     await Promise.all(Array.from({ length: 20 }, (_, i) => g.post(36, 0, 3_600_000 * (i + 2), 3_600_000)));
     assert.equal(most, 6);
+});
+
+// the fixture, with some panels answering without data or failing
+const fixtureWith = ({ empty = [], down = [] }) => async (url, init = {}) => {
+    const pid = Number((/\/panels\/(\d+)\/query$/.exec(new URL(url, 'http://fixture').pathname) || [])[1]);
+    if (down.includes(pid)) return new Response('down', { status: 503 });
+    if (empty.includes(pid)) return new Response(JSON.stringify({ results: { A: { status: 200, frames: [] } } }), { status: 200 });
+    return fixtureFetch(url, init);
+};
+
+test('a read that answers without its figures has not answered: it rejects, to be asked again', async () => {
+    const reads = liveReads({ g: grafana('http://fixture', { fetchImpl: fixtureWith({ empty: [36, 33, 1] }) }), history, endpoints: NO_CHAIN });
+    await assert.rejects(reads['hourly.providers'](), /panel 36: no data/);
+    await assert.rejects(reads.countries(), /panel 33: no countries/);
+    await assert.rejects(reads.t24(), /panel 1: no data/);
+    assert.ok((await reads['hourly.users24']()).v.length > 0);
+});
+
+test('the page\'s history keeps what it could read and comes back partial; the daily job\'s fails', async () => {
+    const g = grafana('http://fixture', { fetchImpl: fixtureWith({ down: [31] }) });
+    const h = await liveReads({ g, history, endpoints: NO_CHAIN }).history();
+    const yesterday = new Date(Math.floor(Date.now() / DAY) * DAY - DAY).toISOString().slice(0, 10);
+    assert.equal(h.partial, true);
+    assert.equal(h.end, yesterday);
+    assert.ok(h.days[yesterday]?.providers != null, 'the gauges that answered fill the gap');
+    assert.equal(h.days[yesterday]?.traffic, undefined, 'the series that failed is left out');
+    assert.equal(history.partial, undefined, 'the file itself is untouched');
+    await assert.rejects(buildHistory({ g, prev: history, days: 3, chain: false, countries: false }), /grafana panel 31: HTTP 503/);
 });

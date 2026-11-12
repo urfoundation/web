@@ -7,13 +7,15 @@
 // astro/astro.config.mjs).
 //
 // Each part of the data is its own read (liveReads), so one that fails costs only the panels
-// it feeds. The page draws once Grafana's reads have all answered or given up (FIRST_DRAW_MS
-// at most), from whatever arrived, and a panel whose data is missing says so in its place
-// (page.js UR.need). A read that failed or timed out is asked again, quietly and less often
-// each time (RETRY_MS), and the panels it feeds are drawn once it answers (UR.refresh).
-// Bittensor mainnet is never waited for: the page reads it in the visitor's browser, which a
-// filtered network may keep from reaching it, so its panels shimmer for a few seconds at
-// most (CHAIN_WAIT_MS) and then say it can't be reached right now, until it answers.
+// it feeds. The page draws once Grafana's reads have all answered or failed, or sooner, after
+// GRACE_MS, with something to draw (the history file is the site's own), from whatever arrived.
+// A panel still waiting for its read shimmers (FIRST_DRAW_MS at most) and one without its data
+// says so in its place (page.js UR.need). A read that failed or timed out is asked again,
+// quietly and less often each time (RETRY_MS), and the panels it feeds are drawn once it
+// answers (UR.refresh). Bittensor mainnet is never waited for: the page reads it in the
+// visitor's browser, which a filtered network may keep from reaching it, so its panels shimmer
+// for a few seconds at most (CHAIN_WAIT_MS) and then say it can't be reached right now, until
+// it answers.
 import { CHAIN_READS, GRAFANA, assembleLive, grafana, liveReads } from '../../../lib/dashboardData.js';
 import { loadPageCopy } from '../../../i18n/page-copy.js';
 import { displayRegion, formatUsd, interpolate, intlLocale, pluralCategory } from '../../../i18n/format.js';
@@ -22,6 +24,7 @@ import pageUrl from './page.js?url';
 
 const [pageCopy, scriptCopy] = await Promise.all([loadPageCopy('dashboard'), loadPageCopy('dashboard/script')]);
 
+const GRACE_MS = 3_000;
 const FIRST_DRAW_MS = 20_000;
 const CHAIN_WAIT_MS = 8_000;
 // a Grafana request without an answer by then has failed
@@ -118,76 +121,94 @@ export async function startDashboard(lang = 'en') {
     const base = firstParty ? GRAFANA : '/__grafana';
     const status = document.getElementById('upd');
     const t = scriptCopy(lang);
+    // the page's markup, while it is shown (the SPA takes it away when the visitor moves on) and its scripts could
+    // load: nothing is read or drawn for it after that
+    let dead = false;
+    const here = () => !dead && (!status || status.isConnected);
     window.UR_I18N = scriptsI18n(lang);
     const file = await history();
-    const now = Date.now();
+    if (!here()) return;
+    const now = Date.now(), began = Date.now();
     const reads = liveReads({ g: grafana(base, { timeoutMs: REQUEST_MS }), history: file, now });
     const answers = {};
-    // the reads that have not answered or failed yet; the chain's the page shimmers for, while it still waits
+    // the reads that have not answered or failed yet; the chain's the page shimmers for, while it still waits; and
+    // whether it still waits for Grafana's (its panels shimmer meanwhile)
     const pending = new Set(Object.keys(reads)), waitFor = new Set(CHAIN_READS);
-    const snap = () => assembleLive(answers, { history: file, now, pending: [...pending].filter((k) => waitFor.has(k)) });
-    let drawn = false, queued = false, settled = () => {};
-    // the page's markup, while it is shown (the SPA takes it away when the visitor moves on): nothing is read or
-    // drawn for it after that
-    const here = () => !status || status.isConnected;
-    // a later answer (or a chain read the page stops waiting for) is drawn once the page is: answers that come
-    // together, in one go
-    const redraw = () => {
+    let patient = true;
+    const grafanaDone = () => [...pending].every((k) => CHAIN_READS.includes(k));
+    const chainOut = () => CHAIN_READS.some((k) => pending.has(k) && waitFor.has(k));
+    const snap = () => assembleLive(answers, { history: file, now, pending: [...pending].filter((k) => waitFor.has(k)), loading: patient && !grafanaDone() });
+    // each change to what the page would show (an answer, a first failure, a wait given up) counts once, and the
+    // page is drawn again only when there is one it hasn't shown, in one go for changes that come together
+    let drawn = false, queued = false, version = 0, shown = -1, settled = () => {};
+    const changed = () => {
+        version++;
+        settled();
         if (!drawn || queued || !here()) return;
         queued = true;
         requestAnimationFrame(() => {
             queued = false;
+            if (shown === version || !here()) return;
+            shown = version;
             merge(window.SNAP, snap());
             window.UR?.refresh?.();
         });
+    };
+    const again = (key, attempt) => {
+        if (here()) later(() => { if (here()) run(key, attempt + 1); }, RETRY_MS[Math.min(attempt, RETRY_MS.length - 1)]);
     };
     const run = (key, attempt = 0) => reads[key]().then(
         (value) => {
             answers[key] = value;
             pending.delete(key);
-            settled();
-            redraw();
+            changed();
+            // the history with a series missing: shown as it is, and asked for again
+            if (value?.partial) again(key, attempt);
         },
         () => {
-            if (pending.delete(key)) {
-                settled();
-                redraw();
-            }
-            if (here()) later(() => { if (here()) run(key, attempt + 1); }, RETRY_MS[Math.min(attempt, RETRY_MS.length - 1)]);
+            if (pending.delete(key)) changed();
+            again(key, attempt);
         },
     );
     Object.keys(reads).forEach((key) => run(key));
-    setTimeout(() => { waitFor.clear(); redraw(); }, CHAIN_WAIT_MS);
+    // the waits given up: a change only while a read was still out
+    setTimeout(() => { const out = chainOut(); waitFor.clear(); if (out) changed(); }, CHAIN_WAIT_MS);
+    setTimeout(() => { const out = !grafanaDone(); patient = false; if (out) changed(); }, FIRST_DRAW_MS);
 
-    // the first draw: once each of Grafana's reads has answered or failed, FIRST_DRAW_MS at most
-    const grafanaDone = () => [...pending].every((k) => CHAIN_READS.includes(k));
-    if (!grafanaDone()) {
-        await new Promise((resolve) => {
-            settled = () => { if (grafanaDone()) resolve(); };
-            setTimeout(resolve, FIRST_DRAW_MS);
-        });
-    }
-    // nothing to draw (no history, no stats feed, no hourly figure): say so, and draw once something arrives
+    // nothing to draw yet: no history, no stats feed, no hourly figure
     const drawable = () => answers.stats != null || (answers.history ?? file) != null || Object.keys(answers).some((k) => k.startsWith('hourly.') && answers[k]);
+    // the first draw: once each of Grafana's reads has answered or failed; after GRACE_MS, as soon as there is
+    // something to draw; FIRST_DRAW_MS at most
+    await new Promise((resolve) => {
+        const ready = () => grafanaDone() || (drawable() && Date.now() - began >= GRACE_MS);
+        settled = () => { if (ready()) resolve(); };
+        setTimeout(settled, GRACE_MS);
+        setTimeout(resolve, FIRST_DRAW_MS);
+        settled();
+    });
+    if (!here()) return;
     if (!drawable()) {
         document.body.classList.remove('is-loading');
         unavailable(t, status);
         await new Promise((resolve) => { settled = () => { if (drawable()) resolve(); }; });
+        if (!here()) return;
         unavailable(t, status, false);
     }
     settled = () => {};
     window.SNAP = snap();
+    shown = version;
     try {
         await load(engineUrl);
         await load(pageUrl);
     } catch (e) {
         console.error('dashboard:', e);
+        dead = true;
         document.body.classList.remove('is-loading');
         unavailable(t, status);
         return;
     }
     drawn = true;
     document.body.classList.remove('is-loading');
-    // what answered while the scripts loaded
-    redraw();
+    // what changed while the scripts loaded
+    if (shown !== version) changed();
 }

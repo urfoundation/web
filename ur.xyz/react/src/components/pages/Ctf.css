@@ -171,6 +171,7 @@
 .ctf-page .ctf-start-compact .ctf-start-unit { gap: 5px; }
 .ctf-page .ctf-start-compact .ctf-start-num { border-radius: 7px; }
 .ctf-page .ctf-start-compact .ctf-start-uname { font-size: 8.5px; letter-spacing: 0.04em; }
+.ctf-page:lang(ar) .ctf-start-compact .ctf-start-uname { letter-spacing: 0; }
 
 /* the live bar: wraps instead of scrolling; hairline separators come from the 1px gap */
 .ctf-page .ctf-live { display: flex; flex-wrap: wrap; gap: 1px; background: var(--ctf-line); border: 1px solid var(--ctf-line); border-radius: 12px; overflow: hidden; }
@@ -540,4 +541,6 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
 /* a narrow phone (400px and below): the countdown's unit names set closer, so the longest clear their neighbours */
 @media (max-width: 400px) {
     .ctf-page .ctf-start-uname, .ctf-page .ctf-start-compact .ctf-start-uname { font-size: 8px; letter-spacing: 0.02em; }
+    /* the compact tiles a little larger, so SEKUNDEN and SEGUNDOS clear their neighbours at 320 px */
+    .ctf-page .ctf-start-compact { --ctf-start-digit: clamp(21px, 6vw, 24px); }
 }

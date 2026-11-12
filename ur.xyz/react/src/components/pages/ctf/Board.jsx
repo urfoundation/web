@@ -173,9 +173,9 @@ export default function Board({ lang = 'en', m: model = CTF }) {
                     </div>
                 )}
                 <div className={cx('ctf-grid', focus === 'np' && 'ctf-focus-p', focus === 'nx' && 'ctf-focus-x')}>
-                    {cells.map((c, i) => {
+                    {cells.map((c) => {
                         const ct = cellTips(tips, c.code);
-                        return <GridCell key={c.code} m={m} c={c} i={i} mounted={mounted} tipApi={tips.api} tipHover={ct.hover} tipFocus={ct.focus} tipPin={ct.pin} expanded={expanded === c.code} onExpand={onExpand} />;
+                        return <GridCell key={c.code} m={m} c={c} mounted={mounted} tipApi={tips.api} tipHover={ct.hover} tipFocus={ct.focus} tipPin={ct.pin} expanded={expanded === c.code} onExpand={onExpand} />;
                     })}
                 </div>
                 {cells.length === 0 && <p className="ctf-empty">{rich(t.empty, { q })}</p>}

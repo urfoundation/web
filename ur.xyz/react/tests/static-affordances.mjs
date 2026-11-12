@@ -172,9 +172,12 @@ async function main() {
             const inert = await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.map((el) => el.disabled));
             check(inert.length >= 4 && inert.every(Boolean), '/ctf without JavaScript disables the sorting, the search and the picker, which need the script');
             check(Boolean((await page.textContent('.ctf-live').catch(() => '')).trim()), '/ctf without JavaScript shows the live bar');
-            // the flags wave out of step, as design.html staggers them: each grid flag starts its wave at its own delay
-            const delays = await page.$$eval('.ctf-grid .ctf-flag', (els) => els.map((el) => el.style.animationDelay));
-            check(delays.length === 249 && delays.every((d) => /^-\d\.\ds$/.test(d)) && new Set(delays).size >= 20, `/ctf's flags wave out of step: each grid flag has its own delay (${new Set(delays).size} different)`);
+            // the flags wave out of step, as design.html staggers them: each grid flag starts its wave at its country's
+            // delay (model.js waveDelay; read from the attribute as written, since the style object rewrites -1.0s as -1s)
+            const waves = buildModel(SNAPSHOT).byCode;
+            const flags = await page.$$eval('.ctf-grid .ctf-flag', (els) => els.map((el) => [el.getAttribute('src'), el.getAttribute('style')]));
+            const own = flags.filter(([src, style]) => style === `animation-delay:${waves.get((src.match(/\/([a-z]{2})\.svg$/) || [])[1])?.wave}`);
+            check(flags.length === 249 && own.length === 249 && new Set(flags.map(([, style]) => style)).size >= 20, `/ctf's flags wave out of step, each at its own country's delay (${own.length} of ${flags.length})`);
             await close();
         }
         {

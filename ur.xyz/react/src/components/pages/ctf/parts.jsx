@@ -348,7 +348,9 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
     const empty = c ? uninhabitedSentence(c, m.lang) : null;
     const where = c ? { where: c.the, whereIn: place(c).in } : { where: t.where, whereIn: t.whereIn };
     return (
-        <section className={cx('ctf-mine', anyOpen && 'ctf-wave')} aria-labelledby="ctf-mine-h">
+        {/* its flag waves unless every slot of both roles was won last epoch, as design.html's card does: before a
+            draw nothing is held, so a country's own page and a visitor's country wave from the start */}
+        <section className={cx('ctf-mine', c && !(c.p.held && c.x.held) && 'ctf-wave')} aria-labelledby="ctf-mine-h">
             <div className="ctf-pole"><Flag code={c?.code} size="l" lazy={false} /></div>
             <div className="ctf-me-body">
                 <div className="ctf-label">{label}</div>
@@ -387,7 +389,7 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
 // ── easy wins ───────────────────────────────────────────────────────────────
 
 /** One Easy wins card: a country with a big pot and an open slot. */
-export function EasyWinCard({ m, c, i, mounted, tips, expanded, onExpand }) {
+export function EasyWinCard({ m, c, mounted, tips, expanded, onExpand }) {
     const all = ctfCopy(m.lang);
     const t = all.easy;
     const f = formats(m.lang);
@@ -433,7 +435,7 @@ export function EasyWinsSection({ m, picks, title, mounted, tips, expanded, onEx
             </div>
             {/* drawn again on each visit: the static page's draw is the epoch's */}
             <div className="ctf-feat" data-parity-ignore="">
-                {picks.map((c, i) => <EasyWinCard key={c.code} m={m} c={c} i={i} mounted={mounted} tips={tips} expanded={expanded === c.code} onExpand={onExpand} />)}
+                {picks.map((c) => <EasyWinCard key={c.code} m={m} c={c} mounted={mounted} tips={tips} expanded={expanded === c.code} onExpand={onExpand} />)}
             </div>
         </section>
     );
@@ -500,7 +502,7 @@ function cellSummary(m, c) {
 }
 
 /** One country of the grid: its link, flag, pots, slot status and chance to win; the rest when it opens. */
-export const GridCell = React.memo(function GridCell({ m, c, i, mounted, tipApi, tipHover, tipFocus, tipPin, expanded, onExpand }) {
+export const GridCell = React.memo(function GridCell({ m, c, mounted, tipApi, tipHover, tipFocus, tipPin, expanded, onExpand }) {
     const all = ctfCopy(m.lang);
     const t = all.cell;
     const f = formats(m.lang);

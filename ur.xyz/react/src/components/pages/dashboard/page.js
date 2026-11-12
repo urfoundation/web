@@ -7,6 +7,8 @@
 const {$,$$,nf,cpt,fmtD,fmtDw,esc,EN,TX,PG}=UR;
 const T={grid:'rgba(255,255,255,.06)',text:'#7E7E88',strong:'#FAFAFA',cross:'rgba(255,255,255,.22)',surface:'#111113',font:"'PP Neue Montreal',Helvetica,Arial,sans-serif"};
 const tbF=v=>v==null?'—':UR.un(v,v>=100?0:v>=10?1:2,'TB');
+// the Overview's data carried figure: the same, with the unit's narrow form where UR.NARROW_CARD (ت.ب in Arabic)
+const tbCard=v=>v==null?'—':UR.un(v,v>=100?0:v>=10?1:2,'TB',UR.NARROW_CARD);
 const gbs=v=>v==null?'—':UR.un(v,2,'Gb/s');
 const BAR='rgba(237,143,255,.26)',BAR_HI='#ED8FFF',ALT='#D6E6F4',AVG='#F7C8FF';
 UR.THEME={acc:'#ED8FFF',rgb:'237,143,255',alt:'#D6E6F4',tint:'#161616'};document.body.dataset.accent='pink';
@@ -93,7 +95,7 @@ UR.onChange(()=>{
   const bk=UR.bucketKey();
   // each card: its live figure and its chart over the period, or, with neither, the card's note
   if(need($('#o-data'),nw.data!=null||any(tr.v))){
-    set('#o-data',tbF(nw.data));dl($('#o-data-d'),nw.data,P<=3?back('traffic',s24):back('traffic'),ago);
+    set('#o-data',tbCard(nw.data));dl($('#o-data-d'),nw.data,P<=3?back('traffic',s24):back('traffic'),ago);
     set('#o-data-k',nw.data==null?'':TX.overview.last24);
     html('#o-data-s',tr.total==null?'':`${P>1?`${UR.h(TX.periodTotal['d'+P],{value:`<b>${tbF(tr.total)}</b>`})}<br>${UR.h(TX.overview.aDayOnAverage,{value:`<b>${tbF(tr.total/P)}</b>`})}<br>`:''}${UR.h(TX.overview.onAverage,{value:`<b>${gbs(tr.total*8e12/(P*86400)/1e9)}</b>`})}`)}
   if(need($('#o-users'),nw.users!=null||any(SER('users24').v))){

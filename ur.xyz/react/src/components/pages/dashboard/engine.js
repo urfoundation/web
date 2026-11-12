@@ -31,10 +31,15 @@ const UNITS={TB:'terabyte',PB:'petabyte',GB:'gigabyte','Gb/s':'gigabit-per-secon
 // a figure the page doesn't have (its read failed or hasn't answered) prints as a dash
 const NO='—',no=v=>v==null||!isFinite(v);
 const nf=UR.nf=n=>no(n)?NO:EN?Math.round(n).toLocaleString('en-US'):numF({maximumFractionDigits:0}).format(Math.round(n));
-// a number with d decimals; with a unit (TB, GB, Gb/s, or a symbol such as α); a percentage (v in %); a price in US$
+// a number with d decimals; with a unit (TB, GB, Gb/s, or a symbol such as α), in Intl's narrow form if `narrow`, as the
+// charts' axes write it; a percentage (v in %); a price in US$
 // (loader.js usd: Intl's, and in Spanish "US$1,97", since a bare "$" also means pesos there)
 const fx=UR.fx=(v,d)=>no(v)?NO:EN?v.toFixed(d):numF({minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
-const un=UR.un=(v,d,u)=>no(v)?NO:EN?v.toFixed(d)+' '+u:UNITS[u]?numF({style:'unit',unit:UNITS[u],unitDisplay:'short',minimumFractionDigits:d,maximumFractionDigits:d}).format(v):fx(v,d)+' '+u;
+const un=UR.un=(v,d,u,narrow)=>no(v)?NO:EN?v.toFixed(d)+' '+u:UNITS[u]?numF({style:'unit',unit:UNITS[u],unitDisplay:narrow?'narrow':'short',minimumFractionDigits:d,maximumFractionDigits:d}).format(v):fx(v,d)+' '+u;
+// whether the Overview's data carried figure, on a card a quarter of the row wide, writes its unit's narrow form: in
+// Arabic only, whose short terabyte is the whole word (تيرابايت) and ran past the card at desktop widths; its narrow
+// form is ت.ب, as the axes write it (elsewhere the narrow form is the short one, or drops the space: "10,8TB")
+UR.NARROW_CARD=I.lang==='ar';
 UR.pc=(v,d)=>no(v)?NO:EN?v.toFixed(d)+'%':numF({style:'percent',minimumFractionDigits:d,maximumFractionDigits:d}).format(v/100);
 UR.usd=v=>no(v)?NO:EN?'$'+v.toFixed(2):I.usd(v);
 // a chart's number outside English: d decimals at most, compact (12K) or fixed, with the chart's unit (narrow: the

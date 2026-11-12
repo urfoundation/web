@@ -1,45 +1,51 @@
 import React from 'react';
 import { CTF } from './ctf/data';
 import Board from './ctf/Board';
-import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, METHOD_URL, OPERATOR_YML, SOURCE_URL, alpha, dayName, defaultWinRule, utcClock, utcDay } from './ctf/model';
+import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, METHOD_URL, OPERATOR_YML, SOURCE_URL, defaultWinRule, localModel } from './ctf/model';
+import { ctfCopy, formats, interpolate } from './ctf/i18n';
+import { pagePath } from './ctf/links';
+import { rich } from './ctf/rich';
 import './Ctf.css';
 
 /**
  * CtfPage — the /ctf page body: capture the flag, the hub of the 249 country
  * pages (sn CAPTURETHEFLAG.md §9.2; its design is sn's design/ctf/design.html
- * and its build plan design/ctf/SEO.md §2 and §6).
+ * and its build plan design/ctf/SEO.md §2 and §6), in `lang` (its copy is
+ * react/src/i18n/pages/ctf/; English at /ctf, the others at /<lang>/ctf).
  *
  * Renders only what goes inside <main class="section-page">: the SPA's
- * SectionPage (App.jsx) and the Astro page (astro/src/pages/ctf.astro) both
- * provide the shell. The page is the epoch's snapshot (data/ctf-epoch.json),
- * so every figure is in the static HTML; the header, how the draw works, the
- * questions and the fine print need no script. The board (ctf/Board.jsx: the
- * live bar and its filters, the visitor's country, Easy wins and the grid) is
- * an island, passed in by the static page as `board` and rendered here by the
- * SPA. English-only, like /mainnet.
+ * SectionPage (App.jsx) and the Astro page (astro/src/components/routes/
+ * CtfRoute.astro) both provide the shell. The page is the epoch's snapshot
+ * (data/ctf-epoch.json), so every figure is in the static HTML; the header,
+ * how the draw works, the questions and the fine print need no script. The
+ * board (ctf/Board.jsx: the live bar and its filters, the visitor's country,
+ * Easy wins and the grid) is an island, passed in by the static page as
+ * `board` and rendered here by the SPA.
  *
  * `updated` is the day the page's content last changed (the sitemap's
  * lastmod), which only the static build knows.
  */
-export default function CtfPage({ updated = null, board = null }) {
-    const m = CTF;
+export default function CtfPage({ lang = 'en', updated = null, board = null }) {
+    const m = localModel(CTF, lang);
+    const t = ctfCopy(m.lang);
+    const f = formats(m.lang);
     return (
         <div className="ctf-page">
             <div className="ctf-shell">
                 <header className="ctf-hdr">
-                    <div className="ctf-label ctf-label-acc">SN25 · every country, every epoch</div>
-                    <h1>Capture the flag</h1>
-                    <p className="ctf-mission">Providers and extenders in every country</p>
+                    <div className="ctf-label ctf-label-acc">{t.hub.eyebrow}</div>
+                    <h1>{t.program}</h1>
+                    <p className="ctf-mission">{t.hub.mission}</p>
                     <p className="ctf-intro">
-                        <span className="ctf-answer">Run the free URnetwork app as a provider or an extender, and you can win weekly crypto rewards wherever you are.</span>{' '}
-                        {m.phase === 'prelaunch' && <>Capture the flag starts with epoch {m.firstEpoch}, at about {utcClock(m.startsAt)} on {utcDay(m.startsAt)}. </>}
-                        Every country has ten slots each epoch (one week): five for providers and five for extenders. A slot nobody wins rolls into that country's pot, and each winner there takes its slot and a fifth of the pot. {defaultWinRule(m)}
+                        <span className="ctf-answer">{t.hub.answer}</span>{t.gap}
+                        {m.phase === 'prelaunch' && rich(t.hub.starts, { first: m.firstEpoch, clock: f.utcClock(m.startsAt), day: f.utcDay(m.startsAt) })}
+                        {rich(t.hub.intro, { rule: defaultWinRule(m) })}
                     </p>
                 </header>
 
-                {board || <Board />}
+                {board || <Board lang={lang} />}
 
-                <HowItWorks />
+                <HowItWorks m={m} />
                 <HubQuestions m={m} />
                 <FinePrint m={m} updated={updated} />
             </div>
@@ -47,14 +53,13 @@ export default function CtfPage({ updated = null, board = null }) {
     );
 }
 
-export function HowItWorks() {
+export function HowItWorks({ m }) {
+    const t = ctfCopy(m.lang).how;
     return (
         <section id="how" className="ctf-sec ctf-how" aria-labelledby="ctf-how-h">
-            <h2 id="ctf-how-h" className="ctf-h2">How the draw works</h2>
+            <h2 id="ctf-how-h" className="ctf-h2">{t.title}</h2>
             <div className="ctf-steps">
-                <div className="ctf-step"><b>01</b><h3>Be there</h3><p>Run a provider or an extender in the country for at least half the epoch, and be online when it ends. Your network's existing payout wallet is used, so there is nothing new to sign.</p></div>
-                <div className="ctf-step"><b>02</b><h3>The draw</h3><p>When the epoch ends, the operator commits the list of eligible miners on chain. A public drand round then picks up to five winners per country for each role. With five or fewer entries, everyone wins. Miners in one /29 or /48 share a single ticket.</p></div>
-                <div className="ctf-step"><b>03</b><h3>Claim</h3><p>Each winner takes its slot and a fifth of the country's pot, so staying several epochs captures most of a big pot. The alpha accrues to your wallet, and you claim it with your pool earnings in the app.</p></div>
+                {t.steps.map((step, i) => <div className="ctf-step" key={step.title}><b>{`0${i + 1}`}</b><h3>{step.title}</h3><p>{step.body}</p></div>)}
             </div>
         </section>
     );
@@ -79,26 +84,34 @@ export function Questions({ title, items }) {
 
 /** What a slot is worth, as the data allows: last epoch's, or at epoch 4's scale before the first draw. */
 export function slotWorth(m) {
+    const t = ctfCopy(m.lang).worth;
+    const f = formats(m.lang);
     return m.slot !== null
-        ? <>A slot is worth about {alpha(m.slot, 3)} α this epoch</>
-        : <>A slot is worth the pool's fresh funding for the epoch divided by 2,490: about {alpha(EPOCH4_SLOT_RAO, 3)} α at epoch 4's scale, an illustration rather than a forecast</>;
+        ? rich(t.slot, { slot: f.alpha(m.slot, 3) })
+        : rich(t.scale, { slot: f.alpha(EPOCH4_SLOT_RAO, 3) });
 }
 
 function HubQuestions({ m }) {
+    const t = ctfCopy(m.lang).hubFaq;
+    const f = formats(m.lang);
     const live = m.phase !== 'prelaunch';
+    const links = {
+        ext: (kids) => <a href={pagePath(m.lang, EXTENDER_URL)}>{kids}</a>,
+        api: (kids) => <a href={API_STATE}>{kids}</a>,
+        spec: (kids) => <a href={OPERATOR_YML}>{kids}</a>,
+        code: (kids) => <code>{kids}</code>,
+    };
     return (
         <Questions
-            title="Questions"
+            title={t.title}
             items={[
-                ['What is capture the flag?', <>A weekly reward on URnetwork, Bittensor subnet 25. Every country has five provider slots and five extender slots each epoch (one week), and winners are paid in alpha, the subnet's token. A slot that nobody wins adds its amount to that country's pot, so a newcomer to an empty country takes a fifth of the pot every epoch it stays.{!live && <> It starts with epoch {m.firstEpoch}, at about {utcClock(m.startsAt)} on {utcDay(m.startsAt)}.</>}</>],
-                ['How do I win a slot?', m.drawn
-                    ? <>Run the free URnetwork app as a provider or an extender, keep it online in your country for at least half the epoch, and be online when it ends. Where a slot went unclaimed last epoch, a newcomer wins by default. Where all five were won, a public draw picks five winners.</>
-                    : <>Run the free URnetwork app as a provider or an extender, keep it online in your country for at least half the epoch, and be online when it ends. A public draw then picks up to five winners per country for each role, and with five entries or fewer, everyone wins.</>],
-                ['How much can I earn?', <>{slotWorth(m)}, and a winner in a country with a pot also takes a fifth of that pot. Amounts change every epoch with the network's emission and with how many people run in each country, and alpha's price moves. Nothing is guaranteed.</>],
-                ['Is it passive income, or a job?', <>Neither, quite. The app runs in the background on a phone or computer you already have, but it earns only while it stays online. It is not a job, with no employer, hours or wage, and not an investment, with no fixed return.</>],
-                ['What is the difference between a provider and an extender?', <>A provider shares your internet connection with the people who use URnetwork. An extender is a relay for people who cannot reach the network directly, for example behind censorship. The desktop app runs both by default, and one device can win in both roles. An extender works only where the internet can reach your computer on TCP port 443: <a href={EXTENDER_URL}>Run an extender</a> says how to open it.</>],
-                ['How is the draw kept fair?', <>When the epoch ends, the operator commits the list of eligible miners on chain. A drand round published after that commitment then picks the winners, so nobody can choose them. Every draw can be checked against its census and its round.</>],
-                ['Can my AI assistant read this data?', <>Yes. {live ? 'The numbers on this page are' : `From epoch ${m.firstEpoch}, the numbers on this page are`} public JSON at <a href={API_STATE}>/sn/ctf</a>, documented in <a href={OPERATOR_YML}><code>sn/api/operator.yml</code></a>, with times in UTC and amounts in α. They change once an epoch.</>],
+                [t.whatQ, rich(t.whatA, { starts: !live && rich(t.whatStarts, { first: m.firstEpoch, clock: f.utcClock(m.startsAt), day: f.utcDay(m.startsAt) }) })],
+                [t.winQ, m.drawn ? t.winDrawn : t.winOpen],
+                [t.earnQ, rich(t.earnA, { worth: slotWorth(m) })],
+                [t.passiveQ, t.passiveA],
+                [t.rolesQ, rich(t.rolesA, {}, links)],
+                [t.fairQ, t.fairA],
+                [t.agentsQ, rich(t.agentsA, { lead: live ? t.agentsLive : interpolate(t.agentsSoon, { first: m.firstEpoch }) }, links)],
             ]}
         />
     );
@@ -106,19 +119,31 @@ function HubQuestions({ m }) {
 
 /** The fine print under every capture the flag page. */
 export function FinePrint({ m, updated }) {
+    const all = ctfCopy(m.lang);
+    const t = all.fine;
+    const f = formats(m.lang);
+    const links = {
+        api: (kids) => <a href={API_STATE}>{kids}</a>,
+        ur: (kids) => <a href="https://ur.io">{kids}</a>,
+        mail: (kids) => <a href="mailto:support@ur.xyz">{kids}</a>,
+        method: (kids) => <a href={METHOD_URL}>{kids}</a>,
+        source: (kids) => <a href={SOURCE_URL}>{kids}</a>,
+        lic: (kids) => <a href={FLAGS_LICENSE}>{kids}</a>,
+        time: (kids) => <time dateTime={updated}>{kids}</time>,
+    };
     return (
         <footer className="ctf-foot">
             {m.potsKnown
-                ? <p>Up for grabs is an estimate: the pots carried in, plus this epoch's ten slots at last epoch's slot amount of {alpha(m.slot, 3)} α. Every draw can be checked against its on-chain census and drand round at <a href={API_STATE}>/sn/ctf</a>.</p>
-                : <p>Every draw can be checked against its on-chain census and drand round, published at <a href={API_STATE}>/sn/ctf</a> from epoch {m.firstEpoch}.</p>}
-            <p id="chance-to-win">Chance to win shows where all five of a role's slots were won last epoch. Its entries are last epoch's eligible units in that role plus you, and it is 5 ÷ entries, the exact odds of a draw of five winners; with five entries or fewer, everyone wins.{m.drawn && ' Where a slot went unclaimed, a new miner wins by default.'}</p>
-            <p>Rewards are paid in alpha, the token of Bittensor subnet 25, whose value changes and can fall. They depend on uptime, on how many others run in each country and on the network's emission. They are not wages, a salary, a guaranteed income or an investment, and you pay your own costs, such as power and data. Local law applies.</p>
-            <p>Capture the flag is paid by the CTF pool of URnetwork, SN25's network operator 1 (<a href="https://ur.io">ur.io</a>, <a href="mailto:support@ur.xyz">support@ur.xyz</a>). Its rules are public: the method in <a href={METHOD_URL}>CAPTURETHEFLAG.md</a>, and the code in <a href={SOURCE_URL}>the subnet's repository</a>.</p>
+                ? <p>{rich(t.estimate, { slot: f.alpha(m.slot, 3) }, links)}</p>
+                : <p>{rich(t.published, { first: m.firstEpoch }, links)}</p>}
+            <p id="chance-to-win">{rich(t.chance, { drawn: m.drawn && t.chanceDrawn })}</p>
+            <p>{t.disclosure}</p>
+            <p>{rich(t.operator, {}, links)}</p>
             <p>
-                Country pages are built from each epoch's public data.
-                {m.presence && <> Providers online are the network dashboard's count at the end of {dayName(m.presence.day)}.</>}
-                {' '}Flags: flag-icons, <a href={FLAGS_LICENSE}>MIT licence</a>.
-                {updated && <> Updated <time dateTime={updated}>{updated}</time>.</>}
+                {t.data}
+                {m.presence && rich(t.dataPresence, { day: f.dayName(m.presence.day) })}
+                {all.gap}{rich(t.flags, {}, links)}
+                {updated && rich(t.updated, { day: updated }, links)}
             </p>
         </footer>
     );

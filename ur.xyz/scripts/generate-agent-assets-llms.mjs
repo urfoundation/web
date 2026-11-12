@@ -38,6 +38,7 @@ import { DOC_ORDER, DOC_PAGE_PATHS, HIDDEN_DOC_SLUGS, UNLISTED_DOC_SLUGS, slugFo
 import { investorCentre } from '../react/src/data/investors.js';
 import { pageFacts, SITEMAP_FILES } from '../astro/scripts/page-dates.mjs';
 import { absoluteLinks } from './agent-markdown.mjs';
+import { OPERATORS_FILE, OPERATORS_URL, parseOperatorList } from './ctf-import.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -63,16 +64,17 @@ const MACHINE_FILES = [
     ['/amendments.yml', 'Settlement amendments (YAML)', 'the signed changes to how SN25 settles from an epoch on, each one line signed with the price sheet\'s key'],
 ];
 const SOURCE_REPO = 'https://github.com/urfoundation/sn';
-// Capture the flag: the hub, its country pages' pattern, and the operator API
-// the pages are built from (sn/api/operator.yml, served at /sn/openapi.yml).
+// Capture the flag: the hub, its country pages' pattern, and the API every
+// network operator of the operator list serves, which the pages add up
+// (sn/api/operator.yml, served by each at /sn/openapi.yml).
 const CTF_HUB = '/ctf';
 const isCtfCountry = (u) => /^\/ctf\/[a-z]{2}$/.test(u);
-const CTF_API = 'https://api.bringyour.com';
+const CTF_OPERATORS = parseOperatorList(readFileSync(OPERATORS_FILE, 'utf8'));
 const CTF_LINES = [
     `- Each country's page: ${SITE}/ctf/<cc>, for each of the 249 lowercase ISO 3166-1 alpha-2 codes (${SITE}/ctf/ke is Kenya's)`,
-    `- [Capture the flag state (JSON)](${CTF_API}/sn/ctf): every country's slots, pots and chance to win, this epoch and last; public, CORS-open, amounts in alpha and rao, times in UTC`,
-    `- One country (JSON): ${CTF_API}/sn/ctf/country/<cc>, with its history since the first epoch; the open pots ranked: ${CTF_API}/sn/ctf/top?role=provider|extender|any`,
-    `- [Operator API (OpenAPI 3.1)](${SOURCE_REPO}/blob/main/api/operator.yml): the routes and their fields, also served at ${CTF_API}/sn/openapi.yml`,
+    `- Capture the flag is part of the SN25 protocol: every network operator of [the operator list](${OPERATORS_URL}) runs its own pool and draw, serves its state as JSON (public, CORS-open, amounts in alpha and rao, times in UTC), and the pages add every operator's up`,
+    ...CTF_OPERATORS.map(({ domain, api_url: api }) => `- [${domain}: capture the flag state (JSON)](${api}/sn/ctf): every country's slots, pots and chance to win at this operator, this epoch and last; one country: ${api}/sn/ctf/country/<cc>, with its history since the first epoch; the open pots ranked: ${api}/sn/ctf/top?role=provider|extender|any; the API's document: ${api}/sn/openapi.yml`),
+    `- [Operator API (OpenAPI 3.1)](${SOURCE_REPO}/blob/main/api/operator.yml): the routes and their fields`,
     `- [Design](${SOURCE_REPO}/blob/main/CAPTURETHEFLAG.md): how the slots, the draw and the pots work`,
 ];
 // the section boundary in llms-full.txt; no embedded document may contain it

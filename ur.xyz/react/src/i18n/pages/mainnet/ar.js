@@ -1,6 +1,13 @@
 // /mainnet in Arabic: the translation of en.js beside it (the page's own copy). Same keys as en.js; after
 // changing a translation, run `node tests/i18n-staleness.mjs --unit mainnet --accept ar <key> ...` from react/.
-// Figures keep Western digits; the arrows point right to left (←).
+// Figures keep Western digits and the English separators (9,240,028; 1,076.26 α); the arrows point right to
+// left (←). The terms of all three units (this one, data/ and timeline/): epoch حقبة; settlement v2 التسوية v2;
+// version 1 النسخة 1 (the site's «إصدار» is emission, so a software release is «تحديث»); network operator مشغّل
+// الشبكة; subnet owner مالك الشبكة الفرعية; pool مجمّع; payout root جذر المدفوعات; commit تثبيت / الالتزام بـ;
+// challenge period فترة الاعتراض; claim مطالبة; payout wallet محفظة الدفع; governance Safe محفظة Safe للحوكمة;
+// timelock القفل الزمني; vault خزنة; capture the flag «الاستيلاء على العلم» (the apps' name); draw القرعة (never
+// يانصيب, رهان or مقامرة: it is not a lottery); entry مشارك; slot خانة; pot الرصيد المتراكم; carry forward
+// يُرحَّل; relay تمرير; an IP address block نطاق, a chain block كتلة.
 export default {
     meta: {
         title: 'الجدول الزمني لإطلاق SN25 على الشبكة الرئيسية | UR',

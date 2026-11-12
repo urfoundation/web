@@ -1,5 +1,12 @@
 // /mainnet in German: the translation of en.js beside it (the page's own copy). Same keys as en.js; after
 // changing a translation, run `node tests/i18n-staleness.mjs --unit mainnet --accept de <key> ...` from react/.
+// The terms of all three units (this one, data/ and timeline/): epoch Epoche; settlement v2 Settlement v2;
+// network operator Netzbetreiber; subnet owner Subnet-Eigentümer; payout root Auszahlungs-Root; commit
+// festschreiben; challenge period Anfechtungsfrist; claim Claim, einlösen; payout wallet Auszahlungs-Wallet;
+// governance Safe Governance-Safe; vault Tresor; capture the flag Capture the Flag (the apps' name); draw
+// Auslosung (never Lotterie or Verlosung: it is not a lottery); entry Teilnehmer; pot Topf; carry forward
+// übertragen; relay weiterleiten; reader addressed as du. Figures keep the English digits and separators
+// (9,240,028; 1,076.26 α), not the German 1.076,26.
 export default {
     meta: {
         title: 'Zeitleiste des SN25-Mainnet-Starts | UR',

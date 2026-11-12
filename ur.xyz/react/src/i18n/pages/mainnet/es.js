@@ -1,5 +1,12 @@
 // /mainnet in Spanish: the translation of en.js beside it (the page's own copy). Same keys as en.js; after
 // changing a translation, run `node tests/i18n-staleness.mjs --unit mainnet --accept es <key> ...` from react/.
+// The terms of all three units (this one, data/ and timeline/): epoch época; settlement v2 liquidación v2;
+// mainnet red principal; network operator operador de red; subnet owner propietario de la subred; payout root
+// raíz de pagos; commit registrar; challenge period período de impugnación; claims reclamaciones; payout wallet
+// wallet de pago; governance Safe Safe de gobernanza; vault bóveda; capture the flag «Captura la bandera» (the
+// apps' name); draw sorteo (never lotería, rifa or apuesta: it is not a lottery); entry participante; pot fondo
+// acumulado (not bote); carry forward se traslada; relay retransmitir; reader addressed as tú. Figures keep the
+// English digits and separators (9,240,028; 1,076.26 α).
 export default {
     meta: {
         title: 'Cronología del lanzamiento de SN25 en la red principal | UR',

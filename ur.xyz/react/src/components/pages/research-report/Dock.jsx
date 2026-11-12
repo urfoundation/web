@@ -4,6 +4,7 @@ import { computeStates, fmt, tocPlace } from './model';
 import { onPulse, useActiveEntry } from './active';
 import { Progress } from './Meters';
 import { TocList } from './Toc';
+import { pageCopy } from './copy';
 
 const ENTRIES = data.entries;
 const STATES = computeStates(ENTRIES);
@@ -19,7 +20,8 @@ const STATES = computeStates(ENTRIES);
  * is in the entry that recorded it, and the timeline ends with where they
  * ended); the menu is not.
  */
-export default function ReportDock() {
+export default function ReportDock({ lang = 'en' }) {
+    const t = pageCopy(lang);
     const { index, docked, section, inTimeline } = useActiveEntry();
     const [open, setOpen] = useState(false);
     const [flash, setFlash] = useState(null);
@@ -28,13 +30,14 @@ export default function ReportDock() {
     const st = STATES[index + 1];
     const L = st.load.latest, c = st.bulk.controlled;
     const cells = {
-        load: L ? <>{fmt(L.v, 1)}<small> ms</small></> : '—',
-        bulk: c ? <>{c.to}<small> Mbps</small></> : '—',
+        load: L ? <>{fmt(L.v, 1, lang)}<small> ms</small></> : '—',
+        bulk: c ? <>{fmt(c.to, 0, lang)}<small> Mbps</small></> : '—',
         path: st.path.length || '—',
         memory: st.memory.length || '—',
         fixed: st.fixed.length || '—',
     };
     const { group, item } = tocPlace(section);
+    const labels = t.toc.labels;
 
     // the menu closes when the bar leaves, on Escape (focus back on its button) and on a click outside
     useEffect(() => { if (!docked) setOpen(false); }, [docked]);
@@ -59,19 +62,19 @@ export default function ReportDock() {
                     <svg viewBox="0 0 16 12" width="16" height="12" aria-hidden="true">
                         <path d="M0 1h16M0 6h16M0 11h16" stroke="currentColor" strokeWidth="1.5" />
                     </svg>
-                    <span className="rr-dock-where">{item ? `${group.label} · ${item.label}` : group.label}</span>
-                    <span className="sr-only"> — sections of this page</span>
+                    <span className="rr-dock-where">{item ? `${labels[group.id]} · ${labels[item.id]}` : labels[group.id]}</span>
+                    <span className="sr-only">{` ${t.dock.menu}`}</span>
                 </button>
                 <div className="rr-dock-cells" aria-hidden="true">
-                    <div className="rr-dock-cell is-date"><span>As of</span><b>{index >= 0 ? ENTRIES[index].date : 'Start'}</b></div>
+                    <div className="rr-dock-cell is-date"><span>{t.meter.asOf}</span><b>{index >= 0 ? t.entries[ENTRIES[index].id].date : t.meter.start}</b></div>
                     {data.meters.map((m) => (
-                        <div key={m.key} className={`rr-dock-cell${flash === m.key ? ' is-flash' : ''}`} data-meter={m.key}><span>{m.short}</span><b>{cells[m.key]}</b></div>
+                        <div key={m.key} className={`rr-dock-cell${flash === m.key ? ' is-flash' : ''}`} data-meter={m.key}><span>{t.meters[m.key].short}</span><b>{cells[m.key]}</b></div>
                     ))}
                 </div>
             </div>
             <div className="rr-dock-progress" aria-hidden="true"><Progress index={index} /></div>
-            <nav id="rr-dock-sections" className="rr-dock-panel" aria-label="Sections of this page" hidden={!open}>
-                <TocList section={section} onPick={() => setOpen(false)} />
+            <nav id="rr-dock-sections" className="rr-dock-panel" aria-label={t.sectionsAria} hidden={!open}>
+                <TocList section={section} lang={lang} onPick={() => setOpen(false)} />
             </nav>
         </div>
     );

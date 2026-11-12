@@ -1,0 +1,105 @@
+---
+// The August–October 2026 research report, in one language:
+// /research/2026-q3-report (English, pages/research/2026-q3-report.astro) and
+// /<lang>/research/2026-q3-report (pages/[lang]/research/2026-q3-report.astro).
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/ResearchReport.jsx), rendered to static HTML:
+// the timeline, the start-to-end estimates, the methods and the glossary need
+// no script (an entry's second layer is a native <details>). The parts that
+// follow the reader are islands, passed in through the component's props of
+// the same names: the sections sidebar, the meters in the rail (wide screens),
+// the bar that docks under the nav with its menu of sections (narrow screens),
+// the glance chart (drawn at its measured width), the seven method animations
+// and the glossary tooltips. Their server render is their first state (before
+// the first entry, each animation on its key frame), so the page reads the
+// same before they hydrate. The meters that close the timeline on narrow
+// screens never move (where each ended); they hydrate for their tooltips and
+// toggles. Every island takes the page's language, and its words are the
+// report's copy units (react/src/i18n/pages/research-report/), so an island
+// ships English and that language only.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import ResearchReportPage, { REPORT, REPORT_PATH } from '@react/components/pages/ResearchReport.jsx';
+import ReportMeters from '@react/components/pages/research-report/Meters.jsx';
+import ReportDock from '@react/components/pages/research-report/Dock.jsx';
+import ReportGlance from '@react/components/pages/research-report/Glance.jsx';
+import MethodFigure from '@react/components/pages/research-report/MethodFigure.jsx';
+import TermTips from '@react/components/pages/research-report/TermTips.jsx';
+import ReportToc from '@react/components/pages/research-report/Toc.jsx';
+import { pageCopy } from '@react/components/pages/research-report/copy.jsx';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+import { getDict } from '../../lib/i18n.js';
+import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = pageCopy(lang);
+const text = (await loadPageCopy('research-report/text'))(lang);
+const dict = await getDict(lang);
+
+const title = `${t.title} | UR`;
+const description = t.description;
+const canonical = `https://ur.xyz${lang === 'en' ? '' : `/${lang}`}${REPORT_PATH}`;
+// each method's animation, with its words in the page's language
+const figure = (key) => ({ sceneKey: key, label: text.methods[key].alt, caption: text.methods[key].caption });
+const [owners, boundary, deterministic, ablation, layers, noise, validity] = REPORT.methods.map((m) => figure(m.key));
+// the report as what it is: a dated report by the Foundation
+const jsonLd = [{
+    '@type': 'Report',
+    '@id': `${canonical}#report`,
+    headline: t.title,
+    description,
+    inLanguage: lang,
+    datePublished: REPORT.published,
+    temporalCoverage: `${REPORT.period.start}/${REPORT.period.end}`,
+    author: { '@id': 'https://ur.xyz/#org' },
+    publisher: { '@id': 'https://ur.xyz/#org' },
+    mainEntityOfPage: canonical,
+    url: canonical,
+    isBasedOn: REPORT.source.href,
+}];
+---
+<Base
+    title={title}
+    description={description}
+    breadcrumbName={t.title}
+    lang={lang}
+    ogType="article"
+    article={{ publishedTime: REPORT.published, author: 'UR Foundation' }}
+    jsonLd={jsonLd}
+>
+    <div class="app">
+        <DisclaimerStatic t={dict} />
+        <NavIsland activeRoute="research" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            {/* "Updated" states the sitemap's lastmod: the build fills the
+                token in once the page is fingerprinted (src/lib/lastmod.js) */}
+            <ResearchReportPage lang={lang} updated={LASTMOD_TOKEN}>
+                <ReportToc slot="toc" lang={lang} client:idle />
+                <ReportGlance slot="glance" lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <ReportMeters slot="finalMeters" mode="final" lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <ReportMeters slot="railMeters" mode="rail" lang={lang} client:idle />
+                <ReportDock slot="dock" lang={lang} client:idle />
+                <TermTips slot="termTips" lang={lang} client:idle />
+                <MethodFigure slot="figureOwners" {...owners} lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <MethodFigure slot="figureBoundary" {...boundary} lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <MethodFigure slot="figureDeterministic" {...deterministic} lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <MethodFigure slot="figureAblation" {...ablation} lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <MethodFigure slot="figureLayers" {...layers} lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <MethodFigure slot="figureNoise" {...noise} lang={lang} client:visible={{ rootMargin: '200px' }} />
+                <MethodFigure slot="figureValidity" {...validity} lang={lang} client:visible={{ rootMargin: '200px' }} />
+            </ResearchReportPage>
+        </main>
+
+        <FooterStatic t={dict} lang={lang} />
+    </div>
+</Base>

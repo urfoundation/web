@@ -83,7 +83,7 @@ export default {
         subnetTitle: '共享的提供者与验证层',
         subnetText: '一套基础设施通过质量评分和激励市场，同时支撑实时需求和全部三个研究项目。',
         minersLabel: '住宅矿工',
-        countriesLabel: '个国家',
+        countriesLabel: '个国家和地区',
         expandAria: '打开放大的网络栈示意图',
         dialogTitle: '网络栈',
         zoomAria: '示意图缩放控件',

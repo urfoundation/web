@@ -12,7 +12,7 @@ export default {
         intro: '在 UR 的住宅隐私网络上推出新产品，或将现有产品迁移过来。网络运营商掌握客户体验并带来需求；UR 提供基础设施。UR（SN25）正在把网络的协调与激励扩展到 Bittensor。',
         proof: {
             providers: '提供者',
-            countries: '个国家',
+            countries: '个国家和地区',
             users: 'URnetwork 月活用户',
         },
         quiet: '网络已经上线。它的下一个产品也许还不存在。',
@@ -29,7 +29,7 @@ export default {
         },
         proofV11: {
             providers: '网络提供者',
-            countries: '个国家',
+            countries: '个国家和地区',
             live: '已上线的',
             infrastructure: '网络基础设施',
         },
@@ -42,7 +42,7 @@ export default {
         provides: {
             label: '子网提供',
             title: '供给、测量与激励',
-            body: '分布在 100 多个国家的 10 万多个住宅提供者、验证者、矿工 UID，以及 SN25 结算。',
+            body: '分布在 100 多个国家和地区的 10 万多个住宅提供者、验证者、矿工 UID，以及 SN25 结算。',
         },
     },
 
@@ -218,7 +218,7 @@ export default {
         chain: [
             { label: '客户产品', value: 'URnetwork VPN' },
             { label: '网络需求', value: '活跃用户 + 传输的数据' },
-            { label: '共享供给', value: '100 多个国家的 10 万多个提供者' },
+            { label: '共享供给', value: '100 多个国家和地区的 10 万多个提供者' },
         ],
         link: '了解 URnetwork VPN ↗',
     },

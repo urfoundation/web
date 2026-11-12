@@ -2,7 +2,7 @@
   "about": "The day each page of the ur.xyz page group ctf (react/src/i18n/pages/ctf/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
     "/ar/ctf": {
-      "fingerprint": "0915d65e26cef2b1",
+      "fingerprint": "51723835550eb858",
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/ad": {
@@ -206,7 +206,7 @@
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/hk": {
-      "fingerprint": "493195d39b61c278",
+      "fingerprint": "3b99eb15d2705a50",
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/hn": {
@@ -250,7 +250,7 @@
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/is": {
-      "fingerprint": "1d9fdae9b7b5454e",
+      "fingerprint": "ece2bb9b4685b9d1",
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/it": {
@@ -358,11 +358,11 @@
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/mn": {
-      "fingerprint": "2dddd01b9e8ebd5d",
+      "fingerprint": "eeea5b594a937697",
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/mo": {
-      "fingerprint": "7363f45788e02826",
+      "fingerprint": "7df5a27ebab34dbb",
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/mr": {
@@ -370,7 +370,7 @@
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/mt": {
-      "fingerprint": "565e7155d0a4144e",
+      "fingerprint": "e9f6ddfe2634a79a",
       "lastmod": "2026-11-12"
     },
     "/ar/ctf/mv": {
@@ -566,7 +566,7 @@
       "lastmod": "2026-11-12"
     },
     "/ctf": {
-      "fingerprint": "75e02ee95f466c7a",
+      "fingerprint": "b9d3fd0070d9858a",
       "lastmod": "2026-11-12"
     },
     "/ctf/ad": {
@@ -1130,7 +1130,7 @@
       "lastmod": "2026-11-12"
     },
     "/de/ctf": {
-      "fingerprint": "663936c374bea1f8",
+      "fingerprint": "9ff01107c3d8192a",
       "lastmod": "2026-11-12"
     },
     "/de/ctf/ad": {
@@ -1694,7 +1694,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf": {
-      "fingerprint": "6a5935e7311e4a44",
+      "fingerprint": "1c1701bfba74e162",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/ad": {
@@ -1734,7 +1734,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/ba": {
-      "fingerprint": "edd7a36f8ae28a05",
+      "fingerprint": "55bea85ef5ad6be6",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/bd": {
@@ -1762,7 +1762,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/bo": {
-      "fingerprint": "fd637af98277e162",
+      "fingerprint": "a0eb078f3f23b8a7",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/br": {
@@ -1774,7 +1774,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/bw": {
-      "fingerprint": "793030f9dc097a59",
+      "fingerprint": "cebd224ed68f9ecc",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/by": {
@@ -1870,7 +1870,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/gb": {
-      "fingerprint": "3cdebc565b42e171",
+      "fingerprint": "b9cc345bb4894143",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/gd": {
@@ -1898,11 +1898,11 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/hk": {
-      "fingerprint": "698f07fda4479495",
+      "fingerprint": "356a791984496132",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/hn": {
-      "fingerprint": "07a900b828860475",
+      "fingerprint": "c22f1b93c3a65b94",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/hr": {
@@ -1910,7 +1910,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/hu": {
-      "fingerprint": "1aefa950a3f62b4f",
+      "fingerprint": "d48016f075962847",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/id": {
@@ -2006,7 +2006,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/lu": {
-      "fingerprint": "3e3379858e95436a",
+      "fingerprint": "2fe8147ecf3cceb9",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/lv": {
@@ -2034,11 +2034,11 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/mh": {
-      "fingerprint": "ec3fb405e74c63ef",
+      "fingerprint": "91afabe015e6c7a0",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/mk": {
-      "fingerprint": "9fd682e32238d28c",
+      "fingerprint": "e6ed5207270a8d58",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/ml": {
@@ -2054,7 +2054,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/mo": {
-      "fingerprint": "5b15be16a52bd0f6",
+      "fingerprint": "302f630be6f2db54",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/mr": {
@@ -2126,7 +2126,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/pr": {
-      "fingerprint": "239c7d0fadab9b6e",
+      "fingerprint": "81c286ad79a6c796",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/ps": {
@@ -2238,7 +2238,7 @@
       "lastmod": "2026-11-12"
     },
     "/es/ctf/vg": {
-      "fingerprint": "e78e492474958b0a",
+      "fingerprint": "7a9dac3543998136",
       "lastmod": "2026-11-12"
     },
     "/es/ctf/vn": {
@@ -2258,7 +2258,7 @@
       "lastmod": "2026-11-12"
     },
     "/ru/ctf": {
-      "fingerprint": "436b51c53ab21df6",
+      "fingerprint": "ec603e650f85f1e8",
       "lastmod": "2026-11-12"
     },
     "/ru/ctf/ad": {
@@ -2822,7 +2822,7 @@
       "lastmod": "2026-11-12"
     },
     "/zh/ctf": {
-      "fingerprint": "05c74ccaa1a45644",
+      "fingerprint": "55fbfd312afe3ea7",
       "lastmod": "2026-11-12"
     },
     "/zh/ctf/ad": {

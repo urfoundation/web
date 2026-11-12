@@ -15,7 +15,9 @@
 // live bar with the country's card, and the country's other big pots
 // (ctf/CountryIslands.jsx); their first render is this one. The paths are
 // lowercase codes in the clean form publicPathFor publishes (/ctf/ke,
-// /ru/ctf/ke).
+// /ru/ctf/ke). `noindex` is the English page's decision (ctf-paths.js): a page
+// that reads like another but for the country's name, with no local note, is
+// noindex in every language until its data or a note sets it apart.
 import Base from '../../layouts/Base.astro';
 import DisclaimerStatic from '../DisclaimerStatic.astro';
 import NavIsland from '../../islands/NavIsland.jsx';

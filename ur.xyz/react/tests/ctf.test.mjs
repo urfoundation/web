@@ -52,11 +52,15 @@ import {
     roleLine,
     staticSeed,
     uninhabitedSentence,
+    localModel,
     winEstimate,
 } from '../src/components/pages/ctf/model.js';
 import { countryIndexing, countryIndexingProblems, ownContent } from '../src/components/pages/ctf/indexing.js';
 import { CTF_LOCAL_NOTES } from '../src/data/ctf-local-notes.js';
-import { ctfOgImage } from '../src/components/pages/ctf/og.js';
+import { ctfCardAlt, ctfOgImage } from '../src/components/pages/ctf/og.js';
+import { ctfNames, formats } from '../src/components/pages/ctf/i18n.js';
+import { ctaLink, pagePath } from '../src/components/pages/ctf/links.js';
+import group from '../src/i18n/pages/ctf/group.js';
 import { buildPath, parseRoute } from '../src/router.js';
 import { SLOT, SNAPSHOT, amount, drawnAnswer, firstAnswer } from './ctf-fixtures.mjs';
 
@@ -64,6 +68,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const graphemes = (s) => [...new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(s)].length;
 const DAY = '2026-12-04';
+const LANGS = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
 
 // every phase the pages render: the committed snapshot and the import of each kind of answer
 const PHASES = {
@@ -374,10 +379,12 @@ test('the routes: /ctf and a page per country', () => {
     assert.deepEqual(parseRoute('/ctf'), { name: 'ctf', slug: null });
     assert.deepEqual(parseRoute('/ctf/ke'), { name: 'ctf', slug: 'ke' });
     assert.deepEqual(parseRoute('/de/ctf/ke'), { name: 'ctf', slug: 'ke' });
-    assert.equal(buildPath({ name: 'ctf', slug: 'ke' }, 'de'), '/ctf/ke');
+    // the translations are routes of their own once the group is localized (react/src/i18n/pages/ctf/group.js)
+    assert.equal(buildPath({ name: 'ctf', slug: 'ke' }, 'de'), group.localized ? '/de/ctf/ke' : '/ctf/ke');
     assert.equal(buildPath({ name: 'ctf', slug: null }, 'en'), '/ctf');
-    const pages = fs.readdirSync(path.join(ROOT, 'astro/src/pages/ctf'));
-    assert.deepEqual(pages, ['[cc].astro']);
+    assert.deepEqual(fs.readdirSync(path.join(ROOT, 'astro/src/pages/ctf')), ['[cc].astro']);
+    assert.deepEqual(fs.readdirSync(path.join(ROOT, 'astro/src/pages/[lang]/ctf')), ['[cc].astro']);
+    assert.ok(fs.existsSync(path.join(ROOT, 'astro/src/pages/[lang]/ctf.astro')));
 });
 
 test('every country has its flag, with flag-icons\' licence, and the snapshot its social card', () => {
@@ -387,10 +394,84 @@ test('every country has its flag, with flag-icons\' licence, and the snapshot it
         assert.equal(files.size, 250, `${dir}: 249 flags and the licence`);
         assert.match(fs.readFileSync(path.join(ROOT, dir, 'LICENSE.txt'), 'utf8'), /flag-icons 7\.6\.0[\s\S]*The MIT License/);
     }
-    const card = ctfOgImage(MODELS.committed);
+    // a card per language, the English one named as it always was
+    const cards = LANGS.map((lang) => path.basename(ctfOgImage(localModel(MODELS.committed, lang))));
+    assert.equal(new Set(cards).size, LANGS.length, 'each language has a card of its own');
     for (const dir of ['react/public', 'astro/public']) {
-        assert.deepEqual(fs.readdirSync(path.join(ROOT, dir, 'ctf/og')), [path.basename(card)], `${dir}${card}: run node scripts/generate-og.mjs --ctf`);
+        assert.deepEqual(fs.readdirSync(path.join(ROOT, dir, 'ctf/og')).sort(), [...cards].sort(), `${dir}/ctf/og: run node scripts/generate-og.mjs --ctf`);
     }
+    for (const lang of LANGS) {
+        const alt = ctfCardAlt(localModel(MODELS.committed, lang));
+        assert.ok(alt.includes(String(MODELS.committed.firstEpoch)) && !/\{[A-Za-z]/.test(alt), `${lang}: ${alt}`);
+    }
+});
+
+
+test('the pages in another language: its names, its A–Z, its figures, the same data', () => {
+    const m = MODELS.drawn;
+    for (const lang of LANGS.slice(1)) {
+        const lm = localModel(m, lang);
+        const names = ctfNames(lang);
+        assert.equal(localModel(m, lang), lm, 'one model per language');
+        assert.equal(lm.lang, lang);
+        assert.deepEqual(lm.az.map((c) => c.code), names.order.split(' '), `${lang}: the A–Z is the names file's`);
+        for (const c of lm.countries) {
+            const en = m.byCode.get(c.code);
+            assert.equal(c.name, names.name[c.code]);
+            assert.equal(c.in, names.in[c.code]);
+            // the figures are the English model's
+            assert.deepEqual([c.p, c.x, c.pots, c.avail, c.online, c.big, c.hot, c.flagHeld], [en.p, en.x, en.pots, en.avail, en.online, en.big, en.hot, en.flagHeld], `${lang} ${c.code}`);
+        }
+        // the search and the picker know the language's names and the English ones
+        const ke = lm.byCode.get('ke');
+        assert.deepEqual(gridCountries(lm, { q: ke.name }).map((c) => c.code).includes('ke'), true, `${lang}: ${ke.name}`);
+        assert.equal(findCountry(lm, ke.name)?.code, 'ke', `${lang}: ${ke.name}`);
+        assert.equal(findCountry(lm, 'Kenya')?.code, 'ke', `${lang}: the English name`);
+        assert.equal(findCountry(lm, 'KE')?.code, 'ke');
+        // the same countries in every grid, in the language's A–Z among pots within 0.1 α
+        const buckets = (rows) => rows.map((c) => Math.round(c.pots / 1e8));
+        assert.deepEqual(buckets(gridCountries(lm, { sort: 'pot' })), buckets(gridCountries(m, { sort: 'pot' })));
+        assert.deepEqual(easyWins(lm, 7).map((c) => c.code).sort(), easyWins(m, 7).map((c) => c.code).sort());
+    }
+    assert.equal(localModel(m, 'en'), m, 'English is the model itself');
+    // Arabic's vowel marks and hamza seats fold away in the search
+    const ar = localModel(m, 'ar');
+    assert.equal(findCountry(ar, 'عمان')?.code, 'om', 'عُمان without its damma');
+    assert.equal(findCountry(ar, 'المانيا')?.code, 'de', 'ألمانيا without its hamza');
+});
+
+test('figures and days in each language\'s format, rounded as in English', () => {
+    const cases = {
+        en: ['12.97', '1,234', '2.6%', '83%', 'Nov 27, 18:25 UTC', 'November 27, 2026', '16d 03h'],
+        ru: ['12,97', '1\u00a0234', '2,6\u00a0%', '83\u00a0%', '27 нояб., 18:25 UTC', '27 ноября 2026 года', '16 д 03 ч'],
+        de: ['12,97', '1.234', '2,6\u00a0%', '83\u00a0%', '27. Nov., 18:25 UTC', '27. November 2026', '16 T. 03 Std.'],
+        es: ['12,97', '1234', '2,6\u00a0%', '83\u00a0%', '27 nov, 18:25 UTC', '27 de noviembre de 2026', '16 d 03 h'],
+        zh: ['12.97', '1,234', '2.6%', '83%', '11月27日 18:25 UTC', '2026年11月27日', '16天03小时'],
+    };
+    for (const [lang, want] of Object.entries(cases)) {
+        const f = formats(lang);
+        const got = [f.alpha(12_970_000_000), f.int(1234), f.pct(chanceOf(189)), f.pct(chanceOf(5)), f.utcTime('2026-11-27T18:25:24Z'), f.utcDay('2026-11-27T18:25:24Z'), f.countdown(16 * 86_400_000 + 3 * 3_600_000 + 120_000)];
+        assert.deepEqual(got, want, lang);
+    }
+    // Arabic keeps Western digits
+    const ar = formats('ar');
+    assert.match(ar.alpha(12_970_000_000), /^12\.97$/);
+    assert.match(ar.pct(chanceOf(5)), /^83\u200e?%\u200e?$/);
+    // the chance rounds the same digits in every language
+    for (const units of [5, 9, 99, 188, 30630]) {
+        const digits = (s) => s.replace(/[^\d]/g, '');
+        const en = digits(formats('en').pct(chanceOf(units)));
+        for (const lang of ['ru', 'ar', 'zh', 'de', 'es']) assert.equal(digits(formats(lang).pct(chanceOf(units))), en, `${lang} ${units}`);
+    }
+});
+
+test('a page links to the pages in its language where they are translated', () => {
+    assert.equal(pagePath('en', '/ctf/ke'), '/ctf/ke');
+    assert.equal(pagePath('ru', '/ctf/ke'), group.localized ? '/ru/ctf/ke' : '/ctf/ke');
+    assert.equal(pagePath('ar', '/ctf'), group.localized ? '/ar/ctf' : '/ctf');
+    assert.equal(ctaLink('de', 'start'), 'https://ur.io');
+    assert.match(ctaLink('de', 'x'), /^(\/de)?\/docs\/miner\/extender$/);
+    assert.equal(ctaLink('en', 'x'), '/docs/miner/extender');
 });
 
 // A country page's <main> in miniature, as CtfCountry.jsx renders one: its names in the trail, the heading, the

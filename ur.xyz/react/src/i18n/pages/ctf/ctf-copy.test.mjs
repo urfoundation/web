@@ -44,6 +44,7 @@ import {
     uninhabitedSentence,
 } from '../../../components/pages/ctf/model.js';
 import { ctfCardAlt } from '../../../components/pages/ctf/og.js';
+import { CHANCE_SHOWN, DEFAULT_WIN } from '../../../components/pages/ctf/indexing.js';
 import group from './group.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -175,13 +176,31 @@ test('titles fit 60 graphemes and descriptions 175 characters, and none repeats,
     }
 });
 
-test('before a draw no sentence in any language shows a chance to win', () => {
+// the strings that tell a newcomer it wins by default, which a page says only after a draw
+const DEFAULT_WIN_KEYS = ['rule.drawn', 'fine.chanceDrawn', 'roleLine.pOpen', 'roleLine.xOpen', 'message.both', 'message.pOnly', 'message.xOnly',
+    'hubFaq.winDrawn', 'easy.sub', 'easy.openBoth', 'easy.openP', 'easy.openX', 'legend.openBody', 'legend.openTail', 'cell.pRun', 'cell.xRun',
+    'cell.pOpenSr', 'cell.xOpenSr', 'detail.pOpen', 'detail.xOpen', 'board.noteP', 'board.noteX', 'countryFaq.roleBoth', 'countryFaq.roleX', 'countryFaq.roleP'];
+const keyOf = (copy, at) => at.split('.').reduce((v, k) => v[k], copy);
+
+test('each language says "wins by default" in words the seo-audit knows, and only where English does', () => {
+    for (const [lang, copy] of [['en', EN], ...present.map((l) => [l, COPY[l]])]) {
+        for (const at of DEFAULT_WIN_KEYS) assert.ok(DEFAULT_WIN[lang].test(keyOf(copy, at).replace(/<\/?[a-z]+>/g, '')), `${lang} ${at}: ${keyOf(copy, at)}`);
+        for (const [at, s] of strings(copy)) {
+            if (DEFAULT_WIN_KEYS.some((key) => at === key || at.startsWith(`${key}.`))) continue;
+            const english = keyOf(EN, at.replace(/\.(zero|one|two|few|many)$/, '.other'));
+            if (DEFAULT_WIN.en.test(String(english))) continue;
+            assert.ok(!DEFAULT_WIN[lang].test(s.replace(/<\/?[a-z]+>/g, '')), `${lang} ${at} says a newcomer wins by default where the English does not: ${s}`);
+        }
+    }
+});
+
+test('before a draw no sentence in any language claims a default win or shows a chance to win', () => {
     for (const lang of ['en', ...present]) {
         for (const phase of ['committed', 'first', 'pending', 'undrawn']) {
             const m = localModel(MODELS[phase], lang);
             for (const c of m.countries) {
                 const said = [countryMessage(m, c), roleLine(m, c, 'p'), roleLine(m, c, 'x'), countryDescription(m, c, DAY), lastEpochFacts(m, c) || '', defaultWinRule(m), presenceSentence(m, c) || '', uninhabitedSentence(c, lang) || ''].join(' ');
-                assert.ok(!/\d\s?‎?[%٪]/.test(said), `${lang} ${phase} ${c.code}: ${said}`);
+                assert.ok(!CHANCE_SHOWN.test(said) && !DEFAULT_WIN[lang].test(said), `${lang} ${phase} ${c.code}: ${said}`);
                 assert.ok(!/\{[A-Za-z]/.test(said), `${lang} ${phase} ${c.code}: an unfilled placeholder in ${said}`);
             }
             assert.ok(!/\{[A-Za-z]/.test(ctfCardAlt(m)), `${lang} ${phase}: ${ctfCardAlt(m)}`);

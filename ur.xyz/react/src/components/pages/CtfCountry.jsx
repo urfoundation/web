@@ -1,8 +1,9 @@
 import React from 'react';
 import { CTF } from './ctf/data';
 import { CountryEasyWins, CountryLive } from './ctf/CountryIslands';
+import Countdown from './ctf/Countdown';
 import { Flag } from './ctf/parts';
-import { chanceText, countryMessage, lastEpochFacts, localModel, neighbours, presenceSentence, uninhabitedSentence } from './ctf/model';
+import { chanceText, countryMessage, lastEpochFacts, localModel, neighbours, presenceSentence, startNote, uninhabitedSentence } from './ctf/model';
 import { ctfCopy, formats, interpolate, place } from './ctf/i18n';
 import { pagePath } from './ctf/links';
 import { BOLD, rich } from './ctf/rich';
@@ -23,8 +24,12 @@ import './Ctf.css';
  * (astro/src/components/routes/CtfCountryRoute.astro) as `live` and
  * `easyWins` and rendered here by the SPA. The header, the questions, the
  * countries around it, how the draw works and the fine print are static.
+ * Until capture the flag starts, the hub's note opens the page too, in its
+ * compact form (ctf/Countdown.jsx, passed in as `countdown`): the same words
+ * on every country page, so it changes nothing of which pages read alike
+ * (ctf/indexing.js).
  */
-export default function CtfCountryPage({ code, lang = 'en', updated = null, live = null, easyWins = null, model = CTF }) {
+export default function CtfCountryPage({ code, lang = 'en', updated = null, live = null, easyWins = null, countdown = null, model = CTF }) {
     // `model` is the snapshot's model, or one whose page is read for its
     // indexing (ctf/indexing.js placeholderModel); the islands read the same
     const m = localModel(model, lang);
@@ -39,10 +44,12 @@ export default function CtfCountryPage({ code, lang = 'en', updated = null, live
     const { prev, next } = neighbours(m, code);
     const hub = pagePath(m.lang, '/ctf');
     const values = place(c);
+    const note = startNote(m);
     return (
         <div className="ctf-page">
             <div className="ctf-shell">
-                <header className="ctf-hdr">
+                {note && (countdown || <Countdown {...note} compact />)}
+                <header className={note ? 'ctf-hdr ctf-hdr-noted' : 'ctf-hdr'}>
                     <nav className="ctf-crumbs" aria-label={t.country.crumbs}><a href={hub}>{t.program}</a><span aria-hidden="true">›</span><span aria-current="page">{c.short}</span></nav>
                     <h1>{rich(t.country.h1, values)}</h1>
                     <p className="ctf-mission">{m.many ? f.count(t.country.missionMany, m.roleSlots, values) : rich(t.country.mission, values)}</p>

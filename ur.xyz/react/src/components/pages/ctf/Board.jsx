@@ -174,9 +174,9 @@ export default function Board({ lang = 'en', m: model = CTF }) {
                 )}
                 {/* with more than one operator a role has five slots at each, so the grid counts its winners in place of five pips */}
                 <div className={cx('ctf-grid', m.multi && 'ctf-multi', focus === 'np' && 'ctf-focus-p', focus === 'nx' && 'ctf-focus-x')}>
-                    {cells.map((c, i) => {
+                    {cells.map((c) => {
                         const ct = cellTips(tips, c.code);
-                        return <GridCell key={c.code} m={m} c={c} i={i} mounted={mounted} tipApi={tips.api} tipHover={ct.hover} tipFocus={ct.focus} tipPin={ct.pin} expanded={expanded === c.code} onExpand={onExpand} />;
+                        return <GridCell key={c.code} m={m} c={c} mounted={mounted} tipApi={tips.api} tipHover={ct.hover} tipFocus={ct.focus} tipPin={ct.pin} expanded={expanded === c.code} onExpand={onExpand} />;
                     })}
                 </div>
                 {cells.length === 0 && <p className="ctf-empty">{rich(t.empty, { q })}</p>}

@@ -118,6 +118,15 @@ export const byPot = (a, b) => (potBucket(b.pots) - potBucket(a.pots)) || byName
 export const byOnline = (a, b) => (b.online - a.online) || byName(a, b);
 
 /**
+ * When a country's flag starts its wave (a negative CSS animation-delay), so the
+ * flags of the cards and the grid wave out of step, as design.html staggers them:
+ * from the flag's place in the design's sprite, 16 to a row in code order, which
+ * is the snapshot's order (k, its index). The same for a country wherever it is
+ * shown and however the grid is sorted.
+ */
+export const waveDelay = (k) => `-${((((k % 16) * 7) + (Math.floor(k / 16) * 11)) % 23 / 10).toFixed(1)}s`;
+
+/**
  * A country's role: the operators' sums, and each operator's own draw (`ops`,
  * in the order of `operators`; one operator's is the role itself). It is open
  * where any operator that drew left a slot of it unclaimed (a newcomer with
@@ -178,7 +187,7 @@ export function buildModel(snap) {
     const taking = operators.length || listed.length || 1;
     const apis = (operators.length ? operators : listed).map((o) => o.api_url).filter(Boolean);
     const slots = operators.map((o) => o.slot).filter((v) => v !== null && v !== undefined);
-    const countries = snap.countries.map((c) => {
+    const countries = snap.countries.map((c, k) => {
         const p = roleOf(c.providers, operators, multi);
         const x = roleOf(c.extenders, operators, multi);
         const pots = p.pot + x.pot;
@@ -218,6 +227,8 @@ export function buildModel(snap) {
             won: drawn ? p.won + x.won : null,
             // its local note (data/ctf-local-notes.js), shown on its page
             note: CTF_LOCAL_NOTES[c.code] || null,
+            // when its flag starts its wave (waveDelay)
+            wave: waveDelay(k),
         };
     });
     const az = countries.slice().sort(byFolded);

@@ -20,8 +20,9 @@
 // does. Until capture the flag starts, a note above everything else says when
 // (in the HTML, from the snapshot's prelaunch block) and counts down to it on
 // the visitor's clock (ctf/Countdown.jsx, a small island that brings its words
-// with it and hydrates on load, as the clock is at the top of the page); the
-// build of a snapshot from after the start leaves it out (model.js startNote).
+// with it and hydrates when the browser is idle, within a second, so the page
+// preloads nothing for it); the build of a snapshot from after the start
+// leaves it out (model.js startNote).
 // The snapshot combines every network operator of the operator list
 // (scripts/ctf-import.mjs), so the Dataset's distribution is each operator's
 // GET /sn/ctf, and the page names its JSON as its alternate only while there
@@ -101,7 +102,7 @@ const hereOrigin = new URL(m.api.here).origin;
             {/* "Updated" states the sitemap's lastmod: the build fills the
                 token in once the page is fingerprinted (src/lib/lastmod.js) */}
             <CtfPage lang={lang} updated={LASTMOD_TOKEN}>
-                {note && <Countdown slot="countdown" {...note} client:load />}
+                {note && <Countdown slot="countdown" {...note} client:idle={{ timeout: 1000 }} />}
                 <Board slot="board" {...islandLang} client:idle={{ timeout: 1500 }} />
             </CtfPage>
         </main>

@@ -17,6 +17,7 @@ import path from "node:path";
 import net from "node:net";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { OFFLINE_CHROMIUM_ARGS } from "./offline-chromium.mjs";
+import { localizedSamples } from "./localized-samples.mjs";
 
 // Astro reports every build and preview to telemetry.astro.build unless this is
 // set before it loads; the builds and previews this starts inherit it.
@@ -37,7 +38,9 @@ const ASTRO_OUT = path.join(ASTRO_DIR, "build", UR_ENV);
 const OUT = path.join(__dirname, "__parity__");
 
 // Routes shared by the React implementation and the Astro static build.
-const ROUTES = ["/", "/operators", "/miners", "/validators", "/research", "/docs", "/terms", "/privacy", "/vdp", "/about", "/investors", "/investors/deck", "/investors/conviction-lock", "/investors/apex-competition", "/investors/our-letter-to-bittensor", "/investors/letter-to-tokenholders-september-2026", "/build", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology", "/dashboard", "/ar/miners"];
+const ROUTES = ["/", "/operators", "/miners", "/validators", "/research", "/docs", "/terms", "/privacy", "/vdp", "/about", "/investors", "/investors/deck", "/investors/conviction-lock", "/investors/apex-competition", "/investors/our-letter-to-bittensor", "/investors/letter-to-tokenholders-september-2026", "/build", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology", "/dashboard", "/ar/miners",
+  // a page of each localized page group, in Arabic (localized-samples.mjs)
+  ...localizedSamples(["ar"])];
 
 const PIXEL_TOLERANCE = 40; // desktop
 // Phones render at 3x DPR; composited/animated text vs a static node antialiases the SAME

@@ -54,8 +54,8 @@ test('the file has the explorers and the events, and nothing else', () => {
 
 test('every milestone has a unique id, a readable date, a known status, a title and a detail', () => {
     const ids = new Set();
-    // ids the page itself uses: the notices, the sections and the epoch groups
-    const reserved = new Set([...mainnetNotices.map((n) => n.id), 'actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
+    // ids the page itself uses: the notices (with their titles and texts), the sections and the epoch groups
+    const reserved = new Set([...mainnetNotices.flatMap((n) => [n.id, `${n.id}-heading`, `${n.id}-text`]), 'actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
     for (const event of events) {
         const fields = Object.keys(event).filter((key) => key !== 'approximate' && key !== 'key').sort();
         assert.deepEqual(fields, ['date', 'detail', 'id', 'sources', 'status', 'title'], `${event.id}: fields`);
@@ -230,14 +230,14 @@ test('a milestone is grouped by the epoch it ends in, a day counting from its st
         { id: 'f', date: '2026-10-23T18:09:00Z' },
         { id: 'g', date: '2026-10-30T18:25:00Z/2026-10-30T22:25:00Z' },
         { id: 'i', date: '2026-11-06T18:25:00Z/2026-11-06T22:25:00Z' },
-        // after the last epoch listed, epoch 7
-        { id: 'j', date: '2026-11-27T18:25:00Z/2026-11-27T22:25:00Z' },
+        // after the last epoch listed, epoch 8
+        { id: 'j', date: '2026-12-04T18:25:00Z/2026-12-04T22:25:00Z' },
         { id: 'h', date: 'not a date' },
     ];
     const groups = groupByEpoch(fixture, epochs, { before: { title: 'Before launch' }, after: { summary: 'After' } });
     const where = Object.fromEntries(groups.flatMap((g) => g.events.map((e) => [e.id, g.id])));
-    assert.deepEqual(where, { a: 'before-launch', b: 'epoch-0', c: 'epoch-0', d: 'epoch-1', e: 'epoch-2', f: 'epoch-3', g: 'epoch-4', i: 'epoch-5', j: 'after-epoch-7' });
-    assert.deepEqual(groups.map((g) => g.title), ['Before launch', 'Epoch 0', 'Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'After epoch 7']);
+    assert.deepEqual(where, { a: 'before-launch', b: 'epoch-0', c: 'epoch-0', d: 'epoch-1', e: 'epoch-2', f: 'epoch-3', g: 'epoch-4', i: 'epoch-5', j: 'after-epoch-8' });
+    assert.deepEqual(groups.map((g) => g.title), ['Before launch', 'Epoch 0', 'Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'After epoch 8']);
 
     // the real milestones all land in a group, in the order the data lists them
     const real = groupByEpoch(events, epochs);
@@ -435,9 +435,9 @@ test('the first settlement v2 claims: epoch 4\'s root finalized at 19:10 UTC on 
 
 test('the extender amendment: the pool begins epoch 8, and the billing change is live since November 11', () => {
     // approved on November 10 (the sn whitepaper's §8.6): the extender pool starts with epoch 8's first
-    // block, which is the end of epoch 7, the last epoch listed, so the list shows it after epoch 7
+    // block, which is the end of epoch 7, so the list shows it under epoch 8
     const pool = events.find((e) => e.id === 'extender-pool-epoch-8');
-    const epoch7 = mainnetEpochs.at(-1);
+    const epoch7 = mainnetEpochs.find((e) => e.number === 7);
     assert.equal(epoch7.number, 7);
     assert.equal(epoch7.end.block, 9600028);
     assert.equal(pool.status, 'scheduled');
@@ -450,10 +450,10 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     assert.match(pool.detail, /the part of each contract's traffic that no provider earns counts for extenders instead\./);
     assert.match(pool.detail, /An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11\./);
     assert.doesNotMatch(pool.detail, /bytes that no provider carries/);
-    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === pool.id)).id, 'after-epoch-7');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === pool.id)).id, 'epoch-8');
     // the signed entry and epoch 8's first block do not exist yet: their sources stay empty, so the page hides them
     assert.deepEqual(pool.sources.filter((s) => s.ref === '').map((s) => s.label), ['Signed amendment entry', "Epoch 8's first block, 9,600,028"]);
-    // not a key milestone: the summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
+    // not a key milestone: on the summary, capture the flag marks epoch 8's first block (tests/mainnet-summary.test.mjs)
     assert.equal(pool.key, undefined);
 
     // the billing change (§8.6.7, step 0): done, dated by its deploy on November 11, which reached the network
@@ -532,7 +532,7 @@ test('Pro data on each network\'s own cycle: a milestone and a notice for the su
     assert.equal(notice.paragraphs.length, 5);
     assert.match(what, /^With the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, instead of on the 1st of the month\. /);
     assert.match(what, / a payment no longer adds a separate 600 GiB credit\.$/);
-    assert.equal(sn25, 'SN25 pool rewards are counted as before. The pool is split by completed usage, and subscription payments are not an input to it.');
+    assert.equal(sn25, 'SN25 pool rewards are counted as before. Each operator\'s pool is split by completed usage, and subscription payments are not an input to it.');
     assert.match(subsidy, /^What changes is the subscription revenue counted by the network operator's provider subsidy, which for traffic since the October 6 cutoff pays no USDC and only counts toward the weekly points the network operator awards\. /);
     assert.match(subsidy, / From the release, each period's revenue counts once, through its cycle grants\.$/);
     // for providers: less where revenue counted twice, more for long-running Play, on each network's own cycle;
@@ -561,9 +561,10 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
     assert.equal(share.date, '2026-11-12');
     assert.equal(whenText(parseWhen(share.date), { approxStart: isApproximate(share) }), 'Thu Nov 12');
     assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === share.id)).id, 'epoch-5');
-    // after the Pro data milestone of November 11, before epoch 5's claims
+    // after the milestones of November 11, the last of them Gamma's, before epoch 5's claims
     const ids = events.map((e) => e.id);
-    assert.equal(ids.indexOf(share.id), ids.indexOf('pro-grant-per-cycle') + 1);
+    assert.equal(ids.indexOf(share.id), ids.indexOf('sn25-gamma-payments') + 1);
+    assert.equal(ids.indexOf('sn25-gamma-payments'), ids.indexOf('pro-grant-per-cycle') + 1);
     assert.equal(share.key, undefined);
     // the notice's full text, dated the day of the rollout (sn mainnet/notices, on its main branch)
     const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md';
@@ -647,8 +648,7 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     // deployment plan (§11.2). Its times here are the page's projection from block numbers at 12 seconds a
     // block, so epoch 8's first block, the end of epoch 7, is about 18:25 UTC on November 27, as for the
     // extender pool (the design's measured projection puts it about four minutes later)
-    const epoch7 = mainnetEpochs.at(-1);
-    assert.equal(epoch7.number, 7);
+    const epoch7 = mainnetEpochs.find((e) => e.number === 7);
     assert.equal(epoch7.end.time, '2026-11-27T18:25:00Z');
     const blocksPerEpoch = epoch7.end.block - epoch7.start.block;
     const after = (time, blocks) => new Date(Date.parse(time) + blocks * SECONDS_PER_BLOCK * 1000).toISOString().replace('.000Z', 'Z');
@@ -657,14 +657,19 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     const groupOf = (id) => groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === id)).id;
     const shown = (event) => whenText(parseWhen(event.date), { approxStart: isApproximate(event) });
     const ctf = ['capture-the-flag-presence-sampling', 'capture-the-flag-pool-registration', 'capture-the-flag-epoch-8', 'capture-the-flag-first-draw', 'capture-the-flag-first-claims'];
-    // in date order among the other milestones; nothing is done yet; none is a key milestone, since the
-    // summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
+    // in date order among the other milestones; nothing is done yet; the start is the one key milestone,
+    // marked on the summary at epoch 8's first block, the last epoch listed (tests/mainnet-summary.test.mjs)
     assert.deepEqual(ctf.map((id) => ids.indexOf(id)), ctf.map((id) => ids.indexOf(id)).sort((a, b) => a - b));
     for (const id of ctf) {
         assert.ok(byId(id), `${id} is listed`);
         assert.ok(['scheduled', 'planned'].includes(byId(id).status), `${id}: ${byId(id).status}`);
-        assert.equal(byId(id).key, undefined, id);
+        assert.equal(byId(id).key, id === 'capture-the-flag-epoch-8' ? true : undefined, id);
     }
+    // epoch 8, the first in which capture the flag pays, is listed: its row and its milestones carry the flag
+    const epoch8 = mainnetEpochs.at(-1);
+    assert.deepEqual([epoch8.number, epoch8.settlement, epoch8.captureTheFlag], [8, 'v2', true]);
+    assert.deepEqual([epoch8.start, epoch8.end], [epoch7.end, { block: 9650428, time: '2026-12-04T18:25:00Z', projected: true }]);
+    assert.deepEqual(mainnetEpochs.filter((e) => e.captureTheFlag).map((e) => e.number), [8]);
 
     // the sampler runs by the end of epoch 6, the day epoch 7 begins, so that epoch 7 is a full shadow epoch;
     // the start moves to epoch 9 only if it is not running when epoch 8 starts
@@ -700,7 +705,7 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     assert.equal(start.date, byId('extender-pool-epoch-8').date);
     assert.equal(ids.indexOf(start.id), ids.indexOf('extender-pool-epoch-8') + 1);
     assert.equal(shown(start), 'Fri Nov 27 · ≈18:25 UTC');
-    assert.equal(groupOf(start.id), 'after-epoch-7');
+    assert.equal(groupOf(start.id), 'epoch-8');
     assert.ok(start.detail.startsWith(`From block ${thousands(epoch7.end.block)}, the first of epoch 8, `));
     const slots = 249 * (5 + 5);
     assert.ok(start.detail.includes(` Each of the 249 ISO 3166-1 countries has five provider slots and five extender slots each epoch, each worth the pool's new funding for the epoch divided by ${thousands(slots)}. `));
@@ -731,7 +736,7 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     assert.deepEqual(end8, { block: 9650428, time: '2026-12-04T18:25:00Z' });
     assert.equal(draw.date, `${end8.time}/${after(end8.time, 1200)}`);
     assert.equal(shown(draw), 'Fri Dec 4 · ≈18:25–22:25 UTC');
-    assert.equal(groupOf(draw.id), 'after-epoch-7');
+    assert.equal(groupOf(draw.id), 'after-epoch-8');
     assert.ok(draw.detail.startsWith(`Epoch 8 ends at block ${thousands(end8.block)}. The network operator commits its list of entries by block ${thousands(end8.block + 600)}, `));
     assert.ok(draw.detail.includes(` committed with the provider pool's by block ${thousands(end8.block + 1200)}. `));
     assert.match(draw.detail, / every slot carries forward into its country's pot, and the first winners are drawn in epoch 9\.$/);
@@ -752,7 +757,9 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     const text = notice.paragraphs.join(' ');
     assert.ok(text.startsWith(`From epoch 8, which starts at block ${thousands(epoch7.end.block)} around November 27, 18:25 UTC, `));
     assert.ok(text.includes(` Each of the 249 ISO 3166-1 countries has ten slots each epoch (one week), five for providers and five for extenders, and every slot is worth the same: the pool's new funding for the epoch divided by ${thousands(slots)}. `));
-    assert.match(text, / when it was online, passing the network operator's checks and in that country for at least half of the epoch, and is active at its end\. /);
+    assert.match(text, / when it was online, passing its network operator's checks and in that country for at least half of the epoch, and is active at its end\. /);
+    // every operator draws its own: each commits its list, as each has its pool (the owner's rule: every operator is part of the protocol)
+    assert.match(text, / Each operator commits its list of entries on chain, /);
     // the draw's exact odds (§12.1, item 15)
     assert.match(text, / With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries\. /);
     assert.match(text, / Each winner takes its own slot and a fifth of that pot, /);
@@ -775,4 +782,30 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     for (const words of [`${notice.title} ${text}`, litepaperFlag, ...ctf.map((id) => `${byId(id).title} ${byId(id).detail}`)]) {
         assert.doesNotMatch(words, avoid);
     }
+});
+
+test('Gamma payments on SN25: done at the block the subnet owner switched them on, as a fact of the subnet', () => {
+    // read from the chain (snow's archive, read-only) on November 12: at block 9,483,859, 15:14:12 UTC on November
+    // 11, extrinsic 21, the ur-owner multisig's second approval executed the batch that published SN25's first Gamma
+    // service (ServiceSet: the owner hotkey, the services document, the spender) and switched on SN25's gamma
+    // (SubnetGammaEnabledSet: netuid 25, enabled), the batch mmm BTCPAY.md §18.7 gives. Gamma itself was switched on
+    // network-wide on November 9 (GammaEnabled first true at block 9,471,027)
+    const gamma = events.find((e) => e.id === 'sn25-gamma-payments');
+    assert.equal(gamma.status, 'done');
+    assert.equal(gamma.date, '2026-11-11T15:14:12Z');
+    assert.equal(whenText(parseWhen(gamma.date), { approxStart: isApproximate(gamma) }), 'Wed Nov 11 · 15:14 UTC');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === gamma.id)).id, 'epoch-5');
+    assert.equal(gamma.title, 'Gamma payments available on SN25');
+    assert.ok(gamma.detail.startsWith('At block 9,483,859, the subnet owner\'s multisig published the first Gamma service on SN25 and switched on Gamma for SN25, in one call. '));
+    assert.match(gamma.detail, / switched on network-wide on November 9, /);
+    assert.match(gamma.detail, / Every mint burns SN25 alpha\. /);
+    // a fact of the subnet: URnetwork is named only as one place to pay with it, and no operator is "the" one
+    assert.match(gamma.detail, / The first is URnetwork's, one place to pay with it: /);
+    assert.doesNotMatch(gamma.detail, /the network operator|bringyour/i);
+    // the switch-on links its extrinsic; the ur.io page is linked once it is live
+    const [switchOn, page] = gamma.sources;
+    assert.deepEqual(switchOn, { label: "Published and switched on by the subnet owner's multisig, extrinsic 9483859-0021", kind: 'substrate_extrinsic', ref: '9483859-21' });
+    assert.equal(sourceLink(switchOn, explorers).href, 'https://taostats.io/extrinsic/9483859-0021');
+    assert.deepEqual([page.kind, page.ref], ['doc', '']);
+    assert.equal(gamma.key, undefined);
 });

@@ -4,9 +4,9 @@
 // (src/pages/[lang]/mainnet.astro) are this component with their language.
 //
 // The page body is the React component the SPA renders for this route
-// (react/src/components/pages/Mainnet.jsx). It needs no script, so it is
-// rendered to static HTML here, and only the nav and the summary timeline
-// under the title hydrate: the summary (mainnet/MainnetSummary.jsx) marks
+// (react/src/components/pages/Mainnet.jsx). It is rendered to static HTML
+// here, and only the nav and the summary timeline under the title hydrate:
+// the summary (mainnet/MainnetSummary.jsx) marks
 // "now", which only the visitor's clock knows. It is an island in the page's
 // `summary` slot, given its model, computed here from the same data in the
 // page's language, so the island carries no data files and no copy of its
@@ -14,6 +14,12 @@
 // their words the page's copy (react/src/i18n/pages/mainnet); the shell
 // around them is the section pages' exactly, so the SPA and this render are
 // pixel-identical.
+//
+// The dated notices at the top are closed to their headers, as the SPA keeps
+// them in state (Mainnet.jsx MainnetNotice): the script below opens and
+// closes the same markup without React (mainnet/notices.js wireNotices). Their
+// text is in the HTML either way, and without script the noscript style
+// shows every notice open, with nothing to tap.
 import Base from '../../layouts/Base.astro';
 import DisclaimerStatic from '../DisclaimerStatic.astro';
 import NavIsland from '../../islands/NavIsland.jsx';
@@ -41,6 +47,13 @@ const summary = summaryModel(events, mainnetEpochs, { t });
 const dict = await getDict(lang);
 ---
 <Base title={t.meta.title} description={t.meta.description} breadcrumbName={t.meta.breadcrumb} lang={lang} dir={LANGS[lang]?.dir || 'ltr'}>
+    {/* without script, the notices are open and nothing offers to open them */}
+    <noscript slot="head"><style is:inline>
+        .mainnet-page .mainnet-notice .mainnet-notice-panel { grid-template-rows: 1fr; visibility: visible; }
+        .mainnet-page .mainnet-notice .mainnet-notice-more { display: none; }
+        .mainnet-page .mainnet-notice .mainnet-notice-box,
+        .mainnet-page .mainnet-notice .mainnet-notice-toggle { cursor: auto; }
+    </style></noscript>
     <div class="app">
         <DisclaimerStatic t={dict} />
         <NavIsland activeRoute="mainnet" lang={lang} client:idle={{ timeout: 1000 }} />
@@ -56,3 +69,9 @@ const dict = await getDict(lang);
         <FooterStatic t={dict} lang={lang} />
     </div>
 </Base>
+
+<script>
+    import { wireNotices } from '@react/components/pages/mainnet/notices.js';
+
+    wireNotices(document);
+</script>

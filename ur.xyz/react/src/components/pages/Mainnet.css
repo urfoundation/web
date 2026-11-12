@@ -41,17 +41,47 @@
 
 /* the dated notices above the actions: pale blue, with the token's pink edge;
    the first takes the actions' top padding, and each after it, like the
-   actions, sits close under the one before */
+   actions, sits close under the one before.
+   Each is closed to its header until opened (Mainnet.jsx MainnetNotice,
+   mainnet/notices.js): the header is the card's button, the dateline with
+   "Expand" or "Collapse" and a chevron at its end, over the title, and the
+   whole card answers a tap. The text stays in the HTML: its row of the panel
+   grows from 0fr to 1fr, and it is hidden once closed, so its link takes no
+   focus and a screen reader skips it. Without script every notice is open
+   (the static route's noscript style), and in print too. */
 .mainnet-page .mainnet-notice { padding: 88px var(--content-gutter) 0; }
 .mainnet-page .mainnet-notice + .mainnet-notice,
 .mainnet-page .mainnet-notice + .mainnet-actions { padding-top: 24px; }
-.mainnet-page .mainnet-notice-box { max-width: var(--content-width); margin: 0 auto; padding: 24px 32px 22px; border: 1px solid rgba(214, 230, 244, 0.28); border-inline-start: 3px solid var(--brand-ur); background: rgba(214, 230, 244, 0.05); }
-.mainnet-page .mainnet-notice-date { margin: 0; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; line-height: 1.4; text-transform: uppercase; color: var(--brand-ur); }
-.mainnet-page .mainnet-notice-title { margin: 10px 0 0; font-family: 'PPNeueMontreal', sans-serif; font-size: clamp(1.35rem, 2.6vw, 1.7rem); font-weight: 500; line-height: 1.25; color: var(--brand-white); }
+.mainnet-page .mainnet-notice-box { position: relative; max-width: var(--content-width); margin: 0 auto; border: 1px solid rgba(214, 230, 244, 0.28); border-inline-start: 3px solid var(--brand-ur); background: rgba(214, 230, 244, 0.05); cursor: pointer; scroll-margin-top: calc(var(--nav-height) + 16px); transition: background-color 0.2s ease, border-color 0.2s ease; }
+.mainnet-page .mainnet-notice-heading { margin: 0; font: inherit; }
+.mainnet-page .mainnet-notice-toggle { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'date more' 'title title'; align-items: baseline; gap: 0 20px; width: 100%; margin: 0; padding: 24px 32px 22px; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+/* the focus ring goes round the whole card, the button's reach */
+.mainnet-page .mainnet-notice-toggle:focus-visible { outline: none; }
+.mainnet-page .mainnet-notice-toggle:focus-visible::after { content: ''; position: absolute; inset: -1px; inset-inline-start: -3px; outline: 2px solid var(--brand-ur); outline-offset: 3px; pointer-events: none; }
+.mainnet-page .mainnet-notice-date { grid-area: date; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; line-height: 1.4; text-transform: uppercase; color: var(--brand-ur); }
+.mainnet-page .mainnet-notice-title { grid-area: title; margin: 10px 0 0; font-family: 'PPNeueMontreal', sans-serif; font-size: clamp(1.35rem, 2.6vw, 1.7rem); font-weight: 500; line-height: 1.25; color: var(--brand-white); }
+.mainnet-page .mainnet-notice-more { grid-area: more; display: inline-flex; align-items: center; gap: 8px; justify-self: end; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; line-height: 1.4; text-transform: uppercase; white-space: nowrap; color: var(--brand-ui); transition: color 0.2s ease; }
+.mainnet-page .mainnet-notice-toggle[aria-expanded="true"] .mainnet-notice-more-label[data-shows="closed"],
+.mainnet-page .mainnet-notice-toggle[aria-expanded="false"] .mainnet-notice-more-label[data-shows="open"] { display: none; }
+.mainnet-page .mainnet-notice-chevron { flex: none; width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+.mainnet-page .mainnet-notice-toggle[aria-expanded="true"] .mainnet-notice-chevron { transform: rotate(180deg); }
+@media (hover: hover) {
+    .mainnet-page .mainnet-notice-box:hover { border-color: rgba(214, 230, 244, 0.42); border-inline-start-color: var(--brand-ur); background: rgba(214, 230, 244, 0.075); }
+    .mainnet-page .mainnet-notice-box:hover .mainnet-notice-more { color: var(--brand-white); }
+}
+.mainnet-page .mainnet-notice-panel { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 0.32s cubic-bezier(0.2, 0, 0, 1), visibility 0s linear 0.32s; }
+.mainnet-page .mainnet-notice[data-open] .mainnet-notice-panel { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+.mainnet-page .mainnet-notice-clip { min-height: 0; overflow: hidden; }
+.mainnet-page .mainnet-notice-text { padding: 0 32px 22px; }
 .mainnet-page .mainnet-notice-body { margin: 12px 0 0; font-size: 1.02rem; line-height: 1.6; color: var(--brand-ui); }
+.mainnet-page .mainnet-notice-body:first-child { margin-top: 0; }
 .mainnet-page .mainnet-notice-link { display: inline-block; margin-top: 14px; font-size: 0.85rem; line-height: 1.45; letter-spacing: 0.02em; color: var(--brand-ur); }
 .mainnet-page .mainnet-notice-link:hover { color: var(--brand-white); }
 .mainnet-page .mainnet-notice a:focus-visible { outline: 2px solid var(--brand-ur); outline-offset: 3px; }
+@media print {
+    .mainnet-page .mainnet-notice .mainnet-notice-panel { grid-template-rows: 1fr; visibility: visible; }
+    .mainnet-page .mainnet-notice .mainnet-notice-more { display: none; }
+}
 
 .mainnet-page #mainnet { border-top: 0; padding-top: 88px; padding-bottom: 72px; }
 .mainnet-page #settlement { padding-top: 72px; padding-bottom: 72px; }
@@ -162,6 +192,14 @@
 .mainnet-page .mainnet-epoch-days { color: var(--brand-white); font-size: 1rem; transition: color 0.2s ease; }
 .mainnet-page .mainnet-epoch-by { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand-ui); white-space: nowrap; }
 .mainnet-page .mainnet-epoch-by[data-settlement="v2"] { color: var(--brand-usd); }
+/* capture the flag beside an epoch's settlement (Mainnet.jsx FlagTag), in the
+   token pink with a pennant: in the epoch list a line of its own under the
+   days, and over the epoch's milestones beside its settlement */
+.mainnet-page .mainnet-epoch-flag { display: inline-flex; align-items: center; gap: 7px; font-size: 0.68rem; letter-spacing: 0.14em; line-height: 1.4; text-transform: uppercase; color: var(--brand-ur); white-space: nowrap; }
+.mainnet-page .mainnet-flag-icon { flex: none; width: 12px; height: 12px; overflow: visible; }
+.mainnet-page .mainnet-flag-pole { fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; }
+.mainnet-page .mainnet-flag-cloth { fill: currentColor; }
+.mainnet-page .mainnet-epochs .mainnet-epoch-flag { grid-column: 2 / -1; grid-row: 2; justify-self: start; }
 
 /* --- The milestones, one group per epoch --- */
 .mainnet-page .mainnet-group + .mainnet-group { margin-top: 64px; }
@@ -221,7 +259,10 @@
 
 @media (max-width: 520px) {
     .mainnet-page .mainnet-actions-box { padding: 22px 18px 20px; }
-    .mainnet-page .mainnet-notice-box { padding: 18px 18px 16px; }
+    /* the notice's header in one column: "Expand" goes under the title */
+    .mainnet-page .mainnet-notice-toggle { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'date' 'title' 'more'; padding: 18px 18px 16px; }
+    .mainnet-page .mainnet-notice-more { justify-self: start; margin-top: 12px; }
+    .mainnet-page .mainnet-notice-text { padding: 0 18px 16px; }
     .mainnet-page .mainnet-notice-body { font-size: 0.98rem; }
     .mainnet-page .mainnet-actions-steps li { grid-template-columns: 32px minmax(0, 1fr); gap: 0 8px; }
     .mainnet-page .mainnet-actions-step p,
@@ -230,6 +271,7 @@
     .mainnet-page .mainnet-epochs li > a,
     .mainnet-page .mainnet-epochs li > div { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; }
     .mainnet-page .mainnet-epoch-days { grid-column: 1 / -1; grid-row: 2; }
+    .mainnet-page .mainnet-epochs .mainnet-epoch-flag { grid-column: 1 / -1; grid-row: 3; }
     .mainnet-page .mainnet-track .roadmap-stop { padding-bottom: 32px; }
     /* the ribbon compresses, as the sn page's does: a smaller band, the
        one-day epoch and the tail at their minimum, and the registration
@@ -250,7 +292,7 @@
     .mainnet-page .mainnet-summary-date-title { font-size: 0.9rem; }
 }
 
-/* Phones up to 420 px: the epochs to epoch 7 share the width, so each week's
+/* Phones up to 420 px: the epochs to epoch 8 share the width, so each week's
    band may narrow to 30 px and is named by its number, "E5", as epoch 0 is */
 @media (max-width: 420px) {
     .mainnet-page .mainnet-summary-band[data-week] { min-width: 30px; }
@@ -258,9 +300,11 @@
     .mainnet-page .mainnet-summary-name-abbr { display: inline; }
 }
 
-/* The narrowest phones: the bands' text a size down, so a week's dates fit */
+/* The narrowest phones: the bands' text a size down, so a week's dates fit,
+   and a week's band down to 26 px, so the nine bands fit 320 px */
 @media (max-width: 360px) {
     .mainnet-page .mainnet-summary-bands { gap: 2px; }
+    .mainnet-page .mainnet-summary-band[data-week] { min-width: 26px; }
     .mainnet-page .mainnet-summary-band[data-tail] { min-width: 52px; }
     .mainnet-page .mainnet-summary-box { padding: 0 4px; }
     .mainnet-page .mainnet-summary-name { font-size: 0.74rem; }
@@ -287,10 +331,16 @@
 [dir="rtl"] .mainnet-page .mainnet-summary-band[data-tail] .mainnet-summary-track { background: linear-gradient(270deg, rgba(135, 251, 103, 0.5), rgba(135, 251, 103, 0)); }
 [dir="rtl"] .mainnet-page .mainnet-sources-more > summary::before { transform: rotate(90deg); }
 [dir="rtl"] .mainnet-page .mainnet-sources-more[open] > summary::before { transform: none; }
+[dir="rtl"] .mainnet-page .mainnet-flag-icon { transform: scaleX(-1); }
 .mainnet-page:lang(ar),
 .mainnet-page:lang(ar) * { letter-spacing: 0; }
 
 @media (prefers-reduced-motion: reduce) {
+    .mainnet-page .mainnet-notice-box,
+    .mainnet-page .mainnet-notice-more,
+    .mainnet-page .mainnet-notice-chevron,
+    .mainnet-page .mainnet-notice-panel,
+    .mainnet-page .mainnet-notice[data-open] .mainnet-notice-panel,
     .mainnet-page .mainnet-epochs li > a,
     .mainnet-page .mainnet-epoch-days,
     .mainnet-page .mainnet-sources-more > summary::before,

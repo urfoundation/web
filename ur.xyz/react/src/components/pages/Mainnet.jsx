@@ -18,6 +18,7 @@ import {
     whenParts,
 } from './mainnet/timeline';
 import { localizeActions, localizeEpochs, localizeEvents, localizeNotices } from './mainnet/copy';
+import { keepNoticeInView, noticeAt, togglesNotice } from './mainnet/notices';
 import { summaryModel } from './mainnet/summary';
 import MainnetSummary from './mainnet/MainnetSummary';
 import '../RoadmapTrack.css';
@@ -95,6 +96,7 @@ export default function MainnetPage({ lang = 'en', updated = null, summary = nul
                                 <span className="mainnet-epoch-no">{runs(t.labels.epoch, { number: epoch.number })}</span>{' '}
                                 <span className="mainnet-epoch-days"><When parts={whenParts(epochDays(epoch), { t })} /></span>{' '}
                                 <span className="mainnet-epoch-by" data-settlement={epoch.settlement}>{t.labels.settlement[epoch.settlement]}</span>
+                                {epoch.captureTheFlag && <>{' '}<FlagTag t={t} /></>}
                             </>
                         );
                         return (
@@ -137,20 +139,61 @@ function after(sentence, parts) {
 /**
  * One of the dated notices above the box at the top (data/mainnet.js
  * mainnetNotices, which lists them newest first), anchored at its id, with a
- * link to its full text or to its milestone. Like the box's headline, its
- * title is an h2 under the page's single h1. Its date is the day it was
+ * link to its full text or to its milestone. Its date is the day it was
  * posted, as the page's language writes it (copy.js noticeDate).
+ *
+ * Closed, it shows only its header: the dateline, the title and "Expand"
+ * with a chevron (mainnet/notices.js). The header is the notice's button,
+ * inside its h2, an h2 under the page's single h1 like the box's headline; a
+ * tap anywhere on the card opens or closes it, and the address can point at
+ * it (/mainnet#notice). The text stays in the HTML, closed with CSS, and the
+ * static page, which runs no React here, opens and closes the same markup
+ * with its own script (notices.js wireNotices).
  */
 function MainnetNotice({ notice, t }) {
+    const [open, setOpen] = React.useState(false);
+    const section = React.useRef(null);
+    React.useEffect(() => {
+        const follow = () => {
+            if (noticeAt(window.location.hash) === section.current) setOpen(true);
+        };
+        follow();
+        window.addEventListener('hashchange', follow);
+        return () => window.removeEventListener('hashchange', follow);
+    }, []);
+    const toggle = (event) => {
+        if (!togglesNotice(event)) return;
+        if (open) keepNoticeInView(section.current);
+        setOpen(!open);
+    };
     const external = isExternal(notice.link.href) ? EXTERNAL : {};
-    const headingId = `${notice.id}-heading`;
+    const titleId = `${notice.id}-heading`;
+    const textId = `${notice.id}-text`;
     return (
-        <section className="mainnet-notice" id={notice.id} aria-labelledby={headingId}>
-            <div className="mainnet-notice-box" role="note">
-                <p className="mainnet-notice-date">{runs(t.noticeDate, { date: notice.dateText })}</p>
-                <h2 className="mainnet-notice-title" id={headingId}>{notice.title}</h2>
-                {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
-                <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>
+        <section className="mainnet-notice" id={notice.id} aria-labelledby={titleId} data-open={open ? '' : undefined} ref={section}>
+            {/* the card answers a tap; its button is the control for the keyboard and a screen reader */}
+            <div className="mainnet-notice-box" role="note" onClick={toggle}>
+                <h2 className="mainnet-notice-heading">
+                    <button type="button" className="mainnet-notice-toggle" aria-expanded={open} aria-controls={textId}>
+                        <span className="mainnet-notice-date">{runs(t.noticeDate, { date: notice.dateText })}</span>
+                        <span className="mainnet-notice-title" id={titleId}>{notice.title}</span>
+                        <span className="mainnet-notice-more" data-nosnippet="">
+                            <span className="mainnet-notice-more-label" data-shows="closed">{t.noticeToggle.expand}</span>
+                            <span className="mainnet-notice-more-label" data-shows="open">{t.noticeToggle.collapse}</span>
+                            <svg className="mainnet-notice-chevron" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                                <path d="M2.5 4.25 6 7.75l3.5-3.5" />
+                            </svg>
+                        </span>
+                    </button>
+                </h2>
+                <div className="mainnet-notice-panel" id={textId}>
+                    <div className="mainnet-notice-clip">
+                        <div className="mainnet-notice-text">
+                            {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
+                            <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );
@@ -192,6 +235,23 @@ function MinerActions({ actions, lang, t }) {
     );
 }
 
+/**
+ * Capture the flag beside an epoch's settlement: an epoch in which it pays
+ * beside the provider pool (data/mainnet.js `captureTheFlag`, from epoch 8),
+ * in its row of the epoch list and over its milestones, with a pennant.
+ */
+function FlagTag({ t }) {
+    return (
+        <span className="mainnet-epoch-flag">
+            <svg className="mainnet-flag-icon" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                <path className="mainnet-flag-pole" d="M2.75 11.25V1" />
+                <path className="mainnet-flag-cloth" d="M3.5 1.25h6.25L8.25 3.6l1.5 2.35H3.5z" />
+            </svg>
+            {t.labels.captureTheFlag}
+        </span>
+    );
+}
+
 /** A date's runs (timeline.js whenParts), the dated ones as <time>. */
 function When({ parts }) {
     return parts.map((part, index) => (part.dateTime
@@ -216,6 +276,7 @@ function MilestoneGroup({ group, explorers, lang, t }) {
                 {(epoch || about) && (
                     <p className="mainnet-group-sub">
                         {epoch && <span className="mainnet-epoch-by" data-settlement={epoch.settlement}>{t.labels.settlement[epoch.settlement]}</span>}
+                        {epoch?.captureTheFlag && <>{' '}<FlagTag t={t} /></>}
                         {epoch && about && ' '}
                         {about && <span className="mainnet-group-about">{about}</span>}
                     </p>

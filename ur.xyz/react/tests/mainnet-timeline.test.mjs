@@ -550,25 +550,27 @@ test('Pro data on each network\'s own cycle: a milestone and a notice for the su
 });
 
 test('the extenders\' share on the contracts they can relay: a milestone and a notice, with SN25 rewards still split by completed usage', () => {
-    // the network operator's server change of November 11 (server fix/extender-attribution-1111: model
-    // contractExtenderInsertSql and network_extender_address_cache.go), which ships with its next release:
-    // planned until it has rolled out, then done and dated by its rollout
+    // the network operator's server change of November 11 (server a83f0883c, the merge of
+    // fix/extender-attribution-1111: model contractExtenderInsertSql and network_extender_address_cache.go),
+    // rolled out with its server release of November 12: done, and dated by that rollout, to the day
     const share = events.find((e) => e.id === 'extender-relay-share');
     assert.ok(share, 'the milestone is listed');
-    assert.equal(share.status, 'planned');
-    assert.equal(share.approximate, true);
+    assert.equal(share.status, 'done');
+    assert.equal(share.approximate, undefined);
+    assert.equal(isApproximate(share), false);
     assert.equal(share.date, '2026-11-12');
-    assert.equal(whenText(parseWhen(share.date), { approxStart: isApproximate(share) }), '≈ Thu Nov 12');
+    assert.equal(whenText(parseWhen(share.date), { approxStart: isApproximate(share) }), 'Thu Nov 12');
     assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === share.id)).id, 'epoch-5');
     // after the Pro data milestone of November 11, before epoch 5's claims
     const ids = events.map((e) => e.id);
     assert.equal(ids.indexOf(share.id), ids.indexOf('pro-grant-per-cycle') + 1);
     assert.equal(share.key, undefined);
-    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-extender-relay-share.md';
+    // the notice's full text, dated the day of the rollout (sn mainnet/notices, on its main branch)
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md';
     assert.deepEqual(share.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
     assert.equal(share.title, 'Extenders earn their share only on contracts they can relay');
     // the subnet owner's rule of November 11: an extender is one of a contract's n hops only where it relays
-    assert.match(share.detail, /^With the network operator's next server release, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract, as the subnet owner decided on November 11\. /);
+    assert.match(share.detail, /^From the network operator's server release of November 12, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract, as the subnet owner decided on November 11\. /);
     // the three tags that relay nothing: the extender's own client, its own network's, and a public
     // provider's, which dials the platform directly (connect EXTENDER.md J4)
     assert.match(share.detail, / three kinds come from that address without being relayed: the extender host's own connection, other devices of the extender's own network that share its address, and providers of other networks that share it while providing publicly, which always connect to the platform directly\. /);
@@ -576,16 +578,17 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
     // the ipv6 /64, as the camouflage report already decides a relay
     assert.match(share.detail, / A connection from another address of an extender's IPv6 \/64, which hosts commonly send from, now counts as relayed by it\. /);
     assert.match(share.detail, / Contracts created before the release keep their hops, and SN25 pool rewards are still split by completed usage\.$/);
-    // it does not say the release has rolled out, and it gives no figure
-    assert.doesNotMatch(`${share.title} ${share.detail}`, /\bnow (?:earn|credit|count)s? (?:only|in full)\b|\blive\b|since November 1[12]|\d\s?%|\$\s?\d|\bGB\b/i);
+    // it names the release by its day, no longer as one still to come, and it gives no figure
+    assert.doesNotMatch(`${share.title} ${share.detail}`, /\bnext (?:server )?release\b|\d\s?%|\$\s?\d|\bGB\b/i);
 
     const notice = mainnetNotices.find((n) => n.id === 'notice-extender-relay-share');
     assert.ok(notice, 'the notice is listed');
-    assert.equal(notice.date, 'November 11, 2026');
+    // dated the day of the rollout, as the milestone is
+    assert.equal(notice.date, 'November 12, 2026');
     assert.equal(notice.title, "Extenders earn their share only on contracts they can relay. Providers on an extender's address are credited in full.");
     assert.equal(notice.paragraphs.length, 5);
     const [rule, tags, effect, prefix, sn25] = notice.paragraphs;
-    assert.match(rule, /^With the network operator's next server release, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract\. /);
+    assert.match(rule, /^From the network operator's server release of November 12, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract\. /);
     assert.match(rule, / a contract that comes through an extender counts the extender as one of its n hops, each credited 1\/n of the usage\.$/);
     assert.match(tags, /^The network operator counts a connection as relayed when it comes from an extender's address\. /);
     assert.match(tags, / the extender host's own connection, other devices of the extender's own network that share its address, and providers of other networks that share its address while providing publicly, since a public provider always connects to the platform directly\.$/);
@@ -597,17 +600,18 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
     assert.match(prefix, / On those contracts the extender is now one of the hops, beside the provider\.$/);
     assert.match(sn25, /^SN25 pool rewards are still split by completed usage, and the network operator's provider subsidy, which for traffic since the October 6 cutoff only counts toward the weekly points it awards, follows the same hops\. /);
     assert.match(sn25, / Contracts created before the release keep their hops\. There is nothing you need to do\.$/);
-    assert.doesNotMatch(`${notice.title} ${notice.paragraphs.join(' ')}`, /\blive\b|since November 1[12]|\d\s?%|\$\s?\d|\bGB\b/i);
+    assert.doesNotMatch(`${notice.title} ${notice.paragraphs.join(' ')}`, /\bnext (?:server )?release\b|\d\s?%|\$\s?\d|\bGB\b/i);
     // its full text is in the sn repo, as the milestone's is
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the extenders' share, capture
-    // the flag and Pro data, all of November 11, the later-posted first, then epoch 3's of October 31. The
-    // data lists them in the order they were posted, the other way round, so this order is the sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the extenders' share of
+    // November 12, then capture the flag and Pro data, both of November 11, the later-posted first, then
+    // epoch 3's of October 31. The data lists them in the order they were posted, the other way round, so
+    // this order is the sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
-        ['notice-extender-relay-share', 'November 11, 2026'],
+        ['notice-extender-relay-share', 'November 12, 2026'],
         ['notice-capture-the-flag', 'November 11, 2026'],
         ['notice-pro-grant-cycle', 'November 11, 2026'],
         ['notice', 'October 31, 2026'],

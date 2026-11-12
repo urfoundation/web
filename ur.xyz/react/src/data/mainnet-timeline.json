@@ -379,12 +379,11 @@
     {
       "id": "extender-relay-share",
       "date": "2026-11-12",
-      "status": "planned",
-      "approximate": true,
+      "status": "done",
       "title": "Extenders earn their share only on contracts they can relay",
-      "detail": "With the network operator's next server release, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract, as the subnet owner decided on November 11. A connection counts as relayed when it comes from an extender's address, and three kinds come from that address without being relayed: the extender host's own connection, other devices of the extender's own network that share its address, and providers of other networks that share it while providing publicly, which always connect to the platform directly. These no longer make the extender a hop, so their providers are credited the whole of their contracts' usage, where an extender was credited a share of it. A connection from another address of an extender's IPv6 /64, which hosts commonly send from, now counts as relayed by it. Contracts created before the release keep their hops, and SN25 pool rewards are still split by completed usage.",
+      "detail": "From the network operator's server release of November 12, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract, as the subnet owner decided on November 11. A connection counts as relayed when it comes from an extender's address, and three kinds come from that address without being relayed: the extender host's own connection, other devices of the extender's own network that share its address, and providers of other networks that share it while providing publicly, which always connect to the platform directly. These no longer make the extender a hop, so their providers are credited the whole of their contracts' usage, where an extender was credited a share of it. A connection from another address of an extender's IPv6 /64, which hosts commonly send from, now counts as relayed by it. Contracts created before the release keep their hops, and SN25 pool rewards are still split by completed usage.",
       "sources": [
-        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-extender-relay-share.md" }
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md" }
       ]
     },
     {

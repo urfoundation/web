@@ -1,7 +1,7 @@
-// The capture the flag pages' country names in Arabic: `name` and `order` from CLDR 48.0, `short`, `in` and `inShort` by hand.
+// The capture the flag pages' country names in Arabic: `name` and `order` from CLDR 48.0 (the site's own hk, mo: REGION_NAMES in react/src/i18n/format.js), `short`, `in` and `inShort` by hand.
 // Written by scripts/ctf-names.mjs, which keeps the hand-written forms; see it for what each holds.
 export default {
-    order: "is et az am aw er es au ee il sz af ps ar jo tf io ec ae al bh br pt ba cz me dz dk cv sv sn sd se eh so cn iq ga va ph cm cg cd kw de ma mx sa gb no at ne in us jp ye gr aq ag ad id ao ai uy uz ug ua ir ie it pg py pk pw bb bm bn be bg bz bd pa bj bt bw pr bf bi pl bo pf pe by th tw tm tr tt td cl tz tg tv tk tn to tl jm gi ax bs km mq mv um pn tc sb fo fk vi vg ky ck cc mh mp wf bv cx im nf hm cf do za ss ge gs dj je dm rw ru ro re zm zw ci ws as bl pm mf sm vc kn lc sx sh st lk sj sk si sg sy sr ch sl sc rs tj om gm gh gd gl gt gp gu gf gy gg gn gq gw vu fr ve fi vn fj cy qa kg kz nc hr kh ca cu cw kr kp cr co ki ke lv la lb lu ly lr lt li ls mt ml my yt mg eg mk mw mo mn mr mu mz md mc ms mm fm na nr np ng ni nz nu ht hn hu nl bq hk",
+    order: "is et az am aw er es au ee il sz af ps ar jo tf io ec ae al bh br pt ba cz me dz dk cv sv sn sd se eh so cn iq ga va ph cm cg cd kw de ma mx sa gb no at ne in us jp ye gr aq ag ad id ao ai uy uz ug ua ir ie it pg py pk pw bb bm bn be bg bz bd pa bj bt bw pr bf bi pl bo pf pe by th tw tm tr tt td cl tz tg tv tk tn to tl jm gi ax bs km mq mv um pn tc sb fo fk vi vg ky ck cc mh mp wf bv cx im nf hm cf do za ss ge gs dj je dm rw ru ro re zm zw ci ws as bl pm mf sm vc kn lc sx sh st lk sj sk si sg sy sr ch sl sc rs tj om gm gh gd gl gt gp gu gf gy gg gn gq gw vu fr ve fi vn fj cy qa kg kz nc hr kh ca cu cw kr kp cr co ki ke lv la lb lu ly lr lt li ls mo mt ml my yt mg eg mk mw mn mr mu mz md mc ms mm fm na nr np ng ni nz nu ht hn hu nl bq hk",
     name: {
         ad: "أندورا",
         ae: "الإمارات العربية المتحدة",
@@ -97,7 +97,7 @@ export default {
         gu: "غوام",
         gw: "غينيا بيساو",
         gy: "غيانا",
-        hk: "هونغ كونغ الصينية (منطقة إدارية خاصة)",
+        hk: "هونغ كونغ",
         hm: "جزيرة هيرد وجزر ماكدونالد",
         hn: "هندوراس",
         hr: "كرواتيا",
@@ -150,7 +150,7 @@ export default {
         ml: "مالي",
         mm: "ميانمار (بورما)",
         mn: "منغوليا",
-        mo: "منطقة ماكاو الإدارية الخاصة",
+        mo: "ماكاو",
         mp: "جزر ماريانا الشمالية",
         mq: "جزر المارتينيك",
         mr: "موريتانيا",

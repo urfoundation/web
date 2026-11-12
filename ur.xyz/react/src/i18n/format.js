@@ -94,20 +94,28 @@ export function interpolate(template, values = {}) {
  *   zh  Hong Kong, Macao and Taiwan are 香港, 澳门 and 台湾, the English site's
  *       short names, in every form: never CLDR's 中国香港特别行政区 or
  *       中国澳门特别行政区, and never a 中国… prefix;
- *   ru  Hong Kong and Macao are Гонконг and Макао, and
- *   de  Hongkong and Macau, the short names, as the English site's: never
- *       CLDR's Гонконг (САР) or Sonderverwaltungsregion Hongkong;
- *   es  the Latin American name where CLDR's Spanish is Spain's, as Latin
+ *   ru  Hong Kong and Macao are Гонконг and Макао,
+ *   de  Hongkong and Macau,
+ *   ar  هونغ كونغ and ماكاو (as CLDR's long name spells Macao; its short
+ *       style writes مكاو), and
+ *   es  Hong Kong and Macao, the short names, as the English site's: never
+ *       CLDR's Гонконг (САР), Sonderverwaltungsregion Hongkong, the Arabic
+ *       منطقة إدارية خاصة forms or RAE de Hong Kong (China);
+ *   es  also the Latin American name where CLDR's Spanish is Spain's, as Latin
  *       American CLDR (es-419) writes it (Rumania, Arabia Saudita, Costa de
  *       Marfil, Timor Oriental, Islas Åland, República del Congo, Islas
- *       Georgia del Sur y Sándwich del Sur), as every Spanish page is neutral
- *       Latin American.
+ *       Georgia del Sur y Sándwich del Sur, Bosnia-Herzegovina, Islas
+ *       Ultramarinas de EE.UU.), as every Spanish page is neutral Latin
+ *       American.
  */
 export const REGION_NAMES = Object.freeze({
     zh: Object.freeze({ HK: '香港', MO: '澳门', TW: '台湾' }),
     ru: Object.freeze({ HK: 'Гонконг', MO: 'Макао' }),
     de: Object.freeze({ HK: 'Hongkong', MO: 'Macau' }),
+    ar: Object.freeze({ HK: 'هونغ كونغ', MO: 'ماكاو' }),
     es: Object.freeze({
+        HK: 'Hong Kong',
+        MO: 'Macao',
         RO: 'Rumania',
         SA: 'Arabia Saudita',
         CI: 'Costa de Marfil',
@@ -115,6 +123,8 @@ export const REGION_NAMES = Object.freeze({
         AX: 'Islas Åland',
         CG: 'República del Congo',
         GS: 'Islas Georgia del Sur y Sándwich del Sur',
+        BA: 'Bosnia-Herzegovina',
+        UM: 'Islas Ultramarinas de EE.UU.',
     }),
 });
 

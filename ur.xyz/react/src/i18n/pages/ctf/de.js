@@ -74,7 +74,6 @@ export default {
         eyebrow: 'SN25 · jedes Land, jede Epoche',
         mission: 'Provider und Extender in jedem Land',
         answer: 'Mine als Provider oder Extender, mit dem Miner oder der kostenlosen URnetwork-App, und du kannst wöchentliche Krypto-Belohnungen gewinnen, wo immer du bist.',
-        starts: 'Capture the Flag beginnt mit Epoche {first} am {day} gegen {clock}. ',
         intro: 'Jeder Netzbetreiber von SN25 betreibt neben seinem Provider-Pool einen Capture-the-Flag-Pool mit zehn Slots pro Land und Epoche (eine Woche): fünf für Provider und fünf für Extender. Ein Slot, den niemand gewinnt, wandert in den Topf des Landes bei diesem Betreiber, und jeder Gewinner dort erhält seinen Slot und ein Fünftel des Topfes. {rule}',
     },
 

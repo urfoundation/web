@@ -1372,9 +1372,17 @@
 /* Right to left (Arabic): the page's text, tabs, readouts and brief mirror
    through the logical properties above; the architecture model keeps its
    drawn geometry (its parts are placed left to right in 3D), so its stage
-   stays left to right, and the selected layer's caption on it reads right
-   to left. Arrows that point the way through the page turn around. */
+   stays left to right, and the words on it read right to left: the selected
+   layer's caption, the rail under the model, and the text the parts carry
+   (the product screens' copy and labels, the SN25 functions and flows, the
+   keys and bands). A label pinned to a part keeps its corner. Arrows that
+   point the way through the page turn around. */
 [dir="rtl"] .build-page .model-stage{direction:ltr}
-[dir="rtl"] .build-page .model-stage .architecture-readout{direction:rtl}
+[dir="rtl"] .build-page .model-stage :is(.architecture-readout, .system-rail-v11, .stage-meta, .app-topbar, .app-copy, .viz-status, .transport-label, .transport-rail, .sn25-definition, .sn25-functions > span, .economics-split > *, .terminal3-operator-band, .mesh-caption){direction:rtl}
+[dir="rtl"] .build-page .model-stage .app-visual :is(span, small, b, strong, em){direction:rtl;unicode-bidi:isolate}
+[dir="rtl"] .build-page .model-stage .scene-terminal3 :is(.piece-label, .piece-name, .terminal3-base-status){direction:rtl}
+[dir="rtl"] .build-page .model-stage .scene-terminal3 .piece-label{left:14px;right:auto}
+[dir="rtl"] .build-page .model-stage .scene-terminal3 .terminal3-base .piece-name{left:22px;right:auto}
+[dir="rtl"] .build-page .model-stage .scene-terminal3 .terminal3-base-status{right:22px;left:auto}
 /* a figure such as "100K+" keeps its sign after the number */
 [dir="rtl"] .build-page .proof-strip b{direction:ltr;unicode-bidi:isolate}

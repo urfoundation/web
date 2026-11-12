@@ -6,7 +6,7 @@ description: 安装并运行当前的 SN25 验证者，配置其密钥和生产�
 
 UR 验证者运行在 **Bittensor SN25，netuid 25** 上。当前的 [`sn/validator`](https://github.com/urfoundation/sn/tree/main/validator) 通过 `/verify` 遍历路径测量提供者，保留已签名的证据，并通过原生 commit-reveal 提交由此得出的矿工权重。一个 `validator` 进程同时执行测量和权重提交。
 
-验证者获得的是**原生 Bittensor 分红**。它们与从 UR 结算金库领取的提供者奖励是分开的。1.0 版本中没有 `validator claim` 命令，也没有验证者工作奖励。提取流程见下文。
+验证者获得的是**原生 Bittensor 分红**。它们与从 UR 结算金库领取的提供者奖励是分开的。1.0 版本中没有 `validator claim` 命令，也没有验证者努力奖励。提取流程见下文。
 
 本指南介绍的是 SN25 验证者。**netuid 0 上的根验证者**有单独的注册、运行和篮子领取流程；在根网络上注册并不会启动 UR 验证。UR 的其他角色请参阅[矿工指南](/docs/miner)和[网络运营商指南](/docs/operator)。
 
@@ -16,7 +16,7 @@ UR 验证者运行在 **Bittensor SN25，netuid 25** 上。当前的 [`sn/valida
 
 - 一台 Linux 主机、持久存储，以及对每个已配置运营商的 HTTPS API 和 WSS 传输的持续访问，外加该部署的 EVM HTTP(S) 和原生 WS(S) RPC 端点。主网的持久卷检查需要 Linux，尽管该二进制文件也可以为 macOS 构建。
 - 一个 Bittensor coldkey 钱包，其中有用于注册、质押和交易手续费的资金。请把它保存在用于钱包操作的机器上。运行中的验证者需要其 hotkey 和每个运营商的客户端密钥，而不需要 coldkey。
-- 一个已在 SN25 注册的 hotkey，并具有足够的质押权重以获得验证者许可（validator permit）。注册、质押门槛和许可数量都是链上状态，而不是本指南中的固定数值。[Bittensor validator permits](https://www.bittensor.com/docs/guides/validating) 说明了资格是如何确定的。
+- 一个已在 SN25 注册的 hotkey，并具有足够的质押权重以获得验证者许可（validator permit）。注册、质押门槛和许可数量都是链上状态，而不是本指南中的固定数值。[Bittensor 关于验证者许可的文档](https://www.bittensor.com/docs/guides/validating)说明了资格是如何确定的。
 - 一份完整的、经独立批准的 **schema-3 生产配置**、它所引用的运行时/策略批准，以及每个运营商的激活和历史文件。请在启动服务之前，针对你实际的 hotkey、部署和主机路径获取这些文件。
 - 已准备好的状态目录，以及针对这些目录、以 SHA-256 固定的持久卷声明。主网启动需要此声明，并会检查实际的存储身份。
 
@@ -44,7 +44,7 @@ install -m 755 linux/amd64/validator "$HOME/.local/bin/validator"   # choose you
 
 ### 或者从源代码构建
 
-请从为你的部署选定的 `sn` 版本构建。使用 [`sn/go.mod`](https://github.com/urfoundation/sn/blob/main/go.mod) 中声明的 Go 版本，以及与其本地 `replace` 指令相匹配的同级仓库检出：`connect`（包括 `sctp`）、`sdk`、`server`、`warp`、`proxy`、`userwireguard`、`glog`、`goidenticons` 和 `gvisor`。
+请从为你的部署选定的 `sn` 修订版本构建。使用 [`sn/go.mod`](https://github.com/urfoundation/sn/blob/main/go.mod) 中声明的 Go 版本，以及与其本地 `replace` 指令相匹配的同级仓库检出：`connect`（包括 `sctp`）、`sdk`、`server`、`warp`、`proxy`、`userwireguard`、`glog`、`goidenticons` 和 `gvisor`。
 
 在 `sn` 仓库根目录中：
 
@@ -55,7 +55,7 @@ install -m 755 ./bin/validator "$HOME/.local/bin/validator"
 "$HOME/.local/bin/validator" --help
 ```
 
-请把 `$HOME/.local/bin` 添加到你的 `PATH`，以便运行下面的命令。可执行入口是 `cli/validator`；`validator/` 是可导入的实现，因此 `go build ./validator` 不会生成服务的可执行文件。请把源代码版本与二进制文件一起记录下来，以便之后的部署可以复现它。
+请把 `$HOME/.local/bin` 添加到你的 `PATH`，以便运行下面的命令。可执行入口是 `cli/validator`；`validator/` 是可导入的实现，因此 `go build ./validator` 不会生成服务的可执行文件。请把源代码修订版本与二进制文件一起记录下来，以便之后的部署可以复现它。
 
 ## 2. 创建服务密钥
 
@@ -147,9 +147,9 @@ install -m 600 "$HOME/.urnetwork/jwt" /var/lib/ur-validator/no-1/network.jwt
 | 原始请求证据 | 对于使用原始请求回执流程的运营商，部署的 `request_receipt_scope` 和 `request_preparation`，以及它们已准备好的存储。 |
 | 续期历史 | 任何选定的 `production_runtime_approvals`、`production_authority_history`，以及在其原始授权下重放现有工作所需的容量修订。 |
 
-当前的金库生产路径及其批准格式在[原生金库生产](https://github.com/urfoundation/sn/blob/main/validator/TREASURY-PRODUCTION.md)中有说明。验证者会收到公开的金库路由数据；金库私钥不是验证者的前提条件。
+当前的国库生产路径及其批准格式在[原生国库生产](https://github.com/urfoundation/sn/blob/main/validator/TREASURY-PRODUCTION.md)中有说明。验证者会收到公开的国库路由数据；国库私钥不是验证者的前提条件。
 
-请根据已批准的证据和历史界限以及所有已配置的遍历工作线程来确定主机规格。每个运营商的 `concurrency` 必须在 1 到 128 之间，不得超过策略的活跃遍历上限，并允许每个工作线程在步骤超时之前进入限速的 seed 闸门。在已签名的配置中提高并发或磁盘界限，需要经过批准的替换配置。
+请根据已批准的证据和历史界限以及所有已配置的遍历工作线程来确定主机规格。每个运营商的 `concurrency` 必须在 1 到 128 之间，不得超过策略的活跃遍历上限，并允许每个工作线程在步骤超时之前进入限速的种子闸门。在已签名的配置中提高并发或磁盘界限，需要经过批准的替换配置。
 
 激活记录把每个运营商的客户端身份与你已注册的验证者 hotkey 绑定，并带有双方的签名以及已最终确定的证据日志发布。它们的上下文和历史必须覆盖所配置的初始结算边界。生产服务在开始新工作之前会验证这些输入。在主网上，空的 `evidence_v2.operators` 条目是不够的。旧的 `validator activate --config=...` 路径无法从 schema-3 配置生成这些输入。
 
@@ -229,7 +229,7 @@ validator run --all-operators --auto-register \
 - 列表缓存为 `<state_dir>/operators.yml`，每小时（或每隔 `--operators-refresh`，即不少于 `1m` 的 Go 时长）重新获取一次。`--operators-url=<url>` 会跟踪另一个列表。在无法获取列表期间，会继续使用最后一份有效副本。
 - 新列出的运营商会启动，被移出列表的运营商会停止并保留其状态，URL 发生变化的运营商会重启。失败的运营商会在 30 秒后重启，间隔逐次加倍，最长 10 分钟，并且永远不会让其他运营商停止。
 
-## 7. 领取验证者奖励
+## 7. 收取验证者奖励
 
 SN25 验证者分红通过 Bittensor 的原生质押记账累积。你的 coldkey 控制你自己的头寸；委托的质押及其奖励属于委托方的 coldkey，并需扣除验证者的抽成。UR 的协调器和结算金库不托管验证者分红。`provider claim`、`snclaim submit` 以及运营商的支付 Merkle 证明都用于矿工/提供者的奖励路径。
 

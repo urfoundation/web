@@ -1,5 +1,5 @@
 ---
-description: Instala y ejecuta el validador actual de SN25, aprovisiona sus claves y su configuración de producción, supervisa la validación y retira las recompensas nativas.
+description: Instala y ejecuta el validador actual de SN25, aprovisiona sus claves y su configuración de producción, supervisa la validación y retira sus recompensas nativas.
 ---
 
 # Cómo ejecutar un validador
@@ -8,7 +8,7 @@ El validador de UR funciona en **Bittensor SN25, netuid 25**. El [`sn/validator`
 
 Los validadores ganan **dividendos nativos de Bittensor**. Son independientes de las recompensas de los proveedores que se reclaman de la bóveda de liquidación de UR. En la versión 1.0 no hay comando `validator claim` ni recompensa por el esfuerzo del validador. El procedimiento de retiro se describe más abajo.
 
-Esta guía trata de un validador de SN25. Un **validador raíz en netuid 0** tiene registro, operación y reclamaciones de cesta propios; registrarse en root no inicia la validación de UR. Consulta la [guía del minero](/docs/miner) y la [guía del operador de red](/docs/operator) para los otros roles de UR.
+Esta guía trata de un validador de SN25. Un **validador de root en netuid 0** tiene registro, operación y reclamaciones de cesta propios; registrarse en root no inicia la validación de UR. Consulta la [guía del minero](/docs/miner) y la [guía del operador de red](/docs/operator) para los otros roles de UR.
 
 ## Antes de empezar
 
@@ -16,11 +16,11 @@ Prepara estos elementos para el despliegue al que te vas a unir:
 
 - Un host Linux, almacenamiento persistente y acceso continuo a la API HTTPS y al transporte WSS de cada operador configurado, además de los endpoints RPC del despliegue: EVM por HTTP(S) y nativo por WS(S). Las comprobaciones de volúmenes duraderos de mainnet requieren Linux, aunque el binario también se puede compilar para macOS.
 - Una wallet coldkey de Bittensor con fondos para el registro, el stake y las comisiones de las transacciones. Mantenla en la máquina que usas para las operaciones de la wallet. El validador en ejecución necesita su hotkey y las claves de cliente de cada operador, no la coldkey.
-- Una hotkey registrada en SN25 con suficiente peso de stake para obtener un permiso de validador (validator permit). El registro, el umbral de stake y el número de permisos son estado de la cadena, no cantidades fijas de esta guía. [Bittensor validator permits](https://www.bittensor.com/docs/guides/validating) explica cómo se determina la elegibilidad.
+- Una hotkey registrada en SN25 con suficiente peso de stake para obtener un permiso de validador (validator permit). El registro, el umbral de stake y el número de permisos son estado de la cadena, no cantidades fijas de esta guía. [La guía de Bittensor sobre los permisos de validador](https://www.bittensor.com/docs/guides/validating) explica cómo se determina la elegibilidad.
 - Una **configuración de producción schema-3** completa y aprobada de forma independiente, las aprobaciones de runtime y de política a las que hace referencia, y los archivos de activación e historial de cada operador. Obtenlos para tu hotkey, tu despliegue y las rutas de tu host reales antes de iniciar el servicio.
 - Directorios de estado preparados y una declaración de volumen duradero fijada con SHA-256 para esos directorios. El arranque en mainnet exige esta declaración y comprueba la identidad real del almacenamiento.
 
-El binario de producción actual acepta un despliegue schema-3 aprovisionado. Sus comandos `init --config`, `register`, `stake add`, `activate` y `status --config` siguen usando el cargador anterior a la activación, que rechaza schema 3. No ofrecen un arranque autoservicio para el mainnet actual. Usa los pasos nativos de la wallet de abajo para el registro y el stake; aprovisiona las evidencias y las aprobaciones de mainnet mediante el proceso de arranque del despliegue. Cambiar un número de esquema o copiar una configuración de testnet no produce esos elementos. Este límite está documentado en [admisión del runtime de producción](https://github.com/urfoundation/sn/blob/main/mainnet/VALIDATOR-PRODUCTION-RUNTIME.md).
+El binario de producción actual acepta un despliegue schema-3 aprovisionado. Sus comandos `init --config`, `register`, `stake add`, `activate` y `status --config` siguen usando el cargador anterior a la activación, que rechaza schema 3. No ofrecen un arranque de autoservicio para el mainnet actual. Usa los pasos nativos de la wallet de abajo para el registro y el stake; aprovisiona las evidencias y las aprobaciones de mainnet mediante el proceso de arranque del despliegue. Cambiar un número de esquema o copiar una configuración de testnet no produce esos elementos. Este límite está documentado en [admisión del runtime de producción](https://github.com/urfoundation/sn/blob/main/mainnet/VALIDATOR-PRODUCTION-RUNTIME.md).
 
 ## 1. Obtener el validador
 

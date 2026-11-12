@@ -1,5 +1,5 @@
 ---
-description: Den aktuellen SN25-Validator installieren und betreiben, Schlüssel und Produktionskonfiguration bereitstellen, die Validierung überwachen und native Belohnungen abheben.
+description: Den aktuellen SN25-Validator installieren und betreiben, Schlüssel und Produktionskonfiguration bereitstellen, Validierung überwachen und native Validator-Belohnungen abheben.
 ---
 
 # So betreibst du einen Validator
@@ -14,13 +14,13 @@ Dieser Leitfaden behandelt einen SN25-Validator. Ein **Root-Validator auf netuid
 
 Bereite diese Eingaben für die Bereitstellung vor, der du beitreten willst:
 
-- Einen Linux-Host, dauerhaften Speicher und ununterbrochenen Zugang zur HTTPS-API und zum WSS-Transport jedes konfigurierten Betreibers, dazu die RPC-Endpunkte der Bereitstellung: EVM über HTTP(S) und nativ über WS(S). Die Prüfungen der dauerhaften Volumes im Mainnet verlangen Linux, auch wenn sich das Binary ebenso für macOS bauen lässt.
+- Einen Linux-Host, persistenten Speicher und ununterbrochenen Zugang zur HTTPS-API und zum WSS-Transport jedes konfigurierten Betreibers, dazu die RPC-Endpunkte der Bereitstellung: EVM über HTTP(S) und nativ über WS(S). Die Prüfungen der dauerhaften Volumes im Mainnet verlangen Linux, auch wenn sich das Binary ebenso für macOS bauen lässt.
 - Eine Bittensor-Coldkey-Wallet mit Mitteln für Registrierung, Staking und Transaktionsgebühren. Bewahre sie auf dem Rechner auf, den du für Wallet-Vorgänge nutzt. Der laufende Validator braucht seinen Hotkey und die Client-Schlüssel pro Betreiber, nicht den Coldkey.
-- Einen in SN25 registrierten Hotkey mit genug Stake-Gewicht, um ein Validator-Permit zu erhalten. Registrierung, Stake-Schwelle und Zahl der Permits sind Chain-Zustand, keine festen Beträge dieses Leitfadens. [Bittensor validator permits](https://www.bittensor.com/docs/guides/validating) erklärt, wie die Berechtigung bestimmt wird.
-- Eine vollständige, unabhängig genehmigte **Produktionskonfiguration nach schema-3**, die darin referenzierten Laufzeit- und Richtliniengenehmigungen sowie die Aktivierungs- und Verlaufsdateien für jeden Betreiber. Besorge sie für deinen tatsächlichen Hotkey, deine Bereitstellung und deine Host-Pfade, bevor du den Dienst startest.
+- Einen in SN25 registrierten Hotkey mit genug Stake-Gewicht, um ein Validator-Permit zu erhalten. Registrierung, Stake-Schwelle und Zahl der Permits sind Chain-Zustand, keine festen Beträge dieses Leitfadens. [Bittensors Dokumentation zu Validator-Permits](https://www.bittensor.com/docs/guides/validating) erklärt, wie die Berechtigung bestimmt wird.
+- Eine vollständige, unabhängig genehmigte **Produktionskonfiguration nach Schema 3**, die darin referenzierten Runtime- und Richtliniengenehmigungen sowie die Aktivierungs- und Verlaufsdateien für jeden Betreiber. Besorge sie für deinen tatsächlichen Hotkey, deine Bereitstellung und deine Host-Pfade, bevor du den Dienst startest.
 - Vorbereitete Zustandsverzeichnisse und eine per SHA-256 fixierte Deklaration der dauerhaften Volumes für diese Verzeichnisse. Der Start im Mainnet verlangt diese Deklaration und prüft die tatsächliche Identität des Speichers.
 
-Das aktuelle Produktions-Binary akzeptiert eine bereitgestellte schema-3-Bereitstellung. Seine Befehle `init --config`, `register`, `stake add`, `activate` und `status --config` verwenden noch den älteren Lader vor der Aktivierung, der schema 3 ablehnt. Sie bieten keinen Selbstbedienungs-Einstieg für das aktuelle Mainnet. Verwende für Registrierung und Staking die nativen Wallet-Schritte unten; stelle die Evidenz und die Genehmigungseingaben für das Mainnet über den Bootstrap-Prozess der Bereitstellung bereit. Eine geänderte Schemanummer oder eine kopierte Testnet-Konfiguration erzeugt diese Eingaben nicht. Diese Grenze ist unter [Zulassung der Produktionslaufzeit](https://github.com/urfoundation/sn/blob/main/mainnet/VALIDATOR-PRODUCTION-RUNTIME.md) dokumentiert.
+Das aktuelle Produktions-Binary akzeptiert eine fertig eingerichtete Schema-3-Bereitstellung. Seine Befehle `init --config`, `register`, `stake add`, `activate` und `status --config` verwenden noch den älteren Lader vor der Aktivierung, der Schema 3 ablehnt. Sie bieten keinen Selbstbedienungs-Einstieg für das aktuelle Mainnet. Verwende für Registrierung und Staking die nativen Wallet-Schritte unten; stelle die Evidenz und die Genehmigungseingaben für das Mainnet über den Bootstrap-Prozess der Bereitstellung bereit. Eine geänderte Schemanummer oder eine kopierte Testnet-Konfiguration erzeugt diese Eingaben nicht. Diese Grenze ist unter [Zulassung der Produktions-Runtime](https://github.com/urfoundation/sn/blob/main/mainnet/VALIDATOR-PRODUCTION-RUNTIME.md) dokumentiert.
 
 ## 1. Den Validator beschaffen
 
@@ -44,7 +44,7 @@ Füge `$HOME/.local/bin` deinem `PATH` für die Befehle unten hinzu. Notiere die
 
 ### Oder aus dem Quellcode bauen
 
-Baue aus der `sn`-Revision, die für deine Bereitstellung gewählt ist. Verwende die in [`sn/go.mod`](https://github.com/urfoundation/sn/blob/main/go.mod) angegebene Go-Version und passende Checkouts der benachbarten Repositorys für seine lokalen `replace`-Direktiven: `connect` (einschließlich `sctp`), `sdk`, `server`, `warp`, `proxy`, `userwireguard`, `glog`, `goidenticons` und `gvisor`.
+Baue aus der `sn`-Revision, die für deine Bereitstellung gewählt ist. Verwende die in [`sn/go.mod`](https://github.com/urfoundation/sn/blob/main/go.mod) angegebene Go-Version und passende Geschwister-Checkouts für seine lokalen `replace`-Direktiven: `connect` (einschließlich `sctp`), `sdk`, `server`, `warp`, `proxy`, `userwireguard`, `glog`, `goidenticons` und `gvisor`.
 
 Im Wurzelverzeichnis des Repositorys `sn`:
 
@@ -111,7 +111,7 @@ btcli -n finney -w "$VALIDATOR_WALLET" tx add-stake \
 
 [`add-stake`](https://www.bittensor.com/docs/tx/add-stake) tauscht TAO zum Pool-Preis in SN25-Alpha. Prüfe vor dem Bestätigen die Gebühren und den Preisschutz in der Vorschau. Prüfe nach der Finalisierung und der Vergabe des Permits erneut den [Metagraph](https://www.bittensor.com/docs/query/metagraph); dein Hotkey, der besitzende Coldkey, die UID, der Stake und das Validator-Permit müssen zu den Produktionseingaben passen.
 
-Das SN-Binary behält außerdem `validator register` und `validator stake add` für Konfigurationen, die sein älterer Lader zulässt. Sie laufen standardmäßig als Probelauf, bis `--apply` gesetzt ist, nehmen eine Coldkey-Seed-Datei und geben Stake-Beträge in **rao** an. Sie ersetzen nicht die hier beschriebene schema-3-Einrichtung für das Mainnet.
+Das SN-Binary behält außerdem `validator register` und `validator stake add` für Konfigurationen, die sein älterer Lader zulässt. Sie laufen standardmäßig als Probelauf, bis `--apply` gesetzt ist, nehmen eine Coldkey-Seed-Datei und geben Stake-Beträge in **rao** an. Sie ersetzen nicht die hier beschriebene Schema-3-Einrichtung für das Mainnet.
 
 ## 4. Sich bei jedem Betreiber authentifizieren
 
@@ -122,7 +122,7 @@ validator auth --api_url=https://api.bringyour.com
 install -m 600 "$HOME/.urnetwork/jwt" /var/lib/ur-validator/no-1/network.jwt
 ```
 
-Für einen anderen Betreiber verwende dessen tatsächliche API und Anmeldeweg und kopiere dann das neu ausgestellte Token in das Verzeichnis dieses Betreibers. `validator auth -f --api_url=...` ersetzt ausdrücklich das temporäre `$HOME/.urnetwork/jwt`; `validator auth --user_auth=... --api_url=...` fragt stattdessen nach einem Passwort.
+Für einen anderen Betreiber verwende dessen tatsächliche API und dessen tatsächlichen Anmeldeweg und kopiere dann das neu ausgestellte Token in das Verzeichnis dieses Betreibers. `validator auth -f --api_url=...` ersetzt ausdrücklich das temporäre `$HOME/.urnetwork/jwt`; `validator auth --user_auth=... --api_url=...` fragt stattdessen nach einem Passwort.
 
 `validator auth --operator=<domain>` findet den Betreiber in der veröffentlichten [Betreiberliste](/operators.yml), statt `--api_url` zu nehmen, und schreibt sein Token nach `<state_dir>/operators/<domain>/jwt`; das Standard-Zustandsverzeichnis ist `~/.urnetwork/validator`. Dort liest es die [Messung jedes gelisteten Betreibers](#measure-every-listed-operator-without-weights). Mit `--hotkey_seed_file=<path>` meldet sich `validator auth` mit dem Hotkey an, als TAO-Wallet, statt mit einem Auth-Code oder Passwort. Die Produktionskonfiguration liest nur die `network_jwt_file`-Pfade, die sie nennt.
 
@@ -136,7 +136,7 @@ Verwende die vollständige genehmigte `release.yml`, keine von Hand bearbeitete 
 | --- | --- |
 | Produktionsidentität | `schema_version: 3`, `production: true`, `release: "1.0"`, die `deployment_id` der Bereitstellung und deine von null verschiedene `validator_id`. |
 | Netzwerk und Verträge | Im Mainnet `chain_id: 964`, `netuid: 25`, die tatsächlichen `genesis_hash`, `coordinator`, `settlement_vault` und `deploy_block`. |
-| Laufzeit | Geprüfte `runtime_spec`, `transaction_version`, `state_version`, `runtime_code_hash` und `runtime_metadata_hash`, dazu die endlichen nativen Block- und Epochenfenster der Genehmigung und die Producer-Fähigkeit. |
+| Runtime | Geprüfte `runtime_spec`, `transaction_version`, `state_version`, `runtime_code_hash` und `runtime_metadata_hash`, dazu die endlichen nativen Block- und Epochenfenster der Genehmigung und die Producer-Fähigkeit. |
 | Richtlinie und Zeitplanung | Vollständige `policy`, der dazu passende `policy_hash`, `version_key`, `trail_depth` gleich der Trail-Tiefe der Richtlinie und `poll_seconds` von 1 bis 60. |
 | Native wirtschaftliche Genehmigung | Die unabhängig signierte `treasury_approval` oder `owner_recycle_approval` der Bereitstellung, mit dem unabhängigen öffentlichen Signer sowie genauem Pfad, Bytelänge und SHA-256 der Genehmigungsdatei. Die Selektoren schließen sich gegenseitig aus. |
 | Verbindungen | Ausdrückliche EVM-`rpc`-Endpunkte über HTTP(S) und native `substrate`-Endpunkte über WS(S). |
@@ -144,16 +144,16 @@ Verwende die vollständige genehmigte `release.yml`, keine von Hand bearbeitete 
 | Betreiberverzeichnis | Für jeden Betreiber `no_id`, `api_url`, `connect_url`, ein eigener `artifact_signer`, Pfade zu Zugangsdaten und Schlüsseln und `concurrency`. Nimm mindestens `policy.safety.minimum_healthy_no_count` Betreiber auf. |
 | Unabhängigkeit | `controlled_no_ids` listet Betreiber, die du kontrollierst, damit ihre Pools und die zugehörigen Flotten der Spitzenstufe maskiert werden. |
 | Evidenz | Vollständige Grenzen für `evidence_v2` und für jeden Betreiber `activation`, `vpk_signature`, `hotkey_signature`, `context`, `history`, `replay_scratch_root` und `seal_scratch_root`. Dateiverweise fixieren Pfad, Bytes und SHA-256. |
-| Evidenz der ursprünglichen Anfragen | `request_receipt_scope` und `request_preparation` der Bereitstellung für Betreiber, die den ursprünglichen Ablauf mit Anfragebelegen verwenden, mit ihrem vorbereiteten Speicher. |
+| Ursprüngliche Anfrage-Evidenz | `request_receipt_scope` und `request_preparation` der Bereitstellung für Betreiber, die den ursprünglichen Ablauf mit Anfragebelegen verwenden, mit ihrem vorbereiteten Speicher. |
 | Verlängerungsverlauf | Alle gewählten `production_runtime_approvals`, `production_authority_history` und die Kapazitätsrevision, die nötig sind, um vorhandene Arbeit unter ihrer ursprünglichen Autorität erneut abzuspielen. |
 
 Der aktuelle Produktionsweg der Treasury und das Format ihrer Genehmigung sind unter [native Treasury in der Produktion](https://github.com/urfoundation/sn/blob/main/validator/TREASURY-PRODUCTION.md) beschrieben. Validatoren erhalten öffentliche Routing-Daten der Treasury; ein privater Treasury-Schlüssel ist keine Voraussetzung für einen Validator.
 
 Bemiss den Host nach den genehmigten Grenzen für Evidenz und Verlauf und nach allen konfigurierten Trail-Workern. Die `concurrency` pro Betreiber muss zwischen 1 und 128 liegen, innerhalb der Obergrenze aktiver Trails der Richtlinie bleiben und jedem Worker erlauben, vor dem Schritt-Timeout das ratenbegrenzte Seed-Tor zu passieren. Wer in einer signierten Konfiguration Nebenläufigkeit oder Plattengrenzen erhöht, braucht einen genehmigten Ersatz.
 
-Aktivierungseinträge binden die Client-Identität jedes Betreibers an deinen registrierten Validator-Hotkey, mit beiden Signaturen und einer finalisierten Veröffentlichung im Evidenz-Journal. Ihr Kontext und ihr Verlauf müssen die konfigurierte anfängliche Settlement-Grenze abdecken. Der Produktionsdienst authentifiziert diese Eingaben, bevor er neue Arbeit beginnt. Ein leerer Eintrag `evidence_v2.operators` reicht im Mainnet nicht aus. Der ältere Weg `validator activate --config=...` kann diese Eingaben nicht aus einer schema-3-Konfiguration erzeugen.
+Aktivierungseinträge binden die Client-Identität jedes Betreibers an deinen registrierten Validator-Hotkey, mit beiden Signaturen und einer finalisierten Veröffentlichung im Evidenz-Journal. Ihr Kontext und ihr Verlauf müssen die konfigurierte anfängliche Settlement-Grenze abdecken. Der Produktionsdienst authentifiziert diese Eingaben, bevor er neue Arbeit beginnt. Ein leerer Eintrag `evidence_v2.operators` reicht im Mainnet nicht aus. Der ältere Weg `validator activate --config=...` kann diese Eingaben nicht aus einer Schema-3-Konfiguration erzeugen.
 
-Halte die Pfade bei der Bereitstellung stabil. Relative Pfade werden relativ zum Konfigurationsverzeichnis aufgelöst, und das Verschieben einer Konfiguration kann ihre Bedeutung ändern. Eine typische Struktur ist:
+Halte die Pfade beim Einrichten stabil. Relative Pfade werden relativ zum Konfigurationsverzeichnis aufgelöst, und das Verschieben einer Konfiguration kann ihre Bedeutung ändern. Eine typische Struktur ist:
 
 ```text
 /etc/ur-validator/
@@ -175,7 +175,7 @@ Halte die Pfade bei der Bereitstellung stabil. Relative Pfade werden relativ zum
   progress.json                  # created by the running validator
 ```
 
-Das sind Beispielpfade, kein Ersatz für die Pfade in deinem genehmigten Paket. Private Dateien brauchen geschützte Eigentümer und Berechtigungen; Protokollverzeichnisse müssen den vorbereiteten dauerhaften Speicher verwenden. Leere Verzeichnisse anzulegen bereitet allein keine Versuchsjournale vor und ersetzt nicht ihren aufbewahrten Verlauf. Lege die Fortschrittsdatei außerhalb aller Protokoll-, Schlüssel-, Zugangsdaten- und Evidenzverzeichnisse ab, in einem vorhandenen übergeordneten Verzeichnis, das für Gruppe und andere nicht beschreibbar ist.
+Das sind Beispielpfade, kein Ersatz für die Pfade in deinem genehmigten Paket. Private Dateien brauchen geschützte Eigentümerschaft und Berechtigungen; Verzeichnisse des Protokollzustands müssen den vorbereiteten dauerhaften Speicher verwenden. Leere Verzeichnisse anzulegen bereitet allein keine Versuchsjournale vor und ersetzt nicht ihren aufbewahrten Verlauf. Lege die Fortschrittsdatei außerhalb aller Protokollzustands-, Schlüssel-, Zugangsdaten- und Evidenzverzeichnisse ab, in einem vorhandenen übergeordneten Verzeichnis, das für Gruppe und andere nicht beschreibbar ist.
 
 ## 6. Den Validator betreiben und überwachen
 
@@ -202,7 +202,7 @@ Der Befehl im Vordergrund führt echte Validierung durch und kann Gewichte einre
 
 `--operators-refresh=1h` folgt der veröffentlichten [Betreiberliste](/operators.yml) und ruft sie jede Stunde neu ab, ohne zu ändern, was der Validator signiert oder gewichtet: Gewichtet werden nur die in der signierten Konfiguration fixierten Betreiber, und das Release läuft genau so, wie es ohne das Flag liefe. Die Liste wird als `operators.yml` im `state_dir` der Konfiguration zwischengespeichert. Beim Start und bei jeder Änderung der Liste protokolliert der Validator einen Abweichungsbericht und schreibt ihn nach `operators-report.json` neben diesen Cache. Der Bericht zeigt jeden fixierten Betreiber, per API-URL mit der Liste abgeglichen, als gelistet oder aus der Liste entfernt, mit einer etwaigen Abweichung der Connect-URL, und jeden gelisteten Betreiber, den die Konfiguration nicht fixiert. Er ist eine betriebliche Ausgabe; nichts liest ihn wieder ein.
 
-Mit `--operators-refresh` folgt `--operators-url=<url>` einer anderen Liste, und `--observe-unpinned-operators` misst zusätzlich jeden gelisteten Betreiber, den die Konfiguration nicht fixiert, nur zur Beobachtung, unter `observed-operators/<domain>/` im `state_dir` der Konfiguration. Die Beobachtung meldet sich mit dem `hotkey_seed_file` der Konfiguration an und stellt damit bereit, und ihre Ergebnisse erreichen nie Gewichte, Evidenz oder Produktionszustand. Fixierte Betreiber behalten ihr konfiguriertes `network_jwt_file`; fehlt es, wird das gemeldet, es wird aber nie angelegt.
+Mit `--operators-refresh` folgt `--operators-url=<url>` einer anderen Liste, und `--observe-unpinned-operators` misst zusätzlich jeden gelisteten Betreiber, den die Konfiguration nicht fixiert, nur zur Beobachtung, unter `observed-operators/<domain>/` im `state_dir` der Konfiguration. Die Beobachtung meldet sich mit dem `hotkey_seed_file` der Konfiguration an und stellt damit die Messidentität bereit, und ihre Ergebnisse erreichen nie Gewichte, Evidenz oder Produktionszustand. Fixierte Betreiber behalten ihr konfiguriertes `network_jwt_file`; fehlt es, wird das gemeldet, es wird aber nie angelegt.
 
 Beobachte stderr und den in der Größe begrenzten [Fortschrittseintrag](https://github.com/urfoundation/sn/blob/main/mainnet/SERVICE-PROGRESS.md). Prüfe mehrere getrennte Signale:
 
@@ -213,7 +213,7 @@ Beobachte stderr und den in der Größe begrenzten [Fortschrittseintrag](https:/
 - Abweichungen von der Betreiberliste stehen nicht im Fortschrittseintrag. Mit `--operators-refresh` stehen sie im Log und in `operators-report.json`.
 - Native Metagraph-Abfragen zeigen, ob der Hotkey seine UID und sein Permit noch hält und Dividenden erhält.
 
-Das Warten auf eine Epoche kann normal sein; ein frischer Heartbeat allein belegt keine erfolgreiche Validierung. Das aktuelle `validator status --config` lehnt schema 3 ab, also verwende für diesen Produktionsweg den Fortschrittseintrag, die Dienst-Logs und native Chain-Abfragen. Ohne `--config` ist `validator run` ein veralteter reiner Messmodus und schreibt nie Release-Gewichte.
+Das Warten auf eine Epoche kann normal sein; ein frischer Heartbeat allein belegt keine erfolgreiche Validierung. Das aktuelle `validator status --config` lehnt Schema 3 ab, also verwende für diesen Produktionsweg den Fortschrittseintrag, die Dienst-Logs und native Chain-Abfragen. Ohne `--config` ist `validator run` ein Alt-Modus, der nur misst, und schreibt nie Release-Gewichte.
 
 ### Jeden gelisteten Betreiber ohne Gewichte messen
 

@@ -1,28 +1,7 @@
 ---
-import Base from '../layouts/Base.astro';
-import DisclaimerStatic from '../components/DisclaimerStatic.astro';
-import FooterStatic from '../components/FooterStatic.astro';
-import NavIsland from '../islands/NavIsland.jsx';
-import AboutPage from '@react/components/pages/About.jsx';
-import en from '@react/i18n/en.js';
-
-import '@react/components/Nav.css';
-
-const title = 'About UR | The people building the privacy network';
-const description = 'UR is an open-source protocol for private internet applications on a global network of independent bandwidth providers. Meet its core contributors.';
+// /about: the protocol and its core contributors, in English. The page is
+// components/routes/AboutRoute.astro, which pages/[lang]/about.astro renders
+// in the other site languages.
+import AboutRoute from '../components/routes/AboutRoute.astro';
 ---
-
-<Base title={title} description={description} breadcrumbName="About" lang="en">
-    <div class="app">
-        <DisclaimerStatic t={en} />
-        <NavIsland activeRoute="about" lang="en" client:idle={{ timeout: 1000 }} />
-
-        <main class="section-page">
-            {/* the same component the SPA renders at /about (App.jsx SectionPage);
-                hydrated for its scroll-reveal effect, server-rendered identically */}
-            <AboutPage route={{ name: 'about', slug: null }} client:load />
-        </main>
-
-        <FooterStatic t={en} lang="en" />
-    </div>
-</Base>
+<AboutRoute lang="en" />

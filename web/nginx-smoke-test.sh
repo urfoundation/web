@@ -217,11 +217,15 @@ for lang in ru ar zh de es; do
     expect_response ur.xyz "/$lang/investors/august-investment-letter" 301 "$target"
     [[ "$target" == "/$lang/"* ]] || expect_header ur.xyz "/$lang/investors/august-investment-letter" Cache-Control no-store
     # a miss under the language's prefix is a 404 with that language's
-    # not-found page when the build has it, else the English one
-    expect_response ur.xyz "/$lang/no-such-page" 404
+    # not-found page when the build has it, else the English one; under a
+    # translated section too, where the English URL is no page either
     if [[ -f "/www/preview.ur.xyz/$lang/404.html" ]]; then not_found_lang=$lang; else not_found_lang=en; fi
-    grep -q "<html lang=\"$not_found_lang\"" "$test_dir/ur_xyz.body" || \
-        fail "ur.xyz/$lang/no-such-page did not render the $not_found_lang not-found page"
+    for path in /no-such-page /docs/no-such-page /docs/support /ctf/zz /investors/no-such-page \
+        /research/no-such-page /about/no-such-page; do
+        expect_response ur.xyz "/$lang$path" 404
+        grep -q "<html lang=\"$not_found_lang\"" "$test_dir/ur_xyz.body" || \
+            fail "ur.xyz/$lang$path did not render the $not_found_lang not-found page"
+    done
     expect_response ur.xyz "/$lang/404" 404
 done
 expect_response ur.xyz /docs/legal/terms 301 /terms
@@ -316,15 +320,19 @@ for host in ur.xyz preview.ur.xyz; do
     for path in /audits /team /docs-md /docs/support; do
         expect_response "$host" "$path/" 301 "https://$host$path"
     done
-    # a localized docs path goes to the English one
-    expect_response "$host" /es/docs/support 301 /docs/support
+    # a localized docs path that is no page in English either is a 404 in its
+    # language, not a 301 to the English 404
+    if [[ -f /www/preview.ur.xyz/es/404.html ]]; then not_found_lang=es; else not_found_lang=en; fi
+    expect_response "$host" /es/docs/support 404
+    grep -q "<html lang=\"$not_found_lang\"" "$test_dir/${host//./_}.body" || \
+        fail "$host/es/docs/support did not render the $not_found_lang not-found page"
 done
 
 # Every directory of the site, with its slash and without, ends within two
-# redirects in a page, a file or an error, never a loop. Two: a localized
-# path goes to the English one, which may then drop its slash. One curl run
-# per round requests every path, HEAD only. _astro/ is left to the bundles'
-# own location, which answers what it lacks itself.
+# redirects in a page, a file or an error, never a loop. Two: a slashed path
+# drops its slash, and a page the build has only in English sends its /<lang>/
+# path there. One curl run per round requests every path, HEAD only. _astro/
+# is left to the bundles' own location, which answers what it lacks itself.
 expect_no_redirect_loops() {
     local host=$1
     local root=$2

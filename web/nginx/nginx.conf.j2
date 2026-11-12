@@ -477,18 +477,31 @@ http {
         # and its country pages, the dashboard, the docs and the legal pages,
         # the investor pages, mainnet, price, reserve and the research pages
         # under the translated /research). /<lang>/<page> serves the translated
-        # page when the build has it, and 301s to the English page until its
-        # group is localized; its .html and trailing-slash forms go to the
-        # right one of those in one hop. No cache keeps the 301 to English: the
-        # translation may come with any build, and a browser that kept the 301
-        # would then send a visitor who chose the language back to English,
-        # which the stored-language redirect sends to the translation: a loop.
+        # page when the build has it, its .html and trailing-slash forms 301 to
+        # it in one hop, and:
+        #   - a page the build has in English only (its group not localized
+        #     yet) 301s to the English page, from those forms too, with
+        #     Cache-Control: no-store. The translation may come with any build,
+        #     and a browser that kept the 301 would then send a visitor who
+        #     chose the language back to English, which the stored-language
+        #     redirect sends to the translation: a loop.
+        #   - a page the build has in neither language is a 404, which
+        #     error_page renders with that language's not-found page. A 301 to
+        #     the English URL would show the English one.
         # The build writes no redirect stub at these paths (a stub here would
-        # be served as a page).
+        # be served as a page). No `if` below may match a page that is served:
+        # try_files does not apply in an `if` that matched.
         location ~ ^/(?<page_lang>ru|ar|zh|de|es)(?<page_path>/(?:about|build|ctf|dashboard|docs|investors|mainnet|price|reserve|terms|privacy|vdp|research/[^/]+?)(?:/[^/]+?)*?)(?<page_variant>\.html|/+)?$ {
+            set $page_english "";
             if (!-f $document_root/$page_lang$page_path.html) {
+                set $page_english $document_root$page_path.html;
+            }
+            if (-f $page_english) {
                 add_header 'Cache-Control' 'no-store' always;
                 return 301 $page_path$is_args$args;
+            }
+            if ($page_english) {
+                return 404;
             }
             if ($page_variant) {
                 return 301 https://$host/$page_lang$page_path$is_args$args;

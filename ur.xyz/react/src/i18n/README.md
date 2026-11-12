@@ -159,8 +159,10 @@ Makefile.
   language switchers do (`LANG_CHOICE_SCRIPT` in Base.astro), so the stored language does not send the reader back.
 - **The stored-language redirect.** A visitor who chose a language (`ur.xyz.lang`) and opens a translated page's
   English URL is sent to the translation by a script in its head (`storedLanguageRedirectScript`). Only a page with
-  translations carries it, never the not-found page, and it never makes the same redirect twice within ten seconds,
-  which ends a loop it cannot see (a 301 to English a browser kept from an older config). `tests/redirect-loops.mjs`,
-  in `make gates`, runs the site's nginx server block over the build and drives Chromium through every page family
-  with each language stored, the language switcher on a missing page and a profile with the old config's 301s
-  cached; it needs nginx.
+  translations carries it, never the not-found page. It leaves the English page to a visitor who followed a link to
+  it from the translation (in the tab or in another). A redirect that comes back within ten seconds (a 301 to English
+  that a browser kept from an older config) is tried once more at an address no such 301 is cached for
+  (`/de/about?`), and if that comes back too, the page stays: no loop. `tests/redirect-loops.mjs`, in `make gates`,
+  runs the site's nginx server block over the build and drives Chromium through every page family with each
+  language stored, the language switcher on a missing page, a translation's link to its English original and a
+  profile with the old config's 301s cached; it needs nginx.

@@ -10,7 +10,7 @@
 export default {
     meta: {
         title: 'Cronología del lanzamiento de SN25 en la red principal | UR',
-        description: 'SN25 en la red principal, por época: versión 1 desde el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y primeras reclamaciones el 8 de noviembre.',
+        description: 'Lanzamiento de SN25 en la red principal por época: versión 1 desde el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y primeras reclamaciones el 8 de noviembre.',
         breadcrumb: 'Red principal',
     },
 
@@ -35,7 +35,7 @@ export default {
     milestones: {
         eyebrow: 'Cronología',
         title: 'Hitos',
-        fine: 'La hora de un hito programado o previsto es una proyección, a partir de su número de bloque a 12 segundos por bloque o del plan, y se marca con ≈ salvo que se haya fijado para una hora exacta. Una hora proyectada se mueve un poco si los bloques van más rápido o más lento. Desde la época 1, cada época se cierra dentro de los 120 bloques siguientes a su fin, su raíz de pagos vence dentro de los 1,200 bloques siguientes a su fin, y sus reclamaciones se abren 14,400 bloques (unos dos días) después de ella. Los hitos programados y previstos pueden cambiar.',
+        fine: 'La hora de un hito programado o previsto es una proyección, a partir de su número de bloque a 12 segundos por bloque o del plan, y se marca con ≈ salvo que se haya fijado para una hora exacta. Una hora proyectada se mueve un poco si los bloques van más rápido o más lento. Desde la época 1, cada época se cierra dentro de los 120 bloques siguientes a su fin, su raíz de pagos debe registrarse dentro de los 1,200 bloques siguientes a su fin, y sus reclamaciones se abren 14,400 bloques (unos dos días) después de ella. Los hitos programados y previstos pueden cambiar.',
         updated: 'Actualizado el {date}.',
     },
 

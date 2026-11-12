@@ -70,11 +70,13 @@ function textOf(html) {
 
 /**
  * The forms of a country's identity a page can print, longest first: its names
- * (the model's name, sentence name, capitalized and short), its ISO code as a
- * word in capitals, and its code in the paths of its page and its JSON.
+ * (the model's name, sentence name, capitalized and short, and in a
+ * translation its "in <country>" forms), its ISO code as a word in capitals,
+ * and its code in the paths of its page and its JSON (/ru/ctf/ke too).
  */
 function identity(c) {
-    const names = [...new Set([c.name, c.the, c.The, c.short])].sort((a, b) => b.length - a.length);
+    // a translation's country also has its "in <country>" forms (ctf/model.js localModel)
+    const names = [...new Set([c.name, c.the, c.The, c.short, c.in, c.In, c.inShort].filter(Boolean))].sort((a, b) => b.length - a.length);
     return [...names, new RegExp(`\\b${c.code.toUpperCase()}\\b`, 'g'), new RegExp(`/(?:ctf|country)/${c.code}\\b`, 'g')];
 }
 
@@ -158,3 +160,54 @@ export function countryIndexingProblems(m, pages, notes = CTF_LOCAL_NOTES) {
     }
     return { problems, groups: groups.filter((group) => group.length > 1) };
 }
+
+/**
+ * The seo-audit's check of one language's built country pages against the
+ * English ones (each { code, main, noindex }; `m` is the model in that
+ * language, ctf/model.js localModel): a translation is indexed as its English
+ * page is, so a page and its translations form a whole hreflang cluster; and
+ * its pages read alike exactly where the English ones do, so no translated
+ * page drops its own figures or says something of one country it says of no
+ * other. Returns the problems.
+ */
+export function countryTranslationProblems(m, lang, pages, english) {
+    const problems = [];
+    const at = (code) => `/${lang}/ctf/${code}`;
+    const built = new Map();
+    for (const p of pages) {
+        if (!m.byCode.has(p.code)) problems.push(`${at(p.code)}: no such country in the snapshot`);
+        else built.set(p.code, p);
+    }
+    for (const [code, p] of built) {
+        const en = english.get(code);
+        if (!en) problems.push(`${at(code)}: no English page /ctf/${code}`);
+        else if (Boolean(p.noindex) !== Boolean(en.noindex)) problems.push(`${at(code)}: ${p.noindex ? 'noindex' : 'indexable'}, though /ctf/${code} is ${en.noindex ? 'noindex' : 'indexable'}`);
+    }
+    const partition = (contents) => {
+        const out = new Map();
+        for (const group of contentGroups(contents)) for (const code of group) out.set(code, group.slice().sort().join(' '));
+        return out;
+    };
+    const mine = partition(new Map([...built.values()].map((p) => [p.code, ownContent(p.main, m.byCode.get(p.code))])));
+    const theirs = partition(new Map([...built.keys()].filter((code) => english.has(code)).map((code) => [code, english.get(code).own])));
+    for (const [code, group] of mine) {
+        if (theirs.has(code) && theirs.get(code) !== group) {
+            problems.push(`${at(code)}: reads like ${group.split(' ').filter((c) => c !== code).map(at).join(', ') || 'no other page'}, where /ctf/${code} reads like ${theirs.get(code).split(' ').filter((c) => c !== code).map((c) => `/ctf/${c}`).join(', ') || 'no other page'}`);
+        }
+    }
+    return problems;
+}
+
+// What a page may say only after a draw (ctf/model.js): that a newcomer wins by
+// default, in each language's words (the verb and "without the draw" in one
+// clause), and a chance to win, a percentage in any language's format ("2.6%",
+// "2,6 %", "83‎%‎"). ctf-copy.test.mjs keeps the copy and these in step.
+export const DEFAULT_WIN = {
+    en: /\bwins? by default\b/i,
+    ru: /побежда\S*[^.]*?без\s+жеребь[её]вки/i,
+    ar: /[يت]فوز[^.؛]*?دون\s+قرعة/,
+    zh: /无需抽签/,
+    de: /\bgewinn(?:t|st|en)\b[^.]*?ohne\s+Auslosung/i,
+    es: /\bgan(?:a|as|an|ar)\b[^.]*?sin\s+sorteo/i,
+};
+export const CHANCE_SHOWN = /\d[\s\u00a0\u202f]?\u200e?[%٪]/;

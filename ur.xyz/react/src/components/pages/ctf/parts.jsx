@@ -3,25 +3,20 @@ import { flushSync } from 'react-dom';
 import {
     API_HERE,
     START_URL,
-    ctaHref,
-    alpha,
-    countdown,
     countryMessage,
-    countryPath,
-    dayName,
     drawLine,
     findCountry,
     flagSrc,
-    int,
     isCellTip,
     nextStep,
-    pct,
     presenceSentence,
     roleDetail,
     roleLine,
     uninhabitedSentence,
-    utcTime,
 } from './model';
+import { ctfCopy, formats, place } from './i18n';
+import { ctaLink, pagePath } from './links';
+import { BOLD, rich } from './rich';
 
 /**
  * The parts the capture the flag islands share (ctf/Board.jsx and
@@ -32,7 +27,8 @@ import {
  * HTML the build wrote; the clock, the visitor's country and the next-step
  * text arrive after. A control that needs the script (sorting, the filters,
  * the search, Shuffle, the picker) is disabled in the static page and enabled
- * once the island runs.
+ * once the island runs. Every part speaks its model's language (`m.lang`,
+ * ctf/model.js localModel) and links to the pages in it.
  */
 
 export const cx = (...names) => names.filter(Boolean).join(' ');
@@ -163,8 +159,11 @@ export const cellTips = (tips, code) => {
     return { hover: mine(tips.state.hover), focus: mine(tips.state.focus), pin: mine(tips.state.pin) };
 };
 
-/** A chip or label that opens a next-step card (hover and focus on desktop; tap to expand on touch sizes). */
-export function Tip({ tip, cls, text, label, near, body, after, cta, pop = false, low = false }) {
+/**
+ * A chip or label that opens a next-step card (hover and focus on desktop; tap
+ * to expand on touch sizes). `cta` is the call to action, 'start', 'p' or 'x'.
+ */
+export function Tip({ m, tip, cls, text, label, near, body, after, cta, pop = false, low = false }) {
     const { id, api, open, pinned } = tip;
     const domId = `ctf-d-${id.replace(/[^a-z0-9-]/gi, '-')}`;
     return (
@@ -182,28 +181,34 @@ export function Tip({ tip, cls, text, label, near, body, after, cta, pop = false
                     {near && <span className="ctf-act-near">{near}</span>}
                     <span className="ctf-act-do" id={domId}>{body}</span>
                     {after && <span className="ctf-act-near">{after}</span>}
-                    <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaHref(cta)}>{cta}</a>
+                    <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaLink(m.lang, cta)}>{ctfCopy(m.lang).cta[cta]}</a>
                 </span>
             )}
         </span>
     );
 }
 
+/** A next step's words: what to do, the take in bold, and the sentence's end. */
+const stepBody = (m, step) => <>{step.act}<b>{step.take}</b>{ctfCopy(m.lang).stop}</>;
+
 // ── the live bar ────────────────────────────────────────────────────────────
 
 /** The epoch's clock: before the start, the time to it; then the time to the draw. */
 function clock(m, now) {
+    const t = ctfCopy(m.lang).live;
+    const f = formats(m.lang);
+    const approx = (iso) => rich(t.approx, { time: f.utcTime(iso) }).join('');
     const startsAt = m.startsAt ? Date.parse(m.startsAt) : null;
     const drawAt = Date.parse(m.drawAt);
     if (startsAt !== null && (now === null || now < startsAt)) {
-        return now === null ? ['Starts', `≈ ${utcTime(m.startsAt)}`] : ['Starts in', countdown(startsAt - now)];
+        return now === null ? [t.starts, approx(m.startsAt)] : [t.startsIn, f.countdown(startsAt - now)];
     }
-    if (now === null) return ['Draw', `≈ ${utcTime(m.drawAt)}`];
-    return now < drawAt ? ['Draw in', countdown(drawAt - now)] : ['Draw', 'under way'];
+    if (now === null) return [t.draw, approx(m.drawAt)];
+    return now < drawAt ? [t.drawIn, f.countdown(drawAt - now)] : [t.draw, t.underWay];
 }
 
-function FocusControl({ arg, focus, onFocus, hub, mounted, className, title, children }) {
-    if (hub) return <a className={className} href={`/ctf?focus=${arg}`} title={title}>{children}</a>;
+function FocusControl({ m, arg, focus, onFocus, hub, mounted, className, title, children }) {
+    if (hub) return <a className={className} href={`${pagePath(m.lang, '/ctf')}?focus=${arg}`} title={title}>{children}</a>;
     return <button type="button" className={className} aria-pressed={focus === arg} disabled={!mounted} onClick={() => onFocus(arg)} title={title}>{children}</button>;
 }
 
@@ -214,43 +219,46 @@ function FocusControl({ arg, focus, onFocus, hub, mounted, className, title, chi
  * there is nothing to filter on, and the bar says what is known instead.
  */
 export function LiveBar({ m, now, mounted = false, focus = null, onFocus = null, hub = false }) {
+    const t = ctfCopy(m.lang).live;
+    const f = formats(m.lang);
     const [clockLabel, clockValue] = clock(m, now);
     const items = [];
     const it = (label, value, key = label) => items.push(<div className="ctf-it" key={key}><span className="ctf-label">{label}</span><b>{value}</b></div>);
+    const say = (template, values) => rich(template, values).join('');
     items.push(<div className="ctf-it" key="clock"><span className="ctf-label">{clockLabel}</span><b data-parity-ignore="">{clockValue}</b></div>);
     if (m.pending) {
-        it(`Epoch ${m.pending.epoch}'s draw`, m.pending.census_block ? `census at block ${int(m.pending.census_block)}` : 'waiting for the census', 'pending');
+        it(say(t.pending, { epoch: m.pending.epoch }), m.pending.census_block ? say(t.census, { block: f.int(m.pending.census_block) }) : t.waiting, 'pending');
     }
     if (m.drawn) {
-        it('Slot', `${alpha(m.slot, 3)} α`);
-        it('Carried into this epoch', `${alpha(m.last.carried)} α`);
-        it('Paid last epoch', `${alpha(m.last.awarded)} α · ${int(m.last.won)} winners`);
+        it(t.slot, `${f.alpha(m.slot, 3)} α`);
+        it(t.carried, `${f.alpha(m.last.carried)} α`);
+        it(t.paid, f.count(t.paidValue, m.last.won, { amount: f.alpha(m.last.awarded) }));
         items.push(
-            <FocusControl key="held" arg="held" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it ctf-it-btn" title="Show only the flags held on both roles">
-                <span className="ctf-label ctf-it-hint">Flags held<Chevron /></span><b>{int(m.totals.flagsHeld)} / 249</b>
+            <FocusControl key="held" m={m} arg="held" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it ctf-it-btn" title={t.heldTitle}>
+                <span className="ctf-label ctf-it-hint">{t.held}<Chevron /></span><b>{say(t.heldValue, { count: f.int(m.totals.flagsHeld) })}</b>
             </FocusControl>,
             <div className="ctf-it ctf-it-group" role="group" aria-labelledby="ctf-nc-label" key="nfc">
-                <span className="ctf-label" id="ctf-nc-label">Not fully captured</span>
-                <FocusControl arg="np" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it-row" title="Show only countries with a provider slot open">
-                    <span>Providers</span><b>{int(m.totals.openP)}</b><Chevron />
+                <span className="ctf-label" id="ctf-nc-label">{t.notFully}</span>
+                <FocusControl m={m} arg="np" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it-row" title={t.pTitle}>
+                    <span>{t.providers}</span><b>{f.int(m.totals.openP)}</b><Chevron />
                 </FocusControl>
-                <FocusControl arg="nx" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it-row" title="Show only countries with an extender slot open">
-                    <span>Extenders</span><b>{int(m.totals.openX)}</b><Chevron />
+                <FocusControl m={m} arg="nx" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it-row" title={t.xTitle}>
+                    <span>{t.extenders}</span><b>{f.int(m.totals.openX)}</b><Chevron />
                 </FocusControl>
             </div>,
         );
     } else if (m.phase === 'undrawn') {
-        it('Slot', `${alpha(m.slot, 3)} α`);
-        it('Carried into this epoch', `${alpha(m.last.carried)} α`);
-        it(`Epoch ${m.last.epoch}`, 'no draw · every slot carried');
+        it(t.slot, `${f.alpha(m.slot, 3)} α`);
+        it(t.carried, `${f.alpha(m.last.carried)} α`);
+        it(say(t.undrawn, { epoch: m.last.epoch }), t.undrawnValue);
     } else {
-        if (m.phase === 'prelaunch') it('First draw', `≈ ${utcTime(m.drawAt)}`);
-        it('Slots', '5 + 5 a country');
-        it('Countries', '249');
+        if (m.phase === 'prelaunch') it(t.firstDraw, say(t.approx, { time: f.utcTime(m.drawAt) }));
+        it(t.slots, t.slotsValue);
+        it(t.countries, t.countriesValue);
     }
-    const tag = m.phase === 'prelaunch' || (m.phase === 'first' && !m.pending) ? `Epoch ${m.epoch} · the first` : `Epoch ${m.epoch}`;
+    const tag = say(m.phase === 'prelaunch' || (m.phase === 'first' && !m.pending) ? t.tagFirst : t.tag, { epoch: m.epoch });
     return (
-        <section className="ctf-live" aria-label="This epoch">
+        <section className="ctf-live" aria-label={t.aria}>
             <div className="ctf-tag ctf-label ctf-label-acc"><i aria-hidden="true" />{tag}</div>
             {items}
         </section>
@@ -260,18 +268,21 @@ export function LiveBar({ m, now, mounted = false, focus = null, onFocus = null,
 // ── a country's card ────────────────────────────────────────────────────────
 
 function ChanceTip({ m, c, role, tips }) {
+    const t = ctfCopy(m.lang).chance;
+    const f = formats(m.lang);
     const r = c[role];
     const P = role === 'p';
     return (
         <Tip
+            m={m}
             tip={tipOf(tips, `me-${role}c`)}
             pop
             cls="ctf-chance ctf-ex"
-            text={pct(r.chance)}
-            label={`Chance to win · ${P ? 'providers' : 'extenders'}`}
-            body={<>The estimated probability that you win this epoch's reward in {c.the} if you launch {P ? 'a provider' : 'an extender'} there and keep it online for half the epoch: <b>{pct(r.chance)}</b>.</>}
+            text={f.pct(r.chance)}
+            label={P ? t.pLabel : t.xLabel}
+            body={rich(P ? t.pBody : t.xBody, { ...place(c), pct: f.pct(r.chance) }, BOLD)}
             after={drawLine(m, r)}
-            cta={P ? 'Run a provider' : 'Run an extender'}
+            cta={role}
         />
     );
 }
@@ -285,6 +296,7 @@ function ChanceTip({ m, c, role, tips }) {
  * page runs, so the static page carries no 249 options.
  */
 export function CountryPicker({ m, mounted, onPick }) {
+    const t = ctfCopy(m.lang).card;
     const [value, setValue] = useState('');
     const pick = (text) => {
         const hit = findCountry(m, text);
@@ -295,12 +307,12 @@ export function CountryPicker({ m, mounted, onPick }) {
     };
     return (
         <div className="ctf-pick">
-            <label htmlFor="ctf-country" className="ctf-label">Somewhere else?</label>
+            <label htmlFor="ctf-country" className="ctf-label">{t.pickLabel}</label>
             <input
                 id="ctf-country"
                 className="ctf-field"
                 list="ctf-countries"
-                placeholder="Type a country"
+                placeholder={t.pickPlaceholder}
                 autoComplete="off"
                 disabled={!mounted}
                 value={value}
@@ -324,44 +336,47 @@ export function CountryPicker({ m, mounted, onPick }) {
  * country) and a country page's "This epoch in …".
  */
 export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
-    const msg = c ? countryMessage(m, c) : `Every country has five provider slots and five extender slots each epoch${m.phase === 'prelaunch' ? `, from epoch ${m.firstEpoch}` : ''}. Pick yours to see what is up for grabs there.`;
+    const all = ctfCopy(m.lang);
+    const t = all.card;
+    const f = formats(m.lang);
+    const msg = c ? countryMessage(m, c) : rich(m.phase === 'prelaunch' ? t.nonePrelaunch : t.none, { first: m.firstEpoch }).join('');
     const anyOpen = c && (c.p.open || c.x.open);
     const anyClosed = c && (c.p.held || c.x.held);
     // before a draw the dashboard's count is what is known of a country; after one, its draw says more
     const presence = c && !m.potsKnown ? presenceSentence(m, c) : null;
-    const empty = c ? uninhabitedSentence(c) : null;
-    const where = c ? c.the : 'your country';
+    const empty = c ? uninhabitedSentence(c, m.lang) : null;
+    const where = c ? { where: c.the, whereIn: place(c).in } : { where: t.where, whereIn: t.whereIn };
     return (
         <section className={cx('ctf-mine', anyOpen && 'ctf-wave')} aria-labelledby="ctf-mine-h">
             <div className="ctf-pole"><Flag code={c?.code} size="l" lazy={false} /></div>
             <div className="ctf-me-body">
                 <div className="ctf-label">{label}</div>
-                <h2 id="ctf-mine-h" className="ctf-me-name">{c ? c.name : 'Your country'}</h2>
-                {hubLink && c && <p className="ctf-me-seo"><a href={countryPath(c.code)}>Earning in {c.the}: questions and how to start</a></p>}
+                <h2 id="ctf-mine-h" className="ctf-me-name">{c ? c.name : t.yourCountry}</h2>
+                {hubLink && c && <p className="ctf-me-seo"><a href={pagePath(m.lang, `/ctf/${c.code}`)}>{rich(t.earning, place(c))}</a></p>}
                 {c && c.avail !== null && (
-                    <div className="ctf-me-amtrow"><b className="ctf-px ctf-me-amt">{alpha(c.avail)}</b><span className="ctf-me-unit">α</span><span className="ctf-me-what">up for grabs this epoch</span></div>
+                    <div className="ctf-me-amtrow"><b className="ctf-px ctf-me-amt">{f.alpha(c.avail)}</b><span className="ctf-me-unit">α</span><span className="ctf-me-what">{t.upForGrabs}</span></div>
                 )}
                 {c && c.avail === null && c.online !== null && (
-                    <div className="ctf-me-amtrow"><b className="ctf-px ctf-me-amt">{int(c.online)}</b><span className="ctf-me-what">{c.online === 1 ? 'provider' : 'providers'} online at the end of {dayName(m.presence.day)}</span></div>
+                    <div className="ctf-me-amtrow"><b className="ctf-px ctf-me-amt">{f.int(c.online)}</b><span className="ctf-me-what">{rich(t.online, { noun: f.form(t.onlineNoun, c.online), day: f.dayName(m.presence.day) })}</span></div>
                 )}
-                <p className="ctf-me-msg">{msg}{empty && <> {empty}</>}{presence && <> {presence}</>}</p>
+                <p className="ctf-me-msg">{msg}{empty && <>{all.gap}{empty}</>}{presence && <>{all.gap}{presence}</>}</p>
                 {c && (
                     <div className="ctf-roles">
                         {['p', 'x'].map((role) => (
                             <div className="ctf-role" key={role}>
-                                <span className="ctf-label">{role === 'p' ? 'Providers' : 'Extenders'}</span>
+                                <span className="ctf-label">{role === 'p' ? all.live.providers : all.live.extenders}</span>
                                 <Pips won={c[role].won} role={role} big />
-                                <span className="ctf-mono ctf-role-txt">{roleLine(m, c, role)}{c[role].held && <> <ChanceTip m={m} c={c} role={role} tips={tips} /></>}</span>
+                                <span className="ctf-mono ctf-role-txt">{roleLine(m, c, role)}{c[role].held && <>{all.gap}<ChanceTip m={m} c={c} role={role} tips={tips} /></>}</span>
                             </div>
                         ))}
                     </div>
                 )}
-                {anyClosed && <p className="ctf-touch-block ctf-me-note">Chance to win is the estimated probability that you win the epoch reward if you launch a provider or an extender here and keep it online for half the epoch.</p>}
+                {anyClosed && <p className="ctf-touch-block ctf-me-note">{t.chanceNote}</p>}
             </div>
             <div className="ctf-cta">
-                <a className="ctf-btn ctf-btn-p" href={START_URL}>{c ? `Start mining in ${c.the}` : 'Start mining'}</a>
-                <a className="ctf-btn ctf-btn-s" href={ctaHref('Run an extender')}>Run an extender</a>
-                <p className="ctf-cta-note">Stay online in {where} for at least half the epoch to enter the draw. Your app's payout wallet is used.</p>
+                <a className="ctf-btn ctf-btn-p" href={START_URL}>{c ? rich(t.startIn, place(c)).join('') : t.start}</a>
+                <a className="ctf-btn ctf-btn-s" href={ctaLink(m.lang, 'x')}>{t.runExtender}</a>
+                <p className="ctf-cta-note">{rich(t.stay, where)}</p>
                 {picker}
             </div>
         </section>
@@ -372,26 +387,29 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
 
 /** One Easy wins card: a country with a big pot and an open slot. */
 export function EasyWinCard({ m, c, i, mounted, tips, expanded, onExpand }) {
+    const all = ctfCopy(m.lang);
+    const t = all.easy;
+    const f = formats(m.lang);
     const step = nextStep(m, c);
-    const roles = c.p.open && c.x.open ? 'providers and extenders' : c.p.open ? 'providers' : 'extenders';
+    const open = c.p.open && c.x.open ? t.openBoth : c.p.open ? t.openP : t.openX;
     const delay = `-${(((i * 7) + 3) % 23) / 10}s`;
     return (
         <article className={cx('ctf-fc', 'ctf-wave', expanded && 'ctf-expanded')} style={{ animationDelay: delay, '--ctf-vt': `f-${c.code}` }}>
-            {mounted && <button type="button" className="ctf-fc-hit ctf-tap" onClick={() => onExpand(c.code)} aria-label={`Show the next step for ${c.name}`} aria-expanded={expanded} />}
+            {mounted && <button type="button" className="ctf-fc-hit ctf-tap" onClick={() => onExpand(c.code)} aria-label={rich(t.showNext, { name: c.name }).join('')} aria-expanded={expanded} />}
             <div className="ctf-fc-top">
                 <span className="ctf-pole"><Flag code={c.code} size="m" /></span>
-                <Tip tip={tipOf(tips, `feat:${c.code}`)} cls="ctf-ribbon ctf-r-hot" text={c.near > 0 ? 'So close' : 'Easy win'} label="Next step" near={step.near} body={<>{step.act}<b>{step.take}</b>.</>} cta={step.cta} />
+                <Tip m={m} tip={tipOf(tips, `feat:${c.code}`)} cls="ctf-ribbon ctf-r-hot" text={c.near > 0 ? t.soClose : t.easyWin} label={all.next.label} near={step.near} body={stepBody(m, step)} cta={step.cta} />
             </div>
-            <h3 className="ctf-fc-name"><a href={countryPath(c.code)}>{c.name}</a></h3>
-            <div className="ctf-fc-amt"><b className="ctf-px">{alpha(c.avail)}</b><span>α up for grabs</span></div>
-            <span className="ctf-mono ctf-fc-pots ctf-fc-pots-l">Provider pot {alpha(c.p.pot)} α · extender pot {alpha(c.x.pot)} α</span>
-            <span className="ctf-mono ctf-fc-pots ctf-fc-pots-s">P {alpha(c.p.pot)} α · E {alpha(c.x.pot)} α</span>
-            <p className="ctf-mono ctf-fc-line">{c.near > 0 ? `${int(c.near)} ${c.near === 1 ? 'miner was' : 'miners were'} here last epoch but left early. ` : ''}Not fully captured: {roles}, so a newcomer wins by default.</p>
+            <h3 className="ctf-fc-name"><a href={pagePath(m.lang, `/ctf/${c.code}`)}>{c.name}</a></h3>
+            <div className="ctf-fc-amt"><b className="ctf-px">{f.alpha(c.avail)}</b><span>{t.upForGrabs}</span></div>
+            <span className="ctf-mono ctf-fc-pots ctf-fc-pots-l">{rich(t.pots, { p: f.alpha(c.p.pot), x: f.alpha(c.x.pot) }).join('')}</span>
+            <span className="ctf-mono ctf-fc-pots ctf-fc-pots-s">{rich(t.potsShort, { p: f.alpha(c.p.pot), x: f.alpha(c.x.pot) }).join('')}</span>
+            <p className="ctf-mono ctf-fc-line">{c.near > 0 ? f.count(t.left, c.near) : ''}{open}</p>
             {expanded && (
                 <div className="ctf-fc-next">
                     <span className="ctf-act-near">{step.near}</span>
-                    <span className="ctf-act-do">{step.act}<b>{step.take}</b>.</span>
-                    <div className="ctf-more-cta"><a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaHref(step.cta)}>{step.cta}</a><button type="button" className="ctf-btn ctf-btn-s ctf-btn-sm" onClick={() => onExpand(c.code)}>Close</button></div>
+                    <span className="ctf-act-do">{stepBody(m, step)}</span>
+                    <div className="ctf-more-cta"><a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaLink(m.lang, step.cta)}>{all.cta[step.cta]}</a><button type="button" className="ctf-btn ctf-btn-s ctf-btn-sm" onClick={() => onExpand(c.code)}>{t.close}</button></div>
                 </div>
             )}
         </article>
@@ -400,15 +418,16 @@ export function EasyWinCard({ m, c, i, mounted, tips, expanded, onExpand }) {
 
 /** The Easy wins section: eight of the big pots this epoch, with Shuffle. */
 export function EasyWinsSection({ m, picks, title, mounted, tips, expanded, onExpand, onShuffle }) {
+    const t = ctfCopy(m.lang).easy;
     return (
         <section className="ctf-sec ctf-feat-sec" aria-labelledby="ctf-feat-h" data-ctf-elsewhere="">
             <div className="ctf-sec-head">
                 <div className="ctf-sec-title">
-                    <div className="ctf-label ctf-label-acc">Easy wins</div>
+                    <div className="ctf-label ctf-label-acc">{t.label}</div>
                     <h2 id="ctf-feat-h" className="ctf-h2">{title}</h2>
-                    <p className="ctf-sub">Eight countries drawn at random from the biggest pots, weighted by pot size. Each has an open slot, so a newcomer who stays online there for half the epoch wins by default.</p>
+                    <p className="ctf-sub">{t.sub}</p>
                 </div>
-                <button type="button" className="ctf-btn ctf-btn-s" disabled={!mounted} onClick={onShuffle}>Shuffle</button>
+                <button type="button" className="ctf-btn ctf-btn-s" disabled={!mounted} onClick={onShuffle}>{t.shuffle}</button>
             </div>
             {/* drawn again on each visit: the static page's draw is the epoch's */}
             <div className="ctf-feat" data-parity-ignore="">
@@ -421,32 +440,35 @@ export function EasyWinsSection({ m, picks, title, mounted, tips, expanded, onEx
 // ── a grid cell ─────────────────────────────────────────────────────────────
 
 function RoleRow({ m, c, role, tip }) {
+    const all = ctfCopy(m.lang);
+    const t = all.cell;
+    const f = formats(m.lang);
     const r = c[role];
     const P = role === 'p';
-    const name = P ? 'provider' : 'extender';
     let chip = null;
     if (m.drawn && r.open) {
         chip = (
             <>
-                <span className="ctf-rpot" title={`${P ? 'Provider' : 'Extender'} pot`}>{alpha(r.pot)} α</span>
-                <Tip tip={tip(`${role}:${c.code}`)} low cls="ctf-chance ctf-win" text="Open" label={`Not fully captured · ${name}s`}
-                    near={`${SLOTS_OPEN(r)} of 5 ${name} slots went unclaimed last epoch.`}
-                    body={<>Run {P ? 'a provider' : 'an extender'} in {c.the} for half an epoch and you win by default: <b>about {alpha(r.est)} α</b> this epoch, then a fifth of what is left each epoch you stay.</>}
-                    cta={P ? 'Run a provider' : 'Run an extender'} />
+                <span className="ctf-rpot" title={P ? t.pPot : t.xPot}>{f.alpha(r.pot)} α</span>
+                <Tip m={m} tip={tip(`${role}:${c.code}`)} low cls="ctf-chance ctf-win" text={t.open} label={P ? t.pNotFully : t.xNotFully}
+                    near={f.count(P ? t.pUnclaimed : t.xUnclaimed, SLOTS_OPEN(r))}
+                    body={rich(P ? t.pRun : t.xRun, { ...place(c), amount: f.alpha(r.est) }, BOLD)}
+                    cta={role} />
             </>
         );
     } else if (m.drawn) {
+        const ch = all.chance;
         chip = (
-            <Tip tip={tip(`${role}c:${c.code}`)} low cls="ctf-chance ctf-ex" text={pct(r.chance)} label={`Chance to win · ${name}s`}
-                body={<>The estimated probability that you win this epoch's reward in {c.the} if you launch {P ? 'a provider' : 'an extender'} there and keep it online for half the epoch: <b>{pct(r.chance)}</b>.</>}
-                after={drawLine(m, r)} cta={P ? 'Run a provider' : 'Run an extender'} />
+            <Tip m={m} tip={tip(`${role}c:${c.code}`)} low cls="ctf-chance ctf-ex" text={f.pct(r.chance)} label={P ? ch.pLabel : ch.xLabel}
+                body={rich(P ? ch.pBody : ch.xBody, { ...place(c), pct: f.pct(r.chance) }, BOLD)}
+                after={drawLine(m, r)} cta={role} />
         );
     } else if (m.potsKnown) {
-        chip = <span className="ctf-rpot" title={`${P ? 'Provider' : 'Extender'} pot`}>{alpha(r.pot)} α</span>;
+        chip = <span className="ctf-rpot" title={P ? t.pPot : t.xPot}>{f.alpha(r.pot)} α</span>;
     }
     return (
         <div className={cx('ctf-rrow', P ? 'ctf-p-row' : 'ctf-x-row')}>
-            <span className="ctf-rl" aria-hidden="true">{P ? 'P' : 'E'}</span>
+            <span className="ctf-rl" aria-hidden="true">{P ? t.letterP : t.letterX}</span>
             <CellPips won={r.won} role={role} />
             {m.drawn && <span className="ctf-rcount" aria-hidden="true">{r.won}/5</span>}
             {chip}
@@ -458,57 +480,73 @@ const SLOTS_OPEN = (r) => 5 - r.won;
 
 /** What a cell says to a screen reader in place of its pips and chips. */
 function cellSummary(m, c) {
+    const t = ctfCopy(m.lang).cell;
+    const f = formats(m.lang);
+    const say = (template, values) => rich(template, values).join('');
     if (m.drawn) {
-        const role = (r, name) => (r.open ? `${name}s not fully captured, a new ${name} wins by default` : `chance to win as a new ${name} ${pct(r.chance)}`);
-        return `Last epoch: ${c.p.won} of 5 provider slots and ${c.x.won} of 5 extender slots won, ${alpha(c.awarded)} alpha paid; ${role(c.p, 'provider')}; ${role(c.x, 'extender')}.`;
+        const role = (r, open, chance) => (r.open ? open : say(chance, { pct: f.pct(r.chance) }));
+        return say(t.summary, {
+            p: c.p.won,
+            x: c.x.won,
+            amount: f.alpha(c.awarded),
+            pRole: role(c.p, t.pOpenSr, t.pChanceSr),
+            xRole: role(c.x, t.xOpenSr, t.xChanceSr),
+        });
     }
-    if (m.potsKnown) return `No draw last epoch: provider pot ${alpha(c.p.pot)} alpha, extender pot ${alpha(c.x.pot)} alpha.`;
+    if (m.potsKnown) return say(t.undrawnSr, { p: f.alpha(c.p.pot), x: f.alpha(c.x.pot) });
     return null;
 }
 
 /** One country of the grid: its link, flag, pots, slot status and chance to win; the rest when it opens. */
 export const GridCell = React.memo(function GridCell({ m, c, i, mounted, tipApi, tipHover, tipFocus, tipPin, expanded, onExpand }) {
+    const all = ctfCopy(m.lang);
+    const t = all.cell;
+    const f = formats(m.lang);
+    const say = (template, values) => rich(template, values).join('');
     const tip = (id) => ({ id, api: tipApi, open: id === tipHover || id === tipFocus || id === tipPin, pinned: id === tipPin });
     const ribbon = m.drawn && c.hot
         ? (() => {
             const step = nextStep(m, c);
-            return <Tip tip={tip(`grid:${c.code}`)} cls="ctf-ribbon ctf-r-hot" text="So close" label="Next step" near={step.near} body={<>{step.act}<b>{step.take}</b>.</>} cta={step.cta} />;
+            return <Tip m={m} tip={tip(`grid:${c.code}`)} cls="ctf-ribbon ctf-r-hot" text={t.soClose} label={all.next.label} near={step.near} body={stepBody(m, step)} cta={step.cta} />;
         })()
-        : c.big ? <span className="ctf-ribbon ctf-r-open">Big pot</span> : c.flagHeld ? <span className="ctf-ribbon ctf-r-held">Held</span> : null;
+        : c.big ? <span className="ctf-ribbon ctf-r-open">{t.bigPot}</span> : c.flagHeld ? <span className="ctf-ribbon ctf-r-held">{t.held}</span> : null;
     const tier = c.hot ? 'ctf-hot' : c.big ? 'ctf-open' : null;
     const pinned = Boolean(tipPin);
     const style = { '--ctf-vt': `c-${c.code}`, ...(c.hot ? { animationDelay: `-${(((i * 7) + 5) % 23) / 10}s` } : {}) };
     const mini = (r) => (m.drawn ? (r.open ? 'ctf-m-open' : 'ctf-m-held') : 'ctf-m-held');
     const summary = cellSummary(m, c);
+    const cta = m.drawn && c.x.open && !c.p.open ? 'x' : m.drawn && c.p.open && !c.x.open ? 'p' : 'start';
+    const href = pagePath(m.lang, `/ctf/${c.code}`);
     return (
         <article className={cx('ctf-cell', tier, pinned && 'ctf-pinned', expanded && 'ctf-expanded')} style={style}>
             {/* tap to expand (touch sizes) needs the page to run: the static page has no control that does nothing */}
-            {mounted && <button type="button" className="ctf-cell-hit ctf-tap" onClick={() => onExpand(c.code)} aria-label={`Show details for ${c.name}`} aria-expanded={expanded} />}
+            {mounted && <button type="button" className="ctf-cell-hit ctf-tap" onClick={() => onExpand(c.code)} aria-label={say(t.showDetails, { name: c.name })} aria-expanded={expanded} />}
             <div className="ctf-cell-top"><Flag code={c.code} />{ribbon}</div>
-            <h3 className="ctf-cname" title={c.name}><a href={countryPath(c.code)}>{c.name}</a></h3>
+            <h3 className="ctf-cname" title={c.name}><a href={href}>{c.name}</a></h3>
             {m.potsKnown
-                ? <div className="ctf-amt"><b>{alpha(c.pots)}</b><span>α</span><span className="ctf-amt-l">in pots</span></div>
-                : c.online !== null && <div className="ctf-amt"><b>{int(c.online)}</b><span>{c.online === 1 ? 'provider' : 'providers'}</span><span className="ctf-amt-l">online</span></div>}
-            <span className="ctf-mini" aria-hidden="true"><i className={cx('ctf-m', mini(c.p))}>P</i><i className={cx('ctf-m', mini(c.x))}>E</i></span>
+                ? <div className="ctf-amt"><b>{f.alpha(c.pots)}</b><span>α</span><span className="ctf-amt-l">{t.inPots}</span></div>
+                : c.online !== null && <div className="ctf-amt"><b>{f.int(c.online)}</b><span>{f.form(t.providers, c.online)}</span><span className="ctf-amt-l">{t.online}</span></div>}
+            <span className="ctf-mini" aria-hidden="true"><i className={cx('ctf-m', mini(c.p))}>{t.letterP}</i><i className={cx('ctf-m', mini(c.x))}>{t.letterX}</i></span>
             <div className="ctf-last">
                 <RoleRow m={m} c={c} role="p" tip={tip} />
                 <RoleRow m={m} c={c} role="x" tip={tip} />
-                <span aria-hidden="true">{m.drawn ? `${c.won} won · ${alpha(c.awarded)} α` : m.potsKnown ? 'no draw last epoch' : c.seenDays !== null ? `seen ${c.seenDays}/${m.presence.days} days` : `from epoch ${m.firstEpoch}`}</span>
+                <span aria-hidden="true">{m.drawn
+                    ? say(t.wonLine, { won: c.won, amount: f.alpha(c.awarded) })
+                    : m.potsKnown ? t.noDraw
+                        : c.seenDays !== null ? say(t.seen, { seen: f.int(c.seenDays), days: f.int(m.presence.days) })
+                            : say(t.fromEpoch, { first: m.firstEpoch })}</span>
                 {summary && <span className="ctf-sr">{summary}</span>}
             </div>
             {expanded && (
                 <div className="ctf-cell-more">
-                    {m.drawn && c.near > 0 && <p className="ctf-more-near">So close: {int(c.near)} {c.near === 1 ? 'miner' : 'miners'} here left early last epoch.</p>}
+                    {m.drawn && c.near > 0 && <p className="ctf-more-near">{f.count(t.near, c.near)}</p>}
                     {m.potsKnown
                         ? <><p className="ctf-more-line">{roleDetail(m, c, 'p')}</p><p className="ctf-more-line">{roleDetail(m, c, 'x')}</p></>
-                        : <p className="ctf-more-line">{countryMessage(m, c)} {presenceSentence(m, c)}</p>}
+                        : <p className="ctf-more-line">{countryMessage(m, c)}{all.gap}{presenceSentence(m, c)}</p>}
                     <div className="ctf-more-cta ctf-more-cta-3">
-                        {(() => {
-                            const cta = m.drawn && c.x.open && !c.p.open ? 'Run an extender' : m.drawn && c.p.open && !c.x.open ? 'Run a provider' : 'Start mining';
-                            return <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaHref(cta)}>{cta}</a>;
-                        })()}
-                        <a className="ctf-btn ctf-btn-s ctf-btn-sm" href={countryPath(c.code)}>Country page</a>
-                        <button type="button" className="ctf-btn ctf-btn-s ctf-btn-sm" onClick={() => onExpand(c.code)}>Close</button>
+                        <a className="ctf-btn ctf-btn-p ctf-btn-sm" href={ctaLink(m.lang, cta)}>{all.cta[cta]}</a>
+                        <a className="ctf-btn ctf-btn-s ctf-btn-sm" href={href}>{t.countryPage}</a>
+                        <button type="button" className="ctf-btn ctf-btn-s ctf-btn-sm" onClick={() => onExpand(c.code)}>{t.close}</button>
                     </div>
                 </div>
             )}

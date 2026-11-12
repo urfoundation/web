@@ -10,6 +10,10 @@
  * Philippines, Pakistan, Vietnam, Bangladesh, Nepal, Kenya, Ghana, Egypt,
  * Brazil, Mexico, Turkey, then the US, the UK, Canada and Germany).
  *
- *   ke: { reviewed: '2026-12-01', text: 'One paragraph, plain words, no fiat projections.' },
+ * `text` is the English; the same note in a site language goes under that
+ * language's code (ru, ar, zh, de, es), and a page in a language without its
+ * own shows the English. A note decides the page's indexing in every language.
+ *
+ *   ke: { reviewed: '2026-12-01', text: 'One paragraph, plain words, no fiat projections.', es: 'Un párrafo…' },
  */
 export const CTF_LOCAL_NOTES = Object.freeze({});

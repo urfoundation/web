@@ -626,19 +626,27 @@ for (const p of pages.values()) {
 // follow the rule, so no two indexable ones differ by the country's name alone;
 // and pages that read the same must be countries whose data, as the pages
 // state it, is the same, or a page has left out its own figures. The noindex
-// pages are listed. Without a draw last epoch no capture the flag page may
-// claim a default win or show a chance to win (the API's draw figures are
-// null). And the pages are exactly the snapshot's 249.
+// pages are listed. The translations (/<lang>/ctf/<cc>) are the snapshot's 249
+// in each language, each indexed as its English page is (a page and its
+// translations are one hreflang cluster), and they read alike exactly where
+// the English pages do, with the country's names in that language masked, so
+// no translation drops a figure. Without a draw last epoch no capture the flag
+// page in any language may claim a default win or show a chance to win (the
+// API's draw figures are null). And the English pages are exactly the
+// snapshot's 249.
 {
   const CTF_SNAPSHOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../react/src/data/ctf-epoch.json");
   const countryPages = [...pages.values()].filter((p) => /^\/ctf\/[a-z]{2}$/.test(p.urlPath) && !p.redirectStub);
   if ((countryPages.length || pages.has("/ctf")) && !existsSync(CTF_SNAPSHOT)) err("/ctf: react/src/data/ctf-epoch.json is missing");
   else if (countryPages.length || pages.has("/ctf")) {
+    const { localModel } = await import("../../react/src/components/pages/ctf/model.js");
+    const { CHANCE_SHOWN, DEFAULT_WIN, countryTranslationProblems, ownContent } = await import("../../react/src/components/pages/ctf/indexing.js");
     const snapshot = JSON.parse(readFileSync(CTF_SNAPSHOT, "utf8"));
+    const model = buildModel(snapshot);
     if (countryPages.length !== snapshot.countries.length) err(`/ctf: ${countryPages.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
     const mainOf = (html) => (html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "";
     const { problems, groups } = countryIndexingProblems(
-      buildModel(snapshot),
+      model,
       countryPages.map((p) => ({ code: p.urlPath.slice("/ctf/".length), main: mainOf(p.html), noindex: p.noindex })),
     );
     problems.forEach(err);
@@ -646,11 +654,39 @@ for (const p of pages.values()) {
     if (noindex) {
       console.log(`seo-audit: note: ${noindex} country pages are noindex, each reading like another but for the country's name (${groups.length} group(s)): ${groups.map((g) => g.join(" ")).join(" | ")}`);
     }
+    // the translations, against the English pages
+    const english = new Map(countryPages.filter((p) => model.byCode.has(p.urlPath.slice("/ctf/".length))).map((p) => {
+      const code = p.urlPath.slice("/ctf/".length);
+      return [code, { noindex: p.noindex, own: ownContent(mainOf(p.html), model.byCode.get(code)) }];
+    }));
+    const ctfLangs = ["en"];
+    for (const lang of Object.keys(DEFAULT_WIN).filter((l) => l !== "en")) {
+      const translated = [...pages.values()].filter((p) => new RegExp(`^/${lang}/ctf/[a-z]{2}$`).test(p.urlPath) && !p.redirectStub);
+      if (!translated.length && !pages.has(`/${lang}/ctf`)) continue;
+      ctfLangs.push(lang);
+      if (!pages.has(`/${lang}/ctf`)) err(`/${lang}/ctf: the hub is missing beside its country pages`);
+      if (translated.length !== snapshot.countries.length) err(`/${lang}/ctf: ${translated.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
+      countryTranslationProblems(
+        localModel(model, lang),
+        lang,
+        translated.map((p) => ({ code: p.urlPath.slice(`/${lang}/ctf/`.length), main: mainOf(p.html), noindex: p.noindex })),
+        english,
+      ).forEach(err);
+    }
+    if (ctfLangs.length > 1) console.log(`seo-audit: note: capture the flag in ${ctfLangs.join(", ")}: each translation indexed as its English page, and alike where it is`);
     if (!snapshot.last_epoch?.drawn) {
-      for (const p of [...countryPages, pages.get("/ctf")].filter(Boolean)) {
-        const text = decodeHtmlEntities(mainOf(p.html).replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
-        const claim = text.match(/[^.]*\bwins? by default\b[^.]*\.|[^.]*\b\d+(?:\.\d+)?%[^.]*\./);
-        if (claim) err(`${p.urlPath}: without a draw last epoch it says "${claim[0].trim()}"`);
+      for (const lang of ctfLangs) {
+        const prefix = lang === "en" ? "" : `/${lang}`;
+        const ctfPages = [...pages.values()].filter((p) => (p.urlPath === `${prefix}/ctf` || new RegExp(`^${prefix}/ctf/[a-z]{2}$`).test(p.urlPath)) && !p.redirectStub);
+        for (const p of ctfPages) {
+          const text = decodeHtmlEntities(mainOf(p.html).replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+          const sentence = (re) => {
+            const at = text.search(re);
+            return at < 0 ? null : text.slice(Math.max(0, at - 60), at + 80).trim();
+          };
+          const claim = sentence(DEFAULT_WIN[lang]) || sentence(CHANCE_SHOWN);
+          if (claim) err(`${p.urlPath}: without a draw last epoch it says "…${claim}…"`);
+        }
       }
     }
   }

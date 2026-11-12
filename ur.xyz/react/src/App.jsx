@@ -30,12 +30,13 @@ import DashboardPage from './components/pages/Dashboard';
 import ResearchReportPage from './components/pages/ResearchReport';
 import ResearchMethodologyPage from './components/pages/ResearchMethodology';
 import { useRoute } from './router';
+import { useLanguage } from './i18n';
 
-const Terms = () => <LegalSection doc="terms" />;
-const Privacy = () => <LegalSection doc="privacy" />;
-const Vdp = () => <LegalSection doc="vdp" />;
+const Terms = ({ lang }) => <LegalSection doc="terms" lang={lang} />;
+const Privacy = ({ lang }) => <LegalSection doc="privacy" lang={lang} />;
+const Vdp = ({ lang }) => <LegalSection doc="vdp" lang={lang} />;
 // capture the flag: the hub at /ctf, a country's page at /ctf/<cc>
-const Ctf = ({ route }) => (route.slug ? <CtfCountryPage code={route.slug} /> : <CtfPage />);
+const Ctf = ({ route, lang }) => (route.slug ? <CtfCountryPage code={route.slug} lang={lang} /> : <CtfPage lang={lang} />);
 
 /** Map route names to their section component. */
 const SECTION_COMPONENTS = {
@@ -47,7 +48,7 @@ const SECTION_COMPONENTS = {
     terms:      Terms,
     privacy:    Privacy,
     vdp:        Vdp,
-    // the English-only pages (router PAGE_ROUTES); the Astro build renders
+    // the page groups' pages (router PAGE_ROUTES); the Astro build renders
     // the same components from its thin pages, so they stay one source
     about:      AboutPage,
     investors:  InvestorsPage,
@@ -70,10 +71,13 @@ const SECTION_COMPONENTS = {
  */
 export default function App() {
     const route = useRoute();
+    // every page component takes the page's language as `lang`, as the Astro
+    // pages pass it (react/src/i18n/README.md)
+    const { code } = useLanguage();
 
-    if (route.name === 'docs') return <DocsExplorer />;
+    if (route.name === 'docs') return <DocsExplorer lang={code} />;
     // standalone: its own shell, not the site's chrome
-    if (route.name === 'dashboard') return <DashboardPage />;
+    if (route.name === 'dashboard') return <DashboardPage lang={code} />;
 
     const SectionComponent = SECTION_COMPONENTS[route.name];
     if (SectionComponent) return <SectionPage Component={SectionComponent} route={route} />;
@@ -125,6 +129,7 @@ function HomePage() {
  */
 function SectionPage({ Component, route }) {
     const disclaimerVisible = useDisclaimerVisible();
+    const { code } = useLanguage();
 
     return (
         <div className="app">
@@ -132,7 +137,7 @@ function SectionPage({ Component, route }) {
             <Nav disclaimerVisible={disclaimerVisible} />
 
             <main className="section-page">
-                <Component route={route} />
+                <Component route={route} lang={code} />
             </main>
 
             <Footer />

@@ -77,9 +77,10 @@ function urXyzDevRoutes() {
 
 // ── <lastmod>: the day each page's content last changed ──
 // scripts/page-dates.mjs fingerprints every page the build writes and keeps
-// the day each fingerprint last changed in page-dates.json (committed with the
-// content). The integration below updates it once the pages are on disk, and
-// the sitemap reads it. It replaced git dates, which dated a page by its source
+// the day each fingerprint last changed in page-dates.json and, for the page
+// groups' pages, page-dates/<group>.json (committed with the content). The
+// integration below updates them once the pages are on disk, and the sitemap
+// reads them. It replaced git dates, which dated a page by its source
 // files: a shared dictionary re-dated every section when one changed, and a
 // commit that only moved files re-dated everything it moved.
 import { refreshPageDates, SITEMAP_FILES } from './scripts/page-dates.mjs';
@@ -140,9 +141,17 @@ export default defineConfig({
 
                 // English-only pages have no hreflang cluster. This includes
                 // future routes until they are explicitly added to the shared
-                // localized-route list alongside real translated pages.
+                // localized-route list alongside real translated pages (the
+                // sections, and each page group once it is localized).
                 if (!hasLocalizedVersion(basePathFor(pathname))) {
                     item.links = undefined;
+                }
+
+                // a cluster names only pages of this sitemap: indexable, their
+                // own canonical (a page and its translations are indexed alike,
+                // and the seo-audit holds the head's cluster to this one)
+                if (item.links?.length) {
+                    item.links = item.links.filter((l) => pageDates.has(pagePathOf(l.url)));
                 }
 
                 // the head advertises an x-default alternate; the sitemap should agree

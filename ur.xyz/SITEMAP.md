@@ -1,5 +1,9 @@
 # ur.xyz sections
 
+# Languages
+
+Every page is published in English at its bare path and, once translated, in Russian, Arabic, Chinese, German and Spanish at /<lang>/<path>. The home page and the sections read the site dictionaries; every other page belongs to a page group (react/src/i18n/pages/<group>/group.js: about, build, ctf, dashboard, docs with the legal pages, investors, mainnet, not-found, price, research-methodology, research-report, reserve) whose translations are built, linked, clustered by hreflang and listed in the sitemap once the group is marked localized. Until then the page is English-only and its /<lang>/ URLs redirect to it. react/src/i18n/README.md is the guide.
+
 
 # 1. Whitepaper
 

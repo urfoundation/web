@@ -1,9 +1,10 @@
 ---
-import { NON_EN_LANGS } from '../../../lib/i18n.js';
-
+// /<lang>/docs: the docs landing page in another language, a page of the docs
+// group (react/src/i18n/pages/docs/group.js), built once that group is
+// localized. Until then nothing is built here: nginx serves a /<lang>/ page
+// when the build has one and otherwise answers /<lang>/docs with a 301 to
+// /docs, so a redirect stub built here would be served in place of that 301.
 export function getStaticPaths() {
-    return NON_EN_LANGS.map(lang => ({ params: { lang } }));
+    return [];
 }
-
-return Astro.redirect('/docs', 301);
 ---

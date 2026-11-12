@@ -26,6 +26,12 @@
 // committed but the record is not, which is how a change that shipped without
 // its date would otherwise stay undated and be re-dated by every later build.
 //
+// The record is one file per page group: the pages of a group of
+// src/lib/route-localization.js (/about, /ctf and /ctf/<cc>, the docs, …), in
+// every language, are recorded in astro/page-dates/<group>.json, and every
+// other page (the home page, the sections, the audit PDF) in
+// astro/page-dates.json. Work on one group then changes only its own file.
+//
 // Usage (from ur.xyz/astro):
 //   node scripts/page-dates.mjs build/main                  update the record
 //   node scripts/page-dates.mjs build/main --check          read-only check
@@ -35,23 +41,35 @@
 
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { slugFor } from '../../react/src/lib/docs-shared.js';
 import { LASTMOD_TOKEN } from '../src/lib/lastmod.js';
+import { NON_EN_SITE_LANG_CODES, PAGE_GROUPS, groupForPath } from '../src/lib/route-localization.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const UR_XYZ_ROOT = path.resolve(__dirname, '../..');
 export const RECORD_FILE = path.resolve(__dirname, '../page-dates.json');
+// a page group's pages, in every language: page-dates/<group>.json
+export const GROUP_RECORD_DIR = path.resolve(__dirname, '../page-dates');
+const groupRecordFile = (group) => path.join(GROUP_RECORD_DIR, `${group}.json`);
+
+/** The file that records a URL: its page group's, or page-dates.json for every other page. */
+export function recordFileFor(urlPath) {
+    const group = groupForPath(urlPath);
+    return group ? groupRecordFile(group) : RECORD_FILE;
+}
+
+/** Every record file: page-dates.json and a file for each page group. */
+const recordFiles = () => [RECORD_FILE, ...Object.keys(PAGE_GROUPS).sort().map(groupRecordFile)];
 const SITE = 'https://ur.xyz';
 
 // Non-HTML files the sitemap lists. The investor documents' PDFs are not here:
 // each is a printout of an HTML page and points its canonical at that page.
 export const SITEMAP_FILES = Object.freeze(['/audits/masa-l2-2025.pdf']);
 
-const LANGS = ['ru', 'ar', 'zh', 'de', 'es'];
-const LANG_PREFIX = new RegExp(`^/(${LANGS.join('|')})(?=/|$)`);
+const LANG_PREFIX = new RegExp(`^/(${NON_EN_SITE_LANG_CODES.join('|')})(?=/|$)`);
 const SECTIONS = ['operators', 'miners', 'validators', 'research'];
 
 // ── what a page says ─────────────────────────────────────────────────────────
@@ -227,6 +245,20 @@ const INVESTOR_DOCS = { deck: 'deck', 'our-letter-to-bittensor': 'letter', 'conv
  * page that moved keeps the history of the file it moved from.
  */
 function sourcesFor(urlPath) {
+    const group = groupForPath(urlPath);
+    // a page group's copy (react/src/i18n/pages/<group>/) is a source of every page of the group
+    const copy = group ? groupCopyFiles(group) : [];
+    return [...pageSourcesFor(urlPath), ...copy];
+}
+
+/** Every file of a page group's copy (its en.js and translations, at any depth). */
+function groupCopyFiles(group) {
+    const dir = path.join(UR_XYZ_ROOT, 'react/src/i18n/pages', group);
+    if (!existsSync(dir)) return [];
+    return walk(dir).filter((f) => /\.(?:js|md|json)$/.test(f)).map((f) => path.relative(UR_XYZ_ROOT, f).split(path.sep).join('/')).sort();
+}
+
+function pageSourcesFor(urlPath) {
     const lang = urlPath.match(LANG_PREFIX)?.[1] || 'en';
     const base = urlPath.replace(LANG_PREFIX, '') || '/';
     const dict = `react/src/i18n/${lang}.js`;
@@ -299,20 +331,64 @@ export function todayIso() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export function readRecord(file = RECORD_FILE) {
-    if (!existsSync(file)) return new Map();
-    const json = JSON.parse(readFileSync(file, 'utf8'));
-    return new Map(Object.entries(json.pages || {}));
+/** The whole record (url path → { fingerprint, lastmod }), read from every record file. */
+export function readRecord(files = recordFiles()) {
+    const record = new Map();
+    for (const file of [].concat(files)) {
+        if (!existsSync(file)) continue;
+        const json = JSON.parse(readFileSync(file, 'utf8'));
+        for (const [urlPath, entry] of Object.entries(json.pages || {})) record.set(urlPath, entry);
+    }
+    return record;
 }
 
-export function serializeRecord(record) {
+export function serializeRecord(record, group = null) {
     const keys = [...record.keys()].sort((a, b) => (a === '/' ? -1 : b === '/' ? 1 : a < b ? -1 : a > b ? 1 : 0));
     const pages = Object.fromEntries(keys.map((k) => [k, record.get(k)]));
-    return `${JSON.stringify({
-        about: 'The day each ur.xyz page last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.',
-        pages,
-    }, null, 2)}\n`;
+    const about = group
+        ? `The day each page of the ur.xyz page group ${group} (react/src/i18n/pages/${group}/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.`
+        : 'The day each ur.xyz page last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The pages of the page groups are in page-dates/<group>.json. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.';
+    return `${JSON.stringify({ about, pages }, null, 2)}\n`;
 }
+
+/**
+ * What each record file should hold for a record: file → its text, or null
+ * for a group's file that should not exist (a group with no recorded page).
+ */
+export function serializeRecordFiles(record) {
+    const byFile = new Map(recordFiles().map((file) => [file, new Map()]));
+    for (const [urlPath, entry] of record) {
+        const file = recordFileFor(urlPath);
+        if (!byFile.has(file)) byFile.set(file, new Map());
+        byFile.get(file).set(urlPath, entry);
+    }
+    const out = new Map();
+    for (const [file, entries] of byFile) {
+        const group = file === RECORD_FILE ? null : path.basename(file, '.json');
+        out.set(file, file === RECORD_FILE || entries.size ? serializeRecord(entries, group) : null);
+    }
+    return out;
+}
+
+const onDisk = (file) => (existsSync(file) ? readFileSync(file, 'utf8') : null);
+
+/** Bring the record files to `wanted` (serializeRecordFiles); the files it changed. */
+function writeRecordFiles(wanted) {
+    const changed = [];
+    for (const [file, text] of wanted) {
+        if (text === onDisk(file)) continue;
+        if (text === null) rmSync(file);
+        else {
+            mkdirSync(path.dirname(file), { recursive: true });
+            writeFileSync(file, text);
+        }
+        changed.push(file);
+    }
+    return changed;
+}
+
+const staleFiles = (wanted) => [...wanted].filter(([file, text]) => text !== onDisk(file)).map(([file]) => file);
+const relRecord = (file) => path.relative(UR_XYZ_ROOT, file);
 
 /**
  * Bring a record up to date with a build's fingerprints. Returns the new
@@ -352,8 +428,7 @@ const describe = ({ redated, added, dropped }, record) =>
 export async function refreshPageDates(distDir, { write = true, log = console } = {}) {
     const record = readRecord();
     const { next, changes } = await updateRecord(record, fingerprints(distDir));
-    const before = existsSync(RECORD_FILE) ? readFileSync(RECORD_FILE, 'utf8') : '';
-    const after = serializeRecord(next);
+    const wanted = serializeRecordFiles(next);
     // pages that state the day (src/lib/lastmod.js) get the recorded one
     for (const file of walk(distDir)) {
         if (!file.endsWith('.html')) continue;
@@ -361,12 +436,14 @@ export async function refreshPageDates(distDir, { write = true, log = console } 
         if (!html.includes(LASTMOD_TOKEN)) continue;
         writeFileSync(file, html.split(LASTMOD_TOKEN).join(next.get(urlPathOf(distDir, file))?.lastmod || todayIso()));
     }
-    if (after !== before) {
+    const stale = staleFiles(wanted);
+    if (stale.length) {
+        const files = stale.map(relRecord).join(', ');
         if (write) {
-            writeFileSync(RECORD_FILE, after);
-            log.info?.(`page-dates: updated ${path.relative(UR_XYZ_ROOT, RECORD_FILE)} (commit it with the content)\n  ${describe(changes, next)}`);
+            writeRecordFiles(wanted);
+            log.info?.(`page-dates: updated ${files} (commit with the content)\n  ${describe(changes, next)}`);
         } else {
-            log.warn?.(`page-dates: ${path.relative(UR_XYZ_ROOT, RECORD_FILE)} is stale and was not written (UR_PAGE_DATES=check)\n  ${describe(changes, next)}`);
+            log.warn?.(`page-dates: ${files} stale and not written (UR_PAGE_DATES=check)\n  ${describe(changes, next)}`);
         }
     }
     return next;
@@ -383,7 +460,7 @@ async function main() {
         console.error(`page-dates: no such build dir ${distDir}`);
         process.exit(2);
     }
-    const rel = path.relative(UR_XYZ_ROOT, RECORD_FILE);
+    const rel = `${relRecord(RECORD_FILE)} and ${relRecord(GROUP_RECORD_DIR)}/`;
     const current = fingerprints(distDir);
 
     if (seedAt !== -1) {
@@ -395,38 +472,40 @@ async function main() {
         const today = todayIso();
         const { next: seeded } = await updateRecord(new Map(), fingerprints(seedDir), { today, committedOnly: true });
         const { next, changes } = await updateRecord(seeded, current, { today });
-        writeFileSync(RECORD_FILE, serializeRecord(next));
+        writeRecordFiles(serializeRecordFiles(next));
         console.log(`page-dates: seeded ${rel} from ${seedDir} (${seeded.size} URLs dated from git)\n  ${describe(changes, next)}`);
         return;
     }
 
     const { next, changes } = await updateRecord(readRecord(), current);
-    const onDisk = existsSync(RECORD_FILE) ? readFileSync(RECORD_FILE, 'utf8') : '';
-    const wanted = serializeRecord(next);
+    const wanted = serializeRecordFiles(next);
+    const stale = staleFiles(wanted);
 
     if (!args.includes('--check')) {
-        if (wanted !== onDisk) writeFileSync(RECORD_FILE, wanted);
-        console.log(wanted === onDisk ? `page-dates: ${rel} is current` : `page-dates: updated ${rel}\n  ${describe(changes, next)}`);
+        writeRecordFiles(wanted);
+        console.log(stale.length ? `page-dates: updated ${stale.map(relRecord).join(', ')}\n  ${describe(changes, next)}` : `page-dates: ${rel} are current`);
         return;
     }
 
     const problems = [];
-    if (wanted !== onDisk) {
-        problems.push(`${rel} is not what a build of ${path.relative(process.cwd(), distDir)} writes:\n  ${describe(changes, next) || 'formatting differs'}\n  rebuild (or run \`node scripts/page-dates.mjs ${path.relative(process.cwd(), distDir)}\`) and commit it`);
+    if (stale.length) {
+        problems.push(`${stale.map(relRecord).join(', ')}: not what a build of ${path.relative(process.cwd(), distDir)} writes:\n  ${describe(changes, next) || 'formatting differs'}\n  rebuild (or run \`node scripts/page-dates.mjs ${path.relative(process.cwd(), distDir)}\`) and commit it`);
     } else {
         // With the rest of ur.xyz committed, the record must be committed too:
         // otherwise the content it dates shipped without it, and every later
         // build would date that content by its own day.
         try {
-            const pending = git(['status', '--porcelain', '--', '.', `:(exclude)${rel}`]).trim();
+            const pending = git(['status', '--porcelain', '--', '.', `:(exclude)${relRecord(RECORD_FILE)}`, `:(exclude)${relRecord(GROUP_RECORD_DIR)}`]).trim();
             if (!pending) {
-                let committed = null;
-                try {
-                    committed = git(['show', `HEAD:./${rel}`]);
-                } catch {
-                    /* not committed yet */
+                for (const [file, text] of wanted) {
+                    let committed = null;
+                    try {
+                        committed = git(['show', `HEAD:./${relRecord(file)}`]);
+                    } catch {
+                        /* not committed (or rightly absent) */
+                    }
+                    if (committed !== text) problems.push(`${relRecord(file)} dates content that is committed, but it is not: commit it`);
                 }
-                if (committed !== onDisk) problems.push(`${rel} dates content that is committed, but it is not: commit it`);
             }
         } catch {
             /* not a git checkout */
@@ -436,7 +515,7 @@ async function main() {
         console.error(`page-dates: ${problems.join('\n')}`);
         process.exit(1);
     }
-    console.log(`page-dates: ${rel} is current (${next.size} URLs)`);
+    console.log(`page-dates: ${rel} are current (${next.size} URLs)`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

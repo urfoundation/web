@@ -16,6 +16,7 @@ import path from "node:path";
 import net from "node:net";
 import { fileURLToPath } from "node:url";
 import { OFFLINE_CHROMIUM_ARGS } from "./offline-chromium.mjs";
+import { localizedSamples } from "./localized-samples.mjs";
 
 // Astro reports every build and preview to telemetry.astro.build unless this is
 // set before it loads; the builds and previews this starts inherit it.
@@ -28,7 +29,9 @@ const UR_ENV = process.env.UR_ENV || "main";
 const ASTRO_OUT = path.join(ASTRO_DIR, "build", UR_ENV);
 const OUT = path.join(__dirname, "__wiring__");
 
-const ROUTES = ["/", "/price", "/operators", "/miners", "/validators", "/research", "/terms", "/privacy", "/vdp", "/about", "/investors", "/investors/deck", "/investors/conviction-lock", "/investors/apex-competition", "/investors/our-letter-to-bittensor", "/investors/letter-to-tokenholders-september-2026", "/build", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology"];
+const ROUTES = ["/", "/price", "/operators", "/miners", "/validators", "/research", "/terms", "/privacy", "/vdp", "/about", "/investors", "/investors/deck", "/investors/conviction-lock", "/investors/apex-competition", "/investors/our-letter-to-bittensor", "/investors/letter-to-tokenholders-september-2026", "/build", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology",
+  // a page of each localized page group, in German (localized-samples.mjs)
+  ...localizedSamples(["de"])];
 // Same screens as the pixel test: desktop + two phones. On phones the header collapses to a
 // hamburger, so the visible-button inventory differs from desktop — but react and astro share
 // the Header, so they still match each other per-profile, and tapping the hamburger exercises

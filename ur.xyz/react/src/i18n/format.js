@@ -27,6 +27,24 @@ export function formatPercent(fraction, lang, options = {}) {
     return cached(Intl.NumberFormat, lang, { style: 'percent', maximumFractionDigits: 1, ...options }).format(fraction);
 }
 
+/**
+ * A US dollar amount through Intl's currency format, `options` as Intl takes
+ * them: 1.97 → "1,97 $" (de), "US$1.97" (zh). Spanish names the dollar US$
+ * before the figure, "US$1,97" and "US$1,35 M", the pattern of its prose
+ * ("US$134 millones"), since a bare $ also means pesos where Spanish is read
+ * (the owner's style decision of 2026-11-12); its digits are Intl's.
+ */
+export function formatUsd(value, lang, options = {}) {
+    const format = cached(Intl.NumberFormat, lang, { style: 'currency', currency: 'USD', ...options });
+    if (lang !== 'es') return format.format(value);
+    // the figure without Intl's symbol and the space beside it, its sign before US$
+    const parts = format.formatToParts(value).filter((part) => part.type !== 'currency');
+    while (parts.length && parts[0].type === 'literal') parts.shift();
+    while (parts.length && parts[parts.length - 1].type === 'literal') parts.pop();
+    const sign = parts[0]?.type === 'minusSign' || parts[0]?.type === 'plusSign' ? parts.shift().value : '';
+    return `${sign}US$${parts.map((part) => part.value).join('')}`;
+}
+
 /** A Date, epoch milliseconds, or an ISO day ('2026-11-27', read as UTC). */
 function toDate(value) {
     if (value instanceof Date) return value;

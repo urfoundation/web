@@ -7,7 +7,7 @@
 // astro/astro.config.mjs).
 import { GRAFANA, buildLive, grafana } from '../../../lib/dashboardData.js';
 import { loadPageCopy } from '../../../i18n/page-copy.js';
-import { displayRegion, interpolate, intlLocale, pluralCategory } from '../../../i18n/format.js';
+import { displayRegion, formatUsd, interpolate, intlLocale, pluralCategory } from '../../../i18n/format.js';
 import engineUrl from './engine.js?url';
 import pageUrl from './page.js?url';
 
@@ -46,6 +46,8 @@ function scriptsI18n(lang) {
         interpolate,
         // a plural node's form for count (options: Intl.PluralRules', such as the decimals shown)
         plural: (forms, count, options) => forms[pluralCategory(lang, count, options)] ?? forms.other,
+        // a price in US dollars: Intl's, the dollar's narrow symbol ("1,97 $"), and in Spanish "US$1,97"
+        usd: (value) => formatUsd(value, lang, { currencyDisplay: 'narrowSymbol' }),
         // a country's name from its ISO code (Intl), or null when Intl has none
         region: (code) => {
             try {

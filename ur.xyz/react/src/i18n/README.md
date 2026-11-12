@@ -135,7 +135,8 @@ carry that mark), the seo-audit
 complete, `dir` per language), `page-dates.mjs --check`, `tests/page-copy.test.mjs`,
 `scripts/route-localization.test.mjs`, and every `pages/<group>/*.test.mjs`, which a group adds without editing the
 Makefile, with `pages/style.test.mjs`: the owner's Chinese and Spanish style rules in every unit and the docs corpus
-(香港, 澳门 and 台湾; 国家和地区 in a count of places; neutral Latin American Spanish in tú; US$ before a dollar amount).
+(香港, 澳门 and 台湾; 国家和地区 in a count of places; neutral Latin American Spanish in tú; US$ before every dollar
+figure, never a bare $, which `format.js` `formatUsd` also writes for the code's amounts).
 
 ## Good to know
 

@@ -119,6 +119,7 @@ test('dates and blocks are written in each language, at the same UTC times, with
         assert.ok([9240028, 9247228, 7200, 1].every((n) => day.includes(figure(n, lang))), `${lang}: ${day}`);
     }
     assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'ru', t: page('ru') }), 'Блоки 9,247,228 → 9,297,628 · 50,400 блоков, 7 дней');
+    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'de', t: page('de') }), 'Blöcke 9,247,228 → 9,297,628 · 50,400 Blöcke, 7 Tage');
     // Spanish writes figures as Intl does for the page, as on /ctf and its other pages
     assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'es', t: page('es') }), 'Bloques 9.247.228 → 9.297.628 · 50.400 bloques, 7 días');
     assert.equal(epochBlocks(mainnetEpochs[0], { lang: 'es', t: page('es') }), 'Bloques 9.240.028 → 9.247.228 · 7200 bloques, 1 día');

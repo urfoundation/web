@@ -15,7 +15,9 @@
 //   - no Spain-only word where a Latin American one exists: computadora,
 //     costo, confiable, monitoreo, presionar a key, en vivo, Rumania, Arabia
 //     Saudita;
-//   - a dollar amount names the dollar US$ ("US$134 millones"), never a bare $;
+//   - a dollar amount names the dollar US$ before the figure ("US$134 millones";
+//     format.js formatUsd writes the code's amounts so: "US$1,97"), never a
+//     bare $;
 //   - capture the flag is Captura la bandera, without quotes.
 //
 // Usage (from react/): node --test src/i18n/pages/style.test.mjs
@@ -24,6 +26,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+
+import { displayRegion, formatUsd } from '../format.js';
 
 const PAGES = path.dirname(fileURLToPath(import.meta.url));
 const I18N = path.dirname(PAGES);
@@ -61,20 +65,41 @@ function refuse(lang, rules) {
     assert.deepEqual(found, [], found.join('\n'));
 }
 
+// a word, not a part of one: \b is ASCII-only, and á, í, ó end Spanish words
+const word = (alternatives) => new RegExp(`(?<!\\p{L})(?:${alternatives})(?!\\p{L})`, 'iu');
+
 test('Chinese names Hong Kong, Macao and Taiwan as the English site does, counts places as 国家和地区, and calls the pot 累积池', () => {
     refuse('zh', [
         ['a 特别行政区 form or a 中国… prefix', /特别行政区|中国(?:香港|澳门|台湾)/u],
-        ['a count of places without 和地区', /(?:\d|\}|多|\+) ?个国家(?!和地区)/u],
+        // after a figure, a placeholder, a Chinese numeral or 多, or as the label a figure stands before ('个国家')
+        ['a count of places without 和地区', /[\d}多+几数十百千万两'"`]\s?个国家(?!和地区)/u],
         ['the pot is 累积池', /累计奖励|奖池/u],
     ]);
+    assert.deepEqual(['hk', 'mo', 'tw'].map((code) => displayRegion(code, 'zh')), ['香港', '澳门', '台湾']);
 });
 
 test('Spanish is neutral Latin American Spanish in tú, names the dollar US$ and capture the flag without quotes', () => {
     refuse('es', [
-        ['vosotros', /\b(?:vosotr[oa]s|vuestr[oa]s?)\b|\p{L}+(?:áis|éis)\b/iu],
-        ['usted', /\busted\b/iu],
-        ['a Spain-only word', /\b(?:ordenador(?:es)?|costes?|fiab(?:le|les|ilidad)|monitorización|puls(?:a|ar|e)|en directo|Rumanía|Arabia Saudí)\b/iu],
+        ['vosotros', word('vosotr[oa]s|vuestr[oa]s?|\\p{L}+(?:áis|éis)')],
+        ['vosotros', /(?<![\p{L}{<\/.])(?:os|sois|vais|dais|veis)(?![\p{L}}>\/])/u],
+        ['usted', word('usted')],
+        ['a Spain-only word', word([
+            'ordenador(?:es)?', 'costes?', 'fiab(?:le|les|ilidad)', 'monitorización', 'puls(?:a|as|ar|en|ando|ado)',
+            'en directo', 'Rumanía', 'Arabia Saudí', 'armarios?', 'cestas?', 'aparcad[oa]s?',
+            '(?:un|el|tu|su|los|tus|sus|del|al) portátil(?:es)?', 'en móviles',
+        ].join('|'))],
         ['a bare $ before an amount', /(?<![\p{L}$])\$\s?\d/u],
         ['Captura la bandera in quotes', /[«“"]Captura la bandera[»”"]/iu],
     ]);
+    assert.deepEqual(['ro', 'sa'].map((code) => displayRegion(code, 'es')), ['Rumania', 'Arabia Saudita']);
+});
+
+test('the code writes a Spanish dollar amount as US$ and Intl\'s figure, and every other language as Intl does', () => {
+    assert.equal(formatUsd(1.97, 'es'), 'US$1,97');
+    assert.equal(formatUsd(-1.97, 'es'), '-US$1,97');
+    assert.equal(formatUsd(1350000, 'es', { notation: 'compact', maximumFractionDigits: 2 }), 'US$1,35\u00a0M');
+    assert.equal(formatUsd(0.05, 'es', { currencyDisplay: 'narrowSymbol' }), 'US$0,05');
+    for (const lang of ['ru', 'ar', 'zh', 'de']) {
+        assert.equal(formatUsd(1.97, lang), new Intl.NumberFormat(lang === 'ar' ? 'ar-u-nu-latn' : lang, { style: 'currency', currency: 'USD' }).format(1.97), lang);
+    }
 });

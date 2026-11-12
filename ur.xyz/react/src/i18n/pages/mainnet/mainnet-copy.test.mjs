@@ -82,7 +82,7 @@ const figures = (text) => [...new Set(String(text).match(/§?\d+(?:[.,:]\d+)*/g)
 // numbers are Intl's for the page (9.240.028, 1076,26, 0,1); a section (§8.6.7), a time (18:25) and a whole number
 // without separators (2026, 4294967297) read the same in every language
 const written = (figure, lang) => {
-    if (!INTL_FIGURES.has(lang) || !/^(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d+)$/.test(figure)) return figure;
+    if (!INTL_FIGURES.includes(lang) || !/^(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d+)$/.test(figure)) return figure;
     const decimals = (figure.split('.')[1] || '').length;
     return formatNumber(Number(figure.replace(/,/g, '')), lang, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 };

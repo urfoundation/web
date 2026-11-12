@@ -237,10 +237,10 @@ export const thousands = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\
  * owner's style decision of 2026-11-12, so /mainnet and /ctf read alike. Every
  * other language keeps the English digits and separators (9,247,228).
  */
-export const INTL_FIGURES = Object.freeze(new Set(['es']));
+export const INTL_FIGURES = Object.freeze(['es']);
 
 /** A whole number as the page writes it: 9,247,228, or Intl's 9.247.228 in a language of INTL_FIGURES. */
-export const figure = (n, lang = 'en') => (INTL_FIGURES.has(lang) ? formatNumber(Math.round(n), lang) : thousands(n));
+export const figure = (n, lang = 'en') => (INTL_FIGURES.includes(lang) ? formatNumber(Math.round(n), lang) : thousands(n));
 
 /** An epoch's start and end, as a milestone date (date-times). */
 export const epochWhen = (epoch) => parseWhen(`${epoch.start.time}/${epoch.end.time}`);

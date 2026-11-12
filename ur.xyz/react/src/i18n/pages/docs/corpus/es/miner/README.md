@@ -20,6 +20,8 @@ description: Empieza a minar en UR en pocos pasos. Qué hace un minero, qué nec
 
 Un minero de UR comparte tu conexión a internet como salida para un operador de red. Los validadores comprueban que realmente transporta tráfico, y Bittensor SN25 (netuid 25) paga recompensas por ese trabajo en el token α de la subred, con la marca $UR.
 
+¿Prefieres una app? Las apps de URnetwork son una alternativa fácil para minar desde un teléfono o una computadora: instala una desde [ur.io](https://ur.io) y minará en segundo plano, con URnetwork como operador. Esta guía es para el programa minero, que funciona en Linux, macOS y Windows y puede minar para cualquier operador.
+
 Esta página te lleva de cero a un minero en funcionamiento. El resto de la guía del minero profundiza, un tema por página:
 
 | Página | Qué cubre |

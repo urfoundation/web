@@ -258,15 +258,17 @@ export function countryIndexingProblems(m, decision, built) {
 }
 
 // What a page may say only after a draw (ctf/model.js): that a newcomer wins by
-// default, in each language's words (the verb and "without the draw" in one
-// clause), and a chance to win, a percentage in any language's format ("2.6%",
-// "2,6 %", "83‎%‎"). ctf-copy.test.mjs keeps the copy and these in step.
+// default, in each language's words (the verb and "without the random
+// selection" in one clause: a translation names the draw as a random
+// selection, never a drawing of lots), and a chance to win, a percentage in any
+// language's format ("2.6%", "2,6 %", "83‎%‎"). ctf-copy.test.mjs keeps the copy
+// and these in step.
 export const DEFAULT_WIN = {
     en: /\bwins? by default\b/i,
-    ru: /побежда\S*[^.]*?без\s+жеребь[её]вки/i,
-    ar: /[يت]فوز[^.؛]*?دون\s+قرعة/,
-    zh: /无需抽签/,
-    de: /\bgewinn(?:t|st|en)\b[^.]*?ohne\s+Auslosung/i,
-    es: /\bgan(?:a|as|an|ar)\b[^.]*?sin\s+sorteo/i,
+    ru: /побежда\S*[^.]*?без\s+случайного\s+отбора/i,
+    ar: /[يت]فوز[^.؛]*?دون\s+اختيار\s+عشوائي/,
+    zh: /无需随机选取/,
+    de: /\bgewinn(?:t|st|en)\b[^.]*?ohne\s+Zufallsauswahl/i,
+    es: /\bgan(?:a|as|an|ar)\b[^.]*?sin\s+selección\s+aleatoria/i,
 };
 export const CHANCE_SHOWN = /\d[\s  ]?‎?[%٪]/;

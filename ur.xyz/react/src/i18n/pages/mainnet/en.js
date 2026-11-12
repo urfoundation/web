@@ -9,13 +9,14 @@
 // Every {name} stays as it is in a translation. A plural node ({ one, other })
 // takes the forms its language needs (i18n/format.js plural); its {count} is a
 // number as the page writes it (9,240,028: figures keep their English digits
-// and separators in every language but Spanish, which writes them as Intl
-// does, 9.240.028, as on /ctf: timeline.js INTL_FIGURES). Dates are written
-// from the `dates` patterns below, never copied into the text.
+// and separators in Arabic and Chinese, and Spanish, German and Russian write
+// them as Intl does, 9.240.028 and 9 240 028, as on /ctf: timeline.js
+// INTL_FIGURES). Dates are written from the `dates` patterns below, never
+// copied into the text.
 export default {
     meta: {
         title: 'SN25 mainnet launch timeline | UR',
-        description: 'The SN25 mainnet launch by payout epoch: version 1 from October 8, then settlement v2 from epoch 4 (October 30), with its first claims on November 8.',
+        description: 'The SN25 mainnet launch by payout epoch: version 1 from October 8, settlement v2 from epoch 4 (October 30), and capture the flag from epoch 8 (November 27).',
         // the page's name in the breadcrumb trail
         breadcrumb: 'Mainnet',
     },
@@ -23,7 +24,7 @@ export default {
     intro: {
         eyebrow: 'SN25 · Bittensor mainnet',
         title: 'Mainnet launch timeline',
-        lede: "UR's subnet, SN25, went live on Bittensor mainnet on October 8, 2026. This timeline follows the launch by payout epoch, from the version 1 contracts to the first settlement v2 claim.",
+        lede: "UR's subnet, SN25, went live on Bittensor mainnet on October 8, 2026. This timeline follows the launch by payout epoch, from the version 1 contracts through settlement v2 to capture the flag, which starts with epoch 8.",
         // {scheduled} and {planned}: those statuses' pills (labels.status)
         note: 'Milestones marked {scheduled} or {planned} are still ahead, and their dates may change. All times are UTC, and a time marked ≈ is approximate: most are projected from block numbers.',
     },
@@ -35,6 +36,7 @@ export default {
             "SN25 pays providers by payout epoch. These are UR's settlement epochs, not the chain's 72-minute tempo: epoch 0 lasted one day, and each later epoch lasts 7 days (50,400 blocks).",
             'Version 1 launched on October 8 and settles epochs 1 to 3. It pays only the providers the validator has measured, and that measurement is capped at about 1,500 providers an epoch, so most miners receive no version 1 share.',
             'Settlement v2 pays by usage and removes that cap. It was planned to take over from epoch 3, but its pool was not registered before epoch 3 began on October 23, so version 1 settles epoch 3 too. Its pool was registered on October 29, and settlement v2 has paid every epoch since epoch 4, which began around October 30 at 18:25 UTC. The first v2 epoch finished around November 6, and its claims opened on November 8, after its root was committed and its challenge period ended.',
+            'From epoch 8, which begins around November 27 at 18:25 UTC, each network operator has a second pool beside its provider pool: capture the flag, which settlement v2 pays in the same claim flow. The provider pool pays for usage, and capture the flag pays for being present in a country, with ten slots in every country each epoch.',
         ],
         // the list of the epochs
         epochsAria: 'Payout epochs',
@@ -51,11 +53,16 @@ export default {
     // a notice's dateline: {date}, the day it was posted (dates.long)
     noticeDate: 'Notice · {date}',
 
+    // a notice's header is its button: what a tap does, beside its chevron (closed, then open)
+    noticeToggle: { expand: 'Expand', collapse: 'Collapse' },
+
     labels: {
         // a milestone's status, in the pill beside its date
         status: { done: 'Done', in_progress: 'In progress', scheduled: 'Scheduled', planned: 'Planned' },
         // what pays an epoch
         settlement: { v1: 'Version 1', v2: 'Settlement v2' },
+        // beside the settlement of an epoch in which capture the flag pays (from epoch 8): its name, as the apps write it
+        captureTheFlag: 'Capture the flag',
         // a source's link to the explorer
         view: { transaction: 'View transaction', contract: 'View contract', block: 'View block' },
         // a source link's accessible name: {action}, the link's words (view), and {label}, the source's

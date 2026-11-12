@@ -451,8 +451,25 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     assert.match(pool.detail, /An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11\./);
     assert.doesNotMatch(pool.detail, /bytes that no provider carries/);
     assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === pool.id)).id, 'after-epoch-7');
-    // the signed entry and epoch 8's first block do not exist yet: their sources stay empty, so the page hides them
-    assert.deepEqual(pool.sources.filter((s) => s.ref === '').map((s) => s.label), ['Signed amendment entry', "Epoch 8's first block, 9,600,028"]);
+    // the signed entry is published in amendments.yml, at ur.xyz beside the price sheet and in the sn repo; epoch 8's
+    // first block does not exist yet, so its source stays empty and the page hides it
+    assert.deepEqual(pool.sources.map((s) => [s.label, s.ref]), [
+        ['The amendment, WHITEPAPER.md §8.6', 'https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md'],
+        ['Signed amendment entry', 'https://ur.xyz/amendments.yml'],
+        ['The amendments file in the sn repo', 'https://github.com/urfoundation/sn/blob/main/amendments.yml'],
+        ["Epoch 8's first block, 9,600,028", ''],
+    ]);
+    // the same-network rule (§8.6.2): a hop on the origin's network earns no share from epoch 8, free or paid, and only
+    // its share moves; funded traffic only, never measurement traffic; earlier credit stays
+    assert.match(pool.detail, / a provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one, and the share goes to the extender pool, while the contract's other hops keep theirs\. /);
+    assert.match(pool.detail, / Only traffic that a data balance funded counts, never the network operator's own measurement and test traffic, and same-network credit earned before epoch 8 is kept\. /);
+    // with no eligible extender, Z is dropped (decision 4)
+    assert.match(pool.detail, /so extenders earn at most half of a pool; with no eligible extender, it is dropped\. /);
+    // who counts: E1, E4, E5 and E3
+    assert.match(pool.detail, / An extender is eligible when, at the end of the epoch, it is active with at least one address that passes the operator's five-minute challenge, has a payout wallet, is not bound to a top-level miner's fleet and is not on one of the operator's own networks, and records that share a provider client, an IPv4 address or an IPv6 \/64 count once\. /);
+    // what is published (§8.6.4): the header's component, never an address, statement v2, and the shadow runs of epochs 6 and 7
+    assert.match(pool.detail, / each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(pool.detail, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\. /);
     // not a key milestone: the summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
     assert.equal(pool.key, undefined);
 
@@ -605,12 +622,58 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
+test('the extender pool from epoch 8: a notice beside its milestone, with the rule, who counts, what is published and the signed entry', () => {
+    // the sn whitepaper's §8.6, approved on November 10, with Q7 of November 11; the notice's full text is drafted
+    // in the sn repo (mainnet/notices/2026-11-12-extender-pool.md) and waits on its main branch
+    const epoch7 = mainnetEpochs.at(-1);
+    const pool = events.find((e) => e.id === 'extender-pool-epoch-8');
+    const notice = mainnetNotices.find((n) => n.id === 'notice-extender-pool');
+    assert.ok(notice, 'the notice is listed');
+    assert.equal(notice.date, 'November 12, 2026');
+    assert.equal(notice.title, 'The extender pool starts with epoch 8. Bytes served within one network count for extenders, not providers.');
+    assert.equal(notice.paragraphs.length, 5);
+    const [rule, split, who, published, entry] = notice.paragraphs;
+    // the start, at the milestone's block and projected time
+    assert.equal(pool.date, epoch7.end.time);
+    assert.equal(epoch7.end.time, '2026-11-27T18:25:00Z');
+    assert.ok(rule.startsWith(`From epoch 8, which starts at block ${thousands(epoch7.end.block)} around November 27, 18:25 UTC, the part of each contract's usage that no provider earns counts for extenders instead, `));
+    // the same-network rule: a hop on the origin's network earns no share, free or paid, and only its share moves
+    assert.match(rule, / A provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one: the share goes to the extender pool, and the contract's other hops keep theirs\. /);
+    // platform endpoints are sidecar's edges, which have not shipped, so epoch 8's pool is same-network traffic
+    assert.match(rule, / sidecar has not shipped, so until it does, the pool's bytes come from same-network traffic alone\. /);
+    assert.match(rule, / Same-network credit earned before epoch 8 is kept\.$/);
+    // funded traffic only, never measurement; units, then extenders; the cap; an empty set drops the bytes; Q7
+    assert.match(split, /^Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it\. /);
+    assert.match(split, / spread evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, /);
+    assert.match(split, / so extenders take at most half of a pool\. With no eligible extender, the bytes are dropped\. /);
+    assert.match(split, / keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract\.$/);
+    // who counts: E1, E4, E5, then E3
+    assert.match(who, /^An extender counts when, at the end of the epoch, it is in the active pool, with at least one address that passes the network operator's five-minute challenge; /);
+    assert.match(who, / it has a payout wallet and is not bound to a top-level miner's fleet; and it is not on one of the network operator's own networks\. /);
+    assert.match(who, / Records that share a provider client, an IPv4 address or an IPv6 \/64 count once\.$/);
+    // what is published: the header's component, never an address, statement v2, and the shadow runs
+    assert.match(published, /^From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(published, / the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it\. /);
+    assert.match(published, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\.$/);
+    // the signed entry, beside capture the flag's, where the milestone links it
+    assert.match(entry, /^The subnet owner signs the amendment entry that starts the pool during epoch 7, beside capture the flag's, and it takes effect once it is published at ur\.xyz\/amendments\.yml before epoch 8 starts\. /);
+    assert.equal(pool.sources.find((s) => s.label === 'Signed amendment entry').ref, 'https://ur.xyz/amendments.yml');
+    assert.match(entry, / Rewards are paid in alpha, whose value changes and can fall\. /);
+    assert.match(entry, / claimed with its pool account, in the same claim flow\. There is nothing you need to do\.$/);
+    // until the full text is on sn's main branch, the notice links its milestone on this page (NOTICES, src/data/mainnet.js)
+    assert.deepEqual(notice.link, { label: 'See the milestone', href: `#${pool.id}` });
+    // plain words and no earnings promises, as for capture the flag
+    const avoid = /guarantee|risk-free|\breturns?\b|\byield|\bAPY\b|lottery|jackpot|\bbet\b|invest|passive income|get rich|easy money|financial freedom|quit your job|\bjobs?\b|hiring|salary|wage|\$\s?\d/i;
+    for (const words of [`${notice.title} ${notice.paragraphs.join(' ')}`, `${pool.title} ${pool.detail}`]) assert.doesNotMatch(words, avoid);
+});
+
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the extenders' share of
-    // November 12, then capture the flag and Pro data, both of November 11, the later-posted first, then
-    // epoch 3's of October 31. The data lists them in the order they were posted, the other way round, so
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the extender pool and the
+    // extenders' share, both of November 12, then capture the flag and Pro data, both of November 11, the
+    // later-posted first, then epoch 3's of October 31. The data lists them in the order they were posted, the other way round, so
     // this order is the sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
+        ['notice-extender-pool', 'November 12, 2026'],
         ['notice-extender-relay-share', 'November 12, 2026'],
         ['notice-capture-the-flag', 'November 11, 2026'],
         ['notice-pro-grant-cycle', 'November 11, 2026'],
@@ -636,7 +699,7 @@ test('the notices at the top run newest first, by the day each was posted', () =
         assert.ok(Number.isNaN(noticeDay(posted('x', date))), `"${date}" should not read`);
         assert.throws(() => newestFirst([posted('x', date)]), /is not a day such as "November 11, 2026"/, `"${date}"`);
     }
-    // with four notices at the top, the milestones and the box name the one they point to
+    // with five notices at the top, the milestones and the box name the one they point to
     const pointers = [...events.map((e) => e.detail), ...mainnetActions.steps.map((s) => s.detail)];
     for (const text of pointers) assert.doesNotMatch(text, /\bthe notice at the top\b/);
     assert.equal(pointers.filter((text) => text.includes('the epoch 3 notice at the top')).length, 7);

@@ -130,11 +130,12 @@ export const mainnetActions = {
 // in the order they were posted: a new notice goes at the end. The page shows
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
-// posted, the later first. So it shows the extenders' share on the contracts
-// they can relay, of November 12, then capture the flag from epoch 8 and Pro
-// data on each network's own cycle, both of November 11, then epoch 3's delayed
-// payout and its recovery, with the updates that followed, which the milestones
-// and the box point to as "the epoch 3 notice at the top". Their dates are the
+// posted, the later first. So it shows the extender pool from epoch 8, then the
+// extenders' share on the contracts they can relay, both of November 12, then
+// capture the flag from epoch 8 and Pro data on each network's own cycle, both
+// of November 11, then epoch 3's delayed payout and its recovery, with the
+// updates that followed, which the milestones and the box point to as "the
+// epoch 3 notice at the top". Their dates are the
 // epochs' and the milestones' (tests/mainnet-timeline.test.mjs holds them
 // together). `id` is the anchor of the notice's box. `link` opens a notice's
 // full text in the sn repo once that is on sn's main branch, and until then the
@@ -191,6 +192,19 @@ const NOTICES = [
             "SN25 pool rewards are still split by completed usage, and the network operator's provider subsidy, which for traffic since the October 6 cutoff only counts toward the weekly points it awards, follows the same hops. Contracts created before the release keep their hops. There is nothing you need to do.",
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md' },
+    },
+    {
+        id: 'notice-extender-pool',
+        date: 'November 12, 2026',
+        title: 'The extender pool starts with epoch 8. Bytes served within one network count for extenders, not providers.',
+        paragraphs: [
+            "From epoch 8, which starts at block 9,600,028 around November 27, 18:25 UTC, the part of each contract's usage that no provider earns counts for extenders instead, as the subnet owner approved on November 10. A provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one: the share goes to the extender pool, and the contract's other hops keep theirs. A share held by a platform endpoint the network operator registers, such as sidecar's edges, goes there too; sidecar has not shipped, so until it does, the pool's bytes come from same-network traffic alone. Same-network credit earned before epoch 8 is kept.",
+            "Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it. Each epoch, the pool's bytes are spread evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, and weighted beside the provider rows up to the epoch's eligible provider usage, so extenders take at most half of a pool. With no eligible extender, the bytes are dropped. An extender that carries a contract keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract.",
+            "An extender counts when, at the end of the epoch, it is in the active pool, with at least one address that passes the network operator's five-minute challenge; it has a payout wallet and is not bound to a top-level miner's fleet; and it is not on one of the network operator's own networks. Records that share a provider client, an IPv4 address or an IPv6 /64 count once.",
+            "From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed /29 or /48 prefix hash and never by address, and their shares, and the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it. Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid.",
+            "The subnet owner signs the amendment entry that starts the pool during epoch 7, beside capture the flag's, and it takes effect once it is published at ur.xyz/amendments.yml before epoch 8 starts. Rewards are paid in alpha, whose value changes and can fall. An extender's share is paid to the payout wallet it already uses and claimed with its pool account, in the same claim flow. There is nothing you need to do.",
+        ],
+        link: { label: 'See the milestone', href: '#extender-pool-epoch-8' },
     },
 ];
 

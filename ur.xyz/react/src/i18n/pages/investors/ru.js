@@ -41,7 +41,7 @@ export default {
         'letter-to-tokenholders-september-2026': {
             title: 'Сентябрьское письмо держателям токенов',
             summary: 'Brien и Jack рассказывают о подготовке к запуску основной сети UR, следующем этапе SN25, проекте Meridian и миссии сделать конфиденциальность ожидаемым свойством интернета.',
-            cta: 'Читать обновление',
+            cta: 'Читать сообщение',
             readTime: '6 мин чтения',
             metaTitle: 'Сентябрьское письмо держателям токенов | UR',
             metaDescription: 'Brien и Jack о подготовке к запуску основной сети UR, следующем этапе SN25, проекте Meridian и миссии сделать конфиденциальность ожидаемым свойством интернета.',
@@ -79,7 +79,7 @@ export default {
     dated: 'Дата: {date}',
     letterhead: {
         foundation: 'UR FOUNDATION',
-        subnet: 'Подсеть Bittensor 25 (netuid 25)',
+        subnet: 'Подсеть 25 в Bittensor (netuid 25)',
         protocol: 'Протокол: github.com/urfoundation/sn',
         network: 'Сеть: ur.xyz',
         applications: 'Приложения: ur.io',

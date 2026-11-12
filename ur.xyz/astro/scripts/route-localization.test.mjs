@@ -29,6 +29,13 @@ const ENGLISH_ONLY = [
     ...GROUP_PAGES.filter((path) => !PAGE_GROUPS[groupForPath(path)]?.localized),
     '/audits/report.pdf', '/future-page',
 ];
+// The page groups as they are with none of them localized. The fixtures that
+// name particular groups build on it, so they hold whichever groups the page
+// agents have localized since.
+const UNLOCALIZED = Object.fromEntries(
+    Object.entries(PAGE_GROUPS).map(([id, group]) => [id, { ...group, localized: false }]),
+);
+const unlocalized = createRouteLocalization(UNLOCALIZED);
 
 test('localized metadata is emitted only for routes with translated pages', () => {
     assert.deepEqual(
@@ -61,9 +68,12 @@ test('a language switch keeps the page when it is translated, else lands on that
     assert.equal(localizedPathFor('/de/miners.html', 'ar'), '/ar/miners');
     assert.equal(localizedPathFor('/', 'zh'), '/zh');
     assert.equal(localizedPathFor('/ru', 'en'), '/');
-    assert.equal(localizedPathFor('/terms', 'de'), '/de');
-    assert.equal(localizedPathFor('/docs/litepaper', 'es'), '/es');
-    assert.equal(localizedPathFor('/about', 'en'), '/');
+    assert.equal(unlocalized.localizedPathFor('/terms', 'de'), '/de');
+    assert.equal(unlocalized.localizedPathFor('/docs/litepaper', 'es'), '/es');
+    assert.equal(unlocalized.localizedPathFor('/about', 'en'), '/');
+    // and a page of no group, which no group's state can translate
+    assert.equal(localizedPathFor('/future-page', 'de'), '/de');
+    assert.equal(localizedPathFor('/de/future-page', 'en'), '/');
     assert.equal(localizedPathFor('/miners', 'xx'), '/miners');
 });
 
@@ -131,7 +141,7 @@ test('every English page belongs to one page group, and each group names its pag
 // A localized group, as a page agent's group.js turns it on: its pages, and a
 // family of them one segment under a prefix, gain their /<lang>/ twins.
 const localized = createRouteLocalization({
-    ...PAGE_GROUPS,
+    ...UNLOCALIZED,
     about: { ...PAGE_GROUPS.about, localized: true },
     ctf: { ...PAGE_GROUPS.ctf, localized: true },
     'not-found': { ...PAGE_GROUPS['not-found'], localized: true },
@@ -181,5 +191,5 @@ test('the inline redirect script follows a localized family too', () => {
     }
     assert.equal(run('/ctf/ke', 'zh'), '/zh/ctf/ke');
     // with no localized family the script is the one the site has always had
-    assert.ok(!storedLanguageRedirectScript().includes('.test(p)'));
+    assert.ok(!unlocalized.storedLanguageRedirectScript().includes('.test(p)'));
 });

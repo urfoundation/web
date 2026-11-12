@@ -16,6 +16,10 @@
 //     price feed (lib/usePrice.js): the operators' stats feeds (first-party) or
 //     CoinGecko's GeckoTerminal (*.geckoterminal.com), which /price reads too;
 //     in α, the default, it contacts nothing but the chain.
+//   - on /price: *.geckoterminal.com, CoinGecko's GeckoTerminal, the α price feed
+//     behind the page's live USD equivalents (lib/usePrice.js), which the page
+//     reads on load when the operators' feeds don't answer.
+// A route's own hosts hold for it in every language: /ar/price is /price.
 // SSO / WalletConnect / payment SDKs are intentionally NOT allowlisted — they may load
 // only inside their own flows, which this test does not trigger.
 import { chromium } from "playwright-core";
@@ -37,7 +41,7 @@ const ROUTES = ["/", "/operators", "/miners", "/validators", "/research", "/docs
 
 const ALLOWED = ["ur.xyz", "ur.io", "bringyour.com", "ur.network", "urnetwork.com"];
 // hosts a single route may contact, for the reason stated on that page (in any of its languages)
-const ALLOWED_ON_ROUTE = { "/reserve": ["opentensor.ai", "geckoterminal.com"] };
+const ALLOWED_ON_ROUTE = { "/reserve": ["opentensor.ai", "geckoterminal.com"], "/price": ["geckoterminal.com"] };
 
 function isLocal(host) {
   return host.startsWith("localhost") || host.startsWith("127.");

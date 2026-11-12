@@ -65,12 +65,12 @@ export default {
             readingHistory: 'Leyendo el historial del saldo…',
         },
         aria: {
-            liveProjected: 'Saldo de la reserva, {unit}: en vivo hasta el {liveDate}, luego proyectado hasta {amount} para el {date}. Las flechas del teclado leen cada día.',
-            live: 'Saldo de la reserva, {unit}: en vivo hasta el {liveDate}. Las flechas del teclado leen cada día.',
-            projected: 'Saldo de la reserva, {unit}: proyectado hasta {amount} para el {date}. Las flechas del teclado leen cada día.',
+            liveProjected: 'Saldo de la reserva, {unit}: en vivo hasta el {liveDate}, luego proyectado hasta {amount} para el {date}. Usa las flechas del teclado para leer cada día.',
+            live: 'Saldo de la reserva, {unit}: en vivo hasta el {liveDate}. Usa las flechas del teclado para leer cada día.',
+            projected: 'Saldo de la reserva, {unit}: proyectado hasta {amount} para el {date}. Usa las flechas del teclado para leer cada día.',
             window: {
-                one: 'Saldo de la reserva, {unit}, en el último {count} día, leído de la cadena. Las flechas del teclado leen cada día.',
-                other: 'Saldo de la reserva, {unit}, en los últimos {count} días, leído de la cadena. Las flechas del teclado leen cada día.',
+                one: 'Saldo de la reserva, {unit}, en el último {count} día, leído de la cadena. Usa las flechas del teclado para leer cada día.',
+                other: 'Saldo de la reserva, {unit}, en los últimos {count} días, leído de la cadena. Usa las flechas del teclado para leer cada día.',
             },
         },
     },
@@ -94,16 +94,16 @@ export default {
         },
         aria: {
             live: {
-                one: 'Ingreso mensual y gasto en programas, {unit}: {count} mes, de {from} a {to}, recibido y gastado según la cadena y luego proyectado. Las flechas del teclado leen cada mes.',
-                other: 'Ingreso mensual y gasto en programas, {unit}: {count} meses, de {from} a {to}, recibido y gastado según la cadena y luego proyectado. Las flechas del teclado leen cada mes.',
+                one: 'Ingreso mensual y gasto en programas, {unit}: {count} mes, de {from} a {to}, recibido y gastado según la cadena y luego proyectado. Usa las flechas del teclado para leer cada mes.',
+                other: 'Ingreso mensual y gasto en programas, {unit}: {count} meses, de {from} a {to}, recibido y gastado según la cadena y luego proyectado. Usa las flechas del teclado para leer cada mes.',
             },
             projected: {
-                one: 'Ingreso mensual y gasto en programas, {unit}: {count} mes, de {from} a {to}, todo proyectado. Las flechas del teclado leen cada mes.',
-                other: 'Ingreso mensual y gasto en programas, {unit}: {count} meses, de {from} a {to}, todo proyectado. Las flechas del teclado leen cada mes.',
+                one: 'Ingreso mensual y gasto en programas, {unit}: {count} mes, de {from} a {to}, todo proyectado. Usa las flechas del teclado para leer cada mes.',
+                other: 'Ingreso mensual y gasto en programas, {unit}: {count} meses, de {from} a {to}, todo proyectado. Usa las flechas del teclado para leer cada mes.',
             },
             window: {
-                one: 'Ingreso diario y gasto en programas, {unit}, en el último {count} día, leído de la cadena. Las flechas del teclado leen cada día.',
-                other: 'Ingreso diario y gasto en programas, {unit}, en los últimos {count} días, leído de la cadena. Las flechas del teclado leen cada día.',
+                one: 'Ingreso diario y gasto en programas, {unit}, en el último {count} día, leído de la cadena. Usa las flechas del teclado para leer cada día.',
+                other: 'Ingreso diario y gasto en programas, {unit}, en los últimos {count} días, leído de la cadena. Usa las flechas del teclado para leer cada día.',
             },
         },
     },
@@ -135,7 +135,7 @@ export default {
             owner: 'Propietario de la subred',
             validators: 'Validadores',
             miners: 'Asignación de los mineros',
-            note: 'La parte del propietario es {share}; validadores y mineros se reparten el resto a partes iguales.',
+            note: 'La parte del propietario es del {share}; validadores y mineros se reparten el resto a partes iguales.',
         },
         onChain: {
             title: 'Asignación de los mineros, on-chain ahora',

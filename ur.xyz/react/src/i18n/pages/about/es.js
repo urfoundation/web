@@ -8,7 +8,7 @@ export default {
     protocol: {
         eyebrow: "Protocolo",
         title: "Acerca de",
-        body: "UR es un protocolo de código abierto para crear aplicaciones de internet privadas sobre una red global de proveedores independientes de ancho de banda. La primera aplicación ya está disponible en {link}, y hay más formas de usar la red en desarrollo. Creemos que todas las personas tienen derecho a la privacidad y a un cifrado sólido, y que la infraestructura que protege esos derechos debe ser abierta, resiliente y accesible para todos.",
+        body: "UR es un protocolo de código abierto para crear aplicaciones de internet privadas sobre una red global de proveedores independientes de ancho de banda. La primera aplicación ya está disponible en {link}, y se están desarrollando más formas de usar la red. Creemos que todas las personas tienen derecho a la privacidad y a un cifrado sólido, y que la infraestructura que protege esos derechos debe ser abierta, resiliente y accesible para todos.",
     },
     people: {
         eyebrow: "Personas",

@@ -23,15 +23,15 @@ export default {
             intro: 'Un operador de red convierte la demanda de los clientes en un producto impulsado por UR. El operador es dueño de la experiencia y de la relación comercial; SN25 aporta el enrutamiento residencial medido y el mercado de incentivos que hay debajo.',
         },
         v11: {
-            eyebrow: 'Para builders',
+            eyebrow: 'Para desarrolladores',
             heading: ['Trae el producto.', 'Construye sobre la red.'],
             intro: 'Crea un producto para clientes sobre la red residencial compartida de UR. Tú eres dueño de la experiencia, los usuarios y el modelo comercial; SN25 coordina por debajo el acceso, la medición del servicio y los incentivos.',
         },
         proofV11: {
             providers: 'PROVEEDORES DE RED',
             countries: 'PAÍSES',
-            live: 'EN VIVO',
-            infrastructure: 'INFRAESTRUCTURA DE RED',
+            live: 'INFRAESTRUCTURA',
+            infrastructure: 'DE RED EN MARCHA',
         },
         proofAria: 'Alcance de la red UR',
         bring: {
@@ -47,10 +47,10 @@ export default {
     },
 
     section: {
-        v12: { number: 'Modelo de operador de red', title: 'Mira la red que hay debajo del producto.', copy: 'Elige uno de los seis productos de ejemplo y descubre la red de proveedores y la base de la subred que hay bajo su interfaz. Cada uno muestra una forma en que los builders podrían usar la misma infraestructura compartida.', meta: 'UR / UN PRODUCTO · DOS PLANOS COMPARTIDOS' },
-        v11: { number: 'Seis puntos de partida', title: '¿Qué podría funcionar sobre UR?', copy: 'Elige un ejemplo para ver una superficie de producto ilustrativa sobre la misma red de proveedores y la misma base de SN25. Los seis son ideas para builders, no un límite de lo que la infraestructura puede soportar.', meta: 'UR / CONSTRUYE SOBRE INFRAESTRUCTURA COMPARTIDA' },
+        v12: { number: 'Modelo de operador de red', title: 'Mira la red que hay debajo del producto.', copy: 'Elige uno de los seis productos de ejemplo y descubre la red de proveedores y la base de la subred que hay bajo su interfaz. Cada uno muestra una forma en que los desarrolladores podrían usar la misma infraestructura compartida.', meta: 'UR / UN PRODUCTO · DOS PLANOS COMPARTIDOS' },
+        v11: { number: 'Seis puntos de partida', title: '¿Qué podría funcionar sobre UR?', copy: 'Elige un ejemplo para ver una superficie de producto ilustrativa sobre la misma red de proveedores y la misma base de SN25. Los seis son ideas para desarrolladores, no un límite de lo que la infraestructura puede soportar.', meta: 'UR / CONSTRUYE SOBRE INFRAESTRUCTURA COMPARTIDA' },
         models: {
-            chassis: { number: '05 / Chasis de intercambio', title: 'Abre el operador de red.', copy: 'El chasis convierte la arquitectura en una sola máquina coherente. Ábrelo para separar el producto del cliente del operador, el acceso a la subred, la validación, el mercado de mineros y la oferta residencial.', meta: 'UR / INTERCAMBIO DEL OPERADOR DE RED' },
+            chassis: { number: '05 / Chasis de intercambio', title: 'Abre el operador de red.', copy: 'El chasis convierte la arquitectura en una sola máquina coherente. Ábrelo para ver por separado el producto para el cliente, el operador, el acceso a la subred, la validación, el mercado de mineros y la oferta residencial.', meta: 'UR / INTERCAMBIO DEL OPERADOR DE RED' },
             spine: { number: '06 / Columna de tránsito', title: 'Sigue la demanda a través de la subred.', copy: 'La columna de tránsito se lee de izquierda a derecha: la demanda del cliente entra en un operador, cruza SN25 y su puente de validación, se resuelve a través de los UID de mineros y sale por la oferta residencial.', meta: 'UR / COLUMNA DE TRÁNSITO DE LA DEMANDA' },
             tower: { number: '07 / Torre de la subred', title: 'Construye hacia arriba desde SN25.', copy: 'La torre vuelve literal la jerarquía. La oferta residencial y el mercado de mineros sostienen SN25; los validadores la miden; el operador y el producto del cliente ocupan los pisos superiores.', meta: 'UR / TORRE SOBRE LA BASE DE LA SUBRED' },
             foundation: { number: '08 / Pasarela del operador', title: 'Cambia el producto. Conserva la base.', copy: 'La pasarela es un solo sistema coherente: la oportunidad elegida se convierte en el módulo de producto, el operador de red sigue siendo el plano de control y SN25 permanece debajo como base compartida para el enrutamiento, la medición y los incentivos.', meta: 'UR / PASARELA DEL OPERADOR DE RED' },
@@ -84,7 +84,7 @@ export default {
         economics: 'ECONOMÍA',
         railAria: 'Revela y traza el sistema de la red',
         selectorKicker: 'SEIS LUGARES PARA EMPEZAR',
-        selectorTitle: 'Oportunidades ilustrativas para builders.',
+        selectorTitle: 'Oportunidades ilustrativas para desarrolladores.',
     },
 
     scrub: {
@@ -209,7 +209,7 @@ export default {
     },
 
     proof: {
-        eyebrow: 'EN VIVO HOY / BRINGYOUR',
+        eyebrow: 'EN MARCHA HOY / BRINGYOUR',
         title: 'BringYour es el primer operador de red.',
         body: [
             'Su primer producto, URnetwork, es una VPN para consumidores disponible en móvil, escritorio y navegador. BringYour es dueño de la experiencia del producto y de la relación con el cliente; UR aporta la red que lo impulsa.',
@@ -237,7 +237,7 @@ export default {
         eyebrow: 'Infraestructura compartida / productos independientes',
         eyebrowV11: 'Una base compartida, no un negocio terminado',
         title: 'Tú construyes la razón para usar la red.',
-        body: 'SN25 es la subred de UR en Bittensor: la capa de coordinación e incentivos que hay debajo de la red de proveedores. Da a los builders infraestructura en la que apoyarse sin decidir cuál debe ser el producto para el cliente.',
+        body: 'SN25 es la subred de UR en Bittensor: la capa de coordinación e incentivos que hay debajo de la red de proveedores. Da a los desarrolladores infraestructura en la que apoyarse sin decidir cuál debe ser el producto para el cliente.',
         operator: {
             label: 'EL OPERADOR DE RED APORTA',
             title: 'El producto y la relación con el cliente',

@@ -320,6 +320,11 @@ function cardLink(path, lang, copy) {
     return translated ? { href: translated, cta: copy.cta } : { href: path, cta: copy.ctaEnglish };
 }
 
+// A card's "go" arrow points along the page language's reading direction, as
+// the home page's (RoleBlocks.astro): ← right to left (lib/i18n.js LANGS).
+const RTL = new Set(['ar']);
+const goArrow = (lang) => (RTL.has(lang) ? '←' : '→');
+
 /**
  * The research report's card, under the page's intro: the latest report, as a
  * link to its page in the reader's language (cardLink). The path is the
@@ -335,7 +340,7 @@ export function ResearchReportCard({ t, lang = 'en' }) {
             <span className="research-report-card-tag">{r.tag} · {r.date}</span>
             <h2 className="research-report-card-title">{r.title}</h2>
             <p className="research-report-card-body">{r.body}</p>
-            <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">→</span></span>
+            <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">{goArrow(lang)}</span></span>
         </a>
     );
 }
@@ -366,7 +371,7 @@ export function ResearchMethodologyCard({ t, lang = 'en' }) {
                 <span className="research-report-card-tag">{m.tag} · {m.topic}</span>
                 <h2 className="research-report-card-title">{m.title}</h2>
                 <p className="research-report-card-body">{m.body}</p>
-                <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">→</span></span>
+                <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">{goArrow(lang)}</span></span>
             </div>
         </a>
     );

@@ -7,6 +7,7 @@ import {
     ChassisScene, SpineScene, TowerScene, FoundationScene, TerminalScene, Terminal3Scene,
 } from './BuildScenes';
 import { ArchitectureReadout, BriefPanel, Readout } from './BuildBrief';
+import { hasLocalizedVersion, localizedPathFor } from '../../../../astro/src/lib/route-localization.js';
 import './Build.css';
 
 /**
@@ -835,7 +836,7 @@ export default function BuildPage({ lang = 'en' }) {
                 <div><span className="eyebrow">{cta.eyebrow}</span><h2>{cta.title}</h2><p>{cta.copy}</p></div>
                 <div className="cta-actions-v12">
                     <a href="https://t.me/ursn25" target="_blank" rel="noopener noreferrer">{t.cta.talk}</a>
-                    <a className="cta-secondary-v12 v12-only" href="/docs">{t.cta.docs}</a>
+                    <a className="cta-secondary-v12 v12-only" href={hasLocalizedVersion('/docs') ? localizedPathFor('/docs', lang) : '/docs'}>{t.cta.docs}</a>
                 </div>
             </div></section>
         </div>

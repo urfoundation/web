@@ -13,6 +13,7 @@ import { projectBalance, spliceLive, flowsOf, observedInflow, monthlyFlows, dail
 import { RANGES, RangeToggle, ExpandButton } from './reserve/ChartControls';
 import { MIN_SEEN, inflowPerDay, momentumOf } from './reserve/momentum';
 import { fill } from './reserve/fill';
+import { hasLocalizedVersion, localizedPathFor } from '../../../../astro/src/lib/route-localization.js';
 import './Reserve.css';
 
 /**
@@ -814,7 +815,7 @@ export default function ReservePage({ lang = 'en' }) {
 
                     <div className="reserve-ctas">
                         <a className="reserve-cta" href={reserve.contactUrl} target="_blank" rel="noopener noreferrer">{`${tc.ctas.talk} `}<span aria-hidden="true">↗</span></a>
-                        <a className="reserve-link" href={reserve.minerGuideUrl}>{`${tc.ctas.guide} `}<span aria-hidden="true">→</span></a>
+                        <a className="reserve-link" href={hasLocalizedVersion(reserve.minerGuideUrl) ? localizedPathFor(reserve.minerGuideUrl, lang) : reserve.minerGuideUrl}>{`${tc.ctas.guide} `}<span aria-hidden="true">→</span></a>
                         <a className="reserve-link" href={reserve.policyUrl} target="_blank" rel="noopener noreferrer">{`${tc.ctas.policy} `}<span aria-hidden="true">↗</span></a>
                     </div>
                 </div>

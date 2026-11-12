@@ -15,8 +15,6 @@ import { fileURLToPath } from "node:url";
 import { DOC_ORDER, DOC_PAGE_PATHS, UNLISTED_DOC_SLUGS, slugFor, splitFrontMatter } from "../../react/src/lib/docs-shared.js";
 import { contentDay, investorLetterMetadata } from "./pdf-freshness.mjs";
 import { reserve } from "../../react/src/data/reserve.js";
-import { buildModel } from "../../react/src/components/pages/ctf/model.js";
-import { countryIndexingProblems } from "../../react/src/components/pages/ctf/indexing.js";
 import { LOCALIZED_GROUPS, NON_EN_SITE_LANG_CODES, NOT_FOUND_PATH, PAGE_GROUPS, SITE_LANG_CODES, basePathFor, groupForPath, hasLocalizedVersion, langForPath } from "../src/lib/route-localization.js";
 
 const DIST = path.resolve(process.argv[2] || "dist");
@@ -615,70 +613,59 @@ for (const p of pages.values()) {
 }
 
 // ── capture the flag: 249 country pages, indexed only when each is its own ──
-// A /ctf/<cc> page whose own content reads like another country page's but for
-// the country's name is a doorway in Google's spam policies, so it is noindex
-// until its data or a local note sets it apart (sn design/ctf/SEO.md §2.1).
-// The build decides it with react/src/components/pages/ctf/indexing.js, and
-// this reads the built pages the same way: what each says of its own country,
-// the text of its <main> without the parts about other countries (marked
-// data-ctf-elsewhere: its neighbours in A–Z and its other big pots) and the
-// days it states, with its own names and code masked. Every country page must
-// follow the rule, so no two indexable ones differ by the country's name alone;
-// and pages that read the same must be countries whose data, as the pages
-// state it, is the same, or a page has left out its own figures. The noindex
-// pages are listed. The translations (/<lang>/ctf/<cc>) are the snapshot's 249
-// in each language, each indexed as its English page is (a page and its
-// translations are one hreflang cluster), and they read alike exactly where
-// the English pages do, with the country's names in that language masked, so
-// no translation drops a figure. Without a draw last epoch no capture the flag
-// page in any language may claim a default win or show a chance to win (the
-// API's draw figures are null). And the English pages are exactly the
-// snapshot's 249.
+// A /ctf/<cc> page that reads like another country page but for the country's
+// name is a doorway in Google's spam policies, so it is noindex until its data
+// or a local note sets it apart (sn design/ctf/SEO.md §2.1). The build decides
+// it with react/src/components/pages/ctf/indexing.js from every page rendered
+// with its country's names and code as a placeholder, in every language it is
+// built in; this decides again with the same function and the same component
+// (rendered through Vite, ctf-render.mjs), and holds the built pages to it: each
+// page, in every language, is indexed as decided; every language noindexes the
+// same countries; and pages that read alike print the same figures (pots as the
+// page prints them, to 0.01 α), or a page has left out its own. The noindex
+// pages are listed. Each language has the snapshot's 249 country pages beside
+// its hub. Without a draw last epoch no capture the flag page in any language
+// may claim a default win or show a chance to win (the API's draw figures are
+// null).
 {
   const CTF_SNAPSHOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../react/src/data/ctf-epoch.json");
-  const countryPages = [...pages.values()].filter((p) => /^\/ctf\/[a-z]{2}$/.test(p.urlPath) && !p.redirectStub);
+  const ctfPagesOf = (lang) => {
+    const prefix = lang === "en" ? "" : `/${lang}`;
+    return [...pages.values()].filter((p) => new RegExp(`^${prefix}/ctf/[a-z]{2}$`).test(p.urlPath) && !p.redirectStub);
+  };
+  const countryPages = ctfPagesOf("en");
   if ((countryPages.length || pages.has("/ctf")) && !existsSync(CTF_SNAPSHOT)) err("/ctf: react/src/data/ctf-epoch.json is missing");
   else if (countryPages.length || pages.has("/ctf")) {
-    const { localModel } = await import("../../react/src/components/pages/ctf/model.js");
-    const { CHANCE_SHOWN, DEFAULT_WIN, countryTranslationProblems, ownContent } = await import("../../react/src/components/pages/ctf/indexing.js");
     const snapshot = JSON.parse(readFileSync(CTF_SNAPSHOT, "utf8"));
-    const model = buildModel(snapshot);
-    if (countryPages.length !== snapshot.countries.length) err(`/ctf: ${countryPages.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
-    const mainOf = (html) => (html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "";
-    const { problems, groups } = countryIndexingProblems(
-      model,
-      countryPages.map((p) => ({ code: p.urlPath.slice("/ctf/".length), main: mainOf(p.html), noindex: p.noindex })),
-    );
-    problems.forEach(err);
-    const noindex = countryPages.filter((p) => p.noindex).length;
-    if (noindex) {
-      console.log(`seo-audit: note: ${noindex} country pages are noindex, each reading like another but for the country's name (${groups.length} group(s)): ${groups.map((g) => g.join(" ")).join(" | ")}`);
+    // the languages capture the flag is built in
+    const ctfLangs = ["en", ...NON_EN_SITE_LANG_CODES.filter((lang) => ctfPagesOf(lang).length || pages.has(`/${lang}/ctf`))];
+    for (const lang of ctfLangs) {
+      const built = ctfPagesOf(lang);
+      const hub = lang === "en" ? "/ctf" : `/${lang}/ctf`;
+      if (!pages.has(hub)) err(`${hub}: the hub is missing beside its country pages`);
+      if (built.length !== snapshot.countries.length) err(`${hub}: ${built.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
     }
-    // the translations, against the English pages
-    const english = new Map(countryPages.filter((p) => model.byCode.has(p.urlPath.slice("/ctf/".length))).map((p) => {
-      const code = p.urlPath.slice("/ctf/".length);
-      return [code, { noindex: p.noindex, own: ownContent(mainOf(p.html), model.byCode.get(code)) }];
-    }));
-    const ctfLangs = ["en"];
-    for (const lang of Object.keys(DEFAULT_WIN).filter((l) => l !== "en")) {
-      const translated = [...pages.values()].filter((p) => new RegExp(`^/${lang}/ctf/[a-z]{2}$`).test(p.urlPath) && !p.redirectStub);
-      if (!translated.length && !pages.has(`/${lang}/ctf`)) continue;
-      ctfLangs.push(lang);
-      if (!pages.has(`/${lang}/ctf`)) err(`/${lang}/ctf: the hub is missing beside its country pages`);
-      if (translated.length !== snapshot.countries.length) err(`/${lang}/ctf: ${translated.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
-      countryTranslationProblems(
-        localModel(model, lang),
-        lang,
-        translated.map((p) => ({ code: p.urlPath.slice(`/${lang}/ctf/`.length), main: mainOf(p.html), noindex: p.noindex })),
-        english,
-      ).forEach(err);
+    const { ctfRenderer } = await import("./ctf-render.mjs");
+    const renderer = await ctfRenderer();
+    try {
+      const { countryIndexing, countryIndexingProblems } = renderer.indexing;
+      const decision = countryIndexing(renderer.CTF, renderer.render, ctfLangs);
+      const built = ctfLangs.flatMap((lang) => ctfPagesOf(lang).map((p) => ({ lang, code: p.urlPath.slice(-2), noindex: p.noindex })));
+      countryIndexingProblems(renderer.CTF, decision, built).forEach(err);
+      const groups = decision.byLang.get("en").groups;
+      const noindexed = [...decision.decided.values()].filter((d) => d.noindex).length;
+      if (noindexed) {
+        console.log(`seo-audit: note: ${noindexed} country pages are noindex in ${ctfLangs.join(", ")}, each reading like another but for the country's name (${groups.length} group(s)): ${groups.map((g) => g.join(" ")).join(" | ")}`);
+      }
+    } finally {
+      await renderer.close();
     }
-    if (ctfLangs.length > 1) console.log(`seo-audit: note: capture the flag in ${ctfLangs.join(", ")}: each translation indexed as its English page, and alike where it is`);
     if (!snapshot.last_epoch?.drawn) {
+      const { CHANCE_SHOWN, DEFAULT_WIN } = await import("../../react/src/components/pages/ctf/indexing.js");
+      const mainOf = (html) => (html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "";
       for (const lang of ctfLangs) {
-        const prefix = lang === "en" ? "" : `/${lang}`;
-        const ctfPages = [...pages.values()].filter((p) => (p.urlPath === `${prefix}/ctf` || new RegExp(`^${prefix}/ctf/[a-z]{2}$`).test(p.urlPath)) && !p.redirectStub);
-        for (const p of ctfPages) {
+        const hub = pages.get(lang === "en" ? "/ctf" : `/${lang}/ctf`);
+        for (const p of [...ctfPagesOf(lang), hub].filter(Boolean)) {
           const text = decodeHtmlEntities(mainOf(p.html).replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
           const sentence = (re) => {
             const at = text.search(re);

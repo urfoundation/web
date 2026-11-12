@@ -1,30 +1,49 @@
 /**
- * Which capture the flag country pages (ur.xyz/ctf/<cc>) search engines may
- * index (sn design/ctf/SEO.md §2.1, the owner's decision of 2026-11-11). Google
- * treats pages that differ only by a place's name as doorways or scaled
- * content, which can sink the whole site. So a country page whose own content
- * reads like another country page's but for the country's name, and which has
- * no local note (data/ctf-local-notes.js), is noindex: before launch, the
- * countries the network's dashboard never counted, the territories without
- * people and a few countries it counted alike. Every other page is indexable.
- * A noindex page is still built, linked from the hub and served, and the rule
- * is decided afresh from each epoch's snapshot, so a page becomes indexable as
- * soon as its data or a local note sets it apart.
+ * Which capture the flag country pages (ur.xyz/ctf/<cc>, /<lang>/ctf/<cc>)
+ * search engines may index (sn design/ctf/SEO.md §2.1, the owner's decision of
+ * 2026-11-11). Google treats pages that differ only by a place's name as
+ * doorways or scaled content, which can sink the whole site. So a country page
+ * that reads like another country page but for the country's name is noindex:
+ * before launch, the countries the network's dashboard never counted, the
+ * territories without people and a few countries it counted alike. Every other
+ * page is indexable. A noindex page is still built, linked from the hub and
+ * served, and the rule is decided afresh from each epoch's snapshot, so a page
+ * becomes indexable as soon as its data or a local note sets it apart.
  *
- * A page's own content is what it says of its own country: the visible text of
- * its <main>, without the parts about other countries (marked
- * data-ctf-elsewhere: its neighbours in A–Z and its other big pots), without
- * the days the page states (when it last changed, which the build writes only
- * after this is decided, and when its note was reviewed), and with the
- * country's names and code masked. The build decides with it
- * (astro/src/pages/ctf/[cc].astro renders every country page for it), and the
- * seo-audit checks the built pages with it, so both read a page the same way.
- * Pure, with no React: tests/ctf.test.mjs runs it on pages of its own.
+ * The decision reads each page as it would be with no name at all: the page
+ * rendered from a model in which its own country's name forms (in a list, in a
+ * sentence, short, "in <country>") are one fixed placeholder, its code one
+ * fixed placeholder code, and its local note names it by the placeholder too
+ * (placeholderModel). What that render says of its own country is the visible
+ * text of its <main>, without the parts about other countries (marked
+ * data-ctf-elsewhere: its neighbours in A–Z and its other big pots) and
+ * without the days it states. Pages whose renders say the same differ by the
+ * name alone. Nothing in the text is masked after the render, so a word of the
+ * copy that happens to be a country's code or name (AI, IT, NO, Chad) reads
+ * the same on every page; and a local note sets its page apart by what it
+ * says, never by the name in it.
+ *
+ * Every language is decided from its own renders, and every language must
+ * noindex the same countries (a translation that leaves out a figure would
+ * otherwise read alike where the English does not): the build fails when they
+ * differ. The build (astro/src/components/routes/ctf-paths.js) and the
+ * seo-audit (astro/scripts/seo-audit.mjs, which renders through Vite) both
+ * decide with countryIndexing and the same component, so they read a page the
+ * same way; the audit then holds the built pages to the decision and compares
+ * the figures of pages that read alike as the pages print them
+ * (countryIndexingProblems). Pure, with no React: the caller renders, and
+ * tests/ctf.test.mjs runs it on renders of its own.
  */
-import { CTF_LOCAL_NOTES } from '../../../data/ctf-local-notes.js';
+import { capital, ctfNames, formats } from './i18n.js';
+import { localModel } from './model.js';
 
-const MASK = '\u0000';
-const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+/** Every name form of the page's own country, in the render that decides its indexing. */
+export const PLACEHOLDER = '⟨country⟩';
+/** Its code in that render: user-assigned in ISO 3166-1, so no country's. */
+export const PLACEHOLDER_CODE = 'zz';
+
+const LANGS = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
+const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 const decode = (s) => s.replace(/&(?:#(\d+)|#x([\da-f]+)|([a-z]+));/gi, (entity, dec, hex, name) => {
     if (dec) return String.fromCodePoint(Number(dec));
     if (hex) return String.fromCodePoint(Number.parseInt(hex, 16));
@@ -69,25 +88,12 @@ function textOf(html) {
 }
 
 /**
- * The forms of a country's identity a page can print, longest first: its names
- * (the model's name, sentence name, capitalized and short, and in a
- * translation its "in <country>" forms), its ISO code as a word in capitals,
- * and its code in the paths of its page and its JSON (/ru/ctf/ke too).
- */
-function identity(c) {
-    // a translation's country also has its "in <country>" forms (ctf/model.js localModel)
-    const names = [...new Set([c.name, c.the, c.The, c.short, c.in, c.In, c.inShort].filter(Boolean))].sort((a, b) => b.length - a.length);
-    return [...names, new RegExp(`\\b${c.code.toUpperCase()}\\b`, 'g'), new RegExp(`/(?:ctf|country)/${c.code}\\b`, 'g')];
-}
-
-/**
  * What a country page says of its own country (see above), from the HTML of
- * its <main>; `c` is its country in the pages' model (ctf/model.js).
+ * its <main> as the decision renders it: without the parts about other
+ * countries and the days it states. Nothing in it is masked.
  */
-export function ownContent(mainHtml, c) {
-    let text = textOf(withoutElsewhere(mainHtml).replace(/<time\b[^>]*>[\s\S]*?<\/time>/gi, ' '));
-    for (const form of identity(c)) text = typeof form === 'string' ? text.split(form).join(MASK) : text.replace(form, MASK);
-    return text;
+export function ownContent(mainHtml) {
+    return textOf(withoutElsewhere(String(mainHtml)).replace(/<time\b[^>]*>[\s\S]*?<\/time>/gi, ' '));
 }
 
 /** Pages (code → own content) grouped by their own content, in the order given; a page alone is a group of one. */
@@ -100,99 +106,152 @@ export function contentGroups(contents) {
     return [...byText.values()];
 }
 
-/** The rule, for a page of a group: noindex when it reads like another page and has no local note. */
-const ruledNoindex = (group, code, notes) => group.length > 1 && !notes[code];
-
 /**
- * The build's decision for every country page, in the model's order: code →
- * { noindex, alike } (alike: the other pages it reads like). `render(code)` is
- * the HTML of the page's <main> as the build renders it.
+ * Every way a country is named in the site's languages, longest first: the
+ * snapshot's English forms (the model's name, sentence name, capitalized and
+ * short) and each language's from the names unit (pages/ctf/names),
+ * capitalized too.
  */
-export function countryIndexing(m, render, notes = CTF_LOCAL_NOTES) {
-    const decided = new Map();
-    for (const group of contentGroups(new Map(m.countries.map((c) => [c.code, ownContent(render(c.code), c)])))) {
-        for (const code of group) decided.set(code, { noindex: ruledNoindex(group, code, notes), alike: group.filter((other) => other !== code) });
+function nameForms(m, code) {
+    const snap = m.snapshot?.countries?.find((c) => c.code === code);
+    const the = snap?.sentence_name;
+    const forms = [snap?.name, the, the && capital(the), the && the.replace(/^the /, '')];
+    for (const lang of LANGS) {
+        const names = ctfNames(lang);
+        for (const key of ['name', 'short', 'in', 'inShort']) {
+            const form = names[key]?.[code];
+            if (form) forms.push(form, capital(form));
+        }
     }
-    return new Map(m.countries.map((c) => [c.code, decided.get(c.code)]));
+    return [...new Set(forms.filter(Boolean))].sort((a, b) => b.length - a.length);
 }
 
-// The data a country page states (CtfCountry.jsx and ctf/model.js): its dashboard counts, its territory flag,
-// and after a root its roles' winners, units and pots, its near misses, awards and epochs without a winner.
-const stated = (c) => JSON.stringify([
-    c.inhabited, c.online, c.seenDays, c.lastSeen, c.peak, c.openEpochs, c.near, c.awarded,
-    ...[c.p, c.x].map((r) => [r.won, r.units, r.pot]),
-]);
-
-const at = (code) => `/ctf/${code}`;
-const some = (codes) => (codes.length > 3 ? `${codes.slice(0, 3).map(at).join(', ')} and ${codes.length - 3} more` : codes.map(at).join(', '));
-
-/**
- * The seo-audit's check of the built country pages, each { code, main, noindex }
- * (`main` the HTML of its <main>): every page follows the rule, so no two
- * indexable pages differ by the country's name alone; and pages that read
- * alike are countries whose data, as the pages state it, is the same
- * (otherwise a page has left out its own figures). Returns the problems and the
- * groups of pages that read alike, as lists of codes.
- */
-export function countryIndexingProblems(m, pages, notes = CTF_LOCAL_NOTES) {
-    const problems = [];
-    const built = new Map();
-    for (const p of pages) {
-        if (m.byCode.has(p.code)) built.set(p.code, p);
-        else problems.push(`${at(p.code)}: no such country in the snapshot`);
+/** A local note with every name of its country the placeholder, in each language it is written in. */
+function placeholderNote(note, forms) {
+    if (!note) return note;
+    const out = { ...note };
+    for (const [key, value] of Object.entries(note)) {
+        if (key === 'reviewed' || typeof value !== 'string') continue;
+        let text = value;
+        for (const form of forms) text = text.split(form).join(PLACEHOLDER);
+        out[key] = text;
     }
-    const groups = contentGroups(new Map([...built.values()].map((p) => [p.code, ownContent(p.main, m.byCode.get(p.code))])));
-    for (const group of groups) {
-        for (const code of group) {
-            const ruled = ruledNoindex(group, code, notes);
-            if (ruled && !built.get(code).noindex) {
-                problems.push(`${at(code)}: reads like ${some(group.filter((other) => other !== code))} but for the country's name and has no local note, so it must be noindex`);
-            } else if (!ruled && built.get(code).noindex) {
-                problems.push(`${at(code)}: noindex, though ${notes[code] ? 'it has a local note' : 'it reads like no other country page'}`);
-            }
-        }
-        if (group.length < 2) continue;
-        const indexable = group.filter((code) => !built.get(code).noindex);
-        if (indexable.length > 1) problems.push(`${some(indexable)}: indexable, though they differ by the country's name alone`);
-        if (new Set(group.map((code) => stated(m.byCode.get(code)))).size > 1) {
-            problems.push(`${some(group)}: read the same but for the country's name, though their data differs (a page leaves out its own figures)`);
-        }
-    }
-    return { problems, groups: groups.filter((group) => group.length > 1) };
+    return out;
 }
 
 /**
- * The seo-audit's check of one language's built country pages against the
- * English ones (each { code, main, noindex }; `m` is the model in that
- * language, ctf/model.js localModel): a translation is indexed as its English
- * page is, so a page and its translations form a whole hreflang cluster; and
- * its pages read alike exactly where the English ones do, so no translated
- * page drops its own figures or says something of one country it says of no
- * other. Returns the problems.
+ * The model `m` (in any language) with the country `code` as the decision
+ * reads it: the same data and the same local note, but every name form the
+ * placeholder and its code the placeholder code. Render the page of
+ * PLACEHOLDER_CODE in it.
  */
-export function countryTranslationProblems(m, lang, pages, english) {
-    const problems = [];
-    const at = (code) => `/${lang}/ctf/${code}`;
-    const built = new Map();
-    for (const p of pages) {
-        if (!m.byCode.has(p.code)) problems.push(`${at(p.code)}: no such country in the snapshot`);
-        else built.set(p.code, p);
-    }
-    for (const [code, p] of built) {
-        const en = english.get(code);
-        if (!en) problems.push(`${at(code)}: no English page /ctf/${code}`);
-        else if (Boolean(p.noindex) !== Boolean(en.noindex)) problems.push(`${at(code)}: ${p.noindex ? 'noindex' : 'indexable'}, though /ctf/${code} is ${en.noindex ? 'noindex' : 'indexable'}`);
-    }
-    const partition = (contents) => {
-        const out = new Map();
-        for (const group of contentGroups(contents)) for (const code of group) out.set(code, group.slice().sort().join(' '));
-        return out;
+export function placeholderModel(m, code) {
+    const real = m.byCode.get(code);
+    if (!real) throw new Error(`placeholderModel: no country ${code} in the model`);
+    const twin = {
+        ...real,
+        code: PLACEHOLDER_CODE,
+        name: PLACEHOLDER,
+        the: PLACEHOLDER,
+        The: PLACEHOLDER,
+        short: PLACEHOLDER,
+        sortKey: PLACEHOLDER,
+        shortKey: PLACEHOLDER,
+        keys: [PLACEHOLDER],
+        // a translation's "in <country>" forms (ctf/model.js localModel); English builds them from `the`
+        ...('in' in real ? { in: PLACEHOLDER, In: PLACEHOLDER, inShort: PLACEHOLDER } : {}),
+        note: placeholderNote(real.note, nameForms(m, code)),
     };
-    const mine = partition(new Map([...built.values()].map((p) => [p.code, ownContent(p.main, m.byCode.get(p.code))])));
-    const theirs = partition(new Map([...built.keys()].filter((code) => english.has(code)).map((code) => [code, english.get(code).own])));
-    for (const [code, group] of mine) {
-        if (theirs.has(code) && theirs.get(code) !== group) {
-            problems.push(`${at(code)}: reads like ${group.split(' ').filter((c) => c !== code).map(at).join(', ') || 'no other page'}, where /ctf/${code} reads like ${theirs.get(code).split(' ').filter((c) => c !== code).map((c) => `/ctf/${c}`).join(', ') || 'no other page'}`);
+    const swap = (list) => list.map((c) => (c.code === code ? twin : c));
+    const countries = swap(m.countries);
+    return { ...m, countries, byCode: new Map(countries.map((c) => [c.code, c])), az: swap(m.az) };
+}
+
+/**
+ * The decision for every country page in each of `langs` (English first):
+ * `render({ code, lang, model })` is the HTML of the <main> of the page of
+ * `code` in `model`, as the site renders it (CtfCountry.jsx). Returns
+ * `decided` (code → { noindex, alike }, in the model's order: every
+ * language's pages), `byLang` (lang → { decided, groups }, the groups of more
+ * than one page that read alike) and `disagreements` (a language that would
+ * noindex other countries than the first).
+ */
+export function countryIndexing(m, render, langs = ['en']) {
+    const byLang = new Map();
+    for (const lang of langs) {
+        const lm = localModel(m, lang);
+        const contents = new Map(lm.countries.map((c) => [c.code, ownContent(render({ code: PLACEHOLDER_CODE, lang, model: placeholderModel(lm, c.code) }))]));
+        const groups = contentGroups(contents);
+        const decided = new Map();
+        for (const group of groups) {
+            for (const code of group) decided.set(code, { noindex: group.length > 1, alike: group.filter((other) => other !== code) });
+        }
+        byLang.set(lang, {
+            decided: new Map(lm.countries.map((c) => [c.code, decided.get(c.code)])),
+            groups: groups.filter((group) => group.length > 1),
+        });
+    }
+    const [first] = langs;
+    const base = byLang.get(first).decided;
+    const disagreements = [];
+    for (const [lang, { decided }] of byLang) {
+        if (lang === first) continue;
+        const differ = [...decided].filter(([code, d]) => d.noindex !== base.get(code).noindex).map(([code]) => code);
+        if (differ.length) {
+            disagreements.push(`${lang} would ${differ.map((code) => `${decided.get(code).noindex ? 'noindex' : 'index'} /${lang}/ctf/${code}`).join(', ')}, unlike ${first}`);
+        }
+    }
+    return { decided: base, byLang, disagreements };
+}
+
+/**
+ * The figures a country page states (CtfCountry.jsx and ctf/model.js) as the
+ * page prints them in its language: its dashboard counts, its territory flag,
+ * and after a root its roles' winners, units, pots and chances, its near
+ * misses, awards and epochs without a winner. Pots that print alike are alike
+ * (0.001 α and 0.004 α are both "0.00").
+ */
+function statedAs(c, f) {
+    const n = (value, format) => (value === null || value === undefined ? null : format(value));
+    return JSON.stringify([
+        c.inhabited,
+        n(c.online, f.int), n(c.seenDays, f.int), n(c.lastSeen, String), n(c.peak, f.int),
+        n(c.openEpochs, f.int), n(c.near, f.int), n(c.awarded, f.alpha),
+        ...[c.p, c.x].map((r) => [n(r.won, f.int), n(r.units, f.int), n(r.pot, f.alpha), n(r.chance, f.pct)]),
+    ]);
+}
+
+/**
+ * The seo-audit's check of the built country pages against the decision
+ * (countryIndexing, from the same renders the build decides with): `built` is
+ * every built country page, { lang, code, noindex }. Each page is indexed as
+ * decided, in every language; the languages agree; and pages that read alike
+ * print the same figures, or a page leaves out its own. Returns the problems.
+ */
+export function countryIndexingProblems(m, decision, built) {
+    const problems = decision.disagreements.map((d) => `capture the flag: ${d} (every language must noindex the same countries)`);
+    const at = (lang, code) => (lang === 'en' ? `/ctf/${code}` : `/${lang}/ctf/${code}`);
+    const some = (lang, codes) => (codes.length > 3
+        ? `${codes.slice(0, 3).map((c) => at(lang, c)).join(', ')} and ${codes.length - 3} more`
+        : codes.map((c) => at(lang, c)).join(', '));
+    for (const { lang, code, noindex } of built) {
+        const d = decision.decided.get(code);
+        if (!d) {
+            problems.push(`${at(lang, code)}: no such country in the snapshot`);
+            continue;
+        }
+        if (Boolean(noindex) === d.noindex) continue;
+        problems.push(d.noindex
+            ? `${at(lang, code)}: indexable, though it reads like ${some(lang, d.alike)} but for the country's name, so it must be noindex`
+            : `${at(lang, code)}: noindex, though it reads like no other country page`);
+    }
+    for (const [lang, { groups }] of decision.byLang) {
+        const lm = localModel(m, lang);
+        const f = formats(lang);
+        for (const group of groups) {
+            if (new Set(group.map((code) => statedAs(lm.byCode.get(code), f))).size > 1) {
+                problems.push(`${some(lang, group)}: read the same but for the country's name, though the figures they print differ (a page leaves out its own figures)`);
+            }
         }
     }
     return problems;
@@ -210,4 +269,4 @@ export const DEFAULT_WIN = {
     de: /\bgewinn(?:t|st|en)\b[^.]*?ohne\s+Auslosung/i,
     es: /\bgan(?:a|as|an|ar)\b[^.]*?sin\s+sorteo/i,
 };
-export const CHANCE_SHOWN = /\d[\s\u00a0\u202f]?\u200e?[%٪]/;
+export const CHANCE_SHOWN = /\d[\s  ]?‎?[%٪]/;

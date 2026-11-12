@@ -29,6 +29,7 @@
  * they are formatted only for display.
  */
 import { capital, ctfCopy, ctfNames, formats, interpolate, place } from './i18n.js';
+import { CTF_LOCAL_NOTES } from '../../../data/ctf-local-notes.js';
 
 export const SITE = 'https://ur.xyz';
 export const HUB_PATH = '/ctf';
@@ -165,6 +166,8 @@ export function buildModel(snap) {
             big,
             hot: big && c.near_misses > 0,
             won: drawn ? p.won + x.won : null,
+            // its local note (data/ctf-local-notes.js), shown on its page
+            note: CTF_LOCAL_NOTES[c.code] || null,
         };
     });
     const az = countries.slice().sort(byFolded);

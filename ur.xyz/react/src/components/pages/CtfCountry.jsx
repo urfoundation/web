@@ -6,7 +6,6 @@ import { countryMessage, lastEpochFacts, localModel, neighbours, presenceSentenc
 import { ctfCopy, formats, interpolate, place } from './ctf/i18n';
 import { pagePath } from './ctf/links';
 import { BOLD, rich } from './ctf/rich';
-import { CTF_LOCAL_NOTES } from '../../data/ctf-local-notes';
 import { FinePrint, HowItWorks, Questions, slotWorth } from './Ctf';
 import './Ctf.css';
 
@@ -25,8 +24,10 @@ import './Ctf.css';
  * `easyWins` and rendered here by the SPA. The header, the questions, the
  * countries around it, how the draw works and the fine print are static.
  */
-export default function CtfCountryPage({ code, lang = 'en', updated = null, live = null, easyWins = null }) {
-    const m = localModel(CTF, lang);
+export default function CtfCountryPage({ code, lang = 'en', updated = null, live = null, easyWins = null, model = CTF }) {
+    // `model` is the snapshot's model, or one whose page is read for its
+    // indexing (ctf/indexing.js placeholderModel); the islands read the same
+    const m = localModel(model, lang);
     const c = m.byCode.get(code);
     if (!c) return null;
     const t = ctfCopy(m.lang);
@@ -51,11 +52,11 @@ export default function CtfCountryPage({ code, lang = 'en', updated = null, live
                     </p>
                 </header>
 
-                {live || <CountryLive code={code} lang={lang} />}
+                {live || <CountryLive code={code} lang={lang} m={m} />}
 
                 <CountryQuestions m={m} c={c} />
 
-                {easyWins || <CountryEasyWins code={code} lang={lang} />}
+                {easyWins || <CountryEasyWins code={code} lang={lang} m={m} />}
 
                 {/* about other countries: left out of what this page says of its own, which decides
                     whether it is indexed (ctf/indexing.js) */}
@@ -97,7 +98,7 @@ function CountryQuestions({ m, c }) {
     const t = ctfCopy(m.lang).countryFaq;
     const f = formats(m.lang);
     const values = place(c);
-    const note = CTF_LOCAL_NOTES[c.code] || null;
+    const note = c.note || null;
     const entries = (r, none, some) => (r.units === 0 ? none : f.count(some, r.units, { won: r.won }));
     let earn;
     if (m.drawn) {

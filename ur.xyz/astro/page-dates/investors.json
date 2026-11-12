@@ -1,6 +1,90 @@
 {
   "about": "The day each page of the ur.xyz page group investors (react/src/i18n/pages/investors/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
+    "/ar/investors": {
+      "fingerprint": "b9f7fd39c9bd3b8f",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/investors/apex-competition": {
+      "fingerprint": "f833f78c8270e3c4",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/investors/conviction-lock": {
+      "fingerprint": "cb36cebb6806c058",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/investors/deck": {
+      "fingerprint": "17e479bae6481a2c",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/investors/funding-network-capacity": {
+      "fingerprint": "bb4c51baf4d9af52",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/investors/letter-to-tokenholders-september-2026": {
+      "fingerprint": "1d069ed6302b8b14",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/investors/our-letter-to-bittensor": {
+      "fingerprint": "fa8dd5b0c247bf8f",
+      "lastmod": "2026-11-12"
+    },
+    "/de/investors": {
+      "fingerprint": "b1c24e6cb4b68295",
+      "lastmod": "2026-11-12"
+    },
+    "/de/investors/apex-competition": {
+      "fingerprint": "9caac7eec27ef786",
+      "lastmod": "2026-11-12"
+    },
+    "/de/investors/conviction-lock": {
+      "fingerprint": "a1db9c67e33e087c",
+      "lastmod": "2026-11-12"
+    },
+    "/de/investors/deck": {
+      "fingerprint": "4905f6f3b274d723",
+      "lastmod": "2026-11-12"
+    },
+    "/de/investors/funding-network-capacity": {
+      "fingerprint": "c7d916ae93e8dc31",
+      "lastmod": "2026-11-12"
+    },
+    "/de/investors/letter-to-tokenholders-september-2026": {
+      "fingerprint": "68bae0d6bf5b90c1",
+      "lastmod": "2026-11-12"
+    },
+    "/de/investors/our-letter-to-bittensor": {
+      "fingerprint": "b2a617409b05c91e",
+      "lastmod": "2026-11-12"
+    },
+    "/es/investors": {
+      "fingerprint": "3303f586d4d10788",
+      "lastmod": "2026-11-12"
+    },
+    "/es/investors/apex-competition": {
+      "fingerprint": "60ef5763203234cd",
+      "lastmod": "2026-11-12"
+    },
+    "/es/investors/conviction-lock": {
+      "fingerprint": "62cc0586379a2d82",
+      "lastmod": "2026-11-12"
+    },
+    "/es/investors/deck": {
+      "fingerprint": "10482e57ea6dced8",
+      "lastmod": "2026-11-12"
+    },
+    "/es/investors/funding-network-capacity": {
+      "fingerprint": "21c3b558400ec79c",
+      "lastmod": "2026-11-12"
+    },
+    "/es/investors/letter-to-tokenholders-september-2026": {
+      "fingerprint": "cb4a27cb0e7567c2",
+      "lastmod": "2026-11-12"
+    },
+    "/es/investors/our-letter-to-bittensor": {
+      "fingerprint": "5d11b2bc68d843b4",
+      "lastmod": "2026-11-12"
+    },
     "/investors": {
       "fingerprint": "8a6ff5fbf107a9e6",
       "lastmod": "2026-10-28"
@@ -28,6 +112,62 @@
     "/investors/our-letter-to-bittensor": {
       "fingerprint": "bea6c43d6881e1a1",
       "lastmod": "2026-08-18"
+    },
+    "/ru/investors": {
+      "fingerprint": "9d6f8e34a6264afa",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/investors/apex-competition": {
+      "fingerprint": "af3038ea2abbc6c8",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/investors/conviction-lock": {
+      "fingerprint": "9726ff2efb23c394",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/investors/deck": {
+      "fingerprint": "ac0e96d0cc18cae2",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/investors/funding-network-capacity": {
+      "fingerprint": "7027e95e91d0db69",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/investors/letter-to-tokenholders-september-2026": {
+      "fingerprint": "3ca5df342b9f5e29",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/investors/our-letter-to-bittensor": {
+      "fingerprint": "eebfe415269cf688",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/investors": {
+      "fingerprint": "b24d7c4a5b394353",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/investors/apex-competition": {
+      "fingerprint": "14cd9a2f10a28d75",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/investors/conviction-lock": {
+      "fingerprint": "d9db55232883fcbd",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/investors/deck": {
+      "fingerprint": "5077f32be58f8267",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/investors/funding-network-capacity": {
+      "fingerprint": "39fcb7a55024a93d",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/investors/letter-to-tokenholders-september-2026": {
+      "fingerprint": "4028d15db03e5c1f",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/investors/our-letter-to-bittensor": {
+      "fingerprint": "fe8a238d09725ef8",
+      "lastmod": "2026-11-12"
     }
   }
 }

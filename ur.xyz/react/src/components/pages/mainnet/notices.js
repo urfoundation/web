@@ -9,9 +9,11 @@
  * The header is a real button (aria-expanded, aria-controls) inside the
  * notice's h2, so the keyboard and a screen reader open it as any button (it
  * states aria-expanded once script runs: without script the notice is open,
- * and its button claims no state); a
- * tap anywhere on the card does the same, but a tap on a link inside follows
- * the link, and a click that ends a text selection leaves the card as it is.
+ * and its button claims no state; "Expand" and "Collapse" are hidden from a
+ * screen reader, which hears the state); a tap anywhere on the card does the
+ * same, but a tap on a link inside follows the link, a click that ends a text
+ * selection leaves the card as it is, and a click on an open notice's text
+ * waits a moment, so a double-click selects a word instead of closing it.
  * The SPA keeps each notice's state in React; the static page, which renders
  * the body without React in the browser, runs wireNotices over the same
  * markup (astro/src/components/routes/MainnetRoute.astro). Both decide with
@@ -21,20 +23,57 @@
 const NOTICE = '.mainnet-notice';
 const TOGGLE = '.mainnet-notice-toggle';
 
+// A click on an open notice's text closes it only if no second click follows
+// within this long: a double-click there selects a word, as in any text.
+export const DOUBLE_CLICK_MS = 300;
+
+/** Whether some of the card's text is selected. */
+function selectedIn(card) {
+    const selection = typeof window !== 'undefined' && window.getSelection ? window.getSelection() : null;
+    return Boolean(selection && !selection.isCollapsed && card.contains(selection.anchorNode));
+}
+
 /**
- * Whether a click on a notice's card (event.currentTarget) opens or closes
- * it: a click on its button always does (a pointer, or Enter or Space on the
- * focused button); a click on a link or another control inside does not; nor
- * does the click that ends selecting some of the card's text.
+ * What a click on a notice's card (event.currentTarget) does: 'toggle' opens
+ * or closes it at once (its button, by a pointer or by Enter or Space; or the
+ * header around it); 'later' closes it unless a second click follows (a click
+ * on an open notice's text, DOUBLE_CLICK_MS); null does nothing (a link or
+ * another control inside, or the click that ends selecting some text).
  */
-export function togglesNotice(event) {
+export function noticeClick(event) {
     const card = event.currentTarget;
     const target = event.target;
-    if (!card || !target || typeof target.closest !== 'function') return false;
-    if (target.closest(TOGGLE)) return true;
-    if (target.closest('a[href], button, input, select, textarea, summary, label')) return false;
-    const selection = typeof window !== 'undefined' && window.getSelection ? window.getSelection() : null;
-    return !(selection && !selection.isCollapsed && card.contains(selection.anchorNode));
+    if (!card || !target || typeof target.closest !== 'function') return null;
+    if (target.closest(TOGGLE)) return 'toggle';
+    if (target.closest('a[href], button, input, select, textarea, summary, label')) return null;
+    if (selectedIn(card)) return null;
+    return target.closest('.mainnet-notice-text') ? 'later' : 'toggle';
+}
+
+/**
+ * A card's click handler, for the SPA and the static page alike: it calls
+ * `toggle` as noticeClick says, the second click of a double-click doing
+ * nothing and cancelling a close the first one left waiting.
+ */
+export function noticeClicks(toggle) {
+    let waiting = 0;
+    return (event) => {
+        const card = event.currentTarget;
+        if (event.detail > 1) {
+            clearTimeout(waiting);
+            waiting = 0;
+            return;
+        }
+        const what = noticeClick(event);
+        if (what === 'toggle') toggle();
+        else if (what === 'later') {
+            clearTimeout(waiting);
+            waiting = setTimeout(() => {
+                waiting = 0;
+                if (!selectedIn(card)) toggle();
+            }, DOUBLE_CLICK_MS);
+        }
+    };
 }
 
 /** The notice section a URL fragment points at (the notice, or anything inside it), or null. */
@@ -77,12 +116,11 @@ export function wireNotices(doc = document) {
     };
     for (const section of doc.querySelectorAll(NOTICE)) {
         set(section, section.hasAttribute('data-open'));
-        section.querySelector('.mainnet-notice-box')?.addEventListener('click', (event) => {
-            if (!togglesNotice(event)) return;
+        section.querySelector('.mainnet-notice-box')?.addEventListener('click', noticeClicks(() => {
             const open = !section.hasAttribute('data-open');
             set(section, open);
             if (!open) keepNoticeInView(section);
-        });
+        }));
     }
     const follow = () => {
         const section = noticeAt(window.location.hash, doc);

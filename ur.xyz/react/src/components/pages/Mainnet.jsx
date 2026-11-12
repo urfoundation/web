@@ -18,7 +18,7 @@ import {
     whenParts,
 } from './mainnet/timeline';
 import { localizeActions, localizeEpochs, localizeEvents, localizeNotices } from './mainnet/copy';
-import { keepNoticeInView, noticeAt, togglesNotice } from './mainnet/notices';
+import { keepNoticeInView, noticeAt, noticeClicks } from './mainnet/notices';
 import { summaryModel } from './mainnet/summary';
 import MainnetSummary from './mainnet/MainnetSummary';
 import '../RoadmapTrack.css';
@@ -43,8 +43,9 @@ const timelineCopy = await loadPageCopy('mainnet/timeline');
  * (i18n/pages/mainnet, components/pages/mainnet/copy.js); the dates,
  * statuses, figures and links are the data's in every language, and the
  * notices are newest first in every language, as the data sorts them. Apart
- * from the summary's "now" it needs no browser: the Astro page renders it to
- * static HTML.
+ * from the summary's "now" and the notices' opening and closing, it needs no
+ * browser: the Astro page renders it to static HTML, and its own script opens
+ * and closes the notices (mainnet/notices.js).
  *
  * `updated` is the day the page's content last changed (the sitemap's
  * lastmod), which only the static build knows; the SPA leaves it out.
@@ -148,7 +149,8 @@ function after(sentence, parts) {
  * tap anywhere on the card opens or closes it, and the address can point at
  * it (/mainnet#notice). The text stays in the HTML, closed with CSS, and the
  * static page, which runs no React here, opens and closes the same markup
- * with its own script (notices.js wireNotices).
+ * with its own script (notices.js wireNotices). "Expand" and "Collapse" are
+ * the eye's: a screen reader hears the button's state (aria-expanded).
  */
 function MainnetNotice({ notice, t }) {
     const [open, setOpen] = React.useState(false);
@@ -164,11 +166,13 @@ function MainnetNotice({ notice, t }) {
         window.addEventListener('hashchange', follow);
         return () => window.removeEventListener('hashchange', follow);
     }, []);
-    const toggle = (event) => {
-        if (!togglesNotice(event)) return;
-        if (open) keepNoticeInView(section.current);
-        setOpen(!open);
-    };
+    // the card's clicks (notices.js noticeClicks), made once: they read the state through a ref
+    const isOpen = React.useRef(open);
+    isOpen.current = open;
+    const toggle = React.useMemo(() => noticeClicks(() => {
+        if (isOpen.current) keepNoticeInView(section.current);
+        setOpen((was) => !was);
+    }), []);
     const external = isExternal(notice.link.href) ? EXTERNAL : {};
     const titleId = `${notice.id}-heading`;
     const textId = `${notice.id}-text`;
@@ -180,7 +184,7 @@ function MainnetNotice({ notice, t }) {
                     <button type="button" className="mainnet-notice-toggle" aria-expanded={live ? open : undefined} aria-controls={textId}>
                         <span className="mainnet-notice-date">{runs(t.noticeDate, { date: notice.dateText })}</span>
                         <span className="mainnet-notice-title" id={titleId}>{notice.title}</span>
-                        <span className="mainnet-notice-more" data-nosnippet="">
+                        <span className="mainnet-notice-more" aria-hidden="true" data-nosnippet="">
                             <span className="mainnet-notice-more-label" data-shows="closed">{t.noticeToggle.expand}</span>
                             <span className="mainnet-notice-more-label" data-shows="open">{t.noticeToggle.collapse}</span>
                             <svg className="mainnet-notice-chevron" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">

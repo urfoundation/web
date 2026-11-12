@@ -53,6 +53,7 @@ const dict = await getDict(lang);
         .mainnet-page .mainnet-notice .mainnet-notice-more { display: none; }
         .mainnet-page .mainnet-notice .mainnet-notice-box,
         .mainnet-page .mainnet-notice .mainnet-notice-toggle { cursor: auto; }
+        .mainnet-page .mainnet-notice .mainnet-notice-box:hover { border-color: rgba(214, 230, 244, 0.28); border-inline-start-color: var(--brand-ur); background: rgba(214, 230, 244, 0.05); }
     </style></noscript>
     <div class="app">
         <DisclaimerStatic t={dict} />
@@ -68,10 +69,10 @@ const dict = await getDict(lang);
 
         <FooterStatic t={dict} lang={lang} />
     </div>
+
+    <script>
+        import { wireNotices } from '@react/components/pages/mainnet/notices.js';
+
+        wireNotices(document);
+    </script>
 </Base>
-
-<script>
-    import { wireNotices } from '@react/components/pages/mainnet/notices.js';
-
-    wireNotices(document);
-</script>

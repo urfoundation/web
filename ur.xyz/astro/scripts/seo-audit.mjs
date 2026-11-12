@@ -292,6 +292,11 @@ for (const p of canonicalSelf) {
     if (SITE_LANG_CODES.includes(p.lang) && (p.dir || "ltr") !== (DIRS[p.lang] || "ltr")) {
       err(`${p.urlPath}: <html lang="${p.lang}" dir="${p.dir}">, expected dir="${DIRS[p.lang] || "ltr"}"`);
     }
+    // the social card's locale is the page's language (ar_AR, de_DE, …)
+    const ogLocale = attr((p.html.match(/<meta property="og:locale"[^>]*>/) || [])[0] || "", "content");
+    if (ogLocale && SITE_LANG_CODES.includes(p.lang) && ogLocale.split("_")[0] !== p.lang) {
+      err(`${p.urlPath}: og:locale "${ogLocale}" on a page in "${p.lang}"`);
+    }
     if (lang !== "en") {
       const base = basePathFor(p.urlPath);
       const group = groupForPath(p.urlPath);
@@ -372,8 +377,22 @@ for (const p of pages.values()) {
   if (skips.length) err(`${p.urlPath}: heading levels skip (${skips.join(", ")})`);
 }
 
-// an unlisted document's page (docs-shared.js UNLISTED_DOC_SLUGS)
-const unlistedDocPage = (p) => p.startsWith("/docs/") && UNLISTED_DOC_SLUGS.has(p.slice("/docs/".length));
+// The page-specific checks below hold a page's translations to what they hold
+// the English page to: each reads a page by its path without the language
+// prefix (basePathFor), so /de/docs/miner is a docs page as /docs/miner is.
+// The translated pages exist for search too, and a translation can break what
+// its English meets (a title, a stated day, a link).
+
+// an unlisted document's page (docs-shared.js UNLISTED_DOC_SLUGS), in any language
+const unlistedDocPage = (p) => {
+  const base = basePathFor(p);
+  return base.startsWith("/docs/") && UNLISTED_DOC_SLUGS.has(base.slice("/docs/".length));
+};
+// a page and its translations the build has, by its English path
+const inEveryLanguage = (englishPath) =>
+  [englishPath, ...NON_EN_SITE_LANG_CODES.map((l) => `/${l}${englishPath === "/" ? "" : englishPath}`)]
+    .map((u) => pages.get(u))
+    .filter((p) => p && !p.redirectStub);
 
 // ── unlisted documents and document images ──
 // An unlisted document (docs-shared.js) is published for links from outside
@@ -418,14 +437,15 @@ for (const p of pages.values()) {
     spansOf.set(slug, [...spans]);
   }
   const listed = (spans) => `${spans.slice(0, 4).map((s) => `\`${s}\``).join(", ")}${spans.length > 4 ? ", …" : ""}`;
+  // a translated document keeps its code as the English writes it
   for (const [slug, spans] of spansOf) {
-    const p = pages.get(`/docs/${slug}`);
-    if (!p || p.redirectStub) continue;
-    const shown = new Set(
-      [...p.html.matchAll(/<code class="md-icode"[^>]*>([\s\S]*?)<\/code>/g)].map((m) => decodeHtmlEntities(m[1].replace(/<[^>]+>/g, ""))),
-    );
-    const cut = spans.filter((s) => !shown.has(s));
-    if (cut.length) err(`${p.urlPath}: ${cut.length} inline code span(s) shown without all of their text: ${listed(cut)}`);
+    for (const p of inEveryLanguage(`/docs/${slug}`)) {
+      const shown = new Set(
+        [...p.html.matchAll(/<code class="md-icode"[^>]*>([\s\S]*?)<\/code>/g)].map((m) => decodeHtmlEntities(m[1].replace(/<[^>]+>/g, ""))),
+      );
+      const cut = spans.filter((s) => !shown.has(s));
+      if (cut.length) err(`${p.urlPath}: ${cut.length} inline code span(s) shown without all of their text: ${listed(cut)}`);
+    }
   }
   // a query matches where each of its words occurs within a word of the entry (lib/docs-search.js)
   const searchFile = path.join(DIST, "docs-search.json");
@@ -446,7 +466,8 @@ for (const p of pages.values()) {
 for (const p of pages.values()) {
   if (p.redirectStub || p.noindex) continue;
   const body = p.html.slice(p.html.indexOf("<body"));
-  if (p.urlPath.startsWith("/docs/")) {
+  const base = basePathFor(p.urlPath);
+  if (base.startsWith("/docs/")) {
     const meta = (body.match(/<h1\b[^>]*>[\s\S]*?<\/h1>\s*<p class="explorer-page-meta">([\s\S]*?)<\/p>/) || [])[1];
     const modified = (p.html.match(/"dateModified":"([^"]+)"/) || [])[1];
     if (meta === undefined) err(`${p.urlPath}: no line under the document title`);
@@ -456,7 +477,7 @@ for (const p of pages.values()) {
       err(`${p.urlPath}: the line under the title does not give the day the page last changed (${modified})`);
     }
   }
-  if (LEGAL_PAGES.includes(p.urlPath)) {
+  if (LEGAL_PAGES.includes(base)) {
     const heading = decodeHtmlEntities((body.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/) || [])[1]?.replace(/<[^>]+>/g, "") || "").toLowerCase();
     const name = decodeHtmlEntities(p.title).replace(/\s+[—–|-]\s+UR\s*$/u, "").toLowerCase();
     if (!heading.includes(name)) err(`${p.urlPath}: titled "${name}", but its heading names "${heading}"`);
@@ -478,7 +499,14 @@ for (const p of pages.values()) {
     } catch {
       /* reported above */
     }
-    if (p.urlPath.startsWith("/docs/")) {
+    const base = basePathFor(p.urlPath);
+    // a page's own nodes are in its language (the site-wide WebSite lists them all)
+    for (const node of graph) {
+      if (typeof node.inLanguage === "string" && node.inLanguage !== p.lang) {
+        err(`${p.urlPath}: its ${node["@type"]} is inLanguage "${node.inLanguage}", the page "${p.lang}"`);
+      }
+    }
+    if (base.startsWith("/docs/")) {
       const article = graph.find((n) => n["@type"] === "TechArticle");
       if (!article) {
         err(`${p.urlPath}: no TechArticle`);
@@ -494,7 +522,7 @@ for (const p of pages.values()) {
       const imagePath = image ? toPath(image) : null;
       if (!imagePath || !resolves(imagePath)) err(`${p.urlPath}: TechArticle image ${image || "missing"} is not served`);
     }
-    if (/^\/investors\/[^/]+$/.test(p.urlPath) && !graph.some((n) => WORK_TYPES.has(n["@type"]) && DAY.test(n.datePublished || ""))) {
+    if (/^\/investors\/[^/]+$/.test(base) && !graph.some((n) => WORK_TYPES.has(n["@type"]) && DAY.test(n.datePublished || ""))) {
       err(`${p.urlPath}: investor document declares no dated CreativeWork`);
     }
   }
@@ -508,23 +536,25 @@ for (const p of pages.values()) {
 // are read from the chain in the browser: its HTML says so, with the reserve's
 // account and where to check it.
 {
-  const build = pages.get("/build");
-  if (build) {
+  const css = files.filter((f) => f.endsWith(".css")).map((f) => readFileSync(f, "utf8")).join("\n");
+  const englishBriefs = (pages.get("/build")?.html.match(/<section class="brief-panel"[^>]*>/g) || []).map((tag) => attr(tag, "id") || "");
+  for (const build of inEveryLanguage("/build")) {
     const panels = [...build.html.matchAll(/<section class="brief-panel"[^>]*>/g)].map((m) => m[0]);
-    if (!panels.length) err("/build: no opportunity briefs in the page");
+    if (!panels.length) err(`${build.urlPath}: no opportunity briefs in the page`);
     for (const tag of panels) {
       const id = attr(tag, "id") || "";
-      if (!/^brief-[a-z0-9-]+$/.test(id)) err(`/build: brief ${id || "(no id)"} has no #brief-<slug> address`);
-      if (!/\shidden(?:=""|[\s>])/.test(tag)) err(`/build: brief ${id} is not marked hidden in the static page`);
+      if (!/^brief-[a-z0-9-]+$/.test(id)) err(`${build.urlPath}: brief ${id || "(no id)"} has no #brief-<slug> address`);
+      if (!/\shidden(?:=""|[\s>])/.test(tag)) err(`${build.urlPath}: brief ${id} is not marked hidden in the static page`);
     }
-    const css = files.filter((f) => f.endsWith(".css")).map((f) => readFileSync(f, "utf8")).join("\n");
-    if (!/\.brief-panel:target\b/.test(css)) err("/build: no stylesheet rule shows a brief at its address (.brief-panel:target)");
+    // a translation keeps the briefs' addresses, so a #brief-<slug> link works in every language
+    const ids = panels.map((tag) => attr(tag, "id") || "");
+    if (ids.join(" ") !== englishBriefs.join(" ")) err(`${build.urlPath}: its briefs are ${ids.join(", ")}, the English page's ${englishBriefs.join(", ")}`);
+    if (!/\.brief-panel:target\b/.test(css)) err(`${build.urlPath}: no stylesheet rule shows a brief at its address (.brief-panel:target)`);
   }
-  const reservePage = pages.get("/reserve");
-  if (reservePage) {
+  for (const reservePage of inEveryLanguage("/reserve")) {
     const verify = (reservePage.html.match(/<p class="reserve-verify">([\s\S]*?)<\/p>/) || [])[1] || "";
     if (!verify.includes(reserve.address) || !verify.includes(`href="${reserve.explorerUrl}"`)) {
-      err("/reserve: the static page does not say where to verify its figures (the account and its explorer link)");
+      err(`${reservePage.urlPath}: the static page does not say where to verify its figures (the account and its explorer link)`);
     }
   }
 }
@@ -575,7 +605,8 @@ for (const p of pages.values()) {
     for (const island of islands(p.html)) {
       if (island.name === "NavIsland" && island.client === "load") err(`${p.urlPath}: the nav hydrates on load (client:idle keeps it off the critical path)`);
     }
-    if (p.urlPath !== "/docs" && !p.urlPath.startsWith("/docs/")) continue;
+    const docsBase = basePathFor(p.urlPath);
+    if (docsBase !== "/docs" && !docsBase.startsWith("/docs/")) continue;
     const onLoad = islands(p.html).filter((i) => i.client === "load").map((i) => i.name);
     if (onLoad.length) err(`${p.urlPath}: a docs page hydrates ${onLoad.join(", ")} on load`);
     const bytes = scriptBytes(p.html);

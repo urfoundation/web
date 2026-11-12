@@ -18,7 +18,7 @@ export default {
         eyebrow: 'SN25 · Bittensor-Mainnet',
         title: 'Zeitleiste des Mainnet-Starts',
         lede: 'Das Subnet von UR, SN25, ging am 8. Oktober 2026 im Bittensor-Mainnet live. Diese Zeitleiste verfolgt den Start nach Auszahlungsepochen, von den Verträgen der Version 1 bis zum ersten Claim unter Settlement v2.',
-        note: 'Meilensteine mit der Markierung {scheduled} oder {planned} stehen noch bevor, und ihre Termine können sich ändern. Alle Zeiten sind in UTC, und eine mit ≈ markierte Zeit ist ungefähr: Die meisten sind aus Blocknummern hochgerechnet.',
+        note: 'Meilensteine mit der Markierung {scheduled} oder {planned} stehen noch bevor, und ihre Termine können sich ändern. Alle Zeiten sind in UTC, und eine mit ≈ markierte Zeit ist ein Näherungswert: Die meisten sind aus Blocknummern hochgerechnet.',
     },
 
     settlement: {
@@ -35,14 +35,14 @@ export default {
     milestones: {
         eyebrow: 'Zeitleiste',
         title: 'Meilensteine',
-        fine: 'Die Zeit eines terminierten oder geplanten Meilensteins ist eine Hochrechnung, aus seiner Blocknummer bei 12 Sekunden pro Block oder aus dem Plan, und ist mit ≈ markiert, sofern sie nicht auf eine genaue Zeit festgelegt wurde. Eine hochgerechnete Zeit verschiebt sich etwas, wenn Blöcke schneller oder langsamer laufen. Ab Epoche 1 wird jede Epoche innerhalb von 120 Blöcken nach ihrem Ende abgeschlossen, ihr Auszahlungs-Root ist innerhalb von 1,200 Blöcken nach ihrem Ende fällig, und ihre Claims öffnen 14,400 Blöcke (etwa zwei Tage) danach. Terminierte und geplante Meilensteine können sich ändern.',
+        fine: 'Die Zeit eines angesetzten oder geplanten Meilensteins ist eine Hochrechnung, aus seiner Blocknummer bei 12 Sekunden pro Block oder aus dem Plan, und ist mit ≈ markiert, sofern sie nicht auf eine genaue Zeit festgelegt wurde. Eine hochgerechnete Zeit verschiebt sich etwas, wenn Blöcke schneller oder langsamer laufen. Ab Epoche 1 wird jede Epoche innerhalb von 120 Blöcken nach ihrem Ende abgeschlossen, ihr Auszahlungs-Root ist innerhalb von 1,200 Blöcken nach ihrem Ende fällig, und ihre Claims öffnen 14,400 Blöcke (etwa zwei Tage) danach. Angesetzte und geplante Meilensteine können sich ändern.',
         updated: 'Aktualisiert am {date}.',
     },
 
     noticeDate: 'Mitteilung · {date}',
 
     labels: {
-        status: { done: 'Erledigt', in_progress: 'Läuft', scheduled: 'Terminiert', planned: 'Geplant' },
+        status: { done: 'Erledigt', in_progress: 'Läuft', scheduled: 'Angesetzt', planned: 'Geplant' },
         settlement: { v1: 'Version 1', v2: 'Settlement v2' },
         view: { transaction: 'Transaktion ansehen', contract: 'Vertrag ansehen', block: 'Block ansehen' },
         sourceAria: '{action}: {label}',
@@ -85,7 +85,7 @@ export default {
         bandsAria: 'Bänder',
         markersAria: 'Markierungen',
         either: '{first} oder {second}',
-        lower: { done: 'erledigt', in_progress: 'läuft', scheduled: 'terminiert', planned: 'geplant' },
+        lower: { done: 'erledigt', in_progress: 'läuft', scheduled: 'angesetzt', planned: 'geplant' },
         legendSpan: '{title}, {days}',
         datesAria: 'Wichtige Termine',
     },

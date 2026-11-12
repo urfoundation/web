@@ -93,7 +93,7 @@ export default {
         },
         'settlement-v2-release-checks': {
             title: 'Release von Settlement v2 bis zum 16. Oktober nicht fertig',
-            detail: 'Das Release von Settlement v2 hatte bis zum Morgen des 16. Oktober seine abschließenden Prüfungen nicht bestanden, daher hielten die danach geplanten Rollout-Termine nicht. Das Release ging vom 22. bis 25. Oktober hinaus, zu spät für Epoche 3.',
+            detail: 'Das Release von Settlement v2 hatte bis zum Morgen des 16. Oktober seine abschließenden Prüfungen nicht bestanden, daher konnten die danach geplanten Rollout-Termine nicht gehalten werden. Das Release wurde vom 22. bis 25. Oktober ausgerollt, zu spät für Epoche 3.',
             sources: [],
         },
         'epoch-1-closes': {
@@ -235,15 +235,15 @@ export default {
             ],
         },
         'fp2-modern-provider-gate': {
-            title: 'Sperre für moderne Provider aufgegeben: Moderne Provider werden zuerst ausgewählt',
-            detail: 'Die Sperre, die nur als modern verifizierte Provider zu „Qualität“ und „Geschwindigkeit“ zugelassen hätte, wurde nie eingeschaltet: Am 28. Oktober ersetzte der Subnet-Eigentümer sie durch Priorität. Innerhalb jeder Stufe werden als modern verifizierte Provider zuerst ausgewählt, und andere Provider füllen den Rest auf, sodass diese ihre Zugehörigkeit zu „Qualität“ und „Geschwindigkeit“ behalten. Die Priorität erreichte die Dienste des Netzbetreibers am selben Abend, von 22:37 bis 23:20 UTC.',
+            title: 'Beschränkung auf moderne Provider aufgegeben: Moderne Provider werden zuerst ausgewählt',
+            detail: 'Die Beschränkung, die nur als modern verifizierte Provider zu „Qualität“ und „Geschwindigkeit“ zugelassen hätte, wurde nicht eingeschaltet: Am 28. Oktober ersetzte der Subnet-Eigentümer sie durch Priorität. Innerhalb jeder Stufe werden als modern verifizierte Provider zuerst ausgewählt, und andere Provider füllen den Rest auf, sodass diese ihre Zugehörigkeit zu „Qualität“ und „Geschwindigkeit“ behalten. Die Priorität erreichte die Dienste des Netzbetreibers am selben Abend, von 22:37 bis 23:20 UTC.',
             sources: [],
         },
         'intra-traffic-billing-planned': {
             title: 'Verkehr im selben Netzwerk und im Modus „Freunde und Familie“ geht jetzt vom Datenguthaben ab',
             detail: 'Verkehr zwischen Geräten eines Netzwerks und Verkehr zu einem Provider im Modus „Freunde und Familie“ gehen jetzt, wie anderer Verkehr, vom Datenguthaben des sendenden Netzwerks ab, im kostenlosen wie im bezahlten Tarif. Die Abrechnungsänderung, am 10. November vom Subnet-Eigentümer freigegeben, erreichte die Dienste des Netzbetreibers ab 05:43 UTC schrittweise, und alle bis 11:39 UTC. Provider im Modus „Freunde und Familie“ erhalten dafür wie bisher eine Gutschrift: Bezahlter und kostenloser Verkehr zählen gleich. Verträge, die vor der Änderung eröffnet wurden, werden nicht belastet.',
             sources: [
-                'Die Änderung, WHITEPAPER.md §8.6.7',
+                'Das Amendment, WHITEPAPER.md §8.6.7',
             ],
         },
         'pro-grant-per-cycle': {
@@ -256,7 +256,7 @@ export default {
         },
         'extender-relay-share': {
             title: 'Extender erhalten ihren Anteil nur bei Verträgen, die sie weiterleiten können',
-            detail: 'Ab dem Server-Release des Netzbetreibers vom 12. November ist ein Extender nur dann einer der Hops eines Vertrags und erhält seinen Anteil an dessen Nutzung, wenn er den Vertrag weitergeleitet haben kann, wie der Subnet-Eigentümer am 11. November entschieden hat. Eine Verbindung zählt als weitergeleitet, wenn sie von der Adresse eines Extenders kommt, und drei Arten kommen von dieser Adresse, ohne weitergeleitet zu sein: die eigene Verbindung des Extender-Hosts, andere Geräte aus dem eigenen Netzwerk des Extenders, die seine Adresse teilen, und Provider anderer Netzwerke, die sie teilen, während sie öffentlich bereitstellen, und sich immer direkt mit der Plattform verbinden. Diese machen den Extender nicht mehr zu einem Hop, sodass ihren Providern die gesamte Nutzung ihrer Verträge angerechnet wird, wo bisher einem Extender ein Anteil davon angerechnet wurde. Eine Verbindung von einer anderen Adresse aus dem IPv6-/64 eines Extenders, von der Hosts üblicherweise senden, zählt jetzt als von ihm weitergeleitet. Verträge, die vor dem Release erstellt wurden, behalten ihre Hops, und SN25-Pool-Belohnungen werden weiterhin nach abgeschlossener Nutzung aufgeteilt.',
+            detail: 'Ab dem Server-Release des Netzbetreibers vom 12. November ist ein Extender nur dann einer der Hops eines Vertrags und erhält seinen Anteil an dessen Nutzung, wenn er den Vertrag weitergeleitet haben kann, wie der Subnet-Eigentümer am 11. November entschieden hat. Eine Verbindung zählt als weitergeleitet, wenn sie von der Adresse eines Extenders kommt, und drei Arten kommen von dieser Adresse, ohne weitergeleitet zu sein: die eigene Verbindung des Extender-Hosts, andere Geräte aus dem eigenen Netzwerk des Extenders, die seine Adresse teilen, und Provider anderer Netzwerke, die diese Adresse teilen, während sie öffentlich als Provider aktiv sind; solche Provider verbinden sich immer direkt mit der Plattform. Diese machen den Extender nicht mehr zu einem Hop, sodass ihren Providern die gesamte Nutzung ihrer Verträge angerechnet wird, während bisher einem Extender ein Anteil davon angerechnet wurde. Eine Verbindung von einer anderen Adresse aus dem IPv6-/64 eines Extenders, von der Hosts üblicherweise senden, zählt jetzt als von ihm weitergeleitet. Verträge, die vor dem Release erstellt wurden, behalten ihre Hops, und SN25-Pool-Belohnungen werden weiterhin nach abgeschlossener Nutzung aufgeteilt.',
             sources: [
                 'Die vollständige Mitteilung im sn-Repo',
             ],
@@ -270,12 +270,12 @@ export default {
         },
         'capture-the-flag-presence-sampling': {
             title: 'Capture the Flag: Präsenzmessung spätestens zum Ende von Epoche 6',
-            detail: 'Bevor Epoche 6 mit Block 9,549,628 endet, beginnen die Server des Netzbetreibers, jeden Provider und Extender jede Viertelstunde zu erfassen: ob er online ist und die Prüfungen des Betreibers besteht, und in welchem Land er ist. Epoche 7 läuft dann vollständig als Schattenepoche: Nach ihrem Ende erstellt der Betreiber seine Teilnehmerliste, die Auslosung und die Auszahlungen aus den echten Messungen, ohne sie festzuschreiben, und veröffentlicht einen unsignierten Bericht, auf dem die Prüfungen des Validators laufen. Capture the Flag startet nur dann mit Epoche 8, wenn die Messung läuft, sobald Epoche 8 beginnt.',
+            detail: 'Bevor Epoche 6 mit Block 9,549,628 endet, beginnen die Server des Netzbetreibers, jeden Provider und Extender jede Viertelstunde zu erfassen: ob er online ist und die Prüfungen des Betreibers besteht, und in welchem Land er ist. Epoche 7 läuft dann vollständig als Schattenepoche: Nach ihrem Ende erstellt der Betreiber seine Teilnehmerliste, die Auslosung und die Auszahlungen aus den echten Messungen, ohne sie festzuschreiben, und veröffentlicht einen unsignierten Bericht, auf dem die Prüfungen des Validators laufen. Capture the Flag startet nur dann mit Epoche 8, wenn die Messung beim Start von Epoche 8 läuft.',
             sources: [],
         },
         'demand-deposits-priced': {
             title: 'Signierter Preis geht live: Nachfrage-Einlagen ab Epoche 7',
-            detail: 'Ab Block 9,549,628 zahlt der Netzbetreiber 0.010437 α pro GiB und 0.005218 α pro aktivem Nutzer von Epoche 6 ein, begrenzt auf 3,000 α pro Epoche, wie vom Subnet-Eigentümer in price.yml signiert (veröffentlicht am 3. November). Validatoren prüfen die Einlage jeder Epoche bei jedem Steuerungsdurchlauf dagegen, mit dem Validator-Release, das vor Epoche 7 erscheint. Solange die Einlage nicht dem entspricht, was die Nutzung der vorigen Epoche schuldet, erhält der Pool des Betreibers kein Gewicht.',
+            detail: 'Ab Block 9,549,628 zahlt der Netzbetreiber 0.010437 α pro GiB und 0.005218 α pro aktivem Nutzer von Epoche 6 ein, begrenzt auf 3,000 α pro Epoche, wie vom Subnet-Eigentümer in price.yml signiert (veröffentlicht am 3. November). Validatoren prüfen die Einlage jeder Epoche bei jedem Steuerungsdurchlauf anhand dieses Preises, mit dem Validator-Release, das vor Epoche 7 erscheint. Solange die Einlage nicht dem entspricht, was die Nutzung der vorigen Epoche schuldet, erhält der Pool des Betreibers kein Gewicht.',
             sources: [
                 'price.yml',
                 'Der signierte Preis im sn-Repo',
@@ -298,14 +298,14 @@ export default {
             title: 'Extender-Pool für Verkehr innerhalb der Plattform und innerhalb eines Netzwerks, ab Epoche 8',
             detail: 'Ab Block 9,600,028, dem ersten von Epoche 8, zählt der Teil des Verkehrs jedes Vertrags, den kein Provider verdient, stattdessen für Extender. Das umfasst Verkehr zwischen einem Client und der Plattform des Netzbetreibers sowie Verkehr zwischen Geräten eines Netzwerks. Der Pool des Betreibers verteilt ihn gleichmäßig auf jeden /29-Adressblock (IPv4) oder /48-Adressblock (IPv6), der einen berechtigten Extender enthält, dann gleichmäßig auf die Extender darin, bis zur berechtigten Provider-Nutzung der Epoche, sodass Extender höchstens die Hälfte eines Pools verdienen. Ein Extender, über den ein Vertrag läuft, behält seinen eigenen Anteil daran als einer der Hops des Vertrags, wie der Subnet-Eigentümer am 11. November entschieden hat. Am 10. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
             sources: [
-                'Die Änderung, WHITEPAPER.md §8.6',
+                'Das Amendment, WHITEPAPER.md §8.6',
                 'Signierter Amendment-Eintrag',
                 'Erster Block von Epoche 8, 9,600,028',
             ],
         },
         'capture-the-flag-epoch-8': {
             title: 'Capture the Flag ab Epoche 8: zehn Slots in jedem Land',
-            detail: 'Ab Block 9,600,028, dem ersten von Epoche 8, hat jeder Netzbetreiber neben seinem Provider-Pool einen zweiten Pool, Capture the Flag, der für die Präsenz in einem Land zahlt. Jedes der 249 Länder nach ISO 3166-1 hat pro Epoche fünf Provider-Slots und fünf Extender-Slots, jeder so viel wert wie die neue Finanzierung des Pools für die Epoche, geteilt durch 2,490. Ein Provider oder Extender nimmt an der Auslosung seines Landes teil, wenn er mindestens die Hälfte der Epoche online war, die Prüfungen des Betreibers bestanden und sich in diesem Land befunden hat und an ihrem Ende aktiv ist. Der Betreiber schreibt die Teilnehmerliste on-chain fest, und eine danach veröffentlichte drand-Runde lost bis zu fünf Gewinner pro Land und Rolle aus. Ein Slot ohne Gewinner wird in den Topf seines Landes übertragen, und jeder Gewinner erhält seinen eigenen Slot und ein Fünftel dieses Topfes. Der Provider-Pool erhält 9/10 des Anteils der Provider statt des gesamten Anteils, 1,076.26 α statt 1,195.84 α im Maßstab von Epoche 4, und 4/10, sobald Top-Level-Flotten gewichtet werden. Der Validator von UR, der die Stake-Mehrheit hält, gewichtet den Pool ab dem ersten Tempo von Epoche 8. Am 11. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
+            detail: 'Ab Block 9,600,028, dem ersten von Epoche 8, hat jeder Netzbetreiber neben seinem Provider-Pool einen zweiten Pool, Capture the Flag, der für die Präsenz in einem Land zahlt. Jedes der 249 Länder nach ISO 3166-1 hat pro Epoche fünf Provider-Slots und fünf Extender-Slots, jeder so viel wert wie die neue Finanzierung des Pools für die Epoche, geteilt durch 2,490. Ein Provider oder Extender nimmt an der Auslosung seines Landes teil, wenn er mindestens die Hälfte der Epoche lang online war, dabei die Prüfungen des Betreibers bestand und sich in diesem Land befand, und an ihrem Ende aktiv ist. Der Betreiber schreibt die Teilnehmerliste on-chain fest, und eine danach veröffentlichte drand-Runde lost bis zu fünf Gewinner pro Land und Rolle aus. Ein Slot ohne Gewinner wird in den Topf seines Landes übertragen, und jeder Gewinner erhält seinen eigenen Slot und ein Fünftel dieses Topfes. Der Provider-Pool erhält 9/10 des Anteils der Provider statt des gesamten Anteils, 1,076.26 α statt 1,195.84 α im Maßstab von Epoche 4, und 4/10, sobald Top-Level-Flotten gewichtet werden. Der Validator von UR, der die Stake-Mehrheit hält, gewichtet den Pool ab dem ersten Tempo von Epoche 8. Am 11. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
             sources: [
                 'Das Design, CAPTURETHEFLAG.md',
                 'Die vollständige Mitteilung im sn-Repo',
@@ -323,7 +323,7 @@ export default {
         },
         'capture-the-flag-first-claims': {
             title: 'Erste Claims von Capture the Flag',
-            detail: 'Die Claims von Capture the Flag für Epoche 8 öffnen, sobald der Validator ihren Root freigegeben hat und die Anfechtungsfrist von 14,400 Blöcken vergangen ist, etwa zur selben Zeit wie die Pool-Claims von Epoche 8. Das Validator-Release, das Roots von Capture the Flag prüft und freigibt, ist bis etwa zum 1. Dezember fällig, und die Freigabe bis zum Ende von Epoche 9, etwa am 11. Dezember, 18:25 UTC. Gewinner werden an die Auszahlungs-Wallet ausgezahlt, die der Provider-Pool bereits nutzt, und lösen im selben Einlöse-Ablauf ein. Bis zu den App-Releases, die es benennen, zeigt eine App ein Konto von Capture the Flag als „Pool 4294967297“ an und löst es wie jeden Pool ein.',
+            detail: 'Die Claims von Capture the Flag für Epoche 8 öffnen, sobald der Validator ihren Root freigegeben hat und die Anfechtungsfrist von 14,400 Blöcken vergangen ist, etwa zur selben Zeit wie die Pool-Claims von Epoche 8. Das Validator-Release, das Roots von Capture the Flag prüft und freigibt, ist bis etwa zum 1. Dezember fällig, und die Freigabe bis zum Ende von Epoche 9, etwa am 11. Dezember, 18:25 UTC. Gewinner erhalten ihre Auszahlung auf die Auszahlungs-Wallet, die der Provider-Pool bereits nutzt, und lösen im selben Einlöse-Ablauf ein. Bis zu den App-Releases, die Capture the Flag beim Namen nennen, zeigt eine App ein Konto von Capture the Flag als „Pool 4294967297“ an und löst es wie jeden Pool ein.',
             sources: [
                 'Erste Claims von Capture the Flag',
             ],

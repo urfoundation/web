@@ -15,11 +15,11 @@ export default {
     ],
     brien: {
         heading: 'Brien Colwell, colaborador principal, declaró:',
-        quote: '«Llevamos años construyendo UR porque el modelo actual no funciona. Bittensor es una pieza fundamental que nos ayuda a hacer realidad nuestra visión, con los mineros y la comunidad impulsando nuestra materia prima. La red es para que cualquiera pueda ejecutar un minero, convertirse en operador y traer sus productos para usarla. Con la transferencia oficial de la titularidad de SN25 y el bloqueo en convicción perpetua, queremos mostrar a la comunidad que hemos invertido junto a ella y que estamos alineados con el crecimiento y el éxito a largo plazo de la subred.»',
+        quote: '«Llevamos años construyendo UR porque el modelo actual no funciona. Bittensor es una pieza fundamental que nos ayuda a hacer realidad nuestra visión, con los mineros y la comunidad impulsando nuestra materia prima. La red es para que cualquiera pueda ejecutar un minero, convertirse en operador y traer sus productos para usarla. Con la transferencia oficial de la titularidad de SN25 y el bloqueo en convicción perpetua, queremos mostrar a la comunidad que hemos invertido junto a ella y que estamos alineados con el crecimiento y el éxito a largo plazo de la subred».',
     },
     keith: {
         heading: 'Keith Singery, asesor, declaró:',
-        quote: '«Me enorgullece dar la bienvenida a UR a Bittensor y contar con un equipo que trabaja en cifrado y en un internet privado usando Bittensor. Desde 2022 me he dedicado a apoyar la misión del código abierto a través de Bittensor y, desde que conocí a Brien y a Jack, este es un equipo con el que compartimos una visión clara y alineada del futuro. Me alegra que se alineen con todos los titulares de tokens al emprender este camino.»',
+        quote: '«Me enorgullece dar la bienvenida a UR a Bittensor y contar con un equipo que trabaja en cifrado y en un internet privado usando Bittensor. Desde 2022 me he dedicado a apoyar la misión del código abierto a través de Bittensor y, desde que conocí a Brien y a Jack, este es un equipo con el que compartimos una visión clara y alineada del futuro. Me alegra que se alineen con todos los titulares de tokens al emprender este camino».',
     },
     aboutHeading: 'Acerca de UR (SN25)',
     about: [

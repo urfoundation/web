@@ -31,10 +31,10 @@ export default {
     },
     steffen: {
         heading: 'Steffen Cruz, CTO de Macrocosmos, declaró:',
-        quote: '«Apex se creó exactamente para esto. Un problema definido, un resultado objetivo real y un espacio de búsqueda demasiado grande para que un solo equipo lo cubra por sí mismo. UR (SN25) está poniendo la capa de enrutamiento de una red que ya transporta un tráfico de producción considerable ante toda la comunidad, por lo que esperamos que los resultados puedan medirse en manos de usuarios reales y no solo en una clasificación.»',
+        quote: '«Apex se creó exactamente para esto. Un problema definido, un resultado objetivo real y un espacio de búsqueda demasiado grande para que un solo equipo lo cubra por sí mismo. UR (SN25) está poniendo la capa de enrutamiento de una red que ya transporta un tráfico de producción considerable ante toda la comunidad, por lo que esperamos que los resultados puedan medirse en manos de usuarios reales y no solo en una clasificación».',
     },
     brien: {
         heading: 'Brien Colwell, colaborador principal de UR (SN25), declaró:',
-        quote: '«Hemos publicado todos los algoritmos de esta red desde el principio, incluidas las partes que están desactivadas y los motivos por los que lo están. Abrir el problema de enrutamiento a Apex es el siguiente paso lógico, porque quienes están en mejor posición para mejorar un algoritmo de emparejamiento no son necesariamente quienes lo escribieron. Todo lo que supere el benchmark pasa a producción, y 100.000 mineros y cada usuario que hay detrás de ellos notan la diferencia.»',
+        quote: '«Hemos publicado todos los algoritmos de esta red desde el principio, incluidas las partes que están desactivadas y los motivos por los que lo están. Abrir el problema de enrutamiento a Apex es el siguiente paso lógico, porque quienes están en mejor posición para mejorar un algoritmo de emparejamiento no son necesariamente quienes lo escribieron. Todo lo que supere el benchmark pasa a producción, y 100.000 mineros y cada usuario que hay detrás de ellos notan la diferencia».',
     },
 };

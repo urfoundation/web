@@ -428,9 +428,10 @@ http {
             return 301 /docs$docpath;
         }
 
-        # The about, build, investor, mainnet, price and reserve pages are
-        # English-only too: their localized paths 301 to the page.
-        location ~ ^/(?:ru|ar|zh|de|es)/(?<en_page>about|build|investors|mainnet|price|reserve)(?<en_rest>/.*)?$ {
+        # The about, build, capture the flag (/ctf and its country pages),
+        # investor, mainnet, price and reserve pages are English-only too:
+        # their localized paths 301 to the page.
+        location ~ ^/(?:ru|ar|zh|de|es)/(?<en_page>about|build|ctf|investors|mainnet|price|reserve)(?<en_rest>/.*)?$ {
             return 301 /$en_page$en_rest$is_args$args;
         }
 
@@ -530,6 +531,23 @@ http {
         # copy, and the short lifetime keeps a cached copy at most five minutes
         # behind a new signed entry. Only the file itself is served.
         location = /price.yml {
+            types { text/plain yml; }
+            autoindex off;
+            try_files $uri =404;
+            add_header 'Cache-Control' 'public, max-age=300';
+            add_header 'X-Robots-Tag' $ur_preview_robots always;
+            add_header 'Access-Control-Allow-Origin' $public_cors_origin always;
+        }
+
+        # The signed settlement amendments: the tracked copy of sn/amendments.yml
+        # that ur.xyz/scripts/sync-amendments.mjs publishes. The price sheet's key
+        # signs its entries, and it is served as the price sheet is: as text/plain,
+        # so people read the lines the owner signed, with the same five-minute
+        # lifetime. The server, the validator and snclaim read it beside the price
+        # sheet, ask for application/yaml or text/plain, never check the type, and
+        # keep their last verified copy. An entry has to reach them before its
+        # first epoch starts. Only the file itself is served.
+        location = /amendments.yml {
             types { text/plain yml; }
             autoindex off;
             try_files $uri =404;

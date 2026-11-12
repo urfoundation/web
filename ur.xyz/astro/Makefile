@@ -85,6 +85,7 @@ gates: install-playwright-browser
 	node --test ../react/tests/reserve-multisig.test.mjs
 	node --test ../react/tests/mainnet-timeline.test.mjs
 	node --test ../react/tests/mainnet-summary.test.mjs
+	node --test ../react/tests/ctf.test.mjs
 	node --test ../react/tests/research-report.test.mjs
 	node --test ../react/tests/research-methodology.test.mjs
 	node --test ../react/tests/research-competition.test.mjs
@@ -96,6 +97,8 @@ gates: install-playwright-browser
 	node --test ../react/tests/price.test.mjs
 	node --test ../scripts/price-gate.test.mjs
 	node ../scripts/sync-price.mjs --check
+	node --test ../scripts/amendments-gate.test.mjs
+	node ../scripts/sync-amendments.mjs --check
 	node ../react/tests/visual-parity.mjs
 	node ../react/tests/network-privacy.mjs
 	node ../react/tests/static-affordances.mjs

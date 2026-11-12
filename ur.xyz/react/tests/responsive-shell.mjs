@@ -18,7 +18,8 @@ const ROOT = path.join(ASTRO_DIR, 'build', UR_ENV);
 // /docs/operator: the guide with the longest code lines and two tables of
 // code; /docs/miner: a directory tree. Their code wraps and their tables stack,
 // so neither a code block nor a table scrolls sideways at any width.
-const ROUTES = ['/build', '/about', '/investors', '/reserve', '/mainnet', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner'];
+// /ctf: the 249-country grid; /ctf/vc and /ctf/gs: the longest country names.
+const ROUTES = ['/build', '/about', '/investors', '/reserve', '/mainnet', '/ctf', '/ctf/ke', '/ctf/vc', '/ctf/gs', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner'];
 const PROFILES = [
   { name: 'desktop', width: 1280, height: 900 },
   { name: 'desktop-edge', width: 1080, height: 800 },
@@ -29,7 +30,9 @@ const PROFILES = [
   { name: 'phone-landscape', width: 844, height: 390 },
 ];
 const PRIMARY_ORDER = ['research', 'build', 'investors', 'about', 'docs'];
-const MOBILE_ORDER = ['operators', 'miners', 'validators', 'dashboard', ...PRIMARY_ORDER];
+const MOBILE_ORDER = ['operators', 'miners', 'validators', 'dashboard', 'capture the flag', ...PRIMARY_ORDER];
+// a page whose nav link reads otherwise than its path
+const NAV_NAME = { '/ctf': 'capture the flag' };
 const LANGUAGE_ORDER = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
 
 function freePort() {
@@ -203,7 +206,7 @@ async function auditPage(browser, base, route, profile) {
     assert(!(await visible(mobileNav)), `${route} mobile navigation remains visible after Escape`);
   }
 
-  const activeRoute = route === '/' ? null : route.slice(1);
+  const activeRoute = route === '/' ? null : NAV_NAME[route] || route.slice(1);
   if (activeRoute && MOBILE_ORDER.includes(activeRoute)) {
     const active = page.locator(`a[href="${route}"][aria-current="page"]`);
     assert(await active.count() > 0, `${route} has no aria-current=page navigation link`);

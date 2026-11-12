@@ -36,7 +36,7 @@ Changing the operator doesn't move a device that's already registered to the new
 
 ### With an installer
 
-The [installers](https://ur.xyz/docs/miner/install#the-installers) already run the miner in the background: a systemd user service on Linux, a launchd agent on macOS and Startup shortcuts on Windows. Manage it with `urnet-tools`:
+The [installers](https://ur.xyz/docs/miner/install#the-installers) already run the miner in the background: a systemd user service on Linux (or, installed with `--system`, a [system service that runs as you](https://ur.xyz/docs/miner/extender#with-the-linux-installer)), a launchd agent on macOS and Startup shortcuts on Windows. Manage it with `urnet-tools`:
 
 ```bash
 urnet-tools start          # start it (no error if it's already running)
@@ -79,7 +79,7 @@ provider service stop
 provider service uninstall       # your sign-in and identity are kept
 ```
 
-On a server, or to mine for every user of the computer on Linux or macOS, use a system-wide service run as root, with its state in `/var/lib/urnetwork`: `sudo provider setup --system`, or `sudo provider service install --system`. Add `--system` to the other `provider service` commands to manage it. Windows has no system-wide service. For many machines, `provider setup --yes --auth-code-file=<path>` sets up without any questions; it skips the payout step, so [set the payout wallet](https://ur.xyz/docs/miner/rewards#set-your-payout-wallet) afterwards.
+On a server, or to mine for every user of the computer on Linux or macOS, use a system-wide service run as root, with its state in `/var/lib/urnetwork`: `sudo provider setup --system`, or `sudo provider service install --system`. Add `--system` to the other `provider service` commands to manage it. Windows has no system-wide service. On Linux, a user service can't listen on TCP port 443 for the miner's extender; `sudo "$(command -v provider)" service install --system --as="$USER"` runs it as a system service that stays your user and may listen on that port. See [Let the miner listen on port 443](https://ur.xyz/docs/miner/extender#linux-let-the-miner-listen-on-port-443). For many machines, `provider setup --yes --auth-code-file=<path>` sets up without any questions; it skips the payout step, so [set the payout wallet](https://ur.xyz/docs/miner/rewards#set-your-payout-wallet) afterwards.
 
 On Linux and Windows, `provider service install` won't add a second miner beside an installer's. On macOS it can't see the installer's agent, so if you used the macOS installer, keep using `urnet-tools` and don't install a second service.
 

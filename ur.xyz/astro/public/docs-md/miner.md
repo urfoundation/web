@@ -9,6 +9,7 @@ This page gets you from nothing to a running miner. The rest of the miner guide 
 | --- | --- |
 | [Install](https://ur.xyz/docs/miner/install) | The installers for Linux, macOS and Windows, a manual download, and building from source. |
 | [Run and monitor](https://ur.xyz/docs/miner/run) | Starting and stopping, running in the background, logs and the status page, backups. |
+| [Run an extender](https://ur.xyz/docs/miner/extender) | The ports to open for the miner's extender, firewalls and port forwarding, and letting it listen on port 443 on Linux. |
 | [Updates](https://ur.xyz/docs/miner/updates) | How the miner stays up to date, and how to control that. |
 | [Get paid](https://ur.xyz/docs/miner/rewards) | Setting your payout wallet, how rewards are counted, and claiming them. |
 | [Troubleshooting](https://ur.xyz/docs/miner/troubleshooting) | The common errors and what to do about each one. |
@@ -34,7 +35,8 @@ Most miners join an operator's **pool**. You don't need your own Bittensor regis
 ## What you need
 
 - **A Linux, macOS or Windows computer that stays online.** A home PC, a server or a Raspberry Pi 2 or newer all work. On Windows the miner runs while you're signed in.
-- **One stable public internet address per miner.** The miner also tries to listen on TCP port 443 and on UDP ports 443, 53 and 4053 for its extender. To run more than one exit from a host, see [Several exits on one host](https://ur.xyz/docs/miner/advanced#several-exits-on-one-host).
+- **One stable public internet address per miner.** To run more than one exit from a host, see [Several exits on one host](https://ur.xyz/docs/miner/advanced#several-exits-on-one-host).
+- **Open ports for the extender.** The miner also runs an extender, which earns a share of every contract it carries. It needs incoming TCP port 443; UDP ports 443 and 4053 are recommended, and UDP 53 is optional. On Linux it also needs permission to listen on port 443. See [Run an extender](https://ur.xyz/docs/miner/extender).
 - **An account with a network operator.** The miner uses the default operator, `bringyour.com`, unless you [choose another](https://ur.xyz/docs/miner/run#choose-an-operator). You'll get an **auth code** from your account to sign the miner in.
 - **A Bittensor wallet address (coldkey)** for your rewards. It's an ss58 address that starts with `5`. You can sign for it on another device; its secret never needs to be on the miner.
 

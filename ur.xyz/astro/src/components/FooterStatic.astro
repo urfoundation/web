@@ -40,11 +40,12 @@ function path(name: string, slug: string | null = null) {
             <a href={path('operators')}>{t.nav.operators}</a>
             <a href={path('miners')}>{t.nav.miners}</a>
             <a href={path('validators')}>{t.nav.validators}</a>
-            {/* the dashboard, the Network Capacity Reserve and the mainnet launch
-                timeline are English-only, like /about */}
+            {/* the dashboard, the Network Capacity Reserve, the mainnet launch
+                timeline and capture the flag are English-only, like /about */}
             {lang === 'en' && <a href="/dashboard">Dashboard</a>}
             {lang === 'en' && <a href="/reserve">Reserve</a>}
             {lang === 'en' && <a href="/mainnet">Mainnet</a>}
+            {lang === 'en' && <a href="/ctf">Capture the flag</a>}
         </nav>
 
         <nav class="footer-column" aria-label={t.footer.resources}>

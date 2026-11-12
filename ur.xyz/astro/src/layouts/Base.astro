@@ -16,10 +16,12 @@ interface Props {
     // "website" (default) or "article"; article pages also pass `article`
     ogType?: string;
     article?: { publishedTime?: string; author?: string } | null;
-    // per-page social card override (/path), with dimensions when known
+    // per-page social card override (/path), with dimensions when known, and
+    // its alt text when the description does not say what the card shows
     ogImage?: string | null;
     ogImageWidth?: number;
     ogImageHeight?: number;
+    ogImageAlt?: string | null;
     // the page's name in the breadcrumb trail (default: the title without the
     // site suffix)
     breadcrumbName?: string | null;
@@ -38,6 +40,7 @@ const {
     ogImage: ogImageProp = null,
     ogImageWidth = 1200,
     ogImageHeight = 630,
+    ogImageAlt = null,
     breadcrumbName = null,
 } = Astro.props;
 
@@ -49,7 +52,7 @@ const publicPath = publicPathFor(Astro.url.pathname);
 const canonical = new URL(publicPath, SITE_ORIGIN).href;
 // scripts/generate-og.mjs renders the 1200×630 card; pages can override
 const ogImage = `${SITE_ORIGIN}${ogImageProp || '/og.png'}`;
-const ogAlt = `UR: ${description.length <= 120 ? description : title}`;
+const ogAlt = ogImageAlt || `UR: ${description.length <= 120 ? description : title}`;
 const alternateHref = alternate && (alternate.href.startsWith('http') ? alternate.href : `${SITE_ORIGIN}${alternate.href}`);
 
 const OG_LOCALES = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_ES' };
@@ -76,13 +79,15 @@ const ORG_ID = `${SITE_ORIGIN}/#org`;
 const X_HANDLE = 'urnetwork';
 
 // Breadcrumbs follow the URL: the home page of the page's language, the
-// section a page sits in (Docs, the Investor Centre, Research), then the page itself,
-// named without the site suffix (" — UR", " | UR", " — UR Docs").
+// section a page sits in (Docs, the Investor Centre, Research, Capture the
+// flag), then the page itself, named without the site suffix (" — UR",
+// " | UR", " — UR Docs").
 const homeUrl = lang && lang !== 'en' ? new URL(`/${lang}`, SITE_ORIGIN).href : `${SITE_ORIGIN}/`;
 const PARENTS = [
     { prefix: '/docs/', name: 'Docs', path: '/docs' },
     { prefix: '/investors/', name: 'Investor Centre', path: '/investors' },
     { prefix: '/research/', name: 'Research', path: '/research' },
+    { prefix: '/ctf/', name: 'Capture the flag', path: '/ctf' },
 ];
 const parent = PARENTS.find((p) => basePath.startsWith(p.prefix));
 const pageName = breadcrumbName || title.replace(/\s+[—–|-]\s+UR(?:\s+Docs)?\s*$/u, '');

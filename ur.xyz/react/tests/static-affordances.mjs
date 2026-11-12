@@ -12,6 +12,12 @@
 //                         script); the search box fetches /docs-search.json on
 //                         first use; the phone sidebar toggle and the code
 //                         blocks' Copy buttons work without React
+//   /ctf, /ctf/<cc>       every figure and every country's link in the HTML;
+//                         a control that needs the script (sorting, the
+//                         search, the picker; the tap to open a card is not
+//                         drawn at all) is disabled until it runs, and the
+//                         hydrated board finds a country, opens on the
+//                         visitor's (/sn/ctf/here) and lets a tap open a card
 //
 // Usage (from astro/, after a build):  node ../react/tests/static-affordances.mjs
 import { chromium } from 'playwright-core';
@@ -146,6 +152,42 @@ async function main() {
             const copied = await page.evaluate(() => navigator.clipboard.readText()).catch(() => null);
             const source = await block.locator('.md-pre > code').textContent();
             check(await block.locator('.md-codeblock-copy').getAttribute('data-state') === 'copied' && copied === source, '/docs/miner Copy puts the code block\'s text on the clipboard and says so');
+            await context.close();
+        }
+        {
+            // capture the flag: the grid is plain HTML, one link per country
+            const { page, close } = await open(browser, `${base}/ctf`, false);
+            const links = await page.$$eval('.ctf-grid .ctf-cname a', (els) => els.map((a) => a.getAttribute('href')));
+            check(links.length === 249 && links.every((h) => /^\/ctf\/[a-z]{2}$/.test(h)) && new Set(links).size === 249, '/ctf without JavaScript links all 249 country pages');
+            check(await page.locator('.ctf-cell-hit, .ctf-fc-hit').count() === 0, '/ctf without JavaScript draws no tap control that needs the script');
+            const inert = await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.map((el) => el.disabled));
+            check(inert.length >= 4 && inert.every(Boolean), '/ctf without JavaScript disables the sorting, the search and the picker, which need the script');
+            check(Boolean((await page.textContent('.ctf-live').catch(() => '')).trim()), '/ctf without JavaScript shows the live bar');
+            await close();
+        }
+        {
+            const { page, close } = await open(browser, `${base}/ctf/ke`, false);
+            check(/Earn crypto in Kenya/.test(await page.textContent('h1').catch(() => '')), '/ctf/ke without JavaScript leads with its plain-words heading');
+            check((await page.locator('.ctf-faq details').count()) === 6 && /Kenya/.test(await page.textContent('.ctf-intro').catch(() => '')), '/ctf/ke without JavaScript answers its questions with its own figures');
+            await close();
+        }
+        {
+            // hydrated: the visitor's country, the search and a card that opens on a tap
+            const context = await browser.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true });
+            const page = await context.newPage();
+            await page.route(/bringyour\.com/, (r) => r.fulfill({ json: r.request().url().includes('/sn/ctf/here') ? { country: 'ke' } : {} }).catch(() => r.abort()));
+            await page.goto(`${base}/ctf`, { waitUntil: 'networkidle' });
+            await page.waitForSelector('.ctf-cell-hit', { timeout: 8000 }).catch(() => {});
+            check(await page.textContent('.ctf-me-name').catch(() => '') === 'Kenya', '/ctf opens on the visitor\'s country from /sn/ctf/here');
+            check(await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.length >= 4 && els.every((el) => !el.disabled)), '/ctf, hydrated, enables its controls');
+            await page.fill('#ctf-q', 'nigeria');
+            await page.waitForTimeout(200);
+            check(JSON.stringify(await page.$$eval('.ctf-grid .ctf-cname a', (els) => els.map((a) => a.textContent))) === '["Nigeria"]', '/ctf finds a country by name');
+            await page.fill('#ctf-q', '');
+            const cell = page.locator('.ctf-grid .ctf-cell').first();
+            await cell.locator('.ctf-cell-hit').click().catch(() => {});
+            await page.waitForTimeout(1000);
+            check(await cell.evaluate((el) => el.classList.contains('ctf-expanded') && el.querySelector('.ctf-cell-more') !== null).catch(() => false), '/ctf on a tablet opens a country\'s card on a tap');
             await context.close();
         }
         {

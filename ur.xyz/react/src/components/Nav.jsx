@@ -125,9 +125,12 @@ function NetworkMenu({ code, route, t, mobile = false }) {
                         {t.nav[name]}
                     </a>
                 ))}
-                {/* the stats dashboard is English-only, like /reserve */}
+                {/* the stats dashboard and capture the flag are English-only, like /reserve */}
                 {code === 'en' && (
                     <a href="/dashboard" className={route.name === 'dashboard' ? 'is-active' : ''} aria-current={route.name === 'dashboard' ? 'page' : undefined}>Dashboard</a>
+                )}
+                {code === 'en' && (
+                    <a href="/ctf" className={route.name === 'ctf' ? 'is-active' : ''} aria-current={route.name === 'ctf' ? 'page' : undefined}>Capture the flag</a>
                 )}
             </div>
         </details>

@@ -7,11 +7,20 @@
 // Committed outputs (like the letter PDF): the build must not need a
 // Chromium. Re-run when the tagline or the letter title changes:
 //   node scripts/generate-og.mjs
+//
+// With --ctf it renders only the capture the flag pages' card instead, for
+// the epoch's snapshot (react/src/data/ctf-epoch.json): run it after each
+// import (scripts/ctf-import.mjs). The card is named for its epoch and words
+// (react/src/components/pages/ctf/og.js), written to react/public/ctf/og and
+// astro/public/ctf/og, and the cards of earlier snapshots are removed; the
+// seo-audit fails a build whose pages name a card that is not there.
 
 import path from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readdirSync, rmSync } from "node:fs";
 import { createRequire } from "node:module";
+import { buildModel } from "../react/src/components/pages/ctf/model.js";
+import { ctfCard, ctfOgImage } from "../react/src/components/pages/ctf/og.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -51,7 +60,20 @@ function cardHtml({ kicker, title, footer }) {
   </div></body>`;
 }
 
-const CARDS = [
+const CTF_DIRS = [path.join(ROOT, "react/public/ctf/og"), path.join(PUB, "ctf/og")];
+
+function ctfCards() {
+  const m = buildModel(JSON.parse(readFileSync(path.join(ROOT, "react/src/data/ctf-epoch.json"), "utf8")));
+  const name = path.basename(ctfOgImage(m));
+  for (const dir of CTF_DIRS) {
+    mkdirSync(dir, { recursive: true });
+    for (const old of readdirSync(dir)) if (old.endsWith(".png") && old !== name) rmSync(path.join(dir, old));
+  }
+  const html = cardHtml(ctfCard(m));
+  return CTF_DIRS.map((dir) => ({ out: path.join(dir, name), html }));
+}
+
+const CARDS = process.argv.includes("--ctf") ? ctfCards() : [
   {
     out: path.join(PUB, "og.png"),
     html: cardHtml({ kicker: "The UR protocol", title: "Own ur privacy. Own the network.", footer: "coordinated on Bittensor" }),

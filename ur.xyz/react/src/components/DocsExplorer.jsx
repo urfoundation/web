@@ -5,6 +5,7 @@ import Nav from './Nav';
 import Footer from './Footer';
 import { Markdown } from '../lib/markdown.jsx';
 import { docsIndex, findDoc } from '../lib/docs';
+import { DOCS_LANDING_NOTICE } from '../lib/docs-shared.js';
 import { buildPath, navigate, useRoute } from '../router';
 import { useLanguage } from '../i18n';
 
@@ -73,6 +74,9 @@ function DocsLanding({ code }) {
                     Every document is also served as markdown.
                 </p>
             </header>
+
+            {/* the notice above the guides, if any (docs-shared.js), as the static landing draws it */}
+            {DOCS_LANDING_NOTICE && <Markdown source={DOCS_LANDING_NOTICE} baseHref="/docs/" />}
 
             <div className="md">
                 {docsIndex.map(d => {

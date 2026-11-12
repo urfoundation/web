@@ -41,7 +41,7 @@ export default {
         titles: {
             terms: 'Nutzungsbedingungen',
             privacy: 'Datenschutzerklärung',
-            vdp: 'Offenlegung von Schwachstellen',
+            vdp: 'Richtlinie zur Offenlegung von Schwachstellen',
         },
         revised: 'Zuletzt überarbeitet: {date}',
         notice: 'Dies ist eine Übersetzung, die der Bequemlichkeit dient. Maßgeblich ist der englische Text: Weichen beide Fassungen voneinander ab, gilt die englische.',

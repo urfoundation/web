@@ -4,7 +4,7 @@ Zuletzt geändert: 8. Mai 2025
 
 ## Einleitung
 
-UR Foundation (**„Unternehmen“** oder **„Wir“**) respektiert Ihre Privatsphäre und verpflichtet sich, sie zu schützen, indem wir diese Richtlinie einhalten.
+UR Foundation (**„Unternehmen“** oder **„Wir“**) respektiert Ihre Privatsphäre und verpflichtet sich, sie durch die Einhaltung dieser Richtlinie zu schützen.
 
 Diese Richtlinie beschreibt die Arten von Informationen, die wir von Ihnen erheben können oder die Sie uns bereitstellen können, wenn Sie die Website ur.xyz (unsere „Produkte“) besuchen, sowie unsere Praktiken zur Erhebung, Nutzung, Aufbewahrung, zum Schutz und zur Offenlegung dieser Informationen.
 
@@ -55,7 +55,7 @@ Wir verwenden Informationen, die Sie uns bereitstellen:
 
 -   Um Ihnen Mitteilungen zu Ihrem Konto zu senden, einschließlich Mitteilungen über Ablauf und Verlängerung.
 
--   Um unsere Pflichten zu erfüllen und unsere Rechte aus Verträgen zwischen Ihnen und uns durchzusetzen, einschließlich Abrechnung und Inkasso.
+-   Um unsere Pflichten aus Verträgen zwischen Ihnen und uns zu erfüllen und unsere Rechte daraus durchzusetzen, einschließlich Abrechnung und Inkasso.
 
 -   Um Sie über Änderungen an unseren Produkten oder an Produkten oder Dienstleistungen zu informieren, die wir darüber anbieten oder bereitstellen.
 

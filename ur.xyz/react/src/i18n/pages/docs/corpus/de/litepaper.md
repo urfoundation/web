@@ -1,5 +1,5 @@
 ---
-title: "UR-Litepaper: Datenschutznetzwerk auf Bittensor"
+title: "UR-Litepaper: Datenschutznetzwerk, koordiniert auf Bittensor"
 description: "So funktioniert UR: ein dezentrales Datenschutznetzwerk auf Bittensor SN25 — Miner tragen verschlüsselten Verkehr, Validatoren messen ihn, Betreiber bringen die Nachfrage."
 ---
 # Ein Datenschutznetzwerk, koordiniert auf Bittensor
@@ -46,7 +46,7 @@ Ein einzelner Betreiber kann weit über 100.000 Miner bedienen, weit mehr als di
 
 Der Pool ist der Einstieg. Jeder Betreiber hält einen On-Chain-Slot für alle seine Miner; Validatoren gewichten diesen Pool nach der Nachfrage des Betreibers und seiner gemessenen Qualität, und jeder Miner beansprucht seinen Anteil mit einem kryptografischen Nachweis direkt vom Settlement-Vertrag. Es gibt keinen Slot zu gewinnen und nichts zu verbrennen. Hier fängt ein Miner an und verdient eine Grundbelohnung.
 
-Neben dem Pool hat jeder Betreiber auf derselben Stufe ab Epoche 8 auch einen Capture-the-Flag-Pool mit zehn Belohnungs-Slots in jedem Land: fünf für Provider und fünf für Extender. Die Miner des Betreibers nehmen mit der Registrierung des Pools daran teil und verbrennen nichts. In jeder Epoche füllt eine öffentliche Auslosung die Slots aus den Minern, die online waren, die Prüfungen des Betreibers bestanden, mindestens die Hälfte der Epoche im Land waren und an ihrem Ende aktiv sind; ein Slot, den niemand gewinnt, wird in den Topf dieses Landes für seine Rolle übertragen. Capture the Flag nimmt ein Zehntel des Anteils der Provider.
+Neben dem Pool hat jeder Betreiber auf derselben Stufe ab Epoche 8 auch einen Capture-the-Flag-Pool mit zehn Belohnungs-Slots in jedem Land: fünf für Provider und fünf für Extender. Die Miner des Betreibers nehmen mit der Registrierung des Pools daran teil und verbrennen nichts. In jeder Epoche füllt eine öffentliche Auslosung die Slots aus den Minern, die mindestens die Hälfte der Epoche lang online waren, die Prüfungen des Betreibers bestanden und sich im Land befanden, und die an ihrem Ende aktiv sind; ein Slot, den niemand gewinnt, wird in den Topf dieses Landes für seine Rolle übertragen. Capture the Flag nimmt ein Zehntel des Anteils der Provider.
 
 Top-Level-Miner sind die Spitze des Angebots. Die rund 200 größten Flotten, eingestuft danach, wie viele verschiedene, routbare Exit-IPs sie tatsächlich bedienen, und nicht nach Verkehrsvolumen, beanspruchen jeweils ihren eigenen On-Chain-Slot und werden direkt vom Netzwerk bezahlt, ohne Betreiber im Auszahlungsweg. Eine gemeinsam genutzte IP wird auf die Flotten aufgeteilt, die sie beanspruchen, sodass Breite nicht doppelt gezählt werden kann.
 

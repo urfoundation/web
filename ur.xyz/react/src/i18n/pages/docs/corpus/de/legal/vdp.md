@@ -18,7 +18,7 @@ Schwachstellen, die in nicht erfassten Systemen entdeckt oder vermutet werden, s
 
 Wenn Sie gemäß dieser Richtlinie mit uns zusammenarbeiten, können Sie erwarten, dass wir:
 
-- umgehend auf Ihre Meldung antworten und mit Ihnen zusammenarbeiten, um Ihre Meldung zu verstehen und zu bestätigen;
+- umgehend auf Ihre Meldung antworten und mit Ihnen zusammenarbeiten, um Ihre Meldung zu verstehen und zu überprüfen;
 - uns bemühen, Sie über den Fortschritt bei der Bearbeitung einer Schwachstelle auf dem Laufenden zu halten;
 - daran arbeiten, entdeckte Schwachstellen im Rahmen unserer betrieblichen Möglichkeiten zeitnah zu beheben; und
 - Ihrer Schwachstellenforschung im Zusammenhang mit dieser Richtlinie Safe Harbor (rechtlichen Schutz) gewähren.

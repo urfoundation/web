@@ -66,9 +66,9 @@ export const NOT_FOUND_PATH = '/404';
 // The visitor's explicit language choice, written by the language switcher.
 export const LANG_STORAGE_KEY = 'ur.xyz.lang';
 
-// The stored-language redirect's last target and when it went there
-// (sessionStorage, "<target> <ms>"), and how long a repeat of it counts as a
-// loop: the redirect makes the same one again only after this long.
+// The stored-language redirect's last target, when it went there, and whether
+// that was its retry past the cache (sessionStorage, "<target> <ms>[ 1]"); and
+// how long a repeat of a redirect counts as a bounce (storedLanguageRedirectScript).
 export const LANG_REDIRECT_GUARD_KEY = 'ur.xyz.lang.redirect';
 export const LANG_REDIRECT_GUARD_MS = 10000;
 
@@ -212,12 +212,19 @@ export function createRouteLocalization(groups) {
      * not-found page: nginx serves that at every missing URL, and a missing
      * /docs/<x> reads like a docs page to the family rule here.
      *
-     * It never makes the same redirect twice within LANG_REDIRECT_GUARD_MS:
-     * it records its target and the time in sessionStorage, and stays on the
-     * page when the visitor is back from that target so soon. That ends a loop
-     * it cannot see from the page, such as a 301 from /<lang>/<page> to the
-     * English page that a browser cached under an older server config, after
-     * one round trip, on the English page.
+     * Two more cases keep the English page:
+     *   - the visitor followed a link to it from the translation, the English
+     *     original opened in this tab or another: the referrer is the target,
+     *     and no redirect brought the visitor here;
+     *   - the redirect came back twice. A browser may hold a 301 from
+     *     /<lang>/<page> to the English page, cached under the config before
+     *     the pages were translated, which brings the visitor straight back.
+     *     The script keeps its last target and the time in sessionStorage:
+     *     when the same redirect comes round within LANG_REDIRECT_GUARD_MS it
+     *     goes once more with a query (<target>?, or <target>?<query>&), an
+     *     address no such 301 is cached for, and when that comes back too,
+     *     the page stays. No loop outlasts two round trips, and a cached 301
+     *     does not keep the visitor from the translation.
      */
     function storedLanguageRedirectScript() {
         const langs = JSON.stringify(NON_EN_SITE_LANG_CODES);
@@ -233,11 +240,14 @@ export function createRouteLocalization(groups) {
             `if(${langs}.indexOf(l)<0)return;`,
             "var p=location.pathname.replace(/\\/index\\.html$/,'/').replace(/\\.html$/,'').replace(/\\/$/,'')||'/';",
             `if(${paths}.indexOf(p)<0${family})return;`,
-            // the same redirect again this soon is a loop: stay
-            `var t='/'+l+(p==='/'?'':p),n=Date.now(),g=(sessionStorage.getItem(${guard})||'').split(' ');`,
-            `if(g[0]===t&&n-g[1]>=0&&n-g[1]<${LANG_REDIRECT_GUARD_MS})return;`,
-            `sessionStorage.setItem(${guard},t+' '+n);`,
-            'location.replace(t+location.search+location.hash);',
+            "var t='/'+l+(p==='/'?'':p),r=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];",
+            // a link from the translation to this English original: stay
+            "if(document.referrer.split(/[?#]/)[0]===location.origin+t&&!(r&&r.redirectCount))return;",
+            // the same redirect again this soon came back: once more past the cache, then stay
+            `var n=Date.now(),g=(sessionStorage.getItem(${guard})||'').split(' '),b=g[0]===t&&n-g[1]>=0&&n-g[1]<${LANG_REDIRECT_GUARD_MS};`,
+            'if(b&&g[2])return;',
+            `sessionStorage.setItem(${guard},t+' '+n+(b?' 1':''));`,
+            "location.replace(t+(b?(location.search?location.search+'&':'?'):location.search)+location.hash);",
             '}catch(e){}})();',
         ].join('');
     }

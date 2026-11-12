@@ -106,13 +106,16 @@ function memoryStorage() {
 }
 
 // Runs an inline redirect script as a page's <head> would, with the stored
-// choice `stored`, the tab's sessionStorage `session` and the clock at `now`.
-// Returns the URL it sends the page to, or null when the page stays.
-function runRedirect(script, pathname, stored, { search = '', hash = '', throws = false, session = memoryStorage(), now = 1_000_000 } = {}) {
+// choice `stored`, the tab's sessionStorage `session`, the clock at `now`, the
+// page's referrer and the count of redirects that brought it. Returns the URL
+// it sends the page to, or null when the page stays.
+function runRedirect(script, pathname, stored, { search = '', hash = '', throws = false, session = memoryStorage(), now = 1_000_000, referrer = '', redirectCount = 0 } = {}) {
     let replaced = null;
     const localStorage = { getItem: () => { if (throws) throw new Error('blocked'); return stored; } };
-    const location = { pathname, search, hash, replace: (url) => { replaced = url; } };
-    new Function('localStorage', 'sessionStorage', 'location', 'Date', script)(localStorage, session, location, { now: () => now });
+    const location = { origin: 'https://ur.xyz', pathname, search, hash, replace: (url) => { replaced = url; } };
+    const performance = { getEntriesByType: (type) => (type === 'navigation' ? [{ redirectCount }] : []) };
+    new Function('localStorage', 'sessionStorage', 'location', 'Date', 'document', 'performance', script)(
+        localStorage, session, location, { now: () => now }, { referrer }, performance);
     return replaced;
 }
 
@@ -128,25 +131,49 @@ test('the inline redirect script agrees with storedLanguageTarget', () => {
     assert.equal(run('/research', 'es', { throws: true }), null);
 });
 
-test('the inline redirect script never makes the same redirect twice in a row within the guard time', () => {
+test('the inline redirect script tries a redirect that comes back once more past the cache, then stays', () => {
     const script = storedLanguageRedirectScript();
     const session = memoryStorage();
     const at = 5_000_000;
     assert.equal(runRedirect(script, '/miners', 'de', { session, now: at }), '/de/miners');
     assert.equal(session.getItem(LANG_REDIRECT_GUARD_KEY), `/de/miners ${at}`);
-    // back from /de/miners at once (a 301 to the English page, cached under an
-    // older server config): a loop, so the page stays
-    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + 40 }), null);
-    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + LANG_REDIRECT_GUARD_MS - 1 }), null);
-    // another target, or the same one after the guard time, is a redirect again
+    // back from /de/miners at once (a 301 to the English page that the browser
+    // cached under an older server config): once more, at an address the
+    // cache holds no 301 for
+    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + 40, redirectCount: 1 }), '/de/miners?');
+    assert.equal(session.getItem(LANG_REDIRECT_GUARD_KEY), `/de/miners ${at + 40} 1`);
+    // back again: a loop, so the page stays, until the guard time is over
+    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + 80, redirectCount: 1 }), null);
+    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + 40 + LANG_REDIRECT_GUARD_MS - 1 }), null);
+    assert.equal(runRedirect(script, '/miners', 'de', { session, now: at + 40 + LANG_REDIRECT_GUARD_MS }), '/de/miners');
+    // the retry keeps the query and the fragment
+    const other = memoryStorage();
+    assert.equal(runRedirect(script, '/research', 'es', { session: other, now: at, search: '?q=1', hash: '#papers' }), '/es/research?q=1#papers');
+    assert.equal(runRedirect(script, '/research', 'es', { session: other, now: at + 1, search: '?q=1', hash: '#papers' }), '/es/research?q=1&#papers');
+    assert.equal(runRedirect(script, '/', 'ar', { session: other, now: at + 2 }), '/ar');
+    assert.equal(runRedirect(script, '/', 'ar', { session: other, now: at + 3, hash: '#roles' }), '/ar?#roles');
+    // another target, or another language, is a redirect of its own
     assert.equal(runRedirect(script, '/operators', 'de', { session, now: at + 100 }), '/de/operators');
     assert.equal(runRedirect(script, '/operators', 'es', { session, now: at + 200 }), '/es/operators');
-    assert.equal(runRedirect(script, '/operators', 'es', { session, now: at + 200 + LANG_REDIRECT_GUARD_MS }), '/es/operators');
-    // a record from the future (the clock went back) does not hold the page
+    // a record from the future (the clock went back) does not count
     assert.equal(runRedirect(script, '/operators', 'es', { session, now: at }), '/es/operators');
     // without a sessionStorage to keep the guard in, the page stays
     const blocked = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
     assert.equal(runRedirect(script, '/miners', 'de', { session: blocked }), null);
+});
+
+test('the inline redirect script leaves the English original to a visitor who followed a link to it from the translation', () => {
+    const script = storedLanguageRedirectScript();
+    // the link on /de/terms to /terms, in this tab or another
+    assert.equal(runRedirect(script, '/terms', 'de', { referrer: 'https://ur.xyz/de/terms' }), null);
+    assert.equal(runRedirect(script, '/terms', 'de', { referrer: 'https://ur.xyz/de/terms?x=1#top' }), null);
+    // from another page, another language or another site: the translation
+    assert.equal(runRedirect(script, '/terms', 'de', { referrer: 'https://ur.xyz/de/privacy' }), '/de/terms');
+    assert.equal(runRedirect(script, '/terms', 'es', { referrer: 'https://ur.xyz/de/terms' }), '/es/terms');
+    assert.equal(runRedirect(script, '/terms', 'de', { referrer: 'https://example.com/de/terms' }), '/de/terms');
+    // a redirect brought the visitor here (a 301 the browser kept sent the
+    // translation's own link to English): the translation
+    assert.equal(runRedirect(script, '/terms', 'de', { referrer: 'https://ur.xyz/de/terms', redirectCount: 1 }), '/de/terms');
 });
 
 test('every English page belongs to one page group, and each group names its pages', () => {

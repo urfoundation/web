@@ -7,6 +7,11 @@
 !ur.xyz/astro/src/pages/build.astro
 !ur.xyz/react/src/components/pages/Build.jsx
 !ur.xyz/react/src/components/pages/Build.css
+# ... and its page group (ur.xyz/react/src/i18n/pages/build/: the copy and its
+# translations), the group's page-dates record and its translated page.
+!ur.xyz/react/src/i18n/pages/build
+!ur.xyz/astro/page-dates/build.json
+!ur.xyz/astro/src/pages/\[lang\]/build.astro
 manager/manager
 web/web
 /venv

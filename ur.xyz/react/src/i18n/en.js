@@ -22,7 +22,15 @@ export default {
         browseDocs:   'Browse docs',
         search:       'Search',
         ctaAria:    'Usage cost — the current network price',
-        denomAria:  'Price denomination'
+        denomAria:  'Price denomination',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'About',
+        build:       'Build',
+        investors:   'Investors',
+        dashboard:   'Dashboard',
+        liveDashboard: 'Live dashboard',
+        ctf:         'Capture the flag'
     },
 
     footer: {
@@ -48,7 +56,12 @@ export default {
         socialTelegram: 'UR subnet on Telegram',
         socialDiscord:  'URnetwork Discord',
         socialGithub:   'UR subnet on GitHub',
-        productsAria:   'URnetwork products at ur.io'
+        productsAria:   'URnetwork products at ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'Build on UR',
+        reserve:       'Reserve',
+        mainnet:       'Mainnet',
+        investorCentre:  'Investor Centre'
     },
 
     disclaimer: {

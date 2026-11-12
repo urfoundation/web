@@ -1,0 +1,33 @@
+{
+  "about": "The day each page of the ur.xyz page group investors (react/src/i18n/pages/investors/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
+  "pages": {
+    "/investors": {
+      "fingerprint": "8a6ff5fbf107a9e6",
+      "lastmod": "2026-10-28"
+    },
+    "/investors/apex-competition": {
+      "fingerprint": "0f49030e015f1b0c",
+      "lastmod": "2026-10-28"
+    },
+    "/investors/conviction-lock": {
+      "fingerprint": "f2df794171d4f722",
+      "lastmod": "2026-10-28"
+    },
+    "/investors/deck": {
+      "fingerprint": "4b16781637e88d9d",
+      "lastmod": "2026-10-28"
+    },
+    "/investors/funding-network-capacity": {
+      "fingerprint": "db757cfe4e96ce32",
+      "lastmod": "2026-10-28"
+    },
+    "/investors/letter-to-tokenholders-september-2026": {
+      "fingerprint": "6d81afcadd8d497a",
+      "lastmod": "2026-10-28"
+    },
+    "/investors/our-letter-to-bittensor": {
+      "fingerprint": "bea6c43d6881e1a1",
+      "lastmod": "2026-08-18"
+    }
+  }
+}

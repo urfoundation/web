@@ -1,0 +1,68 @@
+---
+// The research methodology, in one language: /research/methodology (English,
+// pages/research/methodology.astro) and /<lang>/research/methodology
+// (pages/[lang]/research/methodology.astro). How UR's research works: three
+// nested research loops (the lab, the open competition, the volunteer field
+// nodes) and the discipline they share. Linked from the methodology's card on
+// /research in every language.
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/ResearchMethodology.jsx), rendered to static
+// HTML. It needs no island: the three loops' rings turn in CSS
+// (ResearchLoops.css) and stand still under reduced motion. Its words are the
+// copy unit react/src/i18n/pages/research-methodology/.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import ResearchMethodologyPage, { METHODOLOGY_PATH } from '@react/components/pages/ResearchMethodology.jsx';
+import { METHODOLOGY } from '@react/data/research-methodology.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+import { getDict } from '../../lib/i18n.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = (await loadPageCopy('research-methodology'))(lang);
+const dict = await getDict(lang);
+
+const title = `${t.title} | UR`;
+const description = t.description;
+const canonical = `https://ur.xyz${lang === 'en' ? '' : `/${lang}`}${METHODOLOGY_PATH}`;
+const jsonLd = [{
+    '@type': 'Article',
+    '@id': `${canonical}#article`,
+    headline: t.title,
+    description,
+    inLanguage: lang,
+    datePublished: METHODOLOGY.published,
+    author: { '@id': 'https://ur.xyz/#org' },
+    publisher: { '@id': 'https://ur.xyz/#org' },
+    mainEntityOfPage: canonical,
+    url: canonical,
+}];
+---
+<Base
+    title={title}
+    description={description}
+    breadcrumbName={t.title}
+    lang={lang}
+    ogType="article"
+    article={{ publishedTime: METHODOLOGY.published, author: 'UR Foundation' }}
+    jsonLd={jsonLd}
+>
+    <div class="app">
+        <DisclaimerStatic t={dict} />
+        <NavIsland activeRoute="research" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            <ResearchMethodologyPage lang={lang} />
+        </main>
+
+        <FooterStatic t={dict} lang={lang} />
+    </div>
+</Base>

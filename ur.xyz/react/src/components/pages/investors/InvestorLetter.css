@@ -1238,3 +1238,117 @@
     /* Room at the foot for the running line the generator stamps there. */
     margin: 18mm 16mm 20mm;
 }
+
+/* --- right to left (the Arabic translation) -------------------------------
+   The rules above are written left to right; these mirror what has a side.
+   Scoped to [dir="rtl"], so the English page and its print are untouched.
+   The network-stack dialog's viewport stays left to right for its scroll and
+   zoom arithmetic, with the diagram inside it right to left
+   (NetworkStackExhibit.jsx). */
+[dir="rtl"] .letter-back span,
+[dir="rtl"] .letter-end span {
+    display: inline-block;
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .letter-back:hover span,
+[dir="rtl"] .letter-back:focus-visible span,
+[dir="rtl"] .letter-end a:hover span,
+[dir="rtl"] .letter-end a:focus-visible span {
+    transform: scaleX(-1) translateX(-3px);
+}
+
+[dir="rtl"] .letter-body blockquote {
+    padding: 4px 28px 4px 0;
+    border-left: 0;
+    border-right: 3px solid var(--brand-ur);
+}
+
+[dir="rtl"] .letter-body ul {
+    padding-left: 0;
+    padding-right: 23px;
+}
+
+[dir="rtl"] .letter-body li {
+    padding-left: 0;
+    padding-right: 7px;
+}
+
+/* the exhibit breaks out of the reading column from its right edge */
+[dir="rtl"] .letter-exhibit {
+    margin-left: 0;
+    margin-right: 50%;
+    transform: translateX(50%);
+}
+
+[dir="rtl"] .letter-flow__arrow {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .letter-stack__group-label--live {
+    margin-right: 0;
+    margin-left: 14px;
+}
+
+[dir="rtl"] .letter-stack__group-label--research {
+    margin-left: 0;
+    margin-right: 14px;
+}
+
+[dir="rtl"] .letter-stack__programme {
+    border-right: 0;
+    border-left: 1px solid var(--letter-line);
+}
+
+[dir="rtl"] .letter-stack__programme:nth-of-type(4) {
+    border-left: 0;
+}
+
+[dir="rtl"] .letter-stack__stat {
+    padding-left: 0;
+    padding-right: 22px;
+    border-left: 0;
+    border-right: 1px solid var(--letter-line-strong);
+}
+
+@media screen and (max-width: 900px) {
+    /* the scaled preview shrinks toward the edge it starts from */
+    [dir="rtl"] .letter-stack-scroll > .letter-stack {
+        transform-origin: right top;
+    }
+
+    [dir="rtl"] .letter-stack-dialog__toolbar {
+        padding-left: 0;
+        padding-right: 18px;
+    }
+
+    [dir="rtl"] .letter-stack-dialog__zoom button {
+        border-right: 0;
+        border-left: 1px solid var(--letter-line-strong);
+    }
+
+    [dir="rtl"] .letter-stack-dialog__zoom button:last-child {
+        border-left: 0;
+    }
+
+    [dir="rtl"] .letter-stack-dialog__close {
+        margin-right: 0;
+        margin-left: 8px;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    [dir="rtl"] .letter-flow__arrow {
+        transform: rotate(90deg);
+    }
+}
+
+@media screen and (max-width: 430px) {
+    [dir="rtl"] .letter-stack-dialog__toolbar {
+        padding-right: 10px;
+    }
+
+    [dir="rtl"] .letter-stack-dialog__close {
+        margin-left: 2px;
+    }
+}

@@ -3,7 +3,7 @@
 export default {
     meta: {
         title: 'Cronología del lanzamiento de SN25 en la red principal | UR',
-        description: 'SN25 en la red principal por época de pago: versión 1 desde el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y primeras reclamaciones el 8 de noviembre.',
+        description: 'SN25 en la red principal, por época: versión 1 desde el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y primeras reclamaciones el 8 de noviembre.',
         breadcrumb: 'Red principal',
     },
 

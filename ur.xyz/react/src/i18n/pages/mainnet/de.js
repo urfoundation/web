@@ -3,7 +3,7 @@
 export default {
     meta: {
         title: 'Zeitleiste des SN25-Mainnet-Starts | UR',
-        description: 'Der Start von SN25 im Mainnet nach Auszahlungsepochen: Version 1 ab dem 8. Oktober, dann Settlement v2 ab Epoche 4 (30. Oktober), mit den ersten Claims am 8. November.',
+        description: 'Der SN25-Mainnet-Start nach Auszahlungsepochen: Version 1 ab dem 8. Oktober, Settlement v2 ab Epoche 4 (30. Oktober), die ersten Claims am 8. November.',
         breadcrumb: 'Mainnet',
     },
 

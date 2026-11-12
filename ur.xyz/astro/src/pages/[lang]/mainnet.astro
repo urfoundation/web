@@ -1,0 +1,12 @@
+---
+// /<lang>/mainnet — the SN25 mainnet launch timeline in ru, ar, zh, de and es:
+// src/components/routes/MainnetRoute.astro in the page's language, built
+// while the mainnet page group is localized (react/src/i18n/pages/mainnet/group.js).
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+import MainnetRoute from '../../components/routes/MainnetRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('mainnet');
+}
+---
+<MainnetRoute lang={Astro.params.lang} />

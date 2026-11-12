@@ -1,0 +1,58 @@
+---
+// /mainnet in one language: the SN25 mainnet launch timeline. The English page
+// (src/pages/mainnet.astro) and its /<lang>/mainnet twins
+// (src/pages/[lang]/mainnet.astro) are this component with their language.
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/Mainnet.jsx). It needs no script, so it is
+// rendered to static HTML here, and only the nav and the summary timeline
+// under the title hydrate: the summary (mainnet/MainnetSummary.jsx) marks
+// "now", which only the visitor's clock knows. It is an island in the page's
+// `summary` slot, given its model, computed here from the same data in the
+// page's language, so the island carries no data files and no copy of its
+// own. The milestones are data (react/src/data/mainnet-timeline.json) and
+// their words the page's copy (react/src/i18n/pages/mainnet); the shell
+// around them is the section pages' exactly, so the SPA and this render are
+// pixel-identical.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import MainnetPage from '@react/components/pages/Mainnet.jsx';
+import MainnetSummary from '@react/components/pages/mainnet/MainnetSummary.jsx';
+import { summaryModel } from '@react/components/pages/mainnet/summary.js';
+import { localizeEvents } from '@react/components/pages/mainnet/copy.js';
+import timeline from '@react/data/mainnet-timeline.json';
+import { mainnetEpochs } from '@react/data/mainnet.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+import { LANGS, getDict } from '../../lib/i18n.js';
+import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = (await loadPageCopy('mainnet'))(lang);
+const events = localizeEvents(timeline.events, (await loadPageCopy('mainnet/timeline'))(lang));
+const summary = summaryModel(events, mainnetEpochs, { t });
+const dict = await getDict(lang);
+---
+<Base title={t.meta.title} description={t.meta.description} breadcrumbName={t.meta.breadcrumb} lang={lang} dir={LANGS[lang]?.dir || 'ltr'}>
+    <div class="app">
+        <DisclaimerStatic t={dict} />
+        <NavIsland activeRoute="mainnet" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            {/* "Updated" states the sitemap's lastmod: the build fills the
+                token in once the page is fingerprinted (src/lib/lastmod.js) */}
+            <MainnetPage lang={lang} route={{ name: 'mainnet', slug: null }} updated={LASTMOD_TOKEN}>
+                <MainnetSummary slot="summary" model={summary} client:visible={{ rootMargin: "200px" }} />
+            </MainnetPage>
+        </main>
+
+        <FooterStatic t={dict} lang={lang} />
+    </div>
+</Base>

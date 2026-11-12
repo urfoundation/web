@@ -24,7 +24,7 @@ export default {
         },
         {
             role: "Growth",
-            detail: "Lemz leitet das Wachstum bei UR und verbindet Produkt, Content, Community und die Umsetzung von Launches. Sein Hintergrund umfasst Marketing, Community-Aufbau und Research im Web3-Bereich.",
+            detail: "Lemz verantwortet bei UR den Bereich Growth und verbindet Produkt, Content, Community und die Umsetzung von Launches. Sein Hintergrund umfasst Marketing, Community-Aufbau und Research im Web3-Bereich.",
         },
         {
             role: "Berater",
@@ -32,7 +32,7 @@ export default {
         },
         {
             role: "Berater",
-            detail: "Keith berät UR zu seiner Rolle im Bittensor-Ökosystem. Seit 2022 widmet er sich der Unterstützung von Open-Source-Entwicklung auf Bittensor.",
+            detail: "Keith berät UR zu dessen Rolle im Bittensor-Ökosystem. Seit 2022 widmet er sich der Unterstützung von Open-Source-Entwicklung auf Bittensor.",
         },
         {
             role: "Berater",

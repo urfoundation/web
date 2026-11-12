@@ -128,7 +128,9 @@ rest (arrows that point, charts' axes).
 
 `make gates` (from `astro/`, after a build) runs, among the rest: `tests/i18n-staleness.mjs`,
 `tests/localized-english-text.mjs` (English prose or an untranslated label on a translated page, against the site
-dictionaries and the page's group's units; `allowEnglish` in `group.js` for deliberate English), the seo-audit
+dictionaries and the page's group's units; `allowEnglish` in `group.js` for deliberate English; code marked
+`translate="no"` is the same in every language and is not compared, and only `code`, `pre`, `kbd` and `samp` may
+carry that mark), the seo-audit
 (hreflang targets indexable and in their language, sitemap alternates equal to the head's, every localized group
 complete, `dir` per language), `page-dates.mjs --check`, `tests/page-copy.test.mjs`,
 `scripts/route-localization.test.mjs`, and every `pages/<group>/*.test.mjs`, which a group adds without editing the

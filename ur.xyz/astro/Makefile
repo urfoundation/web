@@ -94,6 +94,7 @@ gates: install-playwright-browser
 	node --test ../react/tests/docs-search.test.mjs
 	node --test ../react/tests/docs-chapters.test.mjs
 	node --test ../react/tests/page-copy.test.mjs
+	node --test ../react/tests/localized-english-text.test.mjs
 	# each page group's own tests (react/src/i18n/README.md), found by name
 	node --test "../react/src/i18n/pages/**/*.test.mjs"
 	node --test ../scripts/agent-assets.test.mjs

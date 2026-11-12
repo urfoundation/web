@@ -131,10 +131,10 @@ async function auditPage(browser, base, route, profile) {
   // checks: one h1, no sideways scroll, images, errors, and its page's layout
   // checks below; the nav's names and order are English's
   const lang = langForPath(route);
-  const base = basePathFor(route);
+  const pagePath = basePathFor(route);
   if (lang === 'en') assert(await page.locator('footer a[href="/about"]').count() > 0, `${route} footer has no About link`);
 
-  if (base.startsWith('/docs/')) {
+  if (pagePath.startsWith('/docs/')) {
     const sideways = await page.evaluate(() => [...document.querySelectorAll('.md-pre, .md-table-wrap')]
       .filter((el) => el.scrollWidth > el.clientWidth + 1)
       .map((el) => `${el.className}: ${el.textContent.trim().slice(0, 40)}`));
@@ -223,13 +223,13 @@ async function auditPage(browser, base, route, profile) {
     assert(await active.count() > 0, `${route} has no aria-current=page navigation link`);
   }
 
-  if (profile.width <= 844 && base === '/about') {
+  if (profile.width <= 844 && pagePath === '/about') {
     for (const link of await page.locator('.core-contributor__identity a').all()) {
       const box = await link.boundingBox();
       assert(box && box.width >= 44 && box.height >= 44, `/about contributor profile target is ${box?.width}×${box?.height}px`);
     }
   }
-  if (base === '/about') {
+  if (pagePath === '/about') {
     const sectionGaps = await page.evaluate(() => {
       const bottom = (selector) => document.querySelector(selector).getBoundingClientRect().bottom + scrollY;
       const top = (selector) => document.querySelector(selector).getBoundingClientRect().top + scrollY;
@@ -241,13 +241,13 @@ async function auditPage(browser, base, route, profile) {
     const maxGap = profile.width <= 820 ? 110 : 150;
     assert(sectionGaps.every((gap) => gap <= maxGap), `/about section spacing is too large: ${sectionGaps.map(Math.round).join(', ')}px`);
   }
-  if (profile.width <= 844 && base === '/investors') {
+  if (profile.width <= 844 && pagePath === '/investors') {
     for (const link of await page.locator('.resource-dl, .research-links a').all()) {
       const box = await link.boundingBox();
       assert(box && box.height >= 44, `/investors touch target is only ${box?.height}px high`);
     }
   }
-  if (profile.width <= 844 && base === '/build') {
+  if (profile.width <= 844 && pagePath === '/build') {
     const proofLink = page.locator('.proof-v12 a').first();
     const box = await proofLink.boundingBox();
     assert(box && box.height >= 44, `/build proof link is only ${box?.height}px high`);

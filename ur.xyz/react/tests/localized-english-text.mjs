@@ -17,6 +17,10 @@
 //     group's page is held to its group's copy units as well as to the site
 //     dictionaries.
 //
+// Text marked translate="no" (code: commands, flags, error strings, which are
+// the same in every language by design) is not compared, and only code, pre,
+// kbd and samp may carry that mark, so it cannot hide prose.
+//
 // It also asserts <html lang> matches the page language, that no localized
 // page carries NUL bytes (streamed React SSR once split a multibyte character
 // across its flush boundary and left \0 in the zh and ar pages), and that no
@@ -77,13 +81,58 @@ function sentences(text) {
         .filter(Boolean);
 }
 
+// An element marked translate="no": its text and attributes are the same in
+// every language by design (code), so the comparison skips them.
+const TRANSLATE_NO = /<([a-z][a-z0-9-]*)\b[^>]*\stranslate="no"[^>]*>/gi;
+// the elements that may carry the mark: code and its kin, never prose
+const TRANSLATE_NO_ELEMENTS = new Set(['code', 'pre', 'kbd', 'samp']);
+const VOID_ELEMENTS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+
+/** The elements of a page marked translate="no" other than code, pre, kbd and samp, by tag name. */
+export function misplacedTranslateNo(html) {
+    return [...html.matchAll(TRANSLATE_NO)].map((m) => m[1].toLowerCase()).filter((name) => !TRANSLATE_NO_ELEMENTS.has(name));
+}
+
+/**
+ * The HTML without each element marked translate="no", with all it holds (its
+ * own kind nested inside it included). Each leaves a tag in its place, so the
+ * text on either side stays two fragments, as it was around the element.
+ */
+export function withoutTranslateNo(html) {
+    let out = '';
+    let from = 0;
+    TRANSLATE_NO.lastIndex = 0;
+    let open = TRANSLATE_NO.exec(html);
+    while (open) {
+        const name = open[1];
+        const end = open.index + open[0].length;
+        let to = end;
+        if (!VOID_ELEMENTS.has(name.toLowerCase()) && !/\/>$/.test(open[0])) {
+            const tags = new RegExp(`<(/?)${name}\\b[^>]*>`, 'gi');
+            tags.lastIndex = end;
+            let depth = 1;
+            while (depth > 0) {
+                const tag = tags.exec(html);
+                if (!tag) break;
+                depth += tag[1] ? -1 : 1;
+            }
+            to = depth > 0 ? html.length : tags.lastIndex;
+        }
+        out += `${html.slice(from, open.index)}<translate-no>`;
+        from = to;
+        TRANSLATE_NO.lastIndex = from;
+        open = TRANSLATE_NO.exec(html);
+    }
+    return out + html.slice(from);
+}
+
 /** The text a visitor meets on a built page, as { source, text } sentences. */
-function pageText(html) {
+export function pageText(html) {
     const title = normalize((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '');
-    const body = html
+    const body = withoutTranslateNo(html
         .replace(/<head\b[\s\S]*?<\/head>/i, ' ')
         .replace(/<!--[\s\S]*?-->/g, ' ')
-        .replace(/<(script|style|template|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ');
+        .replace(/<(script|style|template|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' '));
 
     const out = [];
     if (title) for (const s of sentences(title)) out.push({ source: '<title>', text: s });
@@ -140,6 +189,28 @@ async function groupDictionary(group, code) {
 // word, so trailing punctuation only counts when a space or the end follows.
 const PROSE_WORD = /(?:^|[\s(“"'])[a-z]{2,}(?=$|[\s)”"']|[,.;:!?](?:$|\s))/;
 
+/**
+ * A translated page's English (see the top): each sentence that is prose of
+ * its English twin, or an English dictionary value this language translates
+ * differently wherever it occurs, as { source, text, why }. `english` is the
+ * twin's sentences; `keysOf` maps an English value to its dictionary keys and
+ * `translations` a key to this language's value.
+ */
+export function englishOnPage(html, english, { allowed = new Set(), keysOf = new Map(), translations = new Map() } = {}) {
+    const out = [];
+    const seen = new Set();
+    for (const { source, text } of pageText(html)) {
+        const id = `${source}\u0000${text}`;
+        if (seen.has(id) || allowed.has(text)) continue;
+        seen.add(id);
+        const prose = english.has(text) && PROSE_WORD.test(text);
+        const keys = keysOf.get(text);
+        const label = keys && keys.every((key) => translations.has(key) && translations.get(key) !== text);
+        if (prose || label) out.push({ source, text, why: label ? `English for ${keys.join(', ')}` : 'identical to the English page' });
+    }
+    return out;
+}
+
 const fileFor = (lang, base) => {
     if (lang === 'en') return base === '/' ? 'index.html' : `${base.slice(1)}.html`;
     return base === '/' ? `${lang}.html` : `${lang}${base}.html`;
@@ -194,12 +265,19 @@ async function main() {
             }
         }
     };
+    // translate="no" exempts code only: on any other element it would hide prose
+    const marks = (route, html) => {
+        for (const name of misplacedTranslateNo(html)) {
+            failures.push(`/${route}: translate="no" on a <${name}>; only code, pre, kbd and samp may carry it`);
+        }
+    };
     const englishPages = translatedEnglishPages();
     const englishText = new Map();
     for (const base of englishPages) {
         const twinFile = path.join(BUILD, fileFor('en', base));
         const html = fs.readFileSync(twinFile, 'utf8');
         placeholders(base === '/' ? '' : base.slice(1), html);
+        marks(base === '/' ? '' : base.slice(1), html);
         englishText.set(base, new Set(pageText(html).map((s) => s.text)));
     }
 
@@ -235,24 +313,14 @@ async function main() {
             const htmlLang = (html.match(/<html[^>]*\slang="([^"]*)"/i) || [])[1];
             if (htmlLang !== lang) failures.push(`/${route}: <html lang="${htmlLang}">, expected "${lang}"`);
             placeholders(route, html);
+            marks(route, html);
 
-            const english = englishText.get(base);
-            const allowed = new Set([...ALLOWED_ENGLISH, ...((group && PAGE_GROUPS[group].allowEnglish) || [])]);
-            const keysOf = group ? groupEnglish.get(group) : enValueKeys;
-            const translations = group ? groupDicts.get(group) : dict;
-            const seen = new Set();
-            for (const { source, text } of pageText(html)) {
-                const id = `${source}\u0000${text}`;
-                if (seen.has(id) || allowed.has(text)) continue;
-                seen.add(id);
-                const prose = english.has(text) && PROSE_WORD.test(text);
-                const keys = keysOf.get(text);
-                const label = keys && keys.every((key) => translations.has(key) && translations.get(key) !== text);
-                if (prose || label) {
-                    const why = label ? `English for ${keys.join(', ')}` : 'identical to the English page';
-                    failures.push(`/${route} ${source}: "${text}" (${why})`);
-                }
-            }
+            const found = englishOnPage(html, englishText.get(base), {
+                allowed: new Set([...ALLOWED_ENGLISH, ...((group && PAGE_GROUPS[group].allowEnglish) || [])]),
+                keysOf: group ? groupEnglish.get(group) : enValueKeys,
+                translations: group ? groupDicts.get(group) : dict,
+            });
+            for (const { source, text, why } of found) failures.push(`/${route} ${source}: "${text}" (${why})`);
             pagesChecked += 1;
         }
     }
@@ -266,7 +334,10 @@ async function main() {
     console.log('localized-english-text: OK');
 }
 
-main().catch((error) => {
-    console.error(`localized-english-text: ${error.stack || error.message}`);
-    process.exit(1);
-});
+// a gate when run, a library when a test imports it
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+    main().catch((error) => {
+        console.error(`localized-english-text: ${error.stack || error.message}`);
+        process.exit(1);
+    });
+}

@@ -5,5 +5,8 @@
 // the group's translated routes, hreflang, sitemap alternates and switcher links.
 export default {
     paths: ['/reserve'],
-    localized: false,
+    localized: true,
+    // momentum, the defined share, stays a Latin term in Russian, Chinese and Spanish (the glossary): the
+    // term on its own and in the reserve's formula, miner emissions × (1 − momentum)
+    allowEnglish: ['momentum', '× (1 − momentum )'],
 };

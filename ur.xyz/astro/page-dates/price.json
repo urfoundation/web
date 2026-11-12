@@ -1,9 +1,29 @@
 {
   "about": "The day each page of the ur.xyz page group price (react/src/i18n/pages/price/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
+    "/ar/price": {
+      "fingerprint": "b1b1a615a6f7cd7b",
+      "lastmod": "2026-11-12"
+    },
+    "/de/price": {
+      "fingerprint": "f8eeeb9f725b784d",
+      "lastmod": "2026-11-12"
+    },
+    "/es/price": {
+      "fingerprint": "d30e7d1e3b336a4f",
+      "lastmod": "2026-11-12"
+    },
     "/price": {
       "fingerprint": "6b50c6ef8ff9e442",
       "lastmod": "2026-11-02"
+    },
+    "/ru/price": {
+      "fingerprint": "cdf7c2218025be9f",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/price": {
+      "fingerprint": "9bf8ca7953acf458",
+      "lastmod": "2026-11-12"
     }
   }
 }

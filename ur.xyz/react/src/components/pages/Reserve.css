@@ -144,7 +144,7 @@
 }
 /* "α" and "USD" as written: uppercased, α becomes a capital Α */
 .reserve-unit button, .reserve-alpha { text-transform: none; }
-.reserve-unit button + button { border-left: 1px solid var(--rv-line); }
+.reserve-unit button + button { border-inline-start: 1px solid var(--rv-line); }
 .reserve-unit button:hover { color: var(--brand-white); }
 .reserve-unit button[aria-pressed="true"] { background: var(--brand-ui); color: var(--brand-bg); }
 .reserve-price-note { margin-top: 12px; font-size: 12px; line-height: 18px; color: var(--rv-quiet); }
@@ -180,7 +180,8 @@
     align-items: center;
     gap: 7px;
     height: 30px;
-    padding: 0 11px 0 10px;
+    padding: 0;
+    padding-inline: 10px 11px;
     border: 1px solid rgba(214, 230, 244, 0.18);
     background: transparent;
     color: var(--brand-ui);
@@ -287,7 +288,7 @@
 .xy-tip i { display: inline-block; width: 14px; height: 0; border-top: 2px solid; }
 .xy-tip i.is-dash { border-top-style: dashed; }
 .xy-tip i.is-rect { width: 10px; height: 10px; border: 0; }
-.xy-tip b { margin-left: auto; padding-left: 14px; font-weight: 400; color: var(--brand-white); }
+.xy-tip b { margin-inline-start: auto; padding-inline-start: 14px; font-weight: 400; color: var(--brand-white); }
 
 .reserve-table { margin-top: 12px; border-top: 1px solid var(--rv-line-2); padding-top: 8px; }
 .reserve-table summary { cursor: pointer; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--rv-label); list-style: none; display: inline-flex; align-items: center; gap: 8px; min-height: 32px; }
@@ -296,10 +297,10 @@
 .reserve-table[open] summary::before { content: '−'; }
 .reserve-table-scroll { max-height: 340px; overflow-y: auto; margin-top: 8px; }
 .reserve-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.reserve-table th { position: sticky; top: 0; background: var(--rv-surface); text-align: left; font-weight: 400; font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--rv-dim); padding: 8px 10px 8px 0; border-bottom: 1px solid var(--rv-line); }
-.reserve-table td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--rv-line-2); color: var(--brand-ui); font-variant-numeric: tabular-nums; }
-.reserve-table td:nth-child(n + 2):not(:last-child), .reserve-table th:nth-child(n + 2):not(:last-child) { text-align: right; }
-.reserve-table td:last-child, .reserve-table th:last-child { padding-right: 0; }
+.reserve-table th { position: sticky; top: 0; background: var(--rv-surface); text-align: start; font-weight: 400; font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--rv-dim); padding: 8px 0; padding-inline-end: 10px; border-bottom: 1px solid var(--rv-line); }
+.reserve-table td { padding: 7px 0; padding-inline-end: 10px; border-bottom: 1px solid var(--rv-line-2); color: var(--brand-ui); font-variant-numeric: tabular-nums; }
+.reserve-table td:nth-child(n + 2):not(:last-child), .reserve-table th:nth-child(n + 2):not(:last-child) { text-align: end; }
+.reserve-table td:last-child, .reserve-table th:last-child { padding-inline-end: 0; }
 
 /* ── the splits under the charts ── */
 .reserve-charts + .reserve-split { margin-top: 28px; }
@@ -318,8 +319,8 @@
 
 /* ── program types ── */
 .reserve-boundary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--rv-line); border-bottom: 1px solid var(--rv-line); margin-top: 36px; }
-.reserve-boundary article { display: grid; grid-template-rows: subgrid; grid-row: span 5; align-items: start; padding: 26px 28px 28px; border-left: 1px solid var(--rv-line); }
-.reserve-boundary article:first-child { padding-left: 0; border-left: 0; }
+.reserve-boundary article { display: grid; grid-template-rows: subgrid; grid-row: span 5; align-items: start; padding: 26px 28px 28px; border-inline-start: 1px solid var(--rv-line); }
+.reserve-boundary article:first-child { padding-inline-start: 0; border-inline-start: 0; }
 .reserve-type-tag { font-family: var(--rv-mono); font-size: 10px; font-weight: 400; letter-spacing: 0.8px; text-transform: uppercase; color: var(--brand-ur); }
 .reserve-boundary h3 { font-size: 22px; line-height: 33px; font-weight: 400; letter-spacing: -0.77px; color: var(--rv-h2); margin-top: 19px; }
 .reserve-boundary p { font-size: 13px; line-height: 20.15px; color: var(--rv-quiet); margin-top: 7px; }
@@ -330,7 +331,7 @@
 /* ── programs: the filter row and the table ── */
 .reserve-programs-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; margin-top: 28px; }
 .reserve-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.reserve-chips .reserve-card-label { margin-right: 6px; }
+.reserve-chips .reserve-card-label { margin-inline-end: 6px; }
 .reserve-chips button {
     min-height: 32px;
     padding: 0 11px;
@@ -352,7 +353,7 @@
 .reserve-programs th {
     padding: 11px 10px;
     border-bottom: 1px solid var(--rv-line);
-    text-align: left;
+    text-align: start;
     font-size: 10.5px;
     font-weight: 600;
     letter-spacing: 1.6px;
@@ -366,7 +367,7 @@
 .reserve-program-sum { display: block; margin-top: 3px; font-size: 12px; line-height: 17px; color: var(--rv-quiet); }
 .reserve-program-meta { display: none; }
 .reserve-programs .is-dim { color: var(--rv-dim); }
-.reserve-programs .is-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.reserve-programs .is-num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .reserve-paid { display: flex; align-items: center; gap: 8px; min-width: 110px; }
 .reserve-use { flex: 1; height: 5px; min-width: 50px; background: rgba(214, 230, 244, 0.12); }
 .reserve-use i { display: block; height: 100%; background: var(--rv-reserve); }
@@ -374,7 +375,7 @@
 
 /* ── steps and custody ── */
 .reserve-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 20px; margin-top: 32px; border-top: 1px solid var(--rv-line); }
-.reserve-steps > div { padding: 18px 20px 0 0; }
+.reserve-steps > div { padding: 18px 0 0; padding-inline-end: 20px; }
 .reserve-k { font-family: var(--rv-mono); font-size: 12px; letter-spacing: 0.06em; color: var(--brand-ur); }
 .reserve-steps b { display: block; font-weight: 400; font-size: 15px; color: var(--rv-h2); margin-top: 8px; }
 .reserve-steps p { font-size: 12px; line-height: 18px; color: var(--rv-quiet); margin-top: 4px; }
@@ -421,7 +422,7 @@
 /* ── responsive ── */
 @media (max-width: 860px) {
     .reserve-boundary { grid-template-columns: minmax(0, 1fr); }
-    .reserve-boundary article { padding: 24px 0; border-left: 0; border-top: 1px solid var(--rv-line); }
+    .reserve-boundary article { padding: 24px 0; border-inline-start: 0; border-top: 1px solid var(--rv-line); }
     .reserve-boundary article:first-child { border-top: 0; }
     .reserve-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     /* each chart has the column to itself (and fills it: XYChart.jsx) */
@@ -475,7 +476,7 @@
     .reserve-table-card { padding: 0 2px; }
     /* a table twin on a phone: smaller figures */
     .reserve-table table { font-size: 12px; }
-    .reserve-table th, .reserve-table td { padding-right: 8px; }
+    .reserve-table th, .reserve-table td { padding-inline-end: 8px; }
     .reserve-custody-cards { gap: 10px; }
     .reserve-boundary article { padding: 20px 0; }
     .reserve-fine-block { padding: 28px 0 44px; }
@@ -506,7 +507,7 @@
 }
 /* a finger needs a larger target than a pointer: 44 px */
 @media (pointer: coarse) {
-    .reserve-copy { height: 44px; padding: 0 14px 0 12px; }
+    .reserve-copy { height: 44px; padding: 0; padding-inline: 12px 14px; }
     .reserve-wallet-link { min-height: 44px; }
     .reserve-unit button, .reserve-chips button { min-height: 44px; }
     .reserve-table summary { min-height: 44px; }
@@ -544,3 +545,17 @@
 @media (max-width: 860px) {
     .reserve-expand { display: none; }
 }
+
+/* ── right to left (Arabic) ── */
+/* the arrows after a link's words point the way the line reads */
+[dir="rtl"] .reserve-wallet-link span[aria-hidden="true"],
+[dir="rtl"] .reserve-cta span[aria-hidden="true"],
+[dir="rtl"] .reserve-link span[aria-hidden="true"] { display: inline-block; transform: scaleX(-1); }
+/* A chart keeps its geometry, time running left to right, and its labels
+   their places. A label's text keeps the page's direction, so an Arabic date
+   reads in its order ("12 أكتوبر 26"), and an SVG anchor is relative to that
+   direction: each one is mirrored so the label sits where it does in English
+   (XYChart.jsx). */
+[dir="rtl"] .xy-chart text[text-anchor="end"] { text-anchor: start; }
+[dir="rtl"] .xy-chart text[text-anchor="start"],
+[dir="rtl"] .xy-chart text:not([text-anchor]) { text-anchor: end; }

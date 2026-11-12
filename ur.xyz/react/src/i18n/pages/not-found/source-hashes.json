@@ -1,0 +1,38 @@
+{
+  "about": "sha256 (first 12 hex) of the English each translation was made from, per language and key. Checked by tests/i18n-staleness.mjs; after updating a translation run `node tests/i18n-staleness.mjs --unit not-found --accept <lang> <key> ...` (from react/).",
+  "ru": {
+    "home": "76c5505ff2e2",
+    "lede": "fc403d419213",
+    "meta.description": "3a467ad945eb",
+    "meta.title": "afe508705e0d",
+    "title": "3a467ad945eb"
+  },
+  "ar": {
+    "home": "76c5505ff2e2",
+    "lede": "fc403d419213",
+    "meta.description": "3a467ad945eb",
+    "meta.title": "afe508705e0d",
+    "title": "3a467ad945eb"
+  },
+  "zh": {
+    "home": "76c5505ff2e2",
+    "lede": "fc403d419213",
+    "meta.description": "3a467ad945eb",
+    "meta.title": "afe508705e0d",
+    "title": "3a467ad945eb"
+  },
+  "de": {
+    "home": "76c5505ff2e2",
+    "lede": "fc403d419213",
+    "meta.description": "3a467ad945eb",
+    "meta.title": "afe508705e0d",
+    "title": "3a467ad945eb"
+  },
+  "es": {
+    "home": "76c5505ff2e2",
+    "lede": "fc403d419213",
+    "meta.description": "3a467ad945eb",
+    "meta.title": "afe508705e0d",
+    "title": "3a467ad945eb"
+  }
+}

@@ -5,5 +5,7 @@
 // the group's translated routes, hreflang, sitemap alternates and switcher links.
 export default {
     paths: ['/dashboard'],
-    localized: false,
+    localized: true,
+    // the org filter's buttons: the GitHub organizations' names, the same in every language
+    allowEnglish: ['urnetwork', 'urfoundation'],
 };

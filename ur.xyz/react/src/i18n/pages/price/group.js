@@ -5,5 +5,5 @@
 // the group's translated routes, hreflang, sitemap alternates and switcher links.
 export default {
     paths: ['/price'],
-    localized: false,
+    localized: true,
 };

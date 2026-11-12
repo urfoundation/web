@@ -1,0 +1,41 @@
+---
+// The not-found page in any site language: pages/404.astro (/404.html) and its
+// translations (pages/[lang]/404.astro, /<lang>/404.html, which nginx serves
+// for a miss under /<lang>/) render this. noindex: an error page is never a
+// search result. Carries the nav and footer like every other route, so a dead
+// link leaves the visitor somewhere they can navigate from; its own link goes
+// to the home page of its language.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import FooterStatic from '../FooterStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import { getDict } from '../../lib/i18n.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+
+import '@react/components/Nav.css';
+import '../NotFound.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const copy = (await loadPageCopy('not-found'))(lang);
+const home = lang === 'en' ? '/' : `/${lang}`;
+---
+<Base title={copy.meta.title} description={copy.meta.description} lang={lang} noindex>
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main id="main" class="notfound-page">
+            <p class="notfound-code" aria-hidden="true">404</p>
+            <h1>{copy.title}</h1>
+            <p class="notfound-lede">{copy.lede}</p>
+            <a class="notfound-home" href={home}>{copy.home}</a>
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

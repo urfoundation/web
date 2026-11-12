@@ -31,14 +31,14 @@ export default {
     openInternet: {
         heading: 'Für ein offenes Internet kämpfen',
         paragraphs: [
-            'Die Wahrheit ist: Moderne VPNs bedienen große Teile der Weltbevölkerung nicht und ermöglichen lediglich die Optimierung des Netflix-Katalogs für die Erste Welt. Seit 2024 besteht die Mission von <urio>ur.io</urio> darin, neue Technologien zu schaffen, die Menschenrechte gegenüber repressiven Regimen auf der ganzen Welt verteidigen können; hier liegt eine echte Chance für Veränderung.',
+            'Die Wahrheit ist: Moderne VPNs bedienen große Teile der Weltbevölkerung nicht und ermöglichen lediglich die Optimierung des Netflix-Katalogs für die Erste Welt. Seit 2024 besteht die Mission von <urio>ur.io</urio> darin, neue Technologien zu schaffen, die Menschenrechte gegenüber repressiven Regimen auf der ganzen Welt verteidigen könnten; hier liegt eine echte Chance für Veränderung.',
             'Über den Zugang für Menschen hinaus erwarten wir eine exponentielle Nachfrage nach Zugang über Privathaushalte durch KI-Agenten: Agenten rufen Webinhalte im Auftrag ihrer Nutzer ab, Labore müssen die Daten des Internets sammeln, um damit zu trainieren; während sich Agenten zum Fortschritt der Menschheit verbreiten, werden etablierte Anbieter diese Gelegenheit zunehmend ins Visier nehmen. Nehmen Sie Cloudflare, das angekündigt hat, ab September Crawler standardmäßig zu blockieren und Gebühren für die Durchleitung im Internet zu erheben.',
             'Eine Welt, in der der Zugang zum Internet zu einer knappen Ressource wird, ist eine niederträchtige Vorstellung.',
         ],
     },
     closing: [
         'Die Wahrheit ist, dass es Menschen auf der Welt gibt, die nicht das Beste für Sie und Ihre Familie wollen: Diese Menschen verfolgen Sie, sammeln Ihre Daten, drosseln Ihr Internet. Ob Unternehmen oder Behörde: Eine Welt, in der die Menschen von ihrer Regierung überwacht werden oder einem Vermieter des Internets Abgaben zahlen, ist niederträchtig. Technologie wurde benutzt, um diese Probleme zu schaffen; sicherlich lässt sich Technologie schaffen, um diese Probleme zu lösen.',
-        'Und darin liegt unser Ziel für Bittensor: gemeinsam Fortschritte hin zu einem offenen und freien Internet zu machen. Für uns wissen die Menschen von Bittensor, was für Open-Source-Technologien auf dem Spiel steht, und wir hoffen, dass UR und Subnet 25 ein Vehikel für unseren Traum für die Welt sein können.',
+        'Und darin liegt unser Ziel für Bittensor: gemeinsam Fortschritte hin zu einem offenen und freien Internet zu machen. Aus unserer Sicht wissen die Menschen von Bittensor, was für Open-Source-Technologien auf dem Spiel steht, und wir hoffen, dass UR und Subnet 25 ein Vehikel für unseren Traum für die Welt sein können.',
         'Schließlich gilt unsere tiefste Bewunderung Keith, der uns die Plattform für diese Mission gegeben hat; ohne ihn und seinen beständigen Optimismus für Bittensor wäre nichts davon möglich. An unsere vielen Freunde, die diese Mission tief geprägt haben: Max von SCORE, Micaela von Nova, Ken von Bitmind, Michael White von Karis Capital, Gyles von TAO.com, eure Energie inspiriert uns jeden Tag.',
         'An Brien: Es ist mir eine Ehre, dir zu helfen, diesen Traum zu verfolgen. Lass uns die Menschen stolz machen.',
     ],

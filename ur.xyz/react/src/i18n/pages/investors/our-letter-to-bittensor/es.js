@@ -31,7 +31,7 @@ export default {
     openInternet: {
         heading: 'Luchar por un internet abierto',
         paragraphs: [
-            'La verdad es que las VPN modernas no sirven a amplias franjas de la población mundial y se limitan a facilitar la optimización del catálogo de Netflix para el primer mundo. Desde 2024, la misión de <urio>ur.io</urio> ha sido crear nuevas tecnologías capaces de defender los derechos humanos frente a regímenes opresivos de todo el mundo; ahí es donde hay una oportunidad real de cambio.',
+            'La verdad es que las VPN modernas no sirven a amplias franjas de la población mundial y se limitan a facilitar la optimización del catálogo de Netflix para el primer mundo. Desde 2024, la misión de <urio>ur.io</urio> ha sido crear nuevas tecnologías que podrían defender los derechos humanos frente a regímenes opresivos de todo el mundo; ahí es donde hay una oportunidad real de cambio.',
             'Más allá del acceso humano, proyectamos una demanda exponencial de acceso residencial impulsada por los agentes de IA: los agentes consultan la web en nombre de sus usuarios, los laboratorios necesitan recopilar los datos de internet para entrenar; a medida que los agentes proliferen para el progreso humano, la oportunidad será cada vez más un blanco de los actores establecidos. Tomemos Cloudflare, que anunció que, a partir de septiembre, empezará a bloquear rastreadores por defecto y empezará a cobrar por el paso por internet.',
             'Un mundo en el que el acceso a internet se convierte en un recurso escaso es un concepto infame.',
         ],

@@ -907,9 +907,10 @@ for (const rel of ["llms.txt", "llms-full.txt", "litepaper.md"]) {
 
 // The letter PDF is reprinted manually (make letter-pdf). If the letter's copy
 // changed after the PDF last did, the download no longer matches the page —
-// fail until it is re-printed. The copy lives in the React component and the
-// letter's metadata within the investor data module (the Astro page is only
-// the shell), and the generator
+// fail until it is re-printed. The copy lives in the React component, the
+// exhibits' words in the letter's copy unit (its en.js, which the English page
+// prints too) and the letter's metadata within the investor data module (the
+// Astro page is only the shell), and the generator
 // writes the PDF under react/public. Every path must exist: when the letter
 // moved into React this check compared a shell page and a mirrored copy of the
 // PDF, found no difference, and passed silently — a moved file now fails here.
@@ -918,6 +919,7 @@ for (const rel of ["llms.txt", "llms-full.txt", "litepaper.md"]) {
   const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
   const LETTER_SOURCES = [
     "react/src/components/pages/investors/InvestorLetter.jsx",
+    "react/src/i18n/pages/investors/our-letter-to-bittensor/en.js",
     "react/src/data/investors.js",
   ];
   const LETTER_PDF = "react/public/investors/our-letter-to-bittensor.pdf";

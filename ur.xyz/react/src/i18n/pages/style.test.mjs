@@ -1,7 +1,7 @@
-// The owner's style decisions of 2026-11-12 for the site's Chinese and Spanish,
-// checked wherever the site says something in those languages: the site
-// dictionaries (i18n/<lang>.js), every copy unit (pages/**/<lang>.js) and the
-// docs corpus (pages/docs/corpus/<lang>), code blocks and inline code left out.
+// The owner's style decisions of 2026-11-12 for the site's languages,
+// checked wherever the site says something in them: the site dictionaries
+// (i18n/<lang>.js), every copy unit (pages/**/<lang>.js) and the docs corpus
+// (pages/docs/corpus/<lang>), code blocks and inline code left out.
 //
 // Chinese
 //   - Hong Kong, Macao and Taiwan are 香港, 澳门 and 台湾, as the English site's
@@ -9,16 +9,34 @@
 //     go through format.js REGION_NAMES);
 //   - a count of places says 国家和地区, since the places counted can include
 //     territories ("{count} 个国家和地区", "100 多个国家和地区");
+//   - a label that names a place without counting says 国家或地区 (输入国家或地区,
+//     更多国家或地区, 你所在的国家或地区, the search messages, the table's column);
 //   - the pot is 累积池, never 累计奖励 (and never the lottery's 奖池).
 // Spanish: neutral Latin American Spanish, the reader addressed as tú
 //   - no vosotros, and no usted (ustedes, the plural, stays);
 //   - no Spain-only word where a Latin American one exists: computadora,
-//     costo, confiable, monitoreo, presionar a key, en vivo, Rumania, Arabia
-//     Saudita;
+//     costo, confiable, monitoreo, presionar a key, en vivo;
+//   - a place is named as Latin American CLDR (es-419) names it where Spain's
+//     differs: Rumania, Arabia Saudita, Costa de Marfil, Timor Oriental, Islas
+//     Åland, República del Congo, Islas Georgia del Sur y Sándwich del Sur;
 //   - a dollar amount names the dollar US$ before the figure ("US$134 millones";
 //     format.js formatUsd writes the code's amounts so: "US$1,97"), never a
 //     bare $;
-//   - capture the flag is Captura la bandera, without quotes.
+//   - capture the flag is Captura la bandera, without quotes;
+//   - the pages' og:locale is es_LA, Latin American Spanish.
+// Russian and German
+//   - Hong Kong and Macao are Гонконг and Макао, Hongkong and Macau, the short
+//     names, as in English: never CLDR's Гонконг (САР) or Sonderverwaltungsregion
+//     Hongkong;
+//   - /mainnet writes its figures as Intl does for the page, as /ctf does
+//     (9.240.028, 1.076,26; 9 240 028, 1 076,26): mainnet/timeline.js
+//     INTL_FIGURES, held figure by figure by mainnet/mainnet-copy.test.mjs.
+// Every language (decision of 2026-11-12): capture the flag is an auction, and
+// its draw a public, verifiable random selection among the eligible entries,
+// so no page in any language names it with the words of drawing lots
+// (жеребьёвка, жребий, القرعة, 抽签, 摇号, Auslosung, Losentscheid, sorteo);
+// the capture the flag copy tests (pages/ctf, pages/mainnet) refuse their
+// verbs and kin too, which mean other things elsewhere on the site.
 //
 // Usage (from react/): node --test src/i18n/pages/style.test.mjs
 import assert from 'node:assert/strict';
@@ -27,6 +45,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { INTL_FIGURES, figure } from '../../components/pages/mainnet/timeline.js';
 import { displayRegion, formatUsd } from '../format.js';
 
 const PAGES = path.dirname(fileURLToPath(import.meta.url));
@@ -90,8 +109,54 @@ test('Spanish is neutral Latin American Spanish in tú, names the dollar US$ and
         ].join('|'))],
         ['a bare $ before an amount', /(?<![\p{L}$])\$\s?\d/u],
         ['Captura la bandera in quotes', /[«“"]Captura la bandera[»”"]/iu],
+        ['a place as Spain\'s CLDR names it (es-419)', /Côte d[’']Ivoire|Timor-Leste|Islas Aland|Sandwich|(?<!del\s)(?<!\p{L})Congo(?!\p{L})/u],
     ]);
-    assert.deepEqual(['ro', 'sa'].map((code) => displayRegion(code, 'es')), ['Rumania', 'Arabia Saudita']);
+    assert.deepEqual(['ro', 'sa', 'ci', 'tl', 'ax', 'cg', 'gs'].map((code) => displayRegion(code, 'es')),
+        ['Rumania', 'Arabia Saudita', 'Costa de Marfil', 'Timor Oriental', 'Islas Åland', 'República del Congo', 'Islas Georgia del Sur y Sándwich del Sur']);
+    // og:locale for the Spanish pages: Latin American Spanish, in the layout and the dashboard's own head
+    for (const file of ['astro/src/layouts/Base.astro', 'astro/src/components/routes/DashboardRoute.astro']) {
+        const head = fs.readFileSync(path.resolve(PAGES, '../../../..', file), 'utf8');
+        assert.match(head, /\bes: 'es_LA'/, file);
+        assert.doesNotMatch(head, /es_ES/, file);
+    }
+});
+
+test('Chinese labels that name a place without counting say 国家或地区', async () => {
+    // a label that begins with the verb or quantifier and names the place, as the search box and the lists do
+    refuse('zh', [['a label naming a place without 或地区', /(?<=['"`])(?:输入|搜索|更多|所有|主要|其他)国家(?!或地区|和地区)/u]]);
+    const unit = async (rel) => (await import(new URL(rel, import.meta.url))).default;
+    const [ctf, dashboard, script] = await Promise.all(['./ctf/zh.js', './dashboard/zh.js', './dashboard/script/zh.js'].map(unit));
+    const labels = {
+        'ctf board.empty': ctf.board.empty, 'ctf board.findPlaceholder': ctf.board.findPlaceholder,
+        'ctf card.pickLabel': ctf.card.pickLabel, 'ctf card.pickPlaceholder': ctf.card.pickPlaceholder, 'ctf country.more': ctf.country.more,
+        // the card's own place, the visitor's (a visitor in 香港, 澳门 or 台湾 sees it), and the links and hints to a place
+        'ctf card.here': ctf.card.here, 'ctf card.yourCountry': ctf.card.yourCountry, 'ctf card.where': ctf.card.where,
+        'ctf card.whereIn': ctf.card.whereIn, 'ctf cell.countryPage': ctf.cell.countryPage, 'ctf legend.mobile': ctf.legend.mobile,
+        'dashboard/script country.prompt': script.country.prompt,
+        'dashboard titles.allCountries': dashboard.titles.allCountries, 'dashboard common.searchCountry': dashboard.common.searchCountry,
+        'dashboard/script country.none': script.country.none, 'dashboard/script country.topCountries': script.country.topCountries,
+        'dashboard/script country.tableCountry': script.country.tableCountry,
+    };
+    for (const [key, value] of Object.entries(labels)) assert.match(value, /国家或地区/u, `${key}: ${value}`);
+});
+
+test('Russian and German name Hong Kong and Macao by their short names, and write /mainnet\'s figures as Intl does', () => {
+    refuse('ru', [['CLDR\'s SAR form', /\(САР\)|Специальный административный район/u]]);
+    refuse('de', [['CLDR\'s SAR form', /Sonderverwaltungsregion/u]]);
+    assert.deepEqual(['hk', 'mo'].map((code) => displayRegion(code, 'ru')), ['Гонконг', 'Макао']);
+    assert.deepEqual(['hk', 'mo'].map((code) => displayRegion(code, 'de')), ['Hongkong', 'Macau']);
+    assert.ok(['es', 'de', 'ru'].every((lang) => INTL_FIGURES.includes(lang)), String(INTL_FIGURES));
+    assert.equal(figure(9247228, 'de'), '9.247.228');
+    assert.equal(figure(9247228, 'ru'), '9\u00a0247\u00a0228');
+    assert.equal(figure(9247228, 'ar'), '9,247,228');
+});
+
+test('no page in any language names capture the flag\'s draw with the words of drawing lots', () => {
+    refuse('ru', [['a drawing of lots (the draw is случайный отбор)', /жеребь[её]вк|жреби[йяюеи]/iu]]);
+    refuse('ar', [['a drawing of lots (the draw is الاختيار العشوائي)', /قرع[ةت]/u]]);
+    refuse('zh', [['a drawing of lots (the draw is 随机选取)', /抽签|抽中|摇号/u]]);
+    refuse('de', [['a drawing of lots (the draw is Zufallsauswahl)', /auslos|ausgelost|losentscheid|losverfahren/iu]]);
+    refuse('es', [['a drawing of lots (the draw is selección aleatoria)', word('sorteos?|sortead[oa]s?')]]);
 });
 
 test('the code writes a Spanish dollar amount as US$ and Intl\'s figure, and every other language as Intl does', () => {

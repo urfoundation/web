@@ -99,7 +99,7 @@ test('every milestone, step and epoch is translated, with the data\'s dates, sta
     }
 });
 
-test('dates and blocks are written in each language, at the same UTC times, with the English figures (Spanish: Intl\'s)', () => {
+test('dates and blocks are written in each language, at the same UTC times, with the English figures (Spanish, German and Russian: Intl\'s)', () => {
     const at = (value, t, options = {}) => whenText(parseWhen(value), { ...options, t });
     for (const lang of LANGS) {
         const t = page(lang);
@@ -118,9 +118,12 @@ test('dates and blocks are written in each language, at the same UTC times, with
         const day = epochBlocks(mainnetEpochs[0], { lang, t });
         assert.ok([9240028, 9247228, 7200, 1].every((n) => day.includes(figure(n, lang))), `${lang}: ${day}`);
     }
-    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'ru', t: page('ru') }), 'Блоки 9,247,228 → 9,297,628 · 50,400 блоков, 7 дней');
-    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'de', t: page('de') }), 'Blöcke 9,247,228 → 9,297,628 · 50,400 Blöcke, 7 Tage');
-    // Spanish writes figures as Intl does for the page, as on /ctf and its other pages
+    // Spanish, German and Russian write figures as Intl does for the page, as on /ctf and their other pages
+    // (Russian groups with no-break spaces); Chinese and Arabic keep the English separators
+    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'ru', t: page('ru') }), 'Блоки 9\u00a0247\u00a0228 → 9\u00a0297\u00a0628 · 50\u00a0400 блоков, 7 дней');
+    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'de', t: page('de') }), 'Blöcke 9.247.228 → 9.297.628 · 50.400 Blöcke, 7 Tage');
+    assert.equal(epochBlocks(mainnetEpochs[0], { lang: 'de', t: page('de') }), 'Blöcke 9.240.028 → 9.247.228 · 7.200 Blöcke, 1 Tag');
+    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'zh', t: page('zh') }), '区块 9,247,228 → 9,297,628 · 50,400 个区块，7 天');
     assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'es', t: page('es') }), 'Bloques 9.247.228 → 9.297.628 · 50.400 bloques, 7 días');
     assert.equal(epochBlocks(mainnetEpochs[0], { lang: 'es', t: page('es') }), 'Bloques 9.240.028 → 9.247.228 · 7200 bloques, 1 día');
     assert.equal(epochBlocks(mainnetEpochs[0], { lang: 'ar', t: page('ar') }), 'الكتل 9,240,028 ← 9,247,228 · 7,200 كتلة، 1 يوم');

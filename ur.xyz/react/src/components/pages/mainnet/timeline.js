@@ -233,11 +233,13 @@ export const thousands = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\
 
 /**
  * The languages whose /mainnet figures are written as Intl writes them for the
- * page, as their other pages write figures: Spanish (9.247.228, 1076,26), the
- * owner's style decision of 2026-11-12, so /mainnet and /ctf read alike. Every
- * other language keeps the English digits and separators (9,247,228).
+ * page, as their other pages write figures: Spanish (9.247.228, 1076,26),
+ * German (9.247.228, 1.076,26) and Russian (9 247 228, 1 076,26, with no-break
+ * spaces), the owner's style decisions of 2026-11-12, so /mainnet and /ctf
+ * read alike. Every other language keeps the English digits and separators
+ * (9,247,228).
  */
-export const INTL_FIGURES = Object.freeze(['es']);
+export const INTL_FIGURES = Object.freeze(['es', 'de', 'ru']);
 
 /** A whole number as the page writes it: 9,247,228, or Intl's 9.247.228 in a language of INTL_FIGURES. */
 export const figure = (n, lang = 'en') => (INTL_FIGURES.includes(lang) ? formatNumber(Math.round(n), lang) : thousands(n));
@@ -251,9 +253,10 @@ export const epochDays = (epoch) => parseWhen(`${epoch.start.time.slice(0, 10)}/
 /**
  * "Blocks 9,247,228 → 9,297,628 · 50,400 blocks, 7 days". The figures keep
  * their English digits and separators, but in a language of INTL_FIGURES
- * (Spanish: "Bloques 9.247.228 → 9.297.628 · 50.400 bloques, 7 días"); the
- * words and their plural forms are the language's (labels.epochBlocks, blocks,
- * days, aboutDays).
+ * (Spanish: "Bloques 9.247.228 → 9.297.628 · 50.400 bloques, 7 días"; German:
+ * "Blöcke 9.247.228 → 9.297.628 · 50.400 Blöcke, 7 Tage"); the words and their
+ * plural forms are the language's (labels.epochBlocks, blocks, days,
+ * aboutDays).
  */
 export function epochBlocks(epoch, { lang = 'en', t = EN } = {}) {
     const blocks = epoch.end.block - epoch.start.block;

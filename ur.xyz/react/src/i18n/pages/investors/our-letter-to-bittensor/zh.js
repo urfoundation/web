@@ -46,7 +46,7 @@ export default {
 
     coverage: {
         heading: '如今矿工集中在两个地区，使网络的上限停留在约一百万用户',
-        subheading: '如今 100k+ 网络运营商分布在哪里，以及激励市场会把他们带到哪里',
+        subheading: '如今 100k+ 提供者分布在哪里，以及激励市场会把他们带到哪里',
         before: {
             eyebrow: '之前',
             title: '深耕两个地区',

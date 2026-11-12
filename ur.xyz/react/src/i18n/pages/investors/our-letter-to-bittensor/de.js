@@ -46,7 +46,7 @@ export default {
 
     coverage: {
         heading: 'Miner bündeln sich heute in zwei Regionen, was das Netzwerk bei rund einer Million Nutzern deckelt',
-        subheading: 'Wo die 100k+ Netzbetreiber heute sitzen und wohin ein Anreizmarkt sie bringt',
+        subheading: 'Wo die 100k+ Provider heute sitzen und wohin ein Anreizmarkt sie bringt',
         before: {
             eyebrow: 'Vorher',
             title: 'Tief in zwei Regionen',

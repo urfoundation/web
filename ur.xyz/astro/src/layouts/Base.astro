@@ -56,7 +56,9 @@ const ogImage = `${SITE_ORIGIN}${ogImageProp || '/og.png'}`;
 const ogAlt = ogImageAlt || `UR: ${description.length <= 120 ? description : title}`;
 const alternateHref = alternate && (alternate.href.startsWith('http') ? alternate.href : `${SITE_ORIGIN}${alternate.href}`);
 
-const OG_LOCALES = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_ES' };
+// Spanish is es_LA, Facebook's Latin American Spanish, as the Spanish pages are neutral Latin American Spanish
+// (the owner's style decision of 2026-11-12)
+const OG_LOCALES = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_LA' };
 const ogLocale = OG_LOCALES[lang] || OG_LOCALES.en;
 
 // Language alternates exist only for routes backed by real translated pages

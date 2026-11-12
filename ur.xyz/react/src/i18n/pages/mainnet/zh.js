@@ -3,8 +3,9 @@
 // The terms of all three units (this one, data/ and timeline/): epoch 周期 (a subscription's cycle is 计费周期);
 // settlement v2 结算 v2; version 1 版本 1; network operator 网络运营商; subnet owner 子网所有者; payout root 支付根;
 // commit 提交; challenge period 质疑期; claim 领取; earnings 报酬 (not 收益, which reads as returns); payout wallet 收款钱包; governance Safe 治理 Safe; timelock
-// 时间锁; vault 金库; capture the flag 夺旗 (the apps' name); draw 抽签 (never 抽奖, 彩票 or 奖池: it is not a
-// lottery); entry 参与者; slot 槽位; pot 累积池; carry forward 结转; relay 中继; credited to 计给 (not 获得计入);
+// 时间锁; vault 金库; capture the flag 夺旗 (the apps' name); draw 随机选取, to draw 随机选出 (a public, verifiable
+// random selection: never 抽签, a drawing of lots, and never 抽奖, 彩票 or 奖池: it is not a lottery); entry 参与者;
+// slot 槽位; pot 累积池; carry forward 结转; relay 中继; credited to 计给 (not 获得计入);
 // ISO 3166-1's 249 entries 国家和地区; the miner as software 矿工程序; quotes “”. Figures keep the English digits
 // and separators (9,240,028; 1,076.26 α); dates as 11月27日, times as 18:25 UTC.
 export default {

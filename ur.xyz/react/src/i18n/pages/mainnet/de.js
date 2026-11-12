@@ -11,14 +11,14 @@
 export default {
     meta: {
         title: 'Zeitleiste des SN25-Mainnet-Starts | UR',
-        description: 'Der SN25-Mainnet-Start nach Auszahlungsepochen: Version 1 ab dem 8. Oktober, Settlement v2 ab Epoche 4 (30. Oktober), die ersten Claims am 8. November.',
+        description: 'Der SN25-Mainnet-Start nach Auszahlungsepochen: Version 1 ab dem 8. Oktober, Settlement v2 ab Epoche 4 (30. Oktober) und Capture the Flag ab Epoche 8 (27. November).',
         breadcrumb: 'Mainnet',
     },
 
     intro: {
         eyebrow: 'SN25 · Bittensor-Mainnet',
         title: 'Zeitleiste des Mainnet-Starts',
-        lede: 'Das Subnet von UR, SN25, ging am 8. Oktober 2026 im Bittensor-Mainnet live. Diese Zeitleiste verfolgt den Start nach Auszahlungsepochen, von den Verträgen der Version 1 bis zum ersten Claim unter Settlement v2.',
+        lede: 'Das Subnet von UR, SN25, ging am 8. Oktober 2026 im Bittensor-Mainnet live. Diese Zeitleiste verfolgt den Start nach Auszahlungsepochen, von den Verträgen der Version 1 über Settlement v2 bis zu Capture the Flag, das mit Epoche 8 startet.',
         note: 'Meilensteine mit der Markierung {scheduled} oder {planned} stehen noch bevor, und ihre Termine können sich ändern. Alle Zeiten sind in UTC, und eine mit ≈ markierte Zeit ist ein Näherungswert: Die meisten sind aus Blocknummern hochgerechnet.',
     },
 
@@ -29,6 +29,7 @@ export default {
             'SN25 bezahlt Provider nach Auszahlungsepochen. Das sind die Abrechnungsepochen von UR, nicht das 72-minütige Tempo der Chain: Epoche 0 dauerte einen Tag, und jede spätere Epoche dauert 7 Tage (50.400 Blöcke).',
             'Version 1 startete am 8. Oktober und rechnet die Epochen 1 bis 3 ab. Sie bezahlt nur die Provider, die der Validator gemessen hat, und diese Messung ist auf etwa 1.500 Provider pro Epoche begrenzt, sodass die meisten Miner keinen Anteil aus Version 1 erhalten.',
             'Settlement v2 zahlt nach Nutzung und hebt diese Grenze auf. Es sollte ab Epoche 3 übernehmen, doch sein Pool wurde nicht registriert, bevor Epoche 3 am 23. Oktober begann, sodass Version 1 auch Epoche 3 abrechnet. Sein Pool wurde am 29. Oktober registriert, und Settlement v2 hat seit Epoche 4, die am 30. Oktober gegen 18:25 UTC begann, jede Epoche bezahlt. Die erste v2-Epoche endete um den 6. November, und ihre Claims öffneten am 8. November, nachdem ihr Root festgeschrieben und ihre Anfechtungsfrist abgelaufen war.',
+            'Ab Epoche 8, die am 27. November gegen 18:25 UTC beginnt, hat jeder Netzbetreiber neben seinem Provider-Pool einen zweiten Pool: Capture the Flag, den Settlement v2 im selben Einlöse-Ablauf auszahlt. Der Provider-Pool zahlt für Nutzung, Capture the Flag für die Präsenz in einem Land, mit zehn Slots in jedem Land pro Epoche.',
         ],
         epochsAria: 'Auszahlungsepochen',
     },
@@ -41,10 +42,12 @@ export default {
     },
 
     noticeDate: 'Mitteilung · {date}',
+    noticeToggle: { expand: 'Aufklappen', collapse: 'Zuklappen' },
 
     labels: {
         status: { done: 'Erledigt', in_progress: 'Läuft', scheduled: 'Angesetzt', planned: 'Geplant' },
         settlement: { v1: 'Version 1', v2: 'Settlement v2' },
+        captureTheFlag: 'Capture the Flag',
         view: { transaction: 'Transaktion ansehen', contract: 'Vertrag ansehen', block: 'Block ansehen' },
         sourceAria: '{action}: {label}',
         sourcesAria: 'Quellen zu {title}',

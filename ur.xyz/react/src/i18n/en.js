@@ -176,7 +176,7 @@ export default {
         signedBefore:          'Epochs before epoch {epoch} keep the earlier rate.',
         signedBeforeInitial:   'Until epoch {epoch}, the initial period\'s rate of 0 α stays in force.',
         sourcingTitle:         'Sourcing commitment',
-        sourcingPays:          'From the first priced epoch, the network operator pays every SN25 demand deposit with alpha bought on the open market with its revenue. It uses no alpha obtained any other way.',
+        sourcingPays:          'From the first priced epoch, network operator 1 pays each of its SN25 demand deposits with alpha bought on the open market with its revenue. It uses no alpha obtained any other way.',
         sourcingRoute:         'Every purchase is on chain. USDC is swapped for TAO on Solana through Jupiter, bridged to Bittensor over LayerZero, and staked into SN25 alpha by the deposit wallet:',
         sourcingUsdcWallet:    'USDC wallet (Solana):',
         sourcingDepositWallet: 'Deposit wallet (Bittensor):',

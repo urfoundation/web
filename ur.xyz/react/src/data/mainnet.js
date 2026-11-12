@@ -18,6 +18,9 @@
  * `settlement` is what pays the epoch: 'v1' (version 1) or 'v2' (settlement
  * v2, from epoch 4: epoch 3 began before the v2 pool was registered, so it
  * stayed on version 1, and its funding is recovered: see its notice below).
+ * `captureTheFlag` marks an epoch in which capture the flag pays beside the
+ * provider pool, from epoch 8 (the capture the flag notice below); the page
+ * flags it in the epoch's row and over its milestones.
  *
  * Plain data with no imports: the page, the SPA and the node test
  * (tests/mainnet-timeline.test.mjs) all read it. Its one rule is the order of
@@ -81,12 +84,21 @@ export const mainnetEpochs = [
         start: { block: 9549628, time: '2026-11-20T18:25:00Z', projected: true },
         end: { block: 9600028, time: '2026-11-27T18:25:00Z', projected: true },
     },
+    {
+        number: 8,
+        settlement: 'v2',
+        captureTheFlag: true,
+        summary: 'The first capture the flag epoch: ten slots in every country',
+        start: { block: 9600028, time: '2026-11-27T18:25:00Z', projected: true },
+        end: { block: 9650428, time: '2026-12-04T18:25:00Z', projected: true },
+    },
 ];
 
 // the milestones before the first epoch listed above, and after the last
 // (the page names that group after the last epoch's number). The epochs run to
-// epoch 7, the first with priced demand deposits; the first settlement v2 cycle,
-// which once came after the last epoch, is epoch 5's.
+// epoch 8, the first in which capture the flag pays: its draw and its first
+// claims, after epoch 8 ends, are listed after it. The first settlement v2
+// cycle, which once came after the last epoch, is epoch 5's.
 export const mainnetBeforeEpochs = { title: 'Before launch' };
 export const mainnetAfterEpochs = {};
 
@@ -160,7 +172,7 @@ const NOTICES = [
         title: "Pro data moves to each network's own cycle. SN25 rewards are counted as before.",
         paragraphs: [
             "With the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, instead of on the 1st of the month. Each cycle's grant carries that cycle's share of the subscription's revenue, and a payment no longer adds a separate 600 GiB credit.",
-            'SN25 pool rewards are counted as before. The pool is split by completed usage, and subscription payments are not an input to it.',
+            "SN25 pool rewards are counted as before. Each operator's pool is split by completed usage, and subscription payments are not an input to it.",
             "What changes is the subscription revenue counted by the network operator's provider subsidy, which for traffic since the October 6 cutoff pays no USDC and only counts toward the weekly points the network operator awards. The subsidy counts revenue through the balances that fund settled traffic. Before, a paid period's revenue could count twice, in full through its 600 GiB credit and again as a share through the monthly grant, and a long-running Google Play subscription counted only a share spread over the months since it began. From the release, each period's revenue counts once, through its cycle grants.",
             "So the subsidy counts less where revenue counted twice, as in a new subscription's first month, and more for long-running Google Play subscriptions. Its timing follows each network's own cycle rather than the 1st. A payment credited during a running cycle, such as a second subscription, adds its revenue to the cycles after it, and the part that overlaps the running cycle is not counted.",
             "Nothing granted before the release changes. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, when that grant's month ends. Customers pay the same, and there is nothing you need to do.",
@@ -173,7 +185,7 @@ const NOTICES = [
         title: 'Capture the flag starts with epoch 8: ten slots in every country, beside the provider pool.',
         paragraphs: [
             "From epoch 8, which starts at block 9,600,028 around November 27, 18:25 UTC, each network operator gets a second SN25 pool beside its provider pool: capture the flag. The provider pool pays for usage, and capture the flag pays for being present in a country. Each of the 249 ISO 3166-1 countries has ten slots each epoch (one week), five for providers and five for extenders, and every slot is worth the same: the pool's new funding for the epoch divided by 2,490.",
-            "A provider or extender enters its country's draw when it was online, passing the network operator's checks and in that country for at least half of the epoch, and is active at its end. The operator commits the list of entries on chain, and a drand round published after it draws up to five winners per country and role. Miners in one /29 IPv4 or /48 IPv6 block share one entry. With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries.",
+            "A provider or extender enters its country's draw when it was online, passing its network operator's checks and in that country for at least half of the epoch, and is active at its end. Each operator commits its list of entries on chain, and a drand round published after it draws up to five winners per country and role. Miners in one /29 IPv4 or /48 IPv6 block share one entry. With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries.",
             "A slot with no winner carries forward into its country's pot for that role. Each winner takes its own slot and a fifth of that pot, so a miner alone in a country takes a fifth of what is left for each epoch it stays.",
             "From epoch 8 the provider pool gets 9/10 of the providers' share of emission instead of all of it. In epoch 4 that share was 1,195.84 α; at that scale the provider pool would get 1,076.26 α and capture the flag 119.58 α. Once top-level fleets are weighted, the provider pool gets 4/10. These figures are at epoch 4's scale, not a forecast. Rewards are paid in alpha, whose value changes and can fall, and what a miner receives depends on its uptime, on how many others are eligible in its country and on the network's emission.",
             "Winners are paid to the payout wallet the provider pool already uses, so there is nothing new to sign. Epoch 8's capture the flag claims open around December 7, with its pool claims, in the same claim flow. The pool is registered through the 72-hour timelock before epoch 8 starts, and the milestones below give each step. There is nothing you need to do.",

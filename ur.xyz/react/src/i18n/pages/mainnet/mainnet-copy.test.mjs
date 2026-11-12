@@ -199,6 +199,13 @@ test('capture the flag keeps the apps\' name, and no translation reads as a lott
         if (t.unit === 'data') {
             const title = t.flat.get('notices.notice-capture-the-flag.title');
             assert.match(title, CTF_NAME[t.lang], `${t.name}: the capture the flag notice's title names it as the apps do: "${title}"`);
+            // epoch 8, the first in which it pays, says so in its row's group
+            assert.match(t.flat.get('epochs.8'), CTF_NAME[t.lang], `${t.name}: epochs.8 names capture the flag as the apps do`);
+        }
+        if (t.unit === '') {
+            // the flag beside an epoch's settlement, and the settlement section's paragraph on it
+            assert.match(t.flat.get('labels.captureTheFlag'), CTF_NAME[t.lang], `${t.name}: labels.captureTheFlag`);
+            assert.match(t.flat.get('settlement.paragraphs.3'), CTF_NAME[t.lang], `${t.name}: settlement.paragraphs.3`);
         }
         if (t.unit === 'timeline') {
             for (const [key, text] of t.flat) {

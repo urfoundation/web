@@ -21,7 +21,15 @@ export default {
         browseDocs:   'تصفّح الوثائق',
         search:       'بحث',
         ctaAria:    'تكلفة الاستخدام — سعر الشبكة الحالي',
-        denomAria:  'عملة عرض السعر'
+        denomAria:  'عملة عرض السعر',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'من نحن',
+        build:       'التطوير',
+        investors:   'المستثمرون',
+        dashboard:   'لوحة البيانات',
+        liveDashboard: 'لوحة البيانات المباشرة',
+        ctf:         'الاستيلاء على العلم'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'شبكة UR الفرعية على Telegram',
         socialDiscord:  'Discord الخاص بـ URnetwork',
         socialGithub:   'شبكة UR الفرعية على GitHub',
-        productsAria:   'منتجات URnetwork على ur.io'
+        productsAria:   'منتجات URnetwork على ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'ابنِ على UR',
+        reserve:       'الاحتياطي',
+        mainnet:       'الشبكة الرئيسية',
+        investorCentre:  'مركز المستثمرين'
     },
 
     disclaimer: {

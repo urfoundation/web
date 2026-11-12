@@ -1,23 +1,29 @@
 import React from 'react';
+import { loadPageCopy } from '../../../i18n/page-copy.js';
+
+const copy = await loadPageCopy('investors/our-letter-to-bittensor');
 
 // The letter's coverage exhibit: the same world map twice, before and after
 // an incentive market spreads the miners out. Static. The panel titles are
 // captions inside the figure, not headings: as <h3>s they sat under the
 // letter's <h1> before its first <h2>, a skipped level in the page outline.
-export default function CoverageExhibit() {
+// Its words are the letter unit's (react/src/i18n/pages/investors/
+// our-letter-to-bittensor/, `coverage`), in the page's language.
+export default function CoverageExhibit({ lang = 'en' }) {
+    const t = copy(lang).coverage;
     return (
         <figure className="letter-exhibit letter-coverage-exhibit">
             <figcaption className="letter-exhibit__heading">
-                <strong>Miners cluster in two regions today, capping the network near one million users</strong>
-                <small>Where the 100k+ network operators sit today, and where an incentive market puts them</small>
+                <strong>{t.heading}</strong>
+                <small>{t.subheading}</small>
             </figcaption>
 
             <div className="coverage-comparison">
                 <section className="coverage-panel">
-                    <p className="coverage-panel__eyebrow">Before</p>
-                    <strong className="coverage-panel__title">Deep in two regions</strong>
-                    <p>real density in the US and Southeast Asia, funded by the company</p>
-                    <svg className="coverage-map" viewBox="0 0 360 170" role="img" aria-label="Coverage concentrated in the United States and Southeast Asia">
+                    <p className="coverage-panel__eyebrow">{t.before.eyebrow}</p>
+                    <strong className="coverage-panel__title">{t.before.title}</strong>
+                    <p>{t.before.text}</p>
+                    <svg className="coverage-map" viewBox="0 0 360 170" role="img" aria-label={t.before.mapAria}>
                         <defs>
                             <pattern id="coverage-dots-before" width="7" height="7" patternUnits="userSpaceOnUse">
                                 <circle cx="2" cy="2" r="1.3" fill="currentColor" />
@@ -45,10 +51,10 @@ export default function CoverageExhibit() {
                 </section>
 
                 <section className="coverage-panel coverage-panel--after">
-                    <p className="coverage-panel__eyebrow">After</p>
-                    <strong className="coverage-panel__title">That depth, everywhere</strong>
-                    <p>100k+ residential addresses</p>
-                    <svg className="coverage-map" viewBox="0 0 360 170" role="img" aria-label="Residential address coverage distributed around the world">
+                    <p className="coverage-panel__eyebrow">{t.after.eyebrow}</p>
+                    <strong className="coverage-panel__title">{t.after.title}</strong>
+                    <p>{t.after.text}</p>
+                    <svg className="coverage-map" viewBox="0 0 360 170" role="img" aria-label={t.after.mapAria}>
                         <defs>
                             <pattern id="coverage-dots-after" width="7" height="7" patternUnits="userSpaceOnUse">
                                 <circle cx="2" cy="2" r="1.3" fill="currentColor" />

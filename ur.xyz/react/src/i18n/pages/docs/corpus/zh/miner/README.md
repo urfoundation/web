@@ -4,6 +4,20 @@ description: 只需几步即可在 UR 上开始挖矿。矿工做什么、你需
 
 # 如何运行矿工
 
+> **如果你的矿工后台服务是由 `provider setup` 或 `provider service install` 设置的，请手动更新一次。** 自 2026.10.22 版本以来，这些矿工在 Linux、macOS 和 Windows 上都没有自行更新。矿工的更新程序接受的版本写法类似 `2026.10.27-1083160450`，但发布版本的标记是 `2026.10.27+1083160450`，因此每个发布版本都把自己当成了开发版本：
+>
+> - `provider status` 显示 “development build, never updates itself”。
+> - `provider update` 以及自动更新都会拒绝，并提示 “this is a development build … which never replaces itself with a release”。
+> - 那个会在新版本未能重新连接时将其回滚的 10 分钟检查从未运行过。
+>
+> 修复包含在 2026 年 11 月 11 日之后的第一个版本中，你的矿工无法自行安装它。该版本发布后，请按[手动下载](/docs/miner/install#manual-download)中的说明下载并解压，但不要安装，而是运行它的更新：使用表中你的文件夹运行 `./linux/amd64/provider update`（如果是系统服务，在前面加上 `sudo`），或在 Windows 上运行 `& "$env:TEMP\windows\$Arch\provider.exe" update`。只输入 `provider update` 会运行你现有的矿工，而它仍会拒绝。该更新会替换你的服务所运行的矿工并将其重启。
+>
+> 此后，更新会再次自动进行：在每次发布后分散在大约 16 小时内，带有 10 分钟的连接检查、回滚，并会把未通过检查的版本跳过 7 天。之后 `provider status` 会显示更新是自动的，或者你已是最新版本。
+>
+> 如果你自己运行矿工、没有使用该服务，`provider update` 也会拒绝：请按[手动下载](/docs/miner/install#manual-download)中的说明安装新版本，然后重启矿工。
+>
+> 不受影响的有：Docker 镜像、各个应用，以及由安装程序设置的矿工，它们通过 `urnet-tools` 更新。
+
 UR 矿工把你的互联网连接作为出口提供给网络运营商。验证者检查它是否真的在承载流量，Bittensor SN25（netuid 25）则以子网的 α 代币（品牌名 $UR）为这项工作支付奖励。
 
 本页带你从零开始运行起一个矿工。矿工指南的其余页面会深入介绍，每页一个主题：

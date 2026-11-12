@@ -4,6 +4,20 @@ description: Empieza a minar en UR en pocos pasos. Qué hace un minero, qué nec
 
 # Cómo ejecutar un minero
 
+> **Si `provider setup` o `provider service install` configuraron el servicio en segundo plano de tu minero, actualízalo a mano una vez.** Desde la versión 2026.10.22, estos mineros no se han actualizado solos, ni en Linux, ni en macOS, ni en Windows. El actualizador del minero aceptaba versiones escritas como `2026.10.27-1083160450`, pero las versiones publicadas llevan el sello `2026.10.27+1083160450`, así que cada versión se tomaba a sí misma por una compilación de desarrollo:
+>
+> - `provider status` dice «development build, never updates itself».
+> - `provider update`, y las actualizaciones automáticas, se niegan con «this is a development build … which never replaces itself with a release».
+> - La comprobación de 10 minutos que revierte una versión nueva que no vuelve conectada nunca se ejecutó.
+>
+> La corrección está en la primera versión posterior al 11 de noviembre de 2026, y tu minero no puede instalarla por sí solo. Cuando salga esa versión, descárgala y descomprímela como en [Descarga manual](/docs/miner/install#manual-download) y, en lugar de instalarla, ejecuta su actualización: `./linux/amd64/provider update` con tu carpeta de la tabla (con `sudo` delante para un servicio del sistema), o en Windows `& "$env:TEMP\windows\$Arch\provider.exe" update`. Escribir solo `provider update` ejecuta el minero que tienes, que sigue negándose. La actualización reemplaza el minero que ejecuta tu servicio y lo reinicia.
+>
+> Después de eso, las actualizaciones vuelven a ser automáticas: repartidas a lo largo de unas 16 horas tras cada versión, con la comprobación de conexión de 10 minutos, una reversión y una omisión de 7 días de la versión que no la supere. `provider status` muestra entonces que las actualizaciones son automáticas, o que estás al día.
+>
+> Si ejecutas el minero tú mismo, sin ese servicio, `provider update` también se niega: instala la nueva versión como en [Descarga manual](/docs/miner/install#manual-download) y reinicia el minero.
+>
+> No están afectados: la imagen de Docker, las apps y los mineros configurados por un instalador, que se actualizan mediante `urnet-tools`.
+
 Un minero de UR comparte tu conexión a internet como salida para un operador de red. Los validadores comprueban que realmente transporta tráfico, y Bittensor SN25 (netuid 25) paga recompensas por ese trabajo en el token α de la subred, con la marca $UR.
 
 Esta página te lleva de cero a un minero en funcionamiento. El resto de la guía del minero profundiza, un tema por página:

@@ -61,6 +61,8 @@ Luego desactiva las actualizaciones automáticas con `urnet-tools auto-update of
 
 ## Actualizaciones automáticas (servicio de provider)
 
+> **Estas actualizaciones no han instalado ninguna versión desde la 2026.10.22.** Cuando salga la primera versión posterior al 11 de noviembre de 2026, actualiza a mano una vez, como explica el aviso al principio de [Cómo ejecutar un minero](/docs/miner). A partir de entonces funcionan como se describe aquí.
+
 El [servicio en segundo plano](/docs/miner/run#with-provider-service) que configura `provider setup` o `provider service install` también mantiene el minero actualizado. Comprueba la [página de versiones de build](https://github.com/urnetwork/build/releases) cada 6 horas: en Linux a partir de 15 minutos después de que arranque el ordenador, más un retraso aleatorio de hasta una hora; en macOS desde que inicias sesión; en Windows a partir de 15 minutos después de que inicies sesión, más un retraso aleatorio de hasta una hora. Tras una versión, cada minero espera su propia fracción aleatoria de 16 horas, de modo que todos la tienen en un día sin que se reinicien todos a la vez.
 
 Una actualización verifica la descarga con el SHA-256 que GitHub publica para ella (eso detecta una descarga dañada), conserva el programa anterior junto al nuevo y reinicia el servicio. Si la versión nueva no vuelve a funcionar en 10 minutos (y conectada de nuevo, si antes estaba conectada), se restaura la anterior y esa versión se omite durante una semana. Tu identidad en `~/.urnetwork` no se toca.

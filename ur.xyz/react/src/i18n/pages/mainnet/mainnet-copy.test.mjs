@@ -8,9 +8,11 @@
 //   • every {placeholder}, as it is;
 //   • the figures: every number of the English (a block, an amount, a time, a
 //     day of the month, a section of a document) appears as the English writes
-//     it, with its digits and separators, Western digits in Arabic too; every
-//     ≈ and UTC; and the names that are not translated (SN25, STSettlement2,
-//     drand, the governance Safe, …);
+//     it, with its digits and separators, Western digits in Arabic too, and in
+//     Spanish as Intl writes it for the page (9.240.028, 1076,26), as /ctf and
+//     its other pages do (timeline.js INTL_FIGURES); every ≈ and UTC; and the
+//     names that are not translated (SN25, STSettlement2, drand, the
+//     governance Safe, …);
 //   • capture the flag under the apps' name for it in each language, and never
 //     called a lottery or a game of chance: the draw picks slots, in plain
 //     words, without the words of gambling or of earnings promises
@@ -22,6 +24,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import { INTL_FIGURES } from '../../../components/pages/mainnet/timeline.js';
+import { formatNumber } from '../../format.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const UNITS = ['', 'data', 'timeline'];
@@ -70,8 +75,17 @@ function* pairs(t) {
 
 const placeholders = (text) => [...String(text).matchAll(/\{[A-Za-z][A-Za-z0-9_]*\}/g)].map((m) => m[0]).sort();
 
-// a figure as the English writes it: 9,240,028, 1,076.26, 18:25, 8.6.7, 2026, 5
-const figures = (text) => [...new Set(String(text).match(/\d+(?:[.,:]\d+)*/g) || [])];
+// a figure as the English writes it: 9,240,028, 1,076.26, 18:25, §8.6.7, 2026, 5
+const figures = (text) => [...new Set(String(text).match(/§?\d+(?:[.,:]\d+)*/g) || [])];
+
+// the figure as a translation writes it: as the English does, but in a language of INTL_FIGURES (Spanish), whose
+// numbers are Intl's for the page (9.240.028, 1076,26, 0,1); a section (§8.6.7), a time (18:25) and a whole number
+// without separators (2026, 4294967297) read the same in every language
+const written = (figure, lang) => {
+    if (!INTL_FIGURES.has(lang) || !/^(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d+)$/.test(figure)) return figure;
+    const decimals = (figure.split('.')[1] || '').length;
+    return formatNumber(Number(figure.replace(/,/g, '')), lang, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+};
 
 // names every language keeps, wherever the English has them
 const NAMES = ['SN25', 'Bittensor', 'STSettlement2', 'vault2', 'drand', 'Safe', 'Google Play', 'GiB', 'USDC', 'EVM', 'UID', 'ISO 3166-1', 'IPv4', 'IPv6', 'price.yml', 'WHITEPAPER.md', 'CAPTURETHEFLAG.md', 'α', 'UTC', '≈', 'Pro'];
@@ -147,8 +161,9 @@ test('the figures and the names are the English\'s own, in Western digits', () =
             if (/^(dates|summary\.epochShort)/.test(key)) continue;
             for (const figure of figures(en)) {
                 // a figure inside a word of the English (IPv4, SN25, vault2) is the name's
-                const bare = new RegExp(`(^|[^\\d.,:])${figure.replace(/[.,]/g, '\\$&')}(?![\\d]|[.,:]\\d)`);
-                assert.match(text, bare, `${t.name}: ${key} lacks ${figure}: "${text}"`);
+                const mine = written(figure, t.lang);
+                const bare = new RegExp(`(^|[^\\d.,:])${mine.replace(/[.,]/g, '\\$&')}(?![\\d]|[.,:]\\d)`);
+                assert.match(text, bare, `${t.name}: ${key} lacks ${mine}: "${text}"`);
             }
             for (const name of NAMES) {
                 if (!en.includes(name)) continue;

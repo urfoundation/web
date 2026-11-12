@@ -13,7 +13,7 @@
 
 import { SECONDS_PER_BLOCK } from '../../../data/mainnet.js';
 import EN from '../../../i18n/pages/mainnet/en.js';
-import { interpolate, plural } from '../../../i18n/format.js';
+import { formatNumber, interpolate, plural } from '../../../i18n/format.js';
 
 // A milestone's status: done; in progress; scheduled, fixed by the chain, a
 // contract or a decision; or planned, intended but not final. Scheduled and
@@ -231,6 +231,17 @@ export const whenText = (when, options) => whenParts(when, options).map((part) =
 
 export const thousands = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+/**
+ * The languages whose /mainnet figures are written as Intl writes them for the
+ * page, as their other pages write figures: Spanish (9.247.228, 1076,26), the
+ * owner's style decision of 2026-11-12, so /mainnet and /ctf read alike. Every
+ * other language keeps the English digits and separators (9,247,228).
+ */
+export const INTL_FIGURES = Object.freeze(new Set(['es']));
+
+/** A whole number as the page writes it: 9,247,228, or Intl's 9.247.228 in a language of INTL_FIGURES. */
+export const figure = (n, lang = 'en') => (INTL_FIGURES.has(lang) ? formatNumber(Math.round(n), lang) : thousands(n));
+
 /** An epoch's start and end, as a milestone date (date-times). */
 export const epochWhen = (epoch) => parseWhen(`${epoch.start.time}/${epoch.end.time}`);
 
@@ -239,15 +250,17 @@ export const epochDays = (epoch) => parseWhen(`${epoch.start.time.slice(0, 10)}/
 
 /**
  * "Blocks 9,247,228 → 9,297,628 · 50,400 blocks, 7 days". The figures keep
- * their English digits and separators in every language; the words and their
- * plural forms are the language's (labels.epochBlocks, blocks, days, aboutDays).
+ * their English digits and separators, but in a language of INTL_FIGURES
+ * (Spanish: "Bloques 9.247.228 → 9.297.628 · 50.400 bloques, 7 días"); the
+ * words and their plural forms are the language's (labels.epochBlocks, blocks,
+ * days, aboutDays).
  */
 export function epochBlocks(epoch, { lang = 'en', t = EN } = {}) {
     const blocks = epoch.end.block - epoch.start.block;
     const days = (blocks * SECONDS_PER_BLOCK) / 86400;
-    const counted = (forms, n) => interpolate(plural(lang, n, forms), { count: thousands(n) });
+    const counted = (forms, n) => interpolate(plural(lang, n, forms), { count: figure(n, lang) });
     const length = Number.isInteger(days) ? counted(t.labels.days, days) : counted(t.labels.aboutDays, Math.round(days));
-    return interpolate(t.labels.epochBlocks, { start: thousands(epoch.start.block), end: thousands(epoch.end.block), blocks: counted(t.labels.blocks, blocks), length });
+    return interpolate(t.labels.epochBlocks, { start: figure(epoch.start.block, lang), end: figure(epoch.end.block, lang), blocks: counted(t.labels.blocks, blocks), length });
 }
 
 /**

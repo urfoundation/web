@@ -7,6 +7,7 @@ export default {
     loadError: 'Die Statistikquellen konnten nicht erreicht werden. Lade die Seite neu, um es erneut zu versuchen.',
     previewError: 'Die Statistikquelle konnte nicht erreicht werden. Neuer Versuch in 1 Minute.',
     unavailable: 'Konnte gerade nicht geladen werden',
+    chainUnavailable: 'Das Bittensor-Mainnet ist gerade nicht erreichbar. Wir versuchen es weiter.',
 
     periodLength: { d1: '24 Stunden', d3: '3 Tage', d7: '7 Tage', d30: '30 Tage', d90: '90 Tage' },
     lastPeriod: 'Letzte {period}',

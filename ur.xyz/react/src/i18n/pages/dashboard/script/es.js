@@ -3,6 +3,7 @@ export default {
     loadError: "No se pudo conectar con las fuentes de estadísticas. Recarga para intentarlo de nuevo.",
     previewError: "No se pudo conectar con la fuente de estadísticas. Se reintentará en 1 min.",
     unavailable: "No se pudo cargar en este momento",
+    chainUnavailable: "No se pudo conectar con la mainnet de Bittensor en este momento. Lo seguimos intentando.",
     periodLength: {
         d1: "24 horas",
         d3: "3 días",

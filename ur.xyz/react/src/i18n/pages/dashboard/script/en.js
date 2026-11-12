@@ -17,6 +17,10 @@ export default {
     previewError: 'Couldn’t reach the stats source. Trying again in 1 min.',
     // at the foot of each panel whose chart, table or map couldn't load
     unavailable: 'Couldn’t load this right now',
+    // in place of what the page reads from Bittensor mainnet (the reserve, its daily inflow, the conviction locks)
+    // while the visitor's browser can't reach it, as a filtered network may keep it from doing; the page keeps
+    // trying and fills them in once it answers
+    chainUnavailable: 'Couldn’t reach Bittensor mainnet right now. Trying again.',
 
     // the selected period as a length of time: {period} in the sentences below
     periodLength: { d1: '24 hours', d3: '3 days', d7: '7 days', d30: '30 days', d90: '90 days' },

@@ -1,10 +1,15 @@
 /* UR stats dashboard engine: the period engine (1D/3D/7D/30D/90D), formatting, tooltip, chart, globe and map helpers.
    Reads window.SNAP, built from live sources by loader.js (react/src/lib/dashboardData.js), and window.UR_I18N, the
    page's language: its copy (t: unit dashboard/script, page: unit dashboard; react/src/i18n/pages/dashboard/) and
-   format.js's interpolate and plural. English keeps its own number and date formats; other languages use Intl. */
+   format.js's interpolate and plural. English keeps its own number and date formats; other languages use Intl.
+   SNAP holds what has answered so far: a part that failed is null or empty (dashboardData.js assembleLive), and the
+   loader merges each later answer into it and calls UR.refresh(), which derives again what follows from it and
+   draws every part of the page again. Nothing here throws for a missing part (UR.run). */
 (function(){
 'use strict';
 const UR=window.UR={};
+// a drawing step that fails is reported and skipped: it never stops the page's other parts
+const run=UR.run=f=>{try{f()}catch(e){console.error('dashboard:',e)}};
 const I=window.UR_I18N,EN=UR.EN=I.lang==='en',LOC=I.locale;
 const TX=UR.TX=I.t,PG=UR.PG=I.page;
 const esc=UR.esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
@@ -23,17 +28,19 @@ const H=36e5, DAY=UR.DAY=864e5;
 const NF={},numF=UR.numF=o=>{const k=JSON.stringify(o);return NF[k]||(NF[k]=new Intl.NumberFormat(LOC,o))};
 const DF={},dtF=o=>{const k=JSON.stringify(o);return DF[k]||(DF[k]=new Intl.DateTimeFormat(LOC,o))};
 const UNITS={TB:'terabyte',PB:'petabyte',GB:'gigabyte','Gb/s':'gigabit-per-second'};
-const nf=UR.nf=n=>EN?Math.round(n).toLocaleString('en-US'):numF({maximumFractionDigits:0}).format(Math.round(n));
+// a figure the page doesn't have (its read failed or hasn't answered) prints as a dash
+const NO='—',no=v=>v==null||!isFinite(v);
+const nf=UR.nf=n=>no(n)?NO:EN?Math.round(n).toLocaleString('en-US'):numF({maximumFractionDigits:0}).format(Math.round(n));
 // a number with d decimals; with a unit (TB, GB, Gb/s, or a symbol such as α); a percentage (v in %); a price in US$
 // (loader.js usd: Intl's, and in Spanish "US$1,97", since a bare "$" also means pesos there)
-const fx=UR.fx=(v,d)=>EN?v.toFixed(d):numF({minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
-const un=UR.un=(v,d,u)=>EN?v.toFixed(d)+' '+u:UNITS[u]?numF({style:'unit',unit:UNITS[u],unitDisplay:'short',minimumFractionDigits:d,maximumFractionDigits:d}).format(v):fx(v,d)+' '+u;
-UR.pc=(v,d)=>EN?v.toFixed(d)+'%':numF({style:'percent',minimumFractionDigits:d,maximumFractionDigits:d}).format(v/100);
-UR.usd=v=>EN?'$'+v.toFixed(2):I.usd(v);
+const fx=UR.fx=(v,d)=>no(v)?NO:EN?v.toFixed(d):numF({minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
+const un=UR.un=(v,d,u)=>no(v)?NO:EN?v.toFixed(d)+' '+u:UNITS[u]?numF({style:'unit',unit:UNITS[u],unitDisplay:'short',minimumFractionDigits:d,maximumFractionDigits:d}).format(v):fx(v,d)+' '+u;
+UR.pc=(v,d)=>no(v)?NO:EN?v.toFixed(d)+'%':numF({style:'percent',minimumFractionDigits:d,maximumFractionDigits:d}).format(v/100);
+UR.usd=v=>no(v)?NO:EN?'$'+v.toFixed(2):I.usd(v);
 // a chart's number outside English: d decimals at most, compact (12K) or fixed, with the chart's unit (narrow: the
 // axis's shortest form, which keeps a long unit name such as Arabic's terabyte inside the chart's margin)
 const qn=(v,d,compact,u,narrow)=>{const o=compact?{notation:'compact',maximumFractionDigits:d}:{minimumFractionDigits:d,maximumFractionDigits:d};if(UNITS[u])Object.assign(o,{style:'unit',unit:UNITS[u],unitDisplay:narrow?'narrow':'short'});const s=numF(o).format(v);return u&&!UNITS[u]?s+' '+u:s};
-const cpt=UR.cpt=(n,d=1)=>{const a=Math.abs(n);if(!EN)return a>=1e3?numF({notation:'compact',maximumFractionDigits:a>=1e6?2:d}).format(n):numF({maximumFractionDigits:1}).format(Math.round(n*10)/10);return a>=1e6?(n/1e6).toFixed(2)+'M':a>=1e3?(n/1e3).toFixed(d)+'K':String(Math.round(n*10)/10)};
+const cpt=UR.cpt=(n,d=1)=>{if(no(n))return NO;const a=Math.abs(n);if(!EN)return a>=1e3?numF({notation:'compact',maximumFractionDigits:a>=1e6?2:d}).format(n):numF({maximumFractionDigits:1}).format(Math.round(n*10)/10);return a>=1e6?(n/1e6).toFixed(2)+'M':a>=1e3?(n/1e3).toFixed(d)+'K':String(Math.round(n*10)/10)};
 const fmtD=UR.fmtD=t=>EN?new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}).replace('Sept','Sep'):dtF({day:'numeric',month:'short',timeZone:'UTC'}).format(t);
 const fmtDw=UR.fmtDw=t=>EN?new Date(t).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).replace('Sept','Sep'):dtF({weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).format(t);
 /* times of day follow the visitor's clock (or UTC); daily totals stay UTC days, as the source reports them */
@@ -47,46 +54,84 @@ UR.tzName=()=>{try{return new Intl.DateTimeFormat(EN?'en-GB':LOC,{timeZoneName:'
 UR.tb=v=>v>=1000?(v/1000).toFixed(2)+' PB':v>=100?v.toFixed(0)+' TB':v>=10?v.toFixed(1)+' TB':v.toFixed(2)+' TB';
 UR.pct=(a,b)=>b?(a/b-1)*100:0;
 UR.signed=(v,d=1)=>v==null||!isFinite(v)?'—':EN?(v>=0?'+':'−')+Math.abs(v).toFixed(d)+'%':numF({style:'percent',signDisplay:'always',minimumFractionDigits:d,maximumFractionDigits:d}).format(v/100);
-UR.alpha=v=>nf(v)+' α';
+UR.alpha=v=>no(v)?NO:nf(v)+' α';
 function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const R=rng(3141);const noise=a=>1+(R()-.5)*a;
 function niceStep(v){const p=10**Math.floor(Math.log10(v)),f=v/p;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
 const scaleY=UR.scaleY=(max,min=0,n=4)=>{const st=niceStep(Math.max(1e-9,(max-min)/n));const lo=Math.floor(min/st)*st,top=Math.ceil(max/st)*st;const t=[];for(let v=lo;v<=top+st*1e-6;v+=st)t.push(+v.toFixed(8));return{lo,top,ticks:t}};
 const colPath=UR.colPath=(x,y,w,h,r)=>{if(h<=0.4)return'';r=Math.min(r,w/2,h);return`M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`};
-const RO=new ResizeObserver(es=>es.forEach(e=>e.target._draw&&e.target._draw()));
-UR.bindDraw=(el,fn)=>{el._draw=fn;RO.observe(el);fn()};
+const RO=new ResizeObserver(es=>es.forEach(e=>{if(e.target._draw)run(e.target._draw)}));
+UR.bindDraw=(el,fn)=>{el._draw=fn;RO.observe(el);run(fn)};
+// Whether the panel holding `el` has its data (`ok`), and if not, what it shows instead (page.css .pn.na): its title
+// and a short note, the chain's own (chain) when what it lacks is read from Bittensor mainnet, which the visitor's
+// network may not reach, else the page's. `wait`: not yet, the read is still on its way (its figures shimmer, .wait),
+// as every panel's is while Grafana's first reads are still out (SNAP.LOADING). Returns ok, so a part can draw only
+// when there is something to draw.
+UR.need=(el,ok,{chain=false,wait=false}={})=>{const pn=el&&el.closest('.pn');ok=!!ok;if(!pn)return ok;
+  if(!chain&&window.SNAP.LOADING)wait=true;
+  pn.classList.toggle('na',!ok&&!wait);pn.classList.toggle('wait',!ok&&wait);
+  if(ok||wait)delete pn.dataset.na;else pn.dataset.na=chain?TX.chainUnavailable:TX.unavailable;
+  return ok};
 
 /* ---------- time base ---------- */
+// The time base is the moment the page read its data: a later answer adds to it, never moves it on. The last full day
+// (UR.END) can still move, once the days the history file lacks are read; dayT and hourT are kept in place (loader.js).
 const S=window.SNAP;                                  // real snapshot: see mvp-data.js
-const NOW=UR.NOW=S.NOW, END=UR.END=S.END;              // END = 00:00 UTC of the last complete day
+const NOW=UR.NOW=S.NOW;
 const dayT=UR.dayT=S.dayT, ND=dayT.length, hourT=UR.hourT=S.hourT, NH=hourT.length;
 const LAUNCH=UR.LAUNCH=Date.UTC(2026,7,28);
 const D=UR.D=S.D, Hs=UR.Hs=S.Hs;
-D.reserve=D.reserve.map((v,i,a)=>v==null&&a[i-1]!=null&&a[i+1]!=null?(a[i-1]+a[i+1])/2:v);   // fill a day the daily chain sample skipped
-UR.LIVE=S.LIVE;
 const GEO={US:[39.5,-98.4,'NA'],FR:[46.6,2.4,'EU'],DE:[51.1,10.4,'EU'],GB:[53.0,-1.8,'EU'],VN:[15.9,105.8,'AS'],BR:[-12.0,-51.9,'SA'],ES:[40.2,-3.6,'EU'],IT:[42.8,12.6,'EU'],CA:[50.5,-96,'NA'],TH:[15.1,101.0,'AS'],NL:[52.2,5.5,'EU'],RU:[55.7,40.0,'EU'],IN:[21.0,78.5,'AS'],SG:[1.35,103.8,'AS'],KR:[36.4,127.9,'AS'],JP:[36.5,138.5,'AS'],PH:[12.5,122.5,'AS'],HK:[22.3,114.2,'AS'],SE:[60.5,15.5,'EU'],CN:[33.0,104.0,'AS'],AT:[47.6,14.1,'EU'],MX:[23.6,-102.5,'NA'],AU:[-25.7,134.5,'OC'],RO:[45.9,25.0,'EU'],ID:[-2.5,117.0,'AS'],UA:[49.0,31.4,'EU'],FI:[63.0,26.0,'EU'],TR:[39.0,35.2,'AS'],ZA:[-29.0,24.7,'AF'],KH:[12.7,105.0,'AS'],PL:[52.0,19.4,'EU'],BG:[42.7,25.3,'EU'],KZ:[48.0,67.0,'AS'],CH:[46.8,8.2,'EU'],BD:[23.7,90.3,'AS'],CZ:[49.8,15.5,'EU'],AR:[-34.6,-64.0,'SA'],PT:[39.6,-8.0,'EU'],NG:[9.1,8.7,'AF'],IE:[53.2,-8.0,'EU'],LT:[55.2,23.9,'EU'],HU:[47.2,19.5,'EU'],CO:[4.6,-74.0,'SA'],CL:[-33.5,-70.6,'SA'],MY:[3.9,102.0,'AS'],TW:[23.7,121.0,'AS'],BE:[50.6,4.6,'EU'],NO:[61.0,8.5,'EU'],DK:[56.0,10.0,'EU'],GR:[39.0,22.0,'EU'],IL:[31.4,35.0,'AS'],AE:[24.0,54.0,'AS'],EG:[26.8,30.8,'AF'],KE:[0.2,37.9,'AF'],PK:[30.0,70.0,'AS'],NZ:[-41.0,174.0,'OC'],MA:[31.8,-7.0,'AF'],RS:[44.0,21.0,'EU'],PE:[-9.2,-75.0,'SA'],SA:[24.0,45.0,'AS'],LK:[7.9,80.7,'AS'],LV:[56.9,24.6,'EU'],BI:[-3.4,29.9,'AF'],SI:[46.1,14.9,'EU'],BW:[-22.3,24.7,'AF'],SK:[48.7,19.7,'EU'],EE:[58.6,25.0,'EU'],MK:[41.6,21.7,'EU'],HR:[45.1,15.2,'EU'],MD:[47.4,28.4,'EU'],SC:[-4.7,55.5,'AF'],ML:[17.6,-4.0,'AF'],CY:[35.1,33.4,'AS'],GE:[42.3,43.4,'AS'],IR:[32.4,53.7,'AS'],LA:[19.9,102.5,'AS'],IQ:[33.2,43.7,'AS'],PA:[8.5,-80.8,'NA'],IS:[64.9,-19.0,'EU'],LU:[49.8,6.1,'EU'],AL:[41.2,20.2,'EU'],BH:[26.0,50.6,'AS'],BY:[53.7,28.0,'EU'],KG:[41.2,74.8,'AS'],AD:[42.5,1.6,'EU'],BA:[43.9,17.7,'EU'],KY:[19.3,-81.3,'NA'],DO:[18.7,-70.2,'NA'],GF:[3.9,-53.1,'SA'],PF:[-17.7,-149.4,'OC'],LB:[33.9,35.9,'AS'],MT:[35.9,14.4,'EU'],NP:[28.4,84.1,'AS'],OM:[21.5,55.9,'AS'],PY:[-23.4,-58.4,'SA'],PR:[18.2,-66.6,'NA'],QA:[25.4,51.2,'AS'],TT:[10.7,-61.2,'NA'],UG:[1.4,32.3,'AF'],DZ:[28.0,2.6,'AF'],AM:[40.1,45.0,'AS'],AZ:[40.3,47.6,'AS'],BN:[4.5,114.7,'AS'],GH:[7.9,-1.0,'AF'],JM:[18.1,-77.3,'NA'],LI:[47.16,9.55,'EU'],MO:[22.2,113.55,'AS'],SM:[43.94,12.46,'EU']};
-UR.COUNTRIES=Object.entries(S.COUNTRY_NOW).map(([c,v])=>{const g=GEO[c]||[null,null,'XX'];return EN?{c,n:S.COUNTRY_NAMES[c]||c,la:g[0],lo:g[1],ct:g[2],v}:{c,n:I.region(c)||S.COUNTRY_NAMES[c]||c,en:S.COUNTRY_NAMES[c],la:g[0],lo:g[1],ct:g[2],v}}).sort((a,b)=>b.v-a.v);
-UR.PROV=UR.COUNTRIES.reduce((a,c)=>a+c.v,0);UR.CMAX=UR.COUNTRIES[0].v;UR.OTHER={n:0,v:0};
 UR.CONTINENTS=['NA','EU','AS','SA','AF','OC'].map(k=>[k,TX.continents[k]]);
-UR.IPFAM=S.IPFAM;UR.EXT=EN?S.EXT:{...S.EXT,list:S.EXT.list.map(([c,n,v])=>[c,I.region(c)||n,v])};
-/* SN25 */
-const E0=S.EPOCH;const EP=UR.EP={n:E0.n,start:E0.start,end:E0.end,now:NOW};
-EP.p=(NOW-EP.start)/(EP.end-EP.start);EP.days=(NOW-EP.start)/DAY;
-{const lm=Math.max(0,Math.floor((EP.end-NOW)/6e4)),lh=Math.floor(lm/60),p2=x=>String(x).padStart(2,'0');EP.leftTxt=lh>=24?UR.f(TX.time.leftDays,{days:Math.floor(lh/24),hours:p2(lh%24)}):UR.f(TX.time.leftHours,{hours:lh,minutes:p2(lm%60)});}
-UR.TOKEN={...S.TOKEN,d24:UR.pct(Hs.price[NH-1],Hs.price[NH-25]),d7:(()=>{const p=D.price.filter(v=>v!=null);return p.length>7?UR.pct(Hs.price[NH-1],p[p.length-8]):null})()};
-UR.RESERVE={alpha:S.RESERVE.alpha,inflow:S.EMISSION.minerPerDay*S.ROUTING.reserve,minerPerDay:S.EMISSION.minerPerDay,share:S.ROUTING.reserve,
-  programs:[['Regional Pre-Install','Network coverage','In preparation'],['Additional exit coverage for an existing operator','Network coverage','Indicative'],['Reliability on existing operator routes','Route reliability','Indicative'],['Provider capacity for a second operator','Operator onboarding','Indicative']],
-  wallet:S.RESERVE.wallet};
+UR.OTHER={n:0,v:0};
+// what follows from SNAP, again on each UR.refresh(); these four are filled in place, so the page may hold them
+const LIVE=UR.LIVE={},COUNTRIES=UR.COUNTRIES=[],EP=UR.EP={},TOKEN=UR.TOKEN={};
+UR.ver=0;let ckey=null;
+function derive(){
+  UR.END=S.END;                                       // 00:00 UTC of the last complete day
+  D.reserve=D.reserve.map((v,i,a)=>v==null&&a[i-1]!=null&&a[i+1]!=null?(a[i-1]+a[i+1])/2:v);   // fill a day the daily chain sample skipped
+  Object.assign(LIVE,S.LIVE);
+  // the countries with providers online now (none until Grafana's panel 33 answers); UR.ver counts their changes
+  const ck=JSON.stringify(S.COUNTRY_NOW);if(ck!==ckey){ckey=ck;UR.ver++}
+  COUNTRIES.splice(0,COUNTRIES.length,...Object.entries(S.COUNTRY_NOW).map(([c,v])=>{const g=GEO[c]||[null,null,'XX'];return EN?{c,n:S.COUNTRY_NAMES[c]||c,la:g[0],lo:g[1],ct:g[2],v}:{c,n:I.region(c)||S.COUNTRY_NAMES[c]||c,en:S.COUNTRY_NAMES[c],la:g[0],lo:g[1],ct:g[2],v}}).sort((a,b)=>b.v-a.v));
+  UR.PROV=COUNTRIES.reduce((a,c)=>a+c.v,0);UR.CMAX=COUNTRIES.length?COUNTRIES[0].v:0;
+  UR.IPFAM=S.IPFAM;UR.EXT=EN||!S.EXT.list?S.EXT:{...S.EXT,list:S.EXT.list.map(([c,n,v])=>[c,I.region(c)||n,v])};
+  /* SN25: the epoch is the stats feed's (none without it) */
+  for(const k of Object.keys(EP))delete EP[k];
+  const E0=S.EPOCH;
+  // its progress and time left by the clock: the stats feed can answer minutes after the page read the rest
+  if(E0){const now=Date.now();Object.assign(EP,{n:E0.n,start:E0.start,end:E0.end,now});
+    EP.p=(now-EP.start)/(EP.end-EP.start);EP.days=(now-EP.start)/DAY;
+    const lm=Math.max(0,Math.floor((EP.end-now)/6e4)),lh=Math.floor(lm/60),p2=x=>String(x).padStart(2,'0');EP.leftTxt=lh>=24?UR.f(TX.time.leftDays,{days:Math.floor(lh/24),hours:p2(lh%24)}):UR.f(TX.time.leftHours,{hours:lh,minutes:p2(lm%60)})}
+  const px=(a,b)=>a==null||b==null?null:UR.pct(a,b);
+  Object.assign(TOKEN,S.TOKEN,{d24:px(Hs.price[NH-1],Hs.price[NH-25]),d7:(()=>{const p=D.price.filter(v=>v!=null);return p.length>7?px(Hs.price[NH-1],p[p.length-8]):null})()});
+  // the reserve, its emission and its routing are Bittensor mainnet's: null while the page can't read it
+  UR.RESERVE=S.RESERVE&&S.EMISSION&&S.ROUTING?{alpha:S.RESERVE.alpha,inflow:S.EMISSION.minerPerDay*S.ROUTING.reserve,minerPerDay:S.EMISSION.minerPerDay,share:S.ROUTING.reserve,
+    programs:[['Regional Pre-Install','Network coverage','In preparation'],['Additional exit coverage for an existing operator','Network coverage','Indicative'],['Reliability on existing operator routes','Route reliability','Indicative'],['Provider capacity for a second operator','Operator onboarding','Indicative']],
+    wallet:S.RESERVE.wallet}:null;
+  UR.NEWC={};[1,3,7,30,90].forEach(P=>{const past=S.COUNTRY_PAST[P]||{};UR.NEWC[P]=Object.keys(past).length?COUNTRIES.filter(c=>!past[c.c]).map(c=>c.c):[]});
+  // the last 24 hours carried (the Data carried card), spread per second, while they end in the last hours (the newest
+  // hour or two can still be empty; without panel 1's 24-hour sum the last 72 are); else the last full day; 0 without either
+  UR.BPS=(()=>{const h=Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;const a=h.slice(Math.max(0,e-23),e+1).filter(v=>v!=null);return a.length===24&&e>=NH-3?a.reduce((x,y)=>x+y,0):(D.traffic[ND-1]||0)})()*1e12/86400;
+}
+run(derive);
 
 /* ---------- period engine ---------- */
 UR.PERIODS={1:{k:PG.periods.d1,lab:TX.periodLength.d1,bucket:1},3:{k:PG.periods.d3,lab:TX.periodLength.d3,bucket:6},7:{k:PG.periods.d7,lab:TX.periodLength.d7,bucket:24},30:{k:PG.periods.d30,lab:TX.periodLength.d30,bucket:24},90:{k:PG.periods.d90,lab:TX.periodLength.d90,bucket:24}};
-UR.P=7; UR.ORG='all'; UR.subs=[];
-UR.onChange=f=>{UR.subs.push(f);f()};
-UR.setP=p=>{UR.P=p;UR.subs.forEach(f=>f())};
-UR.setOrg=o=>{UR.ORG=o;UR.subs.forEach(f=>f())};
+UR.P=7; UR.ORG='all'; UR.subs=[]; UR.parts=[];
+UR.onChange=f=>{UR.subs.push(f);run(f)};
+UR.setP=p=>{UR.P=p;UR.subs.forEach(run)};
+UR.setOrg=o=>{UR.ORG=o;UR.subs.forEach(run)};
+// a part of the page drawn from the data alone (not the period): now, and again on each refresh
+UR.part=f=>{UR.parts.push(f);run(f)};
+// more data has arrived (loader.js merged it into SNAP): derive again, and draw every part and chart again; the focus,
+// if the redraw took its element away, goes to the same chart or to the element with the same id
+UR.refresh=()=>{const a=document.activeElement,box=a&&a!==document.body&&a.closest?a.closest('[id]'):null,svg=a&&a.tagName==='svg';
+  run(derive);UR.parts.forEach(run);UR.subs.forEach(run);
+  if(box&&!a.isConnected){const b=document.getElementById(box.id),f=b&&(svg?b.querySelector('svg'):b);if(f&&f.focus)f.focus({preventScroll:true})}};
 // the period's step: an hour (1D), 6 hours (3D) or a day; names the copy's per-step strings
 UR.bucketKey=()=>({1:'hour',3:'sixHours'})[UR.P]||'day';
-UR.windowLab=()=>{const P=UR.P;if(P<=3){return `${fmtDwT(NOW-P*DAY)}, ${hh(NOW-P*DAY)} to ${fmtDwT(NOW)}, ${hh(NOW)}`}return `${fmtD(END-(P-1)*DAY)} to ${fmtD(END)}, the last full day`};
+UR.windowLab=()=>{const P=UR.P;if(P<=3){return `${fmtDwT(NOW-P*DAY)}, ${hh(NOW-P*DAY)} to ${fmtDwT(NOW)}, ${hh(NOW)}`}return `${fmtD(UR.END-(P-1)*DAY)} to ${fmtD(UR.END)}, the last full day`};
 // series(key, agg) -> {t, v, total, prevTotal}. agg: 'sum' | 'mean' | 'last'
 UR.series=(key,agg,P=UR.P)=>{
   const hourly=P<=3, src=hourly?Hs[key]:D[key], T=hourly?hourT:dayT, n=hourly?P*24:P, b=hourly?UR.PERIODS[P].bucket:1;
@@ -97,7 +142,6 @@ UR.series=(key,agg,P=UR.P)=>{
 };
 UR.xFmt=()=>{const P=UR.P;return P===1?hh:P===3?(t=>EN?new Date(t).toLocaleDateString('en-GB',{weekday:'short',timeZone:tzo()})+' '+hh(t):dtF({weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:tzo()}).format(t)):fmtD};
 UR.tipFmt=()=>{const P=UR.P,b=UR.PERIODS[P].bucket;if(P>3)return fmtDw;return t=>{const a=t-b*H,same=fmtDwT(a)===fmtDwT(t);return (same?UR.f(TX.time.sameDay,{day:fmtDwT(a),from:hh(a),to:hh(t)}):UR.f(TX.time.twoDays,{fromDay:fmtDwT(a),from:hh(a),toDay:fmtDwT(t),to:hh(t)}))+(UR.TZ==='utc'?' UTC':'')}};
-UR.NEWC={};[1,3,7,30,90].forEach(P=>{const past=S.COUNTRY_PAST[P]||{};UR.NEWC[P]=Object.keys(past).length?UR.COUNTRIES.filter(c=>!past[c.c]).map(c=>c.c):[]});
 UR.chg=c=>{const p=(S.COUNTRY_PAST[UR.P]||{})[c.c];return p?UR.pct(c.v,p):null};
 
 /* ---------- tooltip ---------- */
@@ -113,7 +157,7 @@ UR.tipRow=(k,v,c)=>`<div class="row"><span>${c?`<i style="display:inline-block;w
 /* ---------- chart: columns (optionally stacked) and lines on ONE y scale; nulls break lines ---------- */
 UR.chart=(el,get)=>{
   function draw(){
-    const o=get();const w=el.clientWidth;if(!w)return;
+    const w=el.clientWidth;if(!w)return;const o=get();
     const T=o.T,h=o.height||220,SP=h<=90,EL=o.endLabel&&w>=480,m={l:o.ml??52,r:EL?84:12,t:o.endLabel&&!EL?24:14,b:o.noX?6:24};if(w-m.l-m.r<40)return;
     if(o.trim){let f=0;while(f<o.t.length-1&&o.series.every(q=>q.v[f]==null))f++;if(f){o.t=o.t.slice(f);o.series=o.series.map(q=>({...q,v:q.v.slice(f)}))}}
     if(o.now&&o.now.v!=null){o.t=o.t.concat(o.now.t);o.series=o.series.map((q,k)=>({...q,v:q.v.concat(k===0?o.now.v:null)}))}
@@ -153,7 +197,7 @@ UR.chart=(el,get)=>{
     svg.addEventListener('pointerleave',()=>at(-1));svg.addEventListener('blur',()=>at(-1));
     svg.addEventListener('keydown',e=>{if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;e.preventDefault();at(Math.max(0,Math.min(n-1,cur<0?n-1:cur+(e.key==='ArrowRight'?1:-1))))});
   }
-  el._draw=draw;el._get=get;RO.observe(el);UR.subs.push(draw);draw();
+  el._draw=draw;el._get=get;RO.observe(el);UR.subs.push(draw);run(draw);
 };
 
 /* ---------- land grid + globe (dots are countries, never locations) ---------- */
@@ -165,11 +209,12 @@ UR.globe=(cv,o={})=>{
   let rot=o.rot??70,tilt=22*Math.PI/180,vel=0,drag=null,idle=0;const rad=Math.PI/180;
   const vec=(la,lo)=>[Math.cos(la)*Math.sin(lo),Math.sin(la),Math.cos(la)*Math.cos(lo)];
   const pv=UR.LANDPTS.map(([la,lo])=>vec(la*rad,lo*rad));
-  const nodes=UR.COUNTRIES.filter(c=>c.la!=null).map(c=>({c,v:vec(c.la*rad,c.lo*rad),r:1.6+7*Math.sqrt(c.v/UR.CMAX),ph:Math.random()*4}));
+  // its dots, made again when a refresh brings other countries (UR.ver)
+  let nodes=[],ver=-1;const mk=()=>{nodes=UR.COUNTRIES.filter(c=>c.la!=null).map(c=>({c,v:vec(c.la*rad,c.lo*rad),r:1.6+7*Math.sqrt(c.v/UR.CMAX),ph:Math.random()*4}));ver=UR.ver};
   function size(){const r=cv.getBoundingClientRect();w=r.width;h=r.height;if(!w||!h)return;cv.width=w*DPR;cv.height=h*DPR;x.setTransform(DPR,0,0,DPR,0,0);R=Math.min(w,h)*(o.scale||.42);cx=w*.5;cy=h*.5}
   function P(v){const lo=rot*rad,c=Math.cos(lo),s=Math.sin(lo);const X=v[0]*c+v[2]*s,Z=-v[0]*s+v[2]*c,Y=v[1];const ct=Math.cos(tilt),st=Math.sin(tilt);return[cx+X*R,cy-(Y*ct-Z*st)*R,Y*st+Z*ct]}
   function frame(ts){
-    if(!running)return;
+    if(!running)return;if(ver!==UR.ver)mk();
     if(!drag){if(Math.abs(vel)>.01){rot+=vel;vel*=.95}else if(!RM&&ts-idle>1800)rot+=.04}
     x.clearRect(0,0,w,h);
     const halo=x.createRadialGradient(cx,cy,R*.92,cx,cy,R*1.28);halo.addColorStop(0,`rgba(${UR.THEME.rgb},.08)`);halo.addColorStop(1,`rgba(${UR.THEME.rgb},0)`);x.fillStyle=halo;x.beginPath();x.arc(cx,cy,R*1.28,0,7);x.fill();
@@ -201,7 +246,7 @@ UR.globe=(cv,o={})=>{
 const landMap=()=>{if(UR.LANDMAP)return UR.LANDMAP;const rc=([la,lo])=>[Math.round((LAND.lat0-la)/LAND.step),Math.round((lo+180-LAND.step/2)/LAND.step)],A0=UR.LANDPTS.filter(([la,lo])=>(la<=68.5||(lo>-75&&lo<-10))&&!(la>64&&lo>-12&&lo<4)),S0=new Set(A0.map(p=>rc(p).join(',')));const P0=A0.filter(p=>{if(p[0]<=60)return true;const[r,c]=rc(p);let n=1;for(let k=r-1;S0.has(k+','+c);k--)n++;for(let k=r+1;S0.has(k+','+c);k++)n++;return n>=3}),K=new Map();P0.forEach((p,i)=>{const[r,c]=rc(p);K.set(r+','+c,i)});
   const comp=new Int32Array(P0.length).fill(-1),size=[],lat=[],tall=[];P0.forEach((p,i)=>{if(comp[i]>=0)return;const id=size.length;let n=0,ls=0,r0=1e9,r1=-1e9;const st=[i];comp[i]=id;while(st.length){const j=st.pop();n++;ls+=P0[j][0];const[r,c]=rc(P0[j]);r0=Math.min(r0,r);r1=Math.max(r1,r);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const k=K.get((r+a)+','+(c+b));if(k!=null&&comp[k]<0){comp[k]=id;st.push(k)}}}size.push(n);lat.push(ls/n);tall.push(r1-r0)});
   return UR.LANDMAP=P0.filter((p,i)=>!(lat[comp[i]]>60&&(size[comp[i]]<25||tall[comp[i]]<2)))};
-let LCc=null;const landCt=()=>{if(LCc)return LCc;const cs=UR.COUNTRIES.filter(c=>c.la!=null&&c.ct),key=(r,c)=>r+','+c,rc=(la,lo)=>[Math.round((LAND.lat0-la)/LAND.step),Math.round((lo+180-LAND.step/2)/LAND.step)];
+let LCc=null,LCv=-1;const landCt=()=>{if(LCc&&LCv===UR.ver)return LCc;LCv=UR.ver;for(const f in CTR)delete CTR[f];const cs=UR.COUNTRIES.filter(c=>c.la!=null&&c.ct),key=(r,c)=>r+','+c,rc=(la,lo)=>[Math.round((LAND.lat0-la)/LAND.step),Math.round((lo+180-LAND.step/2)/LAND.step)];
   const ct=landMap().map(([la,lo])=>{let b=null,bd=1e9;const k=Math.cos(la*Math.PI/180);for(const c of cs){let dl=Math.abs(c.lo-lo);if(dl>180)dl=360-dl;const d=(c.la-la)**2+(dl*k)**2;if(d<bd){bd=d;b=c}}if(lo>60&&la>45)return 'AS';if(la<13&&lo>-77.5&&lo<-34)return 'SA';if((la>59&&lo<-10&&!(la<67.5&&lo>-25))||(la>50&&lo<-130))return 'NA';return b?b.ct:null});
   const idx=new Map();landMap().forEach(([la,lo],k)=>idx.set(key(...rc(la,lo)),k));
   const edge=landMap().map(([la,lo],k)=>{const[r,c]=rc(la,lo);return [[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>{const j=idx.get(key(r+a,c+b));return j==null||ct[j]!==ct[k]})});return LCc={ct,edge}};
@@ -228,9 +273,8 @@ UR.flatMap=(cv,o)=>{const TOP=84,BOT=-57;
   let dn=null;cv.addEventListener('pointerdown',e=>{dn=[e.clientX,e.clientY]});
   cv.addEventListener('pointerup',e=>{if(!o.onPick||!dn||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>5){dn=null;return}dn=null;const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;let best=null,bd=1e9;(cv._nodes||[]).forEach(n=>{const d=Math.hypot(n.px-mx,n.py-my);if(d<Math.max(10,n.r+6)&&d<bd){bd=d;best=n}});o.onPick(best?best.c:null)});
   if(o.onPick)cv.style.cursor='pointer';
-  cv.addEventListener('pointerleave',UR.hideTip);cv.parentElement._draw=draw;RO.observe(cv.parentElement);draw()};
+  cv.addEventListener('pointerleave',UR.hideTip);cv.parentElement._draw=draw;RO.observe(cv.parentElement);run(draw)};
 
 /* ---------- live counter ---------- */
-UR.BPS=(()=>{const h=Hs.traffic;let e=h.length-1;while(e>=0&&h[e]==null)e--;const a=h.slice(Math.max(0,e-23),e+1).filter(v=>v!=null);return a.length===24?a.reduce((x,y)=>x+y,0):(D.traffic[ND-1]||0)})()*1e12/86400;   // the last 24 hours carried (the Data carried card), spread per second; else the last full day
 UR.liveCounter=el=>{const t0=performance.now();const tick=()=>{const b=UR.BPS*(performance.now()-t0)/1000;el.textContent=b>=1e12?un(b/1e12,3,'TB'):un(b/1e9,2,'GB');setTimeout(tick,RM?1000:90)};tick()};
 })();

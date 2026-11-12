@@ -3,6 +3,7 @@ export default {
     loadError: "无法连接统计数据源。请刷新页面重试。",
     previewError: "无法连接统计数据源。将在 1 分钟后重试。",
     unavailable: "暂时无法加载",
+    chainUnavailable: "暂时无法连接 Bittensor 主网，正在重试。",
     periodLength: {
         d1: "24 小时",
         d3: "3 天",

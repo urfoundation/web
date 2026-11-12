@@ -12,7 +12,11 @@
 // 100% at five entries or fewer; no "wins by default" and no chance without a
 // draw last epoch) and for what the seo-audit and search need: titles of at
 // most 60 graphemes and descriptions of at most 175 characters, all unique,
-// and a static render that is the same for the same data.
+// and a static render that is the same for the same data. Which country pages
+// are indexed (src/components/pages/ctf/indexing.js) is checked on pages in
+// miniature: a page that reads like another but for the country's name, with
+// no local note, is noindex, both as the build decides it and as the seo-audit
+// checks the built pages.
 //
 // Usage: node --test tests/ctf.test.mjs   (no network)
 import assert from 'node:assert/strict';
@@ -50,6 +54,7 @@ import {
     uninhabitedSentence,
     winEstimate,
 } from '../src/components/pages/ctf/model.js';
+import { countryIndexing, countryIndexingProblems, ownContent } from '../src/components/pages/ctf/indexing.js';
 import { CTF_LOCAL_NOTES } from '../src/data/ctf-local-notes.js';
 import { ctfOgImage } from '../src/components/pages/ctf/og.js';
 import { buildPath, parseRoute } from '../src/router.js';
@@ -386,4 +391,106 @@ test('every country has its flag, with flag-icons\' licence, and the snapshot it
     for (const dir of ['react/public', 'astro/public']) {
         assert.deepEqual(fs.readdirSync(path.join(ROOT, dir, 'ctf/og')), [path.basename(card)], `${dir}${card}: run node scripts/generate-og.mjs --ctf`);
     }
+});
+
+// A country page's <main> in miniature, as CtfCountry.jsx renders one: its names in the trail, the heading, the
+// card and the questions, escaped as React escapes them; what it says of its own country (the territory and
+// dashboard sentences, and `own`); a local note if it has one; the day it last changed; and its other big pots
+// and neighbours, which are about other countries, with a section inside a section. React's marker between
+// two texts is in it, as in an island's HTML (renderToString's), unless `markers` is false (renderToStaticMarkup's).
+const esc = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+function countryMain(m, code, { own = '', note = null, day = DAY, states = true, markers = true } = {}) {
+    const c = m.byCode.get(code);
+    const { prev, next } = neighbours(m, code);
+    const said = [states && uninhabitedSentence(c), states && presenceSentence(m, c), own].filter(Boolean).join(' ');
+    return [
+        '<div class="ctf-page"><div class="ctf-shell"><header class="ctf-hdr">',
+        `<nav class="ctf-crumbs" aria-label="Breadcrumb"><a href="/ctf">Capture the flag</a><span aria-hidden="true">›</span><span aria-current="page">${esc(c.short)}</span></nav>`,
+        `<h1>Earn crypto in ${esc(c.the)} with your internet connection</h1>`,
+        `<p class="ctf-intro">${esc(c.The)} has five provider slots and five extender slots each epoch${markers ? '<!-- -->' : ''}. ${esc(said)}</p></header>`,
+        `<section class="ctf-mine"><h2 id="ctf-mine-h" class="ctf-me-name">${esc(c.name)}</h2><a class="ctf-btn ctf-btn-p" href="https://ur.io">Start mining in ${esc(c.the)}</a></section>`,
+        `<section class="ctf-sec ctf-feat-sec" data-ctf-elsewhere=""><h2>Other big pots this epoch</h2><div class="ctf-feat"><article><section><h3><a href="/ctf/${next.code}">${esc(next.name)}</a></h3></section><b>${esc(next.name)} in pots</b></article></div></section>`,
+        `<nav class="ctf-sec ctf-around" aria-label="More countries" data-ctf-elsewhere=""><a href="/ctf/${prev.code}" rel="prev">${esc(prev.name)}</a><a href="/ctf">All 249 countries</a><a href="/ctf/${next.code}" rel="next">${esc(next.name)}</a></nav>`,
+        `<section id="faq"><details open=""><summary>How do I get paid?</summary><p>Local law in ${esc(c.the)} applies.`,
+        note ? `<br/><br/>Local note for ${esc(c.the)}, reviewed <time dateTime="${note.reviewed}">${note.reviewed}</time>: ${esc(note.text)}` : '',
+        `</p></details></section><footer class="ctf-foot"><p>Updated <time dateTime="${day}">${day}</time>.</p></footer></div></div>`,
+    ].join('');
+}
+
+test('a country page\'s own content leaves out other countries and the days it states, and masks its names and code', () => {
+    const m = MODELS.committed;
+    const own = (code, options) => ownContent(countryMain(m, code, { states: false, ...options }), m.byCode.get(code));
+    const ke = own('ke');
+    // its neighbours, its other big pots and the day it last changed are no content of its own
+    assert.equal(own('li', { day: '2026-12-04' }), ke, 'Liechtenstein\'s page reads like Kenya\'s but for the name');
+    assert.equal(own('ke', { markers: false }), ke, 'React\'s markers between texts are nothing, so the build\'s render and the built page read alike');
+    for (const elsewhere of [...Object.values(neighbours(m, 'ke')).map((c) => c.name), 'Other big pots', 'All 249 countries', DAY]) {
+        assert.ok(!ke.includes(elsewhere), elsewhere);
+    }
+    assert.match(ke, /^Capture the flag › \u0000 Earn crypto in \u0000 with your internet connection \u0000 has five provider slots and five extender slots each epoch\. \u0000 Start mining in \u0000 How do I get paid\? Local law in \u0000 applies\. Updated \.$/);
+    // every form of a name, the longest first, and names escaped as React writes them
+    assert.equal(own('cd'), ke, 'Congo, The Democratic Republic of the; the DR Congo; The DR Congo; DR Congo');
+    assert.equal(own('ci'), ke, 'Côte d\'Ivoire');
+    assert.equal(own('us'), ke, 'the United States');
+    // the code too, as a word in capitals and in the paths of the page and its JSON, and no other word
+    assert.equal(own('ke', { own: 'KE: /ctf/ke and /sn/ctf/country/ke' }), own('li', { own: 'LI: /ctf/li and /sn/ctf/country/li' }));
+    assert.equal(own('sn', { own: 'Keep the JSON at /sn/ctf; ke.' }), own('ke', { own: 'Keep the JSON at /sn/ctf; ke.' }));
+    // what a page says of its own country sets it apart
+    assert.notEqual(own('ke', { own: 'The dashboard counted 1 provider online.' }), ke);
+    assert.notEqual(own('ke', { own: 'The dashboard counted 1 provider online.' }), own('li', { own: 'The dashboard counted 2 providers online.' }));
+});
+
+test('the build indexes a country page unless it reads like another but for the name and has no local note', () => {
+    const m = MODELS.first;
+    const own = { us: 'Tens of thousands of providers online.', de: 'Hundreds of providers online.', fr: 'Hundreds of providers online.' };
+    const decided = countryIndexing(m, (code) => countryMain(m, code, { own: own[code] }), {});
+    assert.deepEqual([...decided.keys()], m.countries.map((c) => c.code), 'every country, in the model\'s order');
+    assert.deepEqual(decided.get('us'), { noindex: false, alike: [] }, 'a page of its own');
+    assert.deepEqual(decided.get('de'), { noindex: true, alike: ['fr'] }, 'two pages with the same figures');
+    assert.equal(decided.get('ke').noindex, true);
+    assert.equal(decided.get('ke').alike.length, 249 - 7 - 3 - 1, 'the inhabited countries with nothing of their own');
+    assert.deepEqual(decided.get('aq').alike, ['bv', 'gs', 'hm', 'io', 'tf', 'um'], 'the territories without people read alike');
+    // a local note, shown on its page, sets it apart; and a page with a note is never noindex
+    const note = { reviewed: '2026-12-01', text: 'Winnings can be cashed out to M-Pesa through an exchange that lists alpha.' };
+    const noted = countryIndexing(m, (code) => countryMain(m, code, { own: own[code], note: code === 'ke' ? note : null }), { ke: note });
+    assert.deepEqual(noted.get('ke'), { noindex: false, alike: [] });
+    assert.equal(noted.get('li').noindex, true);
+    const unshown = countryIndexing(m, (code) => countryMain(m, code, { own: own[code] }), { ke: note });
+    assert.equal(unshown.get('ke').noindex, false, 'indexable with a note even where the note does not set it apart');
+    assert.ok(unshown.get('ke').alike.includes('li'));
+    // nothing of its own anywhere: every page reads like another
+    assert.ok([...countryIndexing(m, (code) => countryMain(m, code), {}).values()].every((d) => d.noindex));
+});
+
+test('the seo-audit refuses country pages that break the rule, by the build\'s own reading', () => {
+    const m = MODELS.first;
+    const own = { us: 'Tens of thousands of providers online.', de: 'Hundreds of providers online.', fr: 'Hundreds of providers online.' };
+    const render = (code, options) => countryMain(m, code, { own: own[code], ...options });
+    const decided = countryIndexing(m, render, {});
+    const built = (changed = {}) => m.countries.map((c) => ({ code: c.code, main: render(c.code), noindex: decided.get(c.code).noindex, ...changed[c.code] }));
+    // the pages as the build decides them pass, and the groups that read alike are listed
+    const { problems, groups } = countryIndexingProblems(m, built(), {});
+    assert.deepEqual(problems, []);
+    assert.deepEqual(groups.map((g) => g.length).sort((a, b) => a - b), [2, 7, 249 - 7 - 3]);
+    const refused = (changed, notes = {}) => countryIndexingProblems(m, built(changed), notes).problems;
+    // a page that reads like another indexed: refused, and two such pages are indexable pages that differ by the name alone
+    const two = refused({ ke: { noindex: false }, li: { noindex: false } });
+    assert.match(two[0], /^\/ctf\/ke: reads like \/ctf\/ad, \/ctf\/ae, \/ctf\/af and 235 more but for the country's name and has no local note, so it must be noindex$/);
+    assert.match(two[1], /^\/ctf\/li: reads like /);
+    assert.equal(two[2], '/ctf/ke, /ctf/li: indexable, though they differ by the country\'s name alone');
+    assert.equal(two.length, 3);
+    // a page of its own, or one with a local note, made noindex
+    assert.deepEqual(refused({ us: { noindex: true } }), ['/ctf/us: noindex, though it reads like no other country page']);
+    const note = { reviewed: '2026-12-01', text: 'Winnings can be cashed out to M-Pesa through an exchange that lists alpha.' };
+    assert.deepEqual(refused({ ke: { main: render('ke', { note }), noindex: true } }, { ke: note }), ['/ctf/ke: noindex, though it has a local note']);
+    // local notes that differ by the name alone: indexable by the rule, but still two pages that differ by the name alone
+    const same = (code) => ({ reviewed: '2026-12-01', text: `Winnings can be cashed out in ${m.byCode.get(code).the} through an exchange that lists alpha.` });
+    const notes = { ke: same('ke'), li: same('li') };
+    assert.deepEqual(refused({ ke: { main: render('ke', { note: notes.ke }), noindex: false }, li: { main: render('li', { note: notes.li }), noindex: false } }, notes), ['/ctf/ke, /ctf/li: indexable, though they differ by the country\'s name alone']);
+    // a page that leaves out its own figures: a territory without people that does not say so
+    const dropped = refused({ aq: { main: render('aq', { states: false }) } });
+    assert.equal(dropped.length, 1);
+    assert.match(dropped[0], /^\/ctf\/ad, \/ctf\/ae, \/ctf\/af and \d+ more: read the same but for the country's name, though their data differs \(a page leaves out its own figures\)$/);
+    // and a page for no country of the snapshot
+    assert.deepEqual(countryIndexingProblems(m, [...built(), { code: 'xk', main: '', noindex: false }], {}).problems, ['/ctf/xk: no such country in the snapshot']);
 });

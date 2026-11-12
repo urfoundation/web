@@ -1,7 +1,7 @@
 ---
 import '@react/App.css';
 import { LANG_CODES, LANGS, getDict } from '../lib/i18n.js';
-import { alternatesFor, basePathFor, hasLocalizedVersion, localizedPathFor, publicPathFor, storedLanguageRedirectScript } from '../lib/route-localization.js';
+import { LANG_CHOICE_SCRIPT, alternatesFor, basePathFor, hasLocalizedVersion, localizedPathFor, publicPathFor, storedLanguageRedirectScript } from '../lib/route-localization.js';
 
 interface Props {
     title: string;
@@ -242,5 +242,8 @@ const jsonLdText = JSON.stringify({ '@context': 'https://schema.org', '@graph': 
     <div id="root">
         <slot />
     </div>
+    {/* following a link marked data-lang-choice (a translation's link to its
+        English original) stores that language, as the switcher does */}
+    <script is:inline set:html={LANG_CHOICE_SCRIPT} />
 </body>
 </html>

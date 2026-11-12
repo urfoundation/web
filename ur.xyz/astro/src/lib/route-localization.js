@@ -72,6 +72,13 @@ export const LANG_STORAGE_KEY = 'ur.xyz.lang';
 export const LANG_REDIRECT_GUARD_KEY = 'ur.xyz.lang.redirect';
 export const LANG_REDIRECT_GUARD_MS = 10000;
 
+// Following a link marked data-lang-choice="<lang>" (a translation's link to
+// its English original) is an explicit choice of that language, as the
+// language switcher is: this inline script, on every page (Base.astro),
+// records it, or the stored-language redirect would send the visitor straight
+// back to the translation.
+export const LANG_CHOICE_SCRIPT = `document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-lang-choice]');if(!a)return;try{localStorage.setItem(${JSON.stringify(LANG_STORAGE_KEY)},a.getAttribute('data-lang-choice'))}catch(_){}});`;
+
 const LANG_PREFIX = new RegExp(`^/(${NON_EN_SITE_LANG_CODES.join('|')})(?=/|$)`);
 
 const exactPaths = (group) => group.paths.filter(p => !p.endsWith('/*'));

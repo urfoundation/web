@@ -46,13 +46,13 @@ export default {
             projected: 'Saldo der Reserve · hochgerechnet bis {date}',
             plain: 'Saldo der Reserve',
             window: {
-                one: 'Saldo der Reserve · letzter {count} Tag',
+                one: 'Saldo der Reserve · letzter Tag',
                 other: 'Saldo der Reserve · letzte {count} Tage',
             },
         },
         projectedTo: '→ {amount} bis zum {date}',
         windowChange: {
-            one: '{change} über den letzten {count} Tag',
+            one: '{change} am letzten Tag',
             other: '{change} über die letzten {count} Tage',
         },
         note: {
@@ -73,7 +73,7 @@ export default {
             live: 'Saldo der Reserve, {unit}: live bis zum {liveDate}; mit den Pfeiltasten lässt sich jeder Tag einzeln abrufen.',
             projected: 'Saldo der Reserve, {unit}: hochgerechnet auf {amount} bis zum {date}; mit den Pfeiltasten lässt sich jeder Tag einzeln abrufen.',
             window: {
-                one: 'Saldo der Reserve, {unit}, über den letzten {count} Tag, von der Chain gelesen. Mit den Pfeiltasten lässt sich jeder Tag einzeln abrufen.',
+                one: 'Saldo der Reserve, {unit}, am letzten Tag, von der Chain gelesen. Mit den Pfeiltasten lässt sich jeder Tag einzeln abrufen.',
                 other: 'Saldo der Reserve, {unit}, über die letzten {count} Tage, von der Chain gelesen. Mit den Pfeiltasten lässt sich jeder Tag einzeln abrufen.',
             },
         },
@@ -85,7 +85,7 @@ export default {
         received: '{amount} erhalten',
         toPrograms: '→ {amount} bisher an Programme',
         toProgramsWindow: {
-            one: '→ {amount} an Programme, letzter {count} Tag',
+            one: '→ {amount} an Programme am letzten Tag',
             other: '→ {amount} an Programme, letzte {count} Tage',
         },
         readingHistory: 'Saldoverlauf wird gelesen…',

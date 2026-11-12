@@ -63,7 +63,7 @@ export default {
         balanceReadingHistory: 'Saldoverlauf wird gelesen…',
         inflow: 'Monatlicher Zufluss',
         inflowObserved: {
-            one: '{amount} α pro Tag beobachtet, letzter {count} Tag',
+            one: '{amount} α pro Tag beobachtet, am letzten Tag',
             other: '{amount} α pro Tag beobachtet, letzte {count} Tage',
         },
         inflowProjected: '{amount} α pro Tag hochgerechnet · Miner-Emissionen × (1 − Momentum)',

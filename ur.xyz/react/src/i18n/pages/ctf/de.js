@@ -34,7 +34,7 @@ export default {
             one: '{lead} In dieser Epoche: {count} Land mit offenen Provider-Slots und {carried} α in den Töpfen.',
             other: '{lead} In dieser Epoche: {count} Länder mit offenen Provider-Slots und {carried} α in den Töpfen.',
         },
-        hubUndrawn: '{lead} Epoche {epoch} hatte keine Zufallsauswahl, also wurde jeder Slot übertragen: {carried} α in den Töpfen.',
+        hubUndrawn: '{lead} In Epoche {epoch} gab es keine Zufallsauswahl, also wanderten alle Slots in die Töpfe: {carried} α.',
         hubFirst: '{lead} Epoche {epoch} ist die erste; ihre Zufallsauswahl folgt auf ihr Ende, etwa am {day}.',
         hubDrawing: '{lead} Epoche {first}, die erste, ist zu Ende, und ihre Zufallsauswahl läuft.',
         hubPrelaunch: '{lead} Capture the Flag beginnt mit Epoche {first} am {day}: Sieh dir die Slots jedes Landes an.',

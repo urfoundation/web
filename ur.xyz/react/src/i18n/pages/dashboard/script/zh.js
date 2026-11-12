@@ -69,7 +69,7 @@ export default {
         alphaPerDay: "每天 +{value} α",
     },
     country: {
-        prompt: "搜索或点击一个国家查看其统计。",
+        prompt: "搜索或点击一个国家或地区，查看其统计。",
         rank: "{continent} · 第 {rank} 名，共 {total} 个",
         clear: "清除 {name}",
         shareOfAllProviders: "占全部提供者的比例",

@@ -122,7 +122,7 @@ export default {
         other: "更多统计：设备、连接、扩展器 →",
     },
     globeAria: "提供者所在国家的地球仪。拖动可旋转，点击国家可查看其数据。",
-    mapAria: "各国提供者地图。所有国家都列在下方表格中。",
+    mapAria: "各国提供者地图。所有国家和地区都列在下方表格中。",
     network: {
         showTable: "以表格显示",
         styleAria: "图表样式",

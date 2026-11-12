@@ -3,7 +3,8 @@
 // verifiable random selection among the eligible entries, and to draw 随机选出 (never 抽签 or 抽取, a drawing of
 // lots, nor 抽奖 or 彩票: it is not a lottery); wins by default 无需随机选取即可获胜 (ctf/indexing.js DEFAULT_WIN);
 // no draw 没有进行随机选取, 未进行随机选取; needs the draw 需要参加随机选取; chance to win 获胜概率; entry 参与者;
-// slot 槽位; pot 累积池 (never 奖池); carry forward 结转.
+// slot 槽位; pot 累积池 (never 奖池); carry forward 结转; places 国家和地区 in a count of them, 国家或地区 on a label
+// that names one without counting (你所在的国家或地区, 输入国家或地区).
 export default {
     program: '夺旗',
     gap: '',
@@ -158,13 +159,13 @@ export default {
 
     card: {
         choice: '你的选择',
-        here: '你的国家 · 根据你的连接',
+        here: '你所在的国家或地区 · 根据你的连接',
         biggest: '本周期最大的开放累积池',
         ten: '每个国家十个槽位',
         thisEpochIn: '{name}本周期',
-        yourCountry: '你的国家',
-        none: '每个国家每个周期都有五个提供者槽位和五个扩展器槽位。选择你的国家，看看那里有什么可以赢取。',
-        nonePrelaunch: '自周期 {first} 起，每个国家每个周期都有五个提供者槽位和五个扩展器槽位。选择你的国家，看看那里有什么可以赢取。',
+        yourCountry: '你所在的国家或地区',
+        none: '每个国家每个周期都有五个提供者槽位和五个扩展器槽位。选择你所在的国家或地区，看看那里有什么可以赢取。',
+        nonePrelaunch: '自周期 {first} 起，每个国家每个周期都有五个提供者槽位和五个扩展器槽位。选择你所在的国家或地区，看看那里有什么可以赢取。',
         earning: '{in}赚钱：常见问题与入门',
         upForGrabs: '本周期可赢取',
         online: '{noun}在线（{day}结束时）',
@@ -174,8 +175,8 @@ export default {
         startIn: '{in}开始挖矿',
         runExtender: '运行扩展器',
         stay: '{whereIn}保持在线至少半个周期，即可参加随机选取。系统会使用你在应用中设置的收款钱包。',
-        where: '你的国家',
-        whereIn: '在你的国家',
+        where: '你所在的国家或地区',
+        whereIn: '在你所在的国家或地区',
         pickLabel: '其他国家或地区？',
         pickPlaceholder: '输入国家或地区',
     },
@@ -308,7 +309,7 @@ export default {
         seen: '出现 {seen}/{days} 天',
         fromEpoch: '自周期 {first} 起',
         near: { other: '差一点：上个周期这里有 {count} 名矿工提前离开。' },
-        countryPage: '国家页面',
+        countryPage: '国家或地区页面',
         close: '关闭',
     },
 
@@ -350,7 +351,7 @@ export default {
         undrawn: '提、扩：提供者和扩展器各自的累积池。周期 {epoch} 没有进行随机选取，所有槽位均已结转。',
         bigPot: '大额累积池',
         waiting: '{amount} α 或以上等待赢取',
-        mobile: '开放槽位或已完全夺取 · 点按国家查看详情',
+        mobile: '开放槽位或已完全夺取 · 点按国家或地区查看详情',
         pWon: '提供者已赢得',
         xWon: '扩展器已赢得',
         slotOpen: '槽位开放',

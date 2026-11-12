@@ -10,7 +10,7 @@
 //   - a count of places says 国家和地区, since the places counted can include
 //     territories ("{count} 个国家和地区", "100 多个国家和地区");
 //   - a label that names a place without counting says 国家或地区 (输入国家或地区,
-//     更多国家或地区, the search messages, the table's column);
+//     更多国家或地区, 你所在的国家或地区, the search messages, the table's column);
 //   - the pot is 累积池, never 累计奖励 (and never the lottery's 奖池).
 // Spanish: neutral Latin American Spanish, the reader addressed as tú
 //   - no vosotros, and no usted (ustedes, the plural, stays);
@@ -129,6 +129,10 @@ test('Chinese labels that name a place without counting say 国家或地区', as
     const labels = {
         'ctf board.empty': ctf.board.empty, 'ctf board.findPlaceholder': ctf.board.findPlaceholder,
         'ctf card.pickLabel': ctf.card.pickLabel, 'ctf card.pickPlaceholder': ctf.card.pickPlaceholder, 'ctf country.more': ctf.country.more,
+        // the card's own place, the visitor's (a visitor in 香港, 澳门 or 台湾 sees it), and the links and hints to a place
+        'ctf card.here': ctf.card.here, 'ctf card.yourCountry': ctf.card.yourCountry, 'ctf card.where': ctf.card.where,
+        'ctf card.whereIn': ctf.card.whereIn, 'ctf cell.countryPage': ctf.cell.countryPage, 'ctf legend.mobile': ctf.legend.mobile,
+        'dashboard/script country.prompt': script.country.prompt,
         'dashboard titles.allCountries': dashboard.titles.allCountries, 'dashboard common.searchCountry': dashboard.common.searchCountry,
         'dashboard/script country.none': script.country.none, 'dashboard/script country.topCountries': script.country.topCountries,
         'dashboard/script country.tableCountry': script.country.tableCountry,

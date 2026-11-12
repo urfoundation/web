@@ -1,10 +1,10 @@
 // Capture the flag (ur.xyz/es/ctf and /es/ctf/<cc>): the Spanish copy of en.js, key for key.
 // The terms, as on /mainnet (mainnet/es.js): capture the flag Captura la bandera (the apps' name, without quotes);
 // the draw selección aleatoria, a public, verifiable random selection among the eligible entries, and to draw
-// seleccionar al azar (never sorteo or sortear, a drawing of lots, nor lotería or rifa: it is not a lottery); wins
-// by default gana sin selección aleatoria (ctf/indexing.js DEFAULT_WIN); no draw sin selección aleatoria; needs the
-// draw depende de la selección aleatoria; chance to win probabilidad de ganar; entry participante; slot slot; pot
-// fondo (not bote); carried pasa a su fondo; reader addressed as tú.
+// seleccionar al azar, of slots asignar al azar (never sorteo or sortear, a drawing of lots, nor lotería or rifa: it
+// is not a lottery); wins by default gana sin selección aleatoria (ctf/indexing.js DEFAULT_WIN); no draw sin
+// selección aleatoria; needs the draw depende de la selección aleatoria; chance to win probabilidad de ganar; entry
+// participante; slot slot; pot fondo (not bote); carried pasa a su fondo; reader addressed as tú.
 export default {
     program: 'Captura la bandera',
     gap: ' ',

@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Fortgeschrittenes Mining auf UR: alle gelisteten Betreiber mit einem Hotkey, mehrere Exits auf einem Host, automatische Claims und eine eigene Miner-UID für große Flotten.
+description: Fortgeschrittenes Mining auf UR: alle gelisteten Betreiber mit einem Hotkey, mehrere Exits pro Host, Claims automatisieren oder auslagern, eigene Miner-UID für große Flotten.
 ---
 
 # Fortgeschrittenes Mining
@@ -46,7 +46,7 @@ Mit `--all-operators` betreut ein Prozess für jeden gelisteten Betreiber einen 
 - Der erste Miner-Prozess, der TCP-Port 443 belegt, bedient den Extender für den Host.
 - `--all-operators` lehnt `--api_url`, `--connect_url`, `--provider-jwt`, `--wallet` und seine Signatur-Flags, `--test-egress-source-ip` sowie die Capture- und Close-Report-Flags ab, die auf einen Betreiber beschränkt bleiben.
 
-Um es als [eigenen Dienst](/docs/miner/run#a-service-of-your-own) zu betreiben, verwende `ExecStart=%h/.local/bin/provider provide --all-operators --auto-register --hotkey_seed_file=/absolute/private/hotkey.seed`. Im Automatikmodus behält der Dienst `--auto-register`, sodass jeder neu gelistete Betreiber sein erstes Gerät registriert; eine Identität, die der Miner schon hat, ersetzt das nie. Wenn du dich selbst bei Betreibern anmeldest, lass `--auto-register` weg, behalte `--hotkey_seed_file`, wenn du die Hotkey-Auszahlung unten verwendest, und füge `--allow-client-registration` nur für den ersten Start nach der Anmeldung bei einem neuen Betreiber hinzu.
+Um es als [eigenen Dienst](/docs/miner/run#a-service-of-your-own) zu betreiben, verwende `ExecStart=%h/.local/bin/provider provide --all-operators --auto-register --hotkey_seed_file=/absolute/private/hotkey.seed`. Im Automatikmodus behält der Dienst `--auto-register`, sodass jeder neu gelistete Betreiber sein erstes Gerät registriert; das ersetzt nie eine Identität, die der Miner schon hat. Wenn du dich selbst bei Betreibern anmeldest, lass `--auto-register` weg, behalte `--hotkey_seed_file`, wenn du die Hotkey-Auszahlung unten verwendest, und füge `--allow-client-registration` nur für den ersten Start nach der Anmeldung bei einem neuen Betreiber hinzu.
 
 ### Einmal für jeden gelisteten Betreiber signieren
 
@@ -154,7 +154,7 @@ provider claim-daemon --config=/absolute/path/claim.yml \
   --durable-volumes-sha256='sha256:<reviewed digest>'
 ```
 
-Betreibe einen Daemon pro Warteschlange und Relayer-Schlüssel, und reiche nicht gleichzeitig einzelne Claims ein oder betreibe einen weiteren Daemon mit diesem Schlüssel. Behalte nach einer unterbrochenen Einreichung den ganzen Warteschlangenordner, einschließlich seiner Nebendateien. Ein Warteschlangeneintrag mit der Markierung `uncertain` muss mit seiner ursprünglichen signierten Transaktion abgeglichen werden. Ein finalisierter Claim-Eintrag zeigt, dass der Claim angenommen wurde; die Zahlungsereignisse unterscheiden ausgezahlte Belohnungen von zurückgestellten Gutschriften.
+Betreibe einen Daemon pro Warteschlange und Relayer-Schlüssel, und reiche gleichzeitig keine einzelnen Claims ein und betreibe keinen weiteren Daemon mit diesem Schlüssel. Behalte nach einer unterbrochenen Einreichung den ganzen Warteschlangenordner, einschließlich seiner Nebendateien. Ein Warteschlangeneintrag mit der Markierung `uncertain` muss mit seiner ursprünglichen signierten Transaktion abgeglichen werden. Ein finalisierter Claim-Eintrag zeigt, dass der Claim angenommen wurde; die Zahlungsereignisse unterscheiden ausgezahlte Belohnungen von zurückgestellten Gutschriften.
 
 Für Konten unter Settlement v2 beansprucht `provider claim-daemon-v2` ein Konto, sobald sein beanspruchbares Guthaben `--threshold-rao` erreicht (Standard 1,9 α), und `--claim-now` beansprucht beim Start einmal alles Beanspruchbare. `--v1-config` betreibt den v1-Daemon von oben im selben Prozess, mit einem gemeinsamen Relayer-Schlüssel. Seine Optionen siehe `provider claim-daemon-v2 --help`.
 
@@ -167,7 +167,7 @@ Standardmäßig verdient jeder Miner im **Pool** seines Betreibers: Die Pool-UID
 Validatoren geben nur den **Top-200-Flotten** Gewicht; die UID jeder anderen Flotte bekommt nichts. Flotten werden nach **routbarer Exit-Breite** eingestuft, nicht nach Verkehr:
 
 - Jede Exit-Adresse, über die ein Validator einen echten Verifizierungs-Hop leitet, wird auf ihr Netzwerkpräfix reduziert (ein /29 bei IPv4, ein /48 bei IPv6). Die Punktzahl einer Flotte ist die Zahl der verschiedenen Präfixe, aus denen ihre Geräte austreten.
-- Ein Präfix, das mit anderen Flotten der Spitzenstufe geteilt wird, wird gleichmäßig zwischen ihnen aufgeteilt, sodass viele Geräte hinter einer Adresse oder in einem kleinen Bereich einmal zählen.
+- Ein Präfix, das mit anderen Flotten der Spitzenstufe geteilt wird, wird gleichmäßig zwischen ihnen aufgeteilt, sodass viele Geräte hinter einer Adresse oder in einem kleinen Bereich nur einmal zählen.
 - Die Punktzahl wird über die Zeit geglättet (jedes Tempo zählt zu einem Viertel), sodass eine schlechte Messung keine Flotte abstürzen lässt und eine neue Flotte eine Weile braucht, bis sie ihre volle Punktzahl erreicht.
 
 Ein einzelner Heimanschluss zählt als etwa ein Präfix. Eine eigene UID der Spitzenstufe lohnt sich für Flotten, deren Geräte aus vielen verschiedenen Netzen austreten, etwa Hosts, die über viele Rechenzentren oder viele private Anschlüsse verteilt sind.
@@ -186,11 +186,11 @@ Um zu sehen, wo du stehst, zeigt die Seite **Top 200** auf ur.io die geschätzte
 Du brauchst einen Bittensor-Coldkey mit genug TAO für die Burn-Gebühr, einen Hotkey für die Flotte und die Identitätsdateien der Miner (`~/.urnetwork`). Bewahre den Coldkey auf einem einzigen Registrierungscomputer auf; die Miner brauchen nur ihre eigenen Identitäten. Registrieren, Veröffentlichen, Binden und Widerrufen im Mainnet laufen nur unter Linux und macOS.
 
 1. **Schreibe das Flotten-Manifest.** Es listet die Chain-ID des Netzwerks, die netuid und den Koordinator, eine Flotten-ID, den Flotten-Hotkey, eine Generation sowie die Client-ID und den öffentlichen Schlüssel jedes Geräts. `provider fleet init` erstellt es aus den Dateien der Miner, und `provider fleet manifest --manifest=<path>` prüft es.
-2. **Registriere die UID.** Führe `provider fleet register` mit dem Manifest, den Seed-Dateien von Hotkey und Coldkey und `--substrate`-Endpunkten aus. Ohne `--apply` ist es ein Probelauf, der die aktuelle Burn-Gebühr und die Gebühr nennt. Füge `--apply` hinzu, um zu signieren und zu senden, mit `--burn_limit_rao` und `--fee_limit_rao` als Obergrenzen: Die Chain lehnt eine Registrierung ab, die mehr als dein Limit verbrennen würde.
+2. **Registriere die UID.** Führe `provider fleet register` mit dem Manifest, den Seed-Dateien von Hotkey und Coldkey und `--substrate`-Endpunkten aus. Ohne `--apply` ist es ein Probelauf, der die aktuelle Burn-Gebühr und die Transaktionsgebühr nennt. Füge `--apply` hinzu, um zu signieren und zu senden, mit `--burn_limit_rao` und `--fee_limit_rao` als Obergrenzen: Die Chain lehnt eine Registrierung ab, die mehr als dein Limit verbrennen würde.
 3. **Veröffentliche das Manifest.** `provider fleet publish` schreibt den Hash des Manifests vom Flotten-Hotkey aus auf die Chain.
 4. **Binde jedes Gerät an den Hotkey.** Jede Bindung wird sowohl vom Schlüssel des Geräts als auch vom Flotten-Hotkey signiert, sodass niemand Geräte beanspruchen kann, die er nicht betreibt. Eine Bindung beginnt frühestens mit der nächsten Epoche und umfasst den Epochenbereich, den du wählst (`--valid_from_epoch`, `--valid_to_epoch`). Entweder:
-   - führe `provider fleet sign` für jedes Gerät aus, das nur lokale Dateien liest, füge dann seine Ausgabe auf der Top-200-Seite von ur.io ein und reiche die Transaktion, die es vorbereitet, aus deiner eigenen EVM-Wallet ein; oder
-   - führe `provider fleet bind` für jedes Gerät aus, das die Bindung selbst mit einem EVM-Relayer-Schlüssel und `--rpc`-Endpunkten einreicht.
+   - führe für jedes Gerät `provider fleet sign` aus (der Befehl liest nur lokale Dateien), füge dann seine Ausgabe auf der Top-200-Seite von ur.io ein und reiche die Transaktion, die die Seite vorbereitet, aus deiner eigenen EVM-Wallet ein; oder
+   - führe für jedes Gerät `provider fleet bind` aus; der Befehl reicht die Bindung selbst mit einem EVM-Relayer-Schlüssel und `--rpc`-Endpunkten ein.
 5. **Prüfe und pflege sie.** `provider fleet status` zeigt die Bindung eines Geräts und die UID. `provider fleet revoke` entfernt ein Gerät ab einer künftigen Epoche. Binde neue Geräte auf dieselbe Weise, und binde erneut vor der letzten Epoche einer Bindung.
 
 Im Mainnet brauchen `register`, `publish`, `bind`, `status` und `revoke` außerdem das geprüfte Dokument zur Laufzeitautorität der Flotte des Netzwerks (`--mainnet-runtime-authority` und sein `--mainnet-runtime-authority-sha256`), und die Schreibvorgänge brauchen eine Deklaration des dauerhaften Volumes (`--durable-volumes` und `--durable-volumes-sha256`). Siehe den [Vertrag zu Flottenautorität und Wiederherstellung](https://github.com/urfoundation/sn/blob/main/miner/FLEET-MAINNET-RUNTIME.md) und `provider fleet --help` für jede Option. Wie Spitzenstufe und Pool-Stufe bewertet werden, steht im [Whitepaper](https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md), Abschnitte 8.4 und 11.4.

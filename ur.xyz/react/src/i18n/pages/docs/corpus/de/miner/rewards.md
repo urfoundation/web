@@ -58,7 +58,7 @@ Du kannst die Wallet auch beim Start des Miners festlegen: `provider provide --w
 
 Belohnungen werden in **Epochen** gezählt. Eine neue Wallet-Einstellung beginnt mit der **nächsten** Epoche und gilt für 65.536 Epochen, also lege sie vor der Epoche fest, in der du verdienen willst, und erneuere sie, bevor sie ausläuft. Sie ändert nie, wohin frühere Belohnungen gehen. Um stattdessen einen genauen Bereich zu wählen, übergib sowohl `--wallet-from-epoch=<epoch>` als auch `--wallet-through-epoch=<epoch>` an `wallet challenge` und `wallet set`; die früheste Epoche, die er akzeptiert, bestimmt weiterhin der Betreiber.
 
-Der Miner bewahrt jede signierte Erklärung in `.provider.jwt.wallet-consent/history.json` im Ordner `~/.urnetwork` auf. Bewahre sie mit deinem [Backup](/docs/miner/run#back-up-your-miner) auf. Wird das Senden einer Erklärung unterbrochen, sendet dieselbe Befehlszeile erneut ausgeführt dieselbe signierte Erklärung, selbst wenn der Seed nicht mehr auf dem Computer ist.
+Der Miner bewahrt jede signierte Erklärung in `.provider.jwt.wallet-consent/history.json` im Ordner `~/.urnetwork` auf. Bewahre sie mit deinem [Backup](/docs/miner/run#back-up-your-miner) auf. Wird das Senden einer Erklärung unterbrochen und führst du denselben Befehl erneut aus, sendet er dieselbe signierte Erklärung, selbst wenn der Seed nicht mehr auf dem Computer ist.
 
 Jedes Gerät, das verdienen soll, braucht seine eigene signierte Wallet; mehrere Geräte können denselben Coldkey verwenden. Für zusätzliche Exits auf einem Host wähle jeden mit `--provider-jwt` aus: siehe [Mehrere Exits auf einem Host](/docs/miner/advanced#several-exits-on-one-host). Um einmal für jeden gelisteten Betreiber zu signieren, siehe [Einmal für jeden gelisteten Betreiber signieren](/docs/miner/advanced#sign-once-for-every-listed-operator).
 
@@ -77,7 +77,7 @@ Um für eine Epoche bezahlt zu werden, braucht ein Gerät eine abgeschlossene Nu
 
 Validatoren messen die Routing-Qualität selbst und gewichten die Pools der Betreiber und die Flotten der Spitzenstufe. Miner werden mit **Momentum** bezahlt: dem Anteil der Miner-Emission des Subnets, der jetzt eingesetzt wird, um das Netzwerk zu betreiben, aufgeteilt zwischen der Pool-Stufe und der Spitzenstufe nach einer Richtlinie. Momentum beträgt 10 %; die veröffentlichte Richtlinie deines Betreibers nennt den aktuellen Wert. Die [Network Capacity Reserve](/reserve), das Konto `ur-reserve`, erhält den Rest: Miner-Emission × (1 − Momentum). Ihr Anteil ist nicht fest; er wird kleiner, wenn Momentum wächst. Momentum ist ein Anteil an der Emission, kein fester Preis pro Byte; die veröffentlichte Richtlinie deines Betreibers und die Auszahlungsdateien zeigen die tatsächlichen Einnahmen. Die Reserve ist von der Claim-Sicherheit des Settlement-Tresors getrennt.
 
-Eine Settlement-Epoche wird durch die bereitgestellten Verträge und die Richtlinie festgelegt. Im Mainnet sind es 50.400 Blöcke, etwa sieben Tage bei 12 Sekunden pro Block. Nachdem eine Epoche endet, wird ihr Auszahlungs-Root festgelegt und finalisiert, bevor Claims öffnen, daher ist jüngste Arbeit nicht sofort beanspruchbar. Der `claim_open_block`, den der Claim-Befehl ausgibt, und die veröffentlichten Bereitstellungsfenster deines Betreibers sagen dir, wann.
+Eine Settlement-Epoche wird durch die bereitgestellten Verträge und die Richtlinie festgelegt. Im Mainnet sind es 50.400 Blöcke, etwa sieben Tage bei 12 Sekunden pro Block. Nachdem eine Epoche geendet hat, wird ihr Auszahlungs-Root festgelegt und finalisiert, bevor Claims öffnen, daher ist jüngste Arbeit nicht sofort beanspruchbar. Der `claim_open_block`, den der Claim-Befehl ausgibt, und die veröffentlichten Bereitstellungsfenster deines Betreibers sagen dir, wann.
 
 ## Deine Belohnungen beanspruchen
 
@@ -123,6 +123,6 @@ provider claim --epoch='<settlement_epoch>' \
 
 Eine zurückgestellte Gutschrift verfällt nicht. Ein späterer Claim zahlt die angesammelte Gutschrift aus, sobald eine Zahlung möglich ist, und jeder kann es mit der Methode `withdrawClaimCredit(bytes32 coldkey)` des Tresors erneut versuchen; `snclaim withdraw --vault=v1` (mit `--coldkey`, `--contract`, `--rpc` und `--key_file`) ruft sie auf. Einen bereits angenommenen Claim erneut einzureichen ist keine Abhebung und schlägt als bereits beansprucht fehl.
 
-Beanspruche vor dem Verfall des Anspruchs. Im Mainnet sind das acht Epochen plus eine Kulanzepoche; danach können nicht beanspruchte Belohnungen in den Pool desselben Betreibers zurückfließen. Der Verfall entfernt keine bereits angenommene Gutschrift. Ab der Umstellungsepoche von Settlement v2 verfallen Konten nie.
+Beanspruche deine Belohnungen, bevor der Anspruch verfällt. Im Mainnet sind das acht Epochen plus eine Kulanzepoche; danach können nicht beanspruchte Belohnungen in den Pool desselben Betreibers zurückfließen. Der Verfall entfernt keine bereits angenommene Gutschrift. Ab der Umstellungsepoche von Settlement v2 verfallen Konten nie.
 
 Um automatisch zu beanspruchen oder von einem anderen Computer als dem Miner einzureichen, siehe [Fortgeschritten](/docs/miner/advanced#claim-automatically).

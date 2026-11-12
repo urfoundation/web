@@ -34,13 +34,13 @@ provider network
 
 API-URLs beginnen mit `https://` und Connect-URLs mit `wss://` (einfaches `http://` und `ws://` funktionieren nur für einen lokalen Testserver). `provider network` allein zeigt den aktiven Betreiber, und `provider network reset` kehrt zum Standard zurück. Die Wahl wird gespeichert und gilt für jeden späteren Befehl. Führe dann `provider setup` oder `provider login` mit einem Auth-Code dieses Betreibers aus.
 
-Ein Wechsel des Betreibers zieht ein bereits registriertes Gerät nicht zum neuen um. Halte jeden Betreiber in seinem eigenen Zustand und Konto. Um jeden Betreiber der veröffentlichten Liste auf einmal zu bedienen, siehe [Für jeden gelisteten Betreiber minen](/docs/miner/advanced#mine-every-listed-operator).
+Ein Wechsel des Betreibers zieht ein bereits registriertes Gerät nicht zum neuen um. Halte für jeden Betreiber einen eigenen Zustand und ein eigenes Konto. Um jeden Betreiber der veröffentlichten Liste auf einmal zu bedienen, siehe [Für jeden gelisteten Betreiber minen](/docs/miner/advanced#mine-every-listed-operator).
 
 ## Im Hintergrund laufen lassen
 
 ### Mit einem Installer
 
-Die [Installer](/docs/miner/install#the-installers) betreiben den Miner bereits im Hintergrund: als systemd-Benutzerdienst unter Linux (oder, mit `--system` installiert, als [Systemdienst, der als du läuft](/docs/miner/extender#with-the-linux-installer)), als launchd-Agent unter macOS und über Autostart-Verknüpfungen unter Windows. Verwalte ihn mit `urnet-tools`:
+Die [Installer](/docs/miner/install#the-installers) betreiben den Miner bereits im Hintergrund: als systemd-Benutzerdienst unter Linux (oder, mit `--system` installiert, als [Systemdienst, der unter deinem Benutzer läuft](/docs/miner/extender#with-the-linux-installer)), als launchd-Agent unter macOS und über Autostart-Verknüpfungen unter Windows. Verwalte ihn mit `urnet-tools`:
 
 ```bash
 urnet-tools start          # start it (no error if it's already running)
@@ -85,7 +85,7 @@ provider service uninstall       # your sign-in and identity are kept
 
 Auf einem Server, oder um unter Linux oder macOS für jeden Benutzer des Computers zu minen, verwende einen systemweiten Dienst, der als root läuft, mit seinem Zustand in `/var/lib/urnetwork`: `sudo provider setup --system` oder `sudo provider service install --system`. Füge `--system` zu den anderen `provider service`-Befehlen hinzu, um ihn zu verwalten. Windows hat keinen systemweiten Dienst. Unter Linux kann ein Benutzerdienst für den Extender des Miners nicht auf TCP-Port 443 lauschen; `sudo "$(command -v provider)" service install --system --as="$USER"` betreibt ihn als Systemdienst, der dein Benutzer bleibt und auf diesem Port lauschen darf. Siehe [Den Miner auf Port 443 lauschen lassen](/docs/miner/extender#linux-let-the-miner-listen-on-port-443). Für viele Maschinen richtet `provider setup --yes --auth-code-file=<path>` alles ohne Rückfragen ein; den Auszahlungsschritt überspringt es, also [lege danach die Auszahlungs-Wallet fest](/docs/miner/rewards#set-your-payout-wallet).
 
-Unter Linux und Windows fügt `provider service install` neben dem Miner eines Installers keinen zweiten hinzu. Unter macOS sieht er den Agent des Installers nicht; wenn du den macOS-Installer benutzt hast, verwende also weiter `urnet-tools` und installiere keinen zweiten Dienst.
+Unter Linux und Windows fügt `provider service install` neben dem Miner eines Installers keinen zweiten hinzu. Unter macOS sieht er den Agenten des Installers nicht; wenn du den macOS-Installer benutzt hast, verwende also weiter `urnet-tools` und installiere keinen zweiten Dienst.
 
 ### Ein eigener Dienst
 
@@ -130,7 +130,7 @@ Je eine Zeile für den Miner, die Anmeldung, die Registrierung des Geräts, die 
 provider doctor
 ```
 
-Sucht, warum sich der Miner nicht anmelden oder verbinden kann: ob der Zustandsordner privat ist, DNS, die Verbindung zum Betreiber, einen Proxy oder eine Firewall, die TLS inspiziert, die Uhr und ob sich Updates installieren lassen. Für jedes gefundene Problem nennt er die Lösung.
+Sucht nach Gründen, warum sich der Miner nicht anmelden oder verbinden kann: ob der Zustandsordner privat ist, DNS, die Verbindung zum Betreiber, einen Proxy oder eine Firewall, die TLS inspiziert, die Uhr und ob sich Updates installieren lassen. Für jedes gefundene Problem nennt er die Lösung.
 
 ### Das Log
 

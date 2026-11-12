@@ -7,16 +7,16 @@ description: Starte das Mining auf UR in wenigen Schritten. Was ein Miner tut, w
 > **Wenn `provider setup` oder `provider service install` den Hintergrunddienst deines Miners eingerichtet hat, aktualisiere ihn einmal von Hand.** Seit Release 2026.10.22 haben sich diese Miner nicht selbst aktualisiert, weder unter Linux noch unter macOS oder Windows. Das Update-Programm des Miners akzeptierte Versionen in der Form `2026.10.27-1083160450`, Releases sind aber als `2026.10.27+1083160450` gestempelt, sodass sich jedes Release für einen Entwicklungs-Build hielt:
 >
 > - `provider status` meldet „development build, never updates itself“.
-> - `provider update` und die automatischen Updates verweigern mit „this is a development build … which never replaces itself with a release“.
+> - `provider update` und die automatischen Updates brechen mit „this is a development build … which never replaces itself with a release“ ab.
 > - Die 10-Minuten-Prüfung, die eine neue Version zurückrollt, wenn sie nicht wieder verbunden hochkommt, lief nie.
 >
-> Die Korrektur steckt im ersten Release nach dem 11. November 2026, und dein Miner kann es nicht selbst installieren. Sobald dieses Release erschienen ist, lade es herunter und entpacke es wie unter [Manueller Download](/docs/miner/install#manual-download), und statt es zu installieren, führe sein Update aus: `./linux/amd64/provider update` mit deinem Ordner aus der Tabelle (mit `sudo` davor bei einem Systemdienst) oder unter Windows `& "$env:TEMP\windows\$Arch\provider.exe" update`. Tippst du nur `provider update`, läuft der Miner, den du hast, und der verweigert weiterhin. Das Update ersetzt den Miner, den dein Dienst betreibt, und startet ihn neu.
+> Die Korrektur steckt im ersten Release nach dem 11. November 2026, und dein Miner kann es nicht selbst installieren. Sobald dieses Release erschienen ist, lade es herunter und entpacke es wie unter [Manueller Download](/docs/miner/install#manual-download), und statt es zu installieren, führe sein Update aus: `./linux/amd64/provider update` mit deinem Ordner aus der Tabelle (mit `sudo` davor bei einem Systemdienst) oder unter Windows `& "$env:TEMP\windows\$Arch\provider.exe" update`. Tippst du nur `provider update`, führst du den Miner aus, den du hast, und der bricht weiterhin ab. Das Update ersetzt den Miner, den dein Dienst betreibt, und startet ihn neu.
 >
 > Danach sind Updates wieder automatisch: verteilt über etwa 16 Stunden nach jedem Release, mit der 10-Minuten-Verbindungsprüfung, einem Rollback und einer 7-tägigen Sperre für ein Release, das sie nicht besteht. `provider status` zeigt dann, dass Updates automatisch sind oder dass du auf dem neuesten Stand bist.
 >
-> Wenn du den Miner selbst betreibst, ohne diesen Dienst, verweigert `provider update` ebenfalls: Installiere das neue Release wie unter [Manueller Download](/docs/miner/install#manual-download) und starte den Miner neu.
+> Wenn du den Miner selbst betreibst, ohne diesen Dienst, bricht `provider update` ebenfalls ab: Installiere das neue Release wie unter [Manueller Download](/docs/miner/install#manual-download) und starte den Miner neu.
 >
-> Nicht betroffen: das Docker-Image, die Apps und Miner, die ein Installer eingerichtet hat; sie aktualisieren sich über `urnet-tools`.
+> Nicht betroffen: das Docker-Image, die Apps und Miner, die ein Installer eingerichtet hat und die sich über `urnet-tools` aktualisieren.
 
 Ein UR-Miner teilt deine Internetverbindung als Exit für einen Netzbetreiber. Validatoren prüfen, dass er wirklich Verkehr trägt, und Bittensor SN25 (netuid 25) zahlt für diese Arbeit Belohnungen im α-Token des Subnets, der als $UR auftritt.
 
@@ -33,7 +33,7 @@ Diese Seite bringt dich von null zu einem laufenden Miner. Der Rest des Miner-Le
 | [Fortgeschritten](/docs/miner/advanced) | Für jeden Betreiber minen, mehrere Exits auf einem Host, automatische Claims und die Spitzenstufe für große Flotten. |
 | [Referenz](/docs/miner/reference) | Alle alltäglichen Befehle, die Dateien, die der Miner anlegt, Umgebungsvariablen und ein Glossar. |
 
-Für die anderen Rollen siehe [Einen Validator betreiben](/docs/validator) und [Einen Netzbetreiber betreiben](/docs/operator).
+Für die anderen Rollen siehe [Einen Validator betreiben](/docs/validator) und [Netzbetreiber werden](/docs/operator).
 
 ## So funktioniert es
 

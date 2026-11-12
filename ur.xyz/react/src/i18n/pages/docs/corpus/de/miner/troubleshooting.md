@@ -85,7 +85,7 @@ Der Miner ist gestartet, aber der Betreiber nimmt seine Verbindung nicht an, und
 
 - Stelle sicher, dass der Computer eine normale Internetverbindung für zu Hause oder für Server hat, ohne VPN oder Proxy vor dem Miner.
 - Prüfe, dass du dich bei dem Betreiber angemeldet hast, den der Miner verwendet (`provider network`).
-- Hält es an, frag deinen Betreiber oder [auf unserem Discord](https://discord.gg/urnetwork), mit den Zeilen rund um `refused`.
+- Bleibt das Problem bestehen, frag deinen Betreiber oder [auf unserem Discord](https://discord.gg/urnetwork), mit den Zeilen rund um `refused`.
 
 ### Der Miner stoppt, wenn ich mich abmelde
 
@@ -106,7 +106,7 @@ Mit `--all-operators` hat dieser Betreiber noch keine Anmeldung. Führe `provide
 Der Miner konnte nicht auf TCP-Port 443 lauschen, daher ist sein Extender aus. Er versucht es alle 3 Minuten erneut.
 
 - `tcp_443_permission_denied`: Unter Linux darf ein Miner, der als dein Benutzer läuft, nicht auf Ports unter 1024 lauschen. Installiere ihn als Systemdienst, der das darf: mit dem Installer `curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_Install_Linux.sh | sh -s -- --system`; mit `provider service` `sudo "$(command -v provider)" service install --system --as="$USER"`. Siehe [Den Miner auf Port 443 lauschen lassen](/docs/miner/extender#linux-let-the-miner-listen-on-port-443).
-- `tcp_443_in_use`: Ein anderes Programm hält den Port, etwa ein Webserver oder ein anderer Miner-Prozess auf demselben Computer. Nur ein Programm pro Computer kann ihn haben; der Miner übernimmt ihn innerhalb von 3 Minuten, nachdem er frei wird.
+- `tcp_443_in_use`: Ein anderes Programm hält den Port, etwa ein Webserver oder ein anderer Miner-Prozess auf demselben Computer. Nur ein Programm pro Computer kann ihn haben; der Miner übernimmt ihn innerhalb von 3 Minuten, nachdem er frei geworden ist.
 - `tcp_443_bind_failed`: Es ist aus einem anderen Grund fehlgeschlagen. Lies die Log-Zeilen darum herum.
 
 ### Der Extender ist auf TCP 443 nicht erreichbar

@@ -22,7 +22,7 @@ Ein Extender ist Partei jedes Vertrags, der ihn durchquert, und verdient daher e
 
 Der Betreiber testet TCP-Port 443 aus dem Internet, bevor er deinen Extender listet. Die UDP-Ports geben Clients weitere Wege, ihn zu erreichen.
 
-Nur ein Programm auf einem Computer kann auf TCP-Port 443 lauschen. Laufen mehrere Miner-Prozesse auf einem Host, etwa mit `--all-operators`, bedient der erste, der den Port belegt, den Extender für den Host, und ein anderer übernimmt innerhalb von 3 Minuten, nachdem er gestoppt ist. Ein Webserver oder jedes andere Programm auf Port 443 hält den Extender aus.
+Nur ein Programm auf einem Computer kann auf TCP-Port 443 lauschen. Laufen mehrere Miner-Prozesse auf einem Host, etwa mit `--all-operators`, bedient der erste, der den Port belegt, den Extender für den Host, und ein anderer übernimmt innerhalb von 3 Minuten, nachdem er gestoppt ist. Ein Webserver oder jedes andere Programm auf Port 443 sorgt dafür, dass der Extender ausgeschaltet bleibt.
 
 ## Die Ports öffnen
 
@@ -105,7 +105,7 @@ curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Prov
 
 Eine bestehende Installation kann auch mit `urnet-tools reinstall --system` wechseln.
 
-Er installiert `/etc/systemd/system/urnetwork.service`, das den Miner als du betreibt, stoppt und entfernt deinen eigenen `urnetwork.service` und behält deinen Update-Timer. Von da an wirken `urnet-tools start`, `stop`, `restart`, `status`, `logs` und `uninstall` auf den Systemdienst, und `start`, `stop` und `uninstall` fragen nach `sudo`.
+Er installiert `/etc/systemd/system/urnetwork.service`, das den Miner unter deinem Benutzer betreibt, stoppt und entfernt deinen eigenen `urnetwork.service` und behält deinen Update-Timer. Von da an wirken `urnet-tools start`, `stop`, `restart`, `status`, `logs` und `uninstall` auf den Systemdienst, und `start`, `stop` und `uninstall` fragen nach `sudo`.
 
 Als root ohne systemd-Benutzersitzung ausgeführt (eine `sudo su`-Shell), installiert der Installer den Systemdienst von selbst.
 
@@ -157,7 +157,7 @@ Drei Zeilen machen die ganze Gewährung aus:
 - `CapabilityBoundingSet=CAP_NET_BIND_SERVICE` verhindert, dass er je ein anderes hält.
 - `NoNewPrivileges=yes` verhindert, dass er und alles, was er startet, Privilegien erlangen, zum Beispiel über ein setuid-Programm.
 
-Der Kompromiss: Solange der Dienst läuft, kann das Programm, das er startet, auf Ports unter 1024 lauschen. Das Binary liegt in deinem Ordner, also kann jeder, der es ersetzen kann (du oder ein Programm, das als du läuft), unter dieser Unit Code ausführen, der auf niedrigen Ports lauscht. Dieser Code erlangt kein anderes Privileg: Er läuft nicht als root, `NoNewPrivileges` ist an, und die Begrenzungsmenge enthält nur diese eine Capability. Ist das auf einem gemeinsam genutzten Computer nicht akzeptabel, verwende `--system` nicht. Der Miner mint auch ohne seinen Extender.
+Der Kompromiss: Solange der Dienst läuft, kann das Programm, das er startet, auf Ports unter 1024 lauschen. Das Binary liegt in deinem Ordner, also kann jeder, der es ersetzen kann (du oder ein Programm, das unter deinem Benutzer läuft), unter dieser Unit Code ausführen, der auf niedrigen Ports lauscht. Dieser Code erlangt kein anderes Privileg: Er läuft nicht als root, `NoNewPrivileges` ist an, und die Begrenzungsmenge enthält nur diese eine Capability. Ist das auf einem gemeinsam genutzten Computer nicht akzeptabel, verwende `--system` nicht. Der Miner mint auch ohne seinen Extender.
 
 Andere Wege, den Port zu gewähren, und warum der Miner sie nicht nutzt:
 
@@ -181,7 +181,7 @@ Im Log (`provider service logs --follow` oder `urnet-tools logs`) sagt der `exte
 | `reason` | Was es bedeutet | Was zu tun ist |
 | --- | --- | --- |
 | `tcp_443_permission_denied` | Der Miner darf nicht auf Port 443 lauschen. | [Den Miner auf Port 443 lauschen lassen](#linux-let-the-miner-listen-on-port-443). |
-| `tcp_443_in_use` | Ein anderes Programm hält TCP-Port 443: ein anderer Miner-Prozess oder ein Webserver. | Nur ein Programm pro Computer kann ihn haben. Der Miner übernimmt den Port innerhalb von 3 Minuten, nachdem er frei wird. |
+| `tcp_443_in_use` | Ein anderes Programm hält TCP-Port 443: ein anderer Miner-Prozess oder ein Webserver. | Nur ein Programm pro Computer kann ihn haben. Der Miner übernimmt den Port innerhalb von 3 Minuten, nachdem er frei geworden ist. |
 | `tcp_443_bind_failed` | Das Lauschen auf Port 443 ist aus einem anderen Grund fehlgeschlagen. | Lies die Log-Zeilen darum herum. |
 | `unreachable_on_tcp_443` | Der Miner lauscht, aber der Test des Betreibers konnte ihn aus dem Internet nicht erreichen. | [Öffne die Ports](#open-the-ports) und starte den Miner dann neu. |
 

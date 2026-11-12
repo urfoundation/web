@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Den UR-Miner installieren. Die Installer für Linux, macOS und Windows mit automatischen Updates, ein manueller Download und der Build des provider aus dem Quellcode.
+description: Den UR-Miner installieren. Die Installer für Linux, macOS und Windows mit automatischen Updates, ein manueller Download und der Build von provider aus dem Quellcode.
 ---
 
 # Den Miner installieren
@@ -48,7 +48,7 @@ Ein Benutzerdienst kann nicht auf TCP-Port 443 lauschen, den der [Extender](/doc
 curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_Install_Linux.sh | sh -s -- --system
 ```
 
-Führe ihn als du selbst aus, nicht mit `sudo`; er fragt einmal nach deinem `sudo`-Passwort. Siehe [Den Miner auf Port 443 lauschen lassen](/docs/miner/extender#linux-let-the-miner-listen-on-port-443).
+Führe ihn unter deinem eigenen Benutzer aus, nicht mit `sudo`; er fragt einmal nach deinem `sudo`-Passwort. Siehe [Den Miner auf Port 443 lauschen lassen](/docs/miner/extender#linux-let-the-miner-listen-on-port-443).
 
 Optionen kommen nach `sh -s --`, zum Beispiel `curl -fsSL … | sh -s -- --no-start`. Führe ihn mit `--help` aus, um alle zu sehen.
 

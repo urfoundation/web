@@ -22,8 +22,11 @@ const ROOT = path.join(ASTRO_DIR, 'build', UR_ENV);
 // so neither a code block nor a table scrolls sideways at any width.
 // /ctf: the 249-country grid; /ctf/vc and /ctf/gs: the longest country names.
 const ROUTES = ['/build', '/about', '/investors', '/reserve', '/mainnet', '/ctf', '/ctf/ke', '/ctf/vc', '/ctf/gs', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner',
-    // a page of each localized page group, in Arabic and German (localized-samples.mjs)
-    ...localizedSamples(['ar', 'de'])];
+    // a page of each localized page group, in Arabic and German (localized-samples.mjs), but
+    // /dashboard, which is left out in English too: its figures come live from Grafana (through
+    // /__grafana off ur.xyz), which this offline audit can't serve, so the page reports the load
+    // failure in the console
+    ...localizedSamples(['ar', 'de']).filter((route) => basePathFor(route) !== '/dashboard')];
 const PROFILES = [
   { name: 'desktop', width: 1280, height: 900 },
   { name: 'desktop-edge', width: 1080, height: 800 },

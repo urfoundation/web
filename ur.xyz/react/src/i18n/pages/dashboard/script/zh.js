@@ -82,7 +82,7 @@ export default {
         topCountries: "主要国家",
         worldwide: "全球",
         worldwideHint: "搜索、点击圆点，或展开一个大洲",
-        several: "有多个国家匹配。继续输入或从列表中选择一个。",
+        several: "有多个国家和地区匹配。继续输入或从列表中选择一个。",
         none: "没有名为“{query}”且有在线提供者的国家。",
         top3: "前 3 个国家和地区拥有 {share} 的在线提供者。",
         changeLast: "过去 {period}变化",

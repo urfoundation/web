@@ -9,15 +9,19 @@
  * the constructs these documents use, and nothing else:
  *
  *   #/##/### headings; "-" bullet lists; "> " blockquotes; contract clauses
- *   at 0/4/8-space indents; **bold**; [text](url); <email@host>; pandoc's
- *   backslash escapes (\" \' \. etc.).
+ *   at 0/4/8-space indents; **bold**; *italic* (a case name, the closing
+ *   licence line); [text](url); <email@host>; pandoc's backslash escapes
+ *   (\" \' \. etc.; \* is a literal asterisk).
  */
 
 const escapeHtml = (s) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// An escaped asterisk (\*) stands aside while emphasis is read, then prints as "*".
+const LITERAL_STAR = "\u0000";
+
 function inline(text) {
-  let s = text;
+  let s = text.replace(/\\\*/g, LITERAL_STAR);
   // pandoc backslash escapes first, so \" never reaches the html attr stage
   s = s.replace(/\\([^\w\s])/g, "$1");
   s = escapeHtml(s);
@@ -27,7 +31,9 @@ function inline(text) {
   // [text](bare.domain) links used by the ur.xyz doc
   s = s.replace(/\[([^\]]+)\]\((?!https?:|mailto:)([^)\s]+)\)/g, '<a href="https://$2">$1</a>');
   s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  return s;
+  // *italic*: opens before a non-space and closes after one, never inside a word
+  s = s.replace(/(?<![*\w])\*(?=[^\s*])([^*]*?[^\s*])\*(?![*\w])/g, "<em>$1</em>");
+  return s.replaceAll(LITERAL_STAR, "*");
 }
 
 // A clause marker: "12.", "a.", "iv." — the shapes these contracts use.

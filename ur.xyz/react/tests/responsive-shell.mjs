@@ -24,8 +24,12 @@ const ROOT = path.join(ASTRO_DIR, 'build', UR_ENV);
 const ROUTES = ['/build', '/about', '/investors', '/reserve', '/mainnet', '/ctf', '/ctf/ke', '/ctf/vc', '/ctf/gs', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner',
     // a page of each localized page group, in Arabic and German (localized-samples.mjs), but
     // /dashboard, which is left out in English too: its figures come live from Grafana (through
-    // /__grafana off ur.xyz), which this offline audit can't serve, so the page reports the load
-    // failure in the console
+    // /__grafana off ur.xyz) and from Bittensor, and its engine needs both. Grafana could be
+    // answered here (stats.json, and the panel queries, which rebuild the days history.json lacks
+    // and give the countries the engine needs one of), but the engine then stops on the reserve:
+    // components/pages/dashboard/engine.js reads SNAP.RESERVE, EMISSION and ROUTING, which only a
+    // chain read gives (lib/subtensor.js readReserve), and throws when that read failed, in every
+    // language, so the page logs errors offline
     ...localizedSamples(['ar', 'de']).filter((route) => basePathFor(route) !== '/dashboard')];
 const PROFILES = [
   { name: 'desktop', width: 1280, height: 900 },

@@ -131,7 +131,8 @@ const BANNED = {
     en: /\b(lotter(y|ies)|jackpots?|bets?|betting|gambl\w*|raffle\w*|sweepstake\w*)\b/i,
     ru: /(лотере|джекпот|ставк[аиуеой]|пари\b|азартн|тотализатор)/i,
     ar: /(يانصيب|اليانصيب|لوتو|جائزة كبرى|الجائزة الكبرى|رهان|مراهنة|قمار|مقامرة|ميسر)/,
-    zh: /(彩票|抽奖|头奖|大奖|赌|博彩|下注)/,
+    // 奖池, a lottery's prize pool: the pot is 累积池, as on /mainnet (mainnet/zh.js)
+    zh: /(彩票|抽奖|头奖|大奖|赌|博彩|下注|奖池)/,
     de: /(lotterie|lotto|jackpot|wette|glücksspiel|verlosung|tombola)/i,
     es: /(loter[ií]a|jackpot|apuesta|juego de azar|rifa|quiniela)/i,
 };

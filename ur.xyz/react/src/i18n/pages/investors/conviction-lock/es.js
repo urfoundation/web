@@ -19,11 +19,11 @@ export default {
     },
     keith: {
         heading: 'Keith Singery, asesor, declaró:',
-        quote: '«Me enorgullece dar la bienvenida a UR a Bittensor y contar con un equipo que trabaja en cifrado y en un internet privado usando Bittensor. Desde 2022 me he dedicado a apoyar la misión del código abierto a través de Bittensor y, desde que conocí a Brien y a Jack, este es un equipo con el que compartimos una visión clara y alineada del futuro. Me alegra que se alineen con todos los titulares de tokens al emprender este camino».',
+        quote: '«Es un gran orgullo para mí dar la bienvenida a UR a Bittensor y contar con un equipo que trabaja en cifrado y en un internet privado usando Bittensor. Desde 2022 me he dedicado a apoyar la misión del código abierto a través de Bittensor y, desde que conocí a Brien y a Jack, este es un equipo con el que compartimos una visión clara y alineada del futuro. Me entusiasma que se alineen con todos los titulares de tokens al emprender este camino».',
     },
     aboutHeading: 'Acerca de UR (SN25)',
     about: [
-        'UR (SN25) es un mercado de ancho de banda de código abierto para el acceso privado a internet, construido sobre Bittensor. Hoy, UR (SN25) colabora con más de 80.000 proveedores de red en más de 100 países para transportar tráfico. UR se desarrolla de forma abierta por UR Foundation, con el protocolo en github.com/urfoundation/sn. Más información en ur.xyz.',
+        'UR (SN25) es un mercado de ancho de banda de código abierto para el acceso privado a internet, construido sobre Bittensor. Hoy, UR (SN25) colabora con más de 80.000 proveedores de red en más de 100 países para transportar tráfico. UR Foundation desarrolla UR de forma abierta, con el protocolo en github.com/urfoundation/sn. Más información en ur.xyz.',
         'BringYour es el primer operador de red, ur.io, y gestiona una VPN de consumo que da servicio a más de 350.000 usuarios activos mensuales. Es totalmente de código abierto en github.com/urnetwork y está disponible en iOS, Android, Windows, macOS, Linux, Chrome y Firefox.',
     ],
     figuresAsAt: 'Todas las cifras corresponden al 9 de septiembre de 2026 y están sujetas a cambios.',

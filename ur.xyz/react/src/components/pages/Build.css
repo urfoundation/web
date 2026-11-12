@@ -1389,5 +1389,32 @@
 [dir="rtl"] .build-page .model-stage .scene-terminal3 .piece-label{left:14px;right:auto}
 [dir="rtl"] .build-page .model-stage .scene-terminal3 .terminal3-base .piece-name{left:22px;right:auto}
 [dir="rtl"] .build-page .model-stage .scene-terminal3 .terminal3-base-status{right:22px;left:auto}
+/* The version 10 models (?model=chassis, spine, tower, foundation, terminal)
+   carry their words the same way: every label and line pinned to a part (and
+   the labels their parts draw from data-label) reads right to left and keeps
+   its corner, and so does the product's copy on its deck. The callouts beside
+   every model read right to left inside their place. */
+[dir="rtl"] .build-page .model-stage :is(.scene-chassis, .scene-spine, .scene-tower, .scene-foundation, .scene-terminal) :is(.piece-label, .piece-name, .foundation-rate, .core-copy, .bridge-top, .foundation-title, .operator-studio > div, .stays-shared, .operator-owns, .validator-header, .shell-status, .terminal-owns, .op-product-copy > *),
+[dir="rtl"] .build-page .model-stage .gantry-beam::after,
+[dir="rtl"] .build-page .model-stage .miner-ring::before,
+[dir="rtl"] .build-page .model-stage .miner-ring::after,
+[dir="rtl"] .build-page .model-stage .gateway-foundation::before,
+[dir="rtl"] .build-page .model-stage .terminal-shell::before,
+[dir="rtl"] .build-page .model-stage .terminal-validator::before,
+[dir="rtl"] .build-page .model-stage .callout > span{direction:rtl}
+[dir="rtl"] .build-page .model-stage :is(.scene-chassis, .scene-spine, .scene-tower, .scene-foundation, .scene-terminal) :is(.piece-label, .piece-name, .core-copy){left:14px;right:auto}
+[dir="rtl"] .build-page .model-stage .scene-chassis .chassis-base .piece-name{right:15px;left:auto}
+[dir="rtl"] .build-page .model-stage .station .piece-name{left:10px}
+[dir="rtl"] .build-page .model-stage .spine-emission .piece-name{left:12px}
+[dir="rtl"] .build-page .model-stage .tower-emission .piece-name{left:-44px}
+[dir="rtl"] .build-page .model-stage .foundation-rate{left:18px;right:auto}
+[dir="rtl"] .build-page .model-stage .gateway-foundation .stays-shared{right:20px;left:auto}
+[dir="rtl"] .build-page .model-stage .operator-owns{left:16px;right:auto}
+[dir="rtl"] .build-page .model-stage .terminal-shell .shell-status{right:22px;left:auto}
+[dir="rtl"] .build-page .model-stage .terminal-owns{left:17px;right:auto}
+[dir="rtl"] .build-page .model-stage .gantry-beam::after{left:18px;right:auto}
+[dir="rtl"] .build-page .model-stage .gateway-foundation::before{left:22px;right:auto}
+[dir="rtl"] .build-page .model-stage .terminal-shell::before{left:22px;right:auto}
+[dir="rtl"] .build-page .model-stage .terminal-validator::before{left:14px;right:auto}
 /* a figure such as "100K+" keeps its sign after the number */
 [dir="rtl"] .build-page .proof-strip b{direction:ltr;unicode-bidi:isolate}

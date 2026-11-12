@@ -19,7 +19,7 @@ export default {
         heading: '¿Por qué retener emisiones como capital circulante?',
         paragraphs: [
             'No esperamos que la capacidad de la red y la demanda de los clientes crezcan en perfecta sintonía. En las conversaciones con los operadores, estos buscan pruebas de una oferta fiable ANTES de lanzarse en la subred. Pensemos en un nuevo operador de VPN que quizá ya tenga un producto y clientes: una cobertura más amplia o una disponibilidad fiable en determinados mercados será clave para respaldar su crecimiento. UR necesita coordinar lo antes posible a los proveedores que puedan cumplir esos requisitos.',
-            'Por ello, SN25 utiliza el excedente de emisiones, es decir, las emisiones de los mineros que superan lo que va directamente a los proveedores, para arrancar mineros y demostrar la solidez de la red con el fin de atraer a nuevos operadores de red.',
+            'Por ello, SN25 utiliza el excedente de emisiones, es decir, las emisiones de los mineros que superan lo que va directamente a los proveedores, para impulsar la llegada de mineros y demostrar la solidez de la red con el fin de atraer a nuevos operadores de red.',
         ],
         diagramAlt: 'Los operadores quieren oferta antes de que llegue la demanda. La capacidad se establece antes de que un operador se lance, mientras que el tráfico de clientes crece más tarde. La Network Capacity Reserve financia esa brecha y se libera contra entregas verificadas. Los operadores se lanzan con la capacidad ya disponible; la reserva asume el coste hasta que el tráfico se pone al día, de modo que los primeros clientes reciben un servicio completo desde el primer día.',
         diagramLink: 'Ver el diagrama a tamaño completo ↗',
@@ -37,7 +37,7 @@ export default {
         ],
         paragraphs: [
             'La <em>Network Capacity Reserve</em> añade una forma de financiar esa oferta antes de la demanda. En este modelo, las emisiones se acumulan como capital circulante y se liberan contra compromisos definidos y verificados.',
-            'Para respaldarlo, lanzamos un panel que ayuda a visualizar la asignación de capital, con los saldos de la reserva y las asignaciones publicadas, y con los compromisos y pagos informados a medida que los programas se activen.',
+            'Para respaldarlo, lanzamos un panel que ayuda a visualizar la asignación de capital, con los saldos de la reserva y las asignaciones publicadas, y en el que se informará de los compromisos y pagos a medida que los programas se activen.',
             'En última instancia, cada programa debería tener un ROI claro sobre cómo se incentiva la capacidad excedente.',
         ],
     },

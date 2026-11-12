@@ -13,7 +13,7 @@
  * {{=name}} is markup made here from the copy (COMPUTED).
  */
 import { formatNumber, interpolate } from '../../../i18n/format.js';
-import { hasLocalizedVersion, localizedPathFor } from '../../../../../astro/src/lib/route-localization.js';
+import { groupPageHref, hasLocalizedVersion, localizedPathFor } from '../../../../../astro/src/lib/route-localization.js';
 
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 export const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (c) => ESCAPES[c]);
@@ -26,9 +26,11 @@ const COMPUTED = {
             ? `${escapeHtml(moreShort)}<span class="nl-x">${escapeHtml(more.slice(moreShort.length))}</span>`
             : `<span class="nl-x">${escapeHtml(more)}</span><span class="nl-s">${escapeHtml(moreShort)}</span>`;
     },
-    // the links back to the site: its home page, and /mainnet, in the page's language while that has a translation
+    // the links back to the site: its home page, /mainnet, /miners and /reserve, in the page's language while that has a translation
     home: ({ lang }) => escapeHtml(localizedPathFor('/', lang)),
     mainnet: ({ lang }) => escapeHtml(hasLocalizedVersion('/mainnet') ? localizedPathFor('/mainnet', lang) : '/mainnet'),
+    miners: ({ lang }) => escapeHtml(groupPageHref('/miners', lang) || '/miners'),
+    reserve: ({ lang }) => escapeHtml(groupPageHref('/reserve', lang) || '/reserve'),
     // the live counters' value until the page's scripts start them
     zeroGb: ({ lang }) => escapeHtml(lang === 'en' ? '0 GB' : formatNumber(0, lang, { style: 'unit', unit: 'gigabyte', unitDisplay: 'short' })),
 };

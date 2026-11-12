@@ -14,7 +14,11 @@
  *                   so history outlives Grafana's retention.
  *   buildLive()     runs in the visitor's browser on top of that file: the
  *                   stats feed, the last six days hourly, the countries now,
- *                   and the reserve and conviction locks from the chain.
+ *                   and the reserve and conviction locks from the chain. The
+ *                   page runs its reads (liveReads) one by one and builds its
+ *                   data from those that answered (assembleLive), so a read
+ *                   that fails, Bittensor mainnet's above all, costs only the
+ *                   panels it feeds.
  *
  * Hourly data carried has no single Grafana query (panel 1 sums one range,
  * panel 31 is daily). The last 24 and 72 hours are measured exactly with one
@@ -73,31 +77,62 @@ async function pool(items, n, fn) {
     return out;
 }
 
-/** The public Grafana dashboard and stats feed, at `base` (a dev proxy locally). */
-export function grafana(base = GRAFANA, { signal, fetchImpl = globalThis.fetch } = {}) {
+/**
+ * The public Grafana dashboard and stats feed, at `base` (a dev proxy locally). A request that
+ * fails is tried three times; one that hasn't answered after `timeoutMs` has failed (a filtered
+ * network can leave a request hanging rather than refuse it; the page gives one 20 s) and is
+ * not tried again here. At most `parallel` requests are out at once, and a request's time
+ * counts from when it goes out.
+ */
+export function grafana(base = GRAFANA, { signal, fetchImpl = globalThis.fetch, timeoutMs = 60_000, parallel = 6 } = {}) {
+    let out = 0;
+    const waiting = [];
+    const slot = () => new Promise((go) => { if (out < parallel) { out++; go(); } else waiting.push(go); });
+    const done = () => { const next = waiting.shift(); if (next) next(); else out--; };
+    async function json(url, init, what) {
+        await slot();
+        try {
+            return await request(url, init, what);
+        } finally {
+            done();
+        }
+    }
+    async function request(url, init, what) {
+        const ctrl = new AbortController();
+        let late = false;
+        const timer = setTimeout(() => { late = true; ctrl.abort(); }, timeoutMs);
+        const stop = () => ctrl.abort();
+        if (signal?.aborted) stop();
+        signal?.addEventListener('abort', stop);
+        try {
+            const r = await fetchImpl(url, { ...init, signal: ctrl.signal });
+            if (!r.ok) throw new Error(`${what}: HTTP ${r.status}`);
+            return await r.json();
+        } catch (e) {
+            if (!late) throw e;
+            throw Object.assign(new Error(`${what}: no answer in ${timeoutMs / 1000} s`), { timedOut: true });
+        } finally {
+            clearTimeout(timer);
+            signal?.removeEventListener('abort', stop);
+        }
+    }
     async function post(pid, from, to, step, mdp = 11000, tries = 3) {
         let err;
         for (let i = 0; i < tries; i++) {
             try {
-                const r = await fetchImpl(`${base}/api/public/dashboards/${DASHBOARD}/panels/${pid}/query`, {
-                    method: 'POST', signal, headers: { 'content-type': 'application/json' },
+                return frames(await json(`${base}/api/public/dashboards/${DASHBOARD}/panels/${pid}/query`, {
+                    method: 'POST', headers: { 'content-type': 'application/json' },
                     body: JSON.stringify({ intervalMs: step, maxDataPoints: mdp, timeRange: { from: String(from), to: String(to), timezone: 'utc' } }),
-                });
-                if (!r.ok) throw new Error(`grafana panel ${pid}: HTTP ${r.status}`);
-                return frames(await r.json());
+                }, `grafana panel ${pid}`));
             } catch (e) {
-                if (signal?.aborted) throw e;
+                if (signal?.aborted || e.timedOut) throw e;
                 err = e;
-                await new Promise((res) => setTimeout(res, 800 * (i + 1)));
+                if (i < tries - 1) await new Promise((res) => setTimeout(res, 800 * (i + 1)));
             }
         }
         throw err;
     }
-    async function stats() {
-        const r = await fetchImpl(`${base}/stats.json`, { signal, cache: 'no-store' });
-        if (!r.ok) throw new Error(`stats.json: HTTP ${r.status}`);
-        return r.json();
-    }
+    const stats = () => json(`${base}/stats.json`, { cache: 'no-store' }, 'stats.json');
     return { post, stats };
 }
 
@@ -252,97 +287,133 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
 
 // ── the live view (browser, on load) ──────────────────────────────────────
 
-/**
- * Everything the page needs: `history` for the days, live reads for today.
- * Missing parts come back null and the page leaves them out.
- */
-export async function buildLive({ g = grafana(), history, now = Date.now(), endpoints = FINNEY_RPC, signal } = {}) {
-    const NOW = now, hourEnd = Math.floor(NOW / H) * H;
-    const hourT = Array.from({ length: NH }, (_, i) => hourEnd - (NH - 1 - i) * H);
-    const soft = (p) => p.catch(() => null);
+/** The reads that go to Bittensor mainnet (liveReads), which the page reads in the visitor's browser. */
+export const CHAIN_READS = Object.freeze(['reserve', 'conviction']);
 
+/**
+ * The live reads, by name: each a function that reads its part afresh and resolves to it, or
+ * rejects when the read fails or times out. Grafana's: the stats feed, the history (the file,
+ * with the days it lacks read from Grafana), each hourly gauge (hourly.<key>), the data carried
+ * in the last 24 and 72 hours, the countries now, a day and three days ago, and the extenders';
+ * and the chain's (CHAIN_READS). Each part is read apart from the others, so a part that fails
+ * (a filtered network may block a host) holds back none of them, and the loader can ask again
+ * for that part alone (dashboard/loader.js). Every read is relative to `now`.
+ */
+export function liveReads({ g = grafana(), history = null, now = Date.now(), endpoints = FINNEY_RPC, signal } = {}) {
+    const NOW = now, hourEnd = Math.floor(NOW / H) * H;
     // days the history file doesn't have yet (it's refreshed when the site is deployed) are read here from
     // Grafana: only the gap, without the per-day countries or the archive node's reserve balances
     const gap = history?.end ? Math.round((day(NOW) - DAY - Date.parse(history.end)) / DAY) : ND;
-    const stale = gap > 0;
-    const [st, hist, hourly, t24, t72, cNow, cExt, c1, c3, reserve, conviction] = await Promise.all([
-        g.stats(),
-        stale ? buildHistory({ g, prev: history, now: NOW, days: Math.min(ND, gap + 2), chain: false, countries: !history }) : Promise.resolve(history),
-        pool(GAUGES, 4, ([k, pid]) => soft(g.post(pid, hourEnd - (NH + 1) * H, NOW, H, NH + 2).then(longest))),
-        soft(g.post(1, hourEnd - 24 * H, hourEnd, H, 10).then((fs) => last(fs[0]))),
-        soft(g.post(1, hourEnd - 72 * H, hourEnd, H, 10).then((fs) => last(fs[0]))),
-        soft(countriesAt(g, NOW)),
-        soft(countriesAt(g, NOW, 71)),
-        soft(countriesAt(g, NOW - DAY)),
-        soft(countriesAt(g, NOW - 3 * DAY)),
-        soft(readReserve({ address: RESERVE_WALLET, endpoints, signal }).then(plain)),
-        soft(readConviction({ endpoints, signal })),
-    ]);
+    const reads = {
+        stats: () => g.stats(),
+        history: () => (gap > 0 ? buildHistory({ g, prev: history, now: NOW, days: Math.min(ND, gap + 2), chain: false, countries: !history }) : Promise.resolve(history)),
+        t24: () => g.post(1, hourEnd - 24 * H, hourEnd, H, 10).then((fs) => last(fs[0])),
+        t72: () => g.post(1, hourEnd - 72 * H, hourEnd, H, 10).then((fs) => last(fs[0])),
+        countries: () => countriesAt(g, NOW),
+        extenders: () => countriesAt(g, NOW, 71),
+        countries1: () => countriesAt(g, NOW - DAY),
+        countries3: () => countriesAt(g, NOW - 3 * DAY),
+        reserve: () => readReserve({ address: RESERVE_WALLET, endpoints, signal }).then(plain),
+        conviction: () => readConviction({ endpoints, signal }),
+    };
+    for (const [k, pid] of GAUGES) reads[`hourly.${k}`] = () => g.post(pid, hourEnd - (NH + 1) * H, NOW, H, NH + 2).then(longest);
+    return reads;
+}
+
+/**
+ * Everything the page needs (window.SNAP), from the reads that have answered: `answers` by
+ * liveReads' names, a part that hasn't answered left out. A missing part never throws: what it
+ * feeds comes back null (a figure, a list, the epoch, the reserve), empty (the countries) or
+ * as gaps in a series, and the page shows its panel as unavailable. `history` (the file) stands
+ * in until the history read answers. `pending`: the reads the page waits for before it calls a
+ * part unavailable (PENDING; the loader names the chain's first reads).
+ */
+export function assembleLive(answers = {}, { history = null, now = Date.now(), pending = [] } = {}) {
+    const NOW = now, hourEnd = Math.floor(NOW / H) * H;
+    const hourT = Array.from({ length: NH }, (_, i) => hourEnd - (NH - 1 - i) * H);
+    const st = answers.stats || null, reserve = answers.reserve || null;
+    const hist = answers.history || history || { version: 1, days: {}, countries: {}, names: {}, settlePx: {}, tph: null, end: iso(day(NOW) - DAY) };
 
     const end = Date.parse(hist.end);
     const dayT = Array.from({ length: ND }, (_, i) => end - (ND - 1 - i) * DAY);
     const D = {};
-    for (const k of [...GAUGES.map(([k]) => k), 'traffic', 'newNets', 'reserve']) D[k] = dayT.map((t) => hist.days[iso(t)]?.[k] ?? null);
+    for (const k of [...GAUGES.map(([k]) => k), 'traffic', 'newNets', 'reserve']) D[k] = dayT.map((t) => hist.days?.[iso(t)]?.[k] ?? null);
     if (reserve && D.reserve[ND - 1] == null) D.reserve[ND - 1] = reserve.alpha;
 
     const Hs = {};
-    GAUGES.forEach(([k], i) => {
-        const f = hourly[i], m = {};
+    GAUGES.forEach(([k]) => {
+        const f = answers[`hourly.${k}`], m = {};
         if (f) f.t.forEach((t, j) => { if (f.v[j] != null) m[Math.floor(t / H) * H + H] = f.v[j]; });
         Hs[k] = hourT.map((t) => m[t] ?? null);
     });
     Hs.throughput = Hs.throughput.map((v) => (v == null ? null : v / 1e9));
     Hs.newNets = Hs.nets.map((v, i) => (i && v != null && Hs.nets[i - 1] != null ? Math.max(0, v - Hs.nets[i - 1]) : null));
-    Hs.traffic = hourlyTraffic(hourT, Hs.throughput, D, dayT, t24, t72);
+    Hs.traffic = hourlyTraffic(hourT, Hs.throughput, D, dayT, answers.t24 ?? null, answers.t72 ?? null);
     Hs.reserve = hourT.map(() => null);
     if (reserve) Hs.reserve[NH - 1] = reserve.alpha;
 
     const at = (P) => {
         const want = iso(day(NOW - P * DAY) - DAY);
-        const dates = Object.keys(hist.countries).filter((d) => d <= want).sort();
+        const dates = Object.keys(hist.countries || {}).filter((d) => d <= want).sort();
         return dates.length ? hist.countries[dates[dates.length - 1]] : {};
     };
+    const { countries: cNow, extenders: cExt, countries1: c1, countries3: c3 } = answers;
     const names = { ...hist.names, ...(cNow?.names || {}) };
-    const ep = (k) => (st[k] == null ? null : st[k] * 1000);
-    const alphaBy = Object.fromEntries((reserve?.stakes || []).map((s) => [s.hotkey, s.alpha]));
+    // a figure of the stats feed, or null without it
+    const s = (k) => st?.[k] ?? null;
+    const ep = (k) => (s(k) == null ? null : s(k) * 1000);
+    const alphaBy = Object.fromEntries((reserve?.stakes || []).map((x) => [x.hotkey, x.alpha]));
 
     // the newest hour Grafana has reported (the last hour or two can still be empty)
     const lastOf = (k) => { const a = Hs[k]; for (let i = NH - 1; i >= 0; i--) if (a[i] != null) return a[i]; return null; };
     return {
         NOW, END: end, dayT, hourT, D, Hs,
         LIVE: {
-            providers: st.online_providers, throughput: lastOf('throughput'), conn: lastOf('conn'), users24: lastOf('users24'),
-            countries: st.countries, regions: lastOf('regions'), cities: lastOf('cities'), nets: st.total_networks, devices: lastOf('devices'),
+            providers: s('online_providers'), throughput: lastOf('throughput'), conn: lastOf('conn'), users24: lastOf('users24'),
+            countries: s('countries'), regions: lastOf('regions'), cities: lastOf('cities'), nets: s('total_networks'), devices: lastOf('devices'),
         },
         COUNTRY_NOW: cNow?.counts || {}, COUNTRY_NAMES: names,
         COUNTRY_PAST: { 1: c1?.counts || {}, 3: c3?.counts || {}, 7: at(7), 30: at(30), 90: at(90) },
         EXT: {
-            online: st.online_extenders, v4: st.online_extenders_ipv4, v6: st.online_extenders_ipv6, dual: st.online_extenders_dualstack,
-            list: Object.entries(cExt?.counts || {}).map(([c, v]) => [c, cExt.names[c], v]).sort((a, b) => b[2] - a[2]),
+            online: s('online_extenders'), v4: s('online_extenders_ipv4'), v6: s('online_extenders_ipv6'), dual: s('online_extenders_dualstack'),
+            // null until panel 71 answers
+            list: cExt ? Object.entries(cExt.counts).map(([c, v]) => [c, cExt.names[c], v]).sort((a, b) => b[2] - a[2]) : null,
         },
-        IPFAM: { v4: st.online_providers_ipv4, v6: st.online_providers_ipv6, dual: st.online_providers_dualstack },
-        EPOCH: {
-            n: st.epoch, start: ep('epoch_start'), end: ep('epoch_end'), startBlock: st.epoch_start_block, endBlock: st.epoch_end_block,
-            users: st.users, prevUsers: st.prev_users, dataGiB: st.data_gib, prevDataGiB: st.prev_data_gib,
+        IPFAM: { v4: s('online_providers_ipv4'), v6: s('online_providers_ipv6'), dual: s('online_providers_dualstack') },
+        EPOCH: s('epoch') == null ? null : {
+            n: st.epoch, start: ep('epoch_start'), end: ep('epoch_end'), startBlock: s('epoch_start_block'), endBlock: s('epoch_end_block'),
+            users: s('users'), prevUsers: s('prev_users'), dataGiB: s('data_gib'), prevDataGiB: s('prev_data_gib'),
         },
-        TOKEN: reserve ? {
-            usd: st.alpha_usd, tao: reserve.pool?.priceTao, alphaOut: reserve.pool?.alphaOut, poolAlpha: reserve.pool?.alphaIn,
-            poolTao: reserve.pool?.taoIn, block: reserve.block, blockTime: reserve.time,
-        } : { usd: st.alpha_usd },
+        TOKEN: {
+            usd: s('alpha_usd'), tao: reserve?.pool?.priceTao ?? null, alphaOut: reserve?.pool?.alphaOut ?? null, poolAlpha: reserve?.pool?.alphaIn ?? null,
+            poolTao: reserve?.pool?.taoIn ?? null, block: reserve?.block ?? null, blockTime: reserve?.time ?? null,
+        },
         EMISSION: reserve?.emission ?? null, ROUTING: reserve?.routing ?? null,
         RESERVE: reserve ? { alpha: reserve.alpha, wallet: RESERVE_WALLET, block: reserve.block, time: reserve.time } : null,
-        TPH: hist.tph,
+        TPH: hist.tph || null,
         EXTRA: {
-            minerAlpha: st.miner_emissions_alpha || 0, prevMinerAlpha: st.prev_miner_emissions_alpha || 0, claimsAlpha: 0,
-            depositAlpha: st.demand_deposits_alpha || 0, prevDepositAlpha: st.prev_demand_deposits_alpha || 0,
-            recipients: (reserve?.hotkeys || []).map((x) => ({ hotkey: x.hotkey, uid: x.uid, alpha: alphaBy[x.hotkey] || 0 })),
+            minerAlpha: st ? st.miner_emissions_alpha || 0 : null, prevMinerAlpha: st ? st.prev_miner_emissions_alpha || 0 : null, claimsAlpha: 0,
+            depositAlpha: st ? st.demand_deposits_alpha || 0 : null, prevDepositAlpha: st ? st.prev_demand_deposits_alpha || 0 : null,
+            recipients: reserve ? (reserve.hotkeys || []).map((x) => ({ hotkey: x.hotkey, uid: x.uid, alpha: alphaBy[x.hotkey] || 0 })) : null,
             prevSettlePx: hist.settlePx?.[ep('epoch_start')] ?? null,
             epochs: hist.epochs || null,
             payouts: PAYOUTS,
-            conviction,
+            conviction: answers.conviction || null,
         },
-        HISTORY: { end: hist.end, updated: hist.updated, rebuilt: stale },
+        HISTORY: { end: hist.end, updated: hist.updated, rebuilt: !!answers.history && answers.history !== history },
+        PENDING: [...pending],
     };
+}
+
+/**
+ * Every live read once, and the page's data from what answered (assembleLive): never throws
+ * for a part that failed. The page itself runs the reads apart and asks again for the parts
+ * that failed (dashboard/loader.js).
+ */
+export async function buildLive({ g = grafana(), history = null, now = Date.now(), endpoints = FINNEY_RPC, signal } = {}) {
+    const answers = {};
+    await Promise.all(Object.entries(liveReads({ g, history, now, endpoints, signal })).map(([k, read]) => read().then((v) => { answers[k] = v; }, () => {})));
+    return assembleLive(answers, { history, now });
 }
 
 /**

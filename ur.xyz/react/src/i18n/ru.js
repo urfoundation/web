@@ -58,7 +58,7 @@ export default {
         // the page groups' pages, as the footer names them (see nav)
         buildOnUr:     'Создавайте на UR',
         reserve:       'Резерв',
-        mainnet:       'Мейннет',
+        mainnet:       'Основная сеть',
         investorCentre:  'Центр для инвесторов'
     },
 

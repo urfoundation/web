@@ -1,5 +1,5 @@
 ---
-title: "Litepaper de UR: una red de privacidad en Bittensor"
+title: "Litepaper de UR: red de privacidad coordinada en Bittensor"
 description: "Cómo funciona UR, la red de privacidad descentralizada en Bittensor SN25: los mineros llevan tráfico cifrado, los validadores lo miden y los operadores traen la demanda."
 ---
 # Una red de privacidad, coordinada en Bittensor
@@ -36,7 +36,7 @@ La coinbase de Bittensor emite nuevos UR en cada ciclo, que se reparten de tres 
 | Mineros | 41 % | Los proveedores reciben la parte de momentum, un 10 % en el lanzamiento, a través de los pools de los operadores y los slots de mineros de nivel superior; la Network Capacity Reserve recibe el resto |
 | Validadores | 41 % | Validadores independientes, que reciben dividendos nativos por una puntuación precisa |
 
-Los operadores financian la red depositando UR en proporción a su uso real, a una tarifa de referencia publicada. Un depósito es una señal de demanda real respaldada por ingresos: el contrato traslada cada depósito a la reserva de la subred. Los depósitos acumulados de un operador reducen la tarifa que debe depositar, de modo que los operadores comprometidos pueden incorporarse con menos capital inicial. Durante el período inicial la tarifa publicada es 0, no se exigen depósitos y a cada pool de operador se le asigna la misma demanda, de modo que solo la calidad medida dirige el canal de pools.
+Los operadores financian la red depositando UR en proporción a su uso real, a una tarifa de referencia publicada. Un depósito es una señal de demanda real respaldada por ingresos: el contrato traslada cada depósito a la reserva de la subred. Los depósitos acumulados de un operador reducen la tarifa a la que debe depositar, de modo que los operadores comprometidos pueden incorporarse con menos capital inicial. Durante el período inicial la tarifa publicada es 0, no se exigen depósitos y a cada pool de operador se le asigna la misma demanda, de modo que solo la calidad medida dirige el canal de pools.
 
 A los mineros se les paga con la emisión, no con los depósitos. Como los depósitos se acumulan en la reserva en lugar de reciclarse en pagos, el uso real añade demanda del token, mientras que la emisión sigue un calendario fijo con halvings.
 
@@ -46,7 +46,7 @@ Un solo operador puede atender a muchos más de 100.000 mineros, muchos más que
 
 El pool es la puerta de entrada. Cada operador tiene un slot on-chain para todos sus mineros; los validadores ponderan ese pool según la demanda del operador y su calidad medida, y cada minero reclama su parte directamente del contrato de liquidación con una prueba criptográfica. No hay ningún slot que ganar ni nada que quemar. Es donde un minero empieza y gana una recompensa base.
 
-Junto al pool, en el mismo nivel, cada operador tiene además desde la época 8 un pool de Captura la bandera con diez slots de recompensa en cada país: cinco para proveedores y cinco para extensores. Los mineros del operador entran en él con el registro del pool y no queman nada. En cada época, un sorteo público llena los slots con los mineros que, durante al menos la mitad de la época, estuvieron en línea, superaron las comprobaciones del operador y permanecieron en el país, y están activos al final de ella; un slot que nadie gana se acumula en el bote de ese país para su rol. Captura la bandera se lleva una décima parte de la parte de los proveedores.
+Junto al pool, en el mismo nivel, cada operador tiene además desde la época 8 un pool de Captura la bandera con diez slots de recompensa en cada país: cinco para proveedores y cinco para extensores. Los mineros del operador entran en él con el registro del pool y no queman nada. En cada época, un sorteo público llena los slots con los mineros que, durante al menos la mitad de la época, estuvieron en línea, superaron las comprobaciones del operador y permanecieron en el país, y estaban activos al final de ella; un slot que nadie gana se suma al fondo acumulado de ese país para su rol. Captura la bandera se lleva una décima parte de la parte de los proveedores.
 
 Los mineros de nivel superior son la cúspide de la oferta. Las aproximadamente 200 flotas más grandes, clasificadas por cuántas IPs de salida distintas y enrutables atienden realmente y no por volumen de tráfico, reclaman cada una su propio slot on-chain y reciben el pago directamente de la red, sin ningún operador en la ruta de pago. Una IP compartida se reparte entre las flotas que la reclaman, así que la amplitud no puede contarse dos veces.
 

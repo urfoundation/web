@@ -15,7 +15,7 @@ Esta política se aplica a la información que recopilamos:
 -   En correos electrónicos, mensajes de texto y otros mensajes electrónicos entre usted y nuestros Productos.
 
 
-Lea esta política con atención para comprender nuestras políticas y prácticas en relación con su información y cómo la trataremos. Si no está de acuerdo con nuestras políticas y prácticas, puede optar por no usar nuestros Productos. Al acceder a este Producto o usarlo, usted acepta esta política de privacidad. Esta política puede cambiar ocasionalmente (consulte "Cambios en nuestra política de privacidad"). Su uso continuado de este Producto después de que realicemos cambios se considera una aceptación de dichos cambios, por lo que le rogamos que revise la política periódicamente para conocer las actualizaciones.
+Lea esta política con atención para comprender nuestras políticas y prácticas en relación con su información y cómo la trataremos. Si no está de acuerdo con nuestras políticas y prácticas, su opción es no usar nuestros Productos. Al acceder a este Producto o usarlo, usted acepta esta política de privacidad. Esta política puede cambiar ocasionalmente (consulte "Cambios en nuestra política de privacidad"). Su uso continuado de este Producto después de que realicemos cambios se considera una aceptación de dichos cambios, por lo que le rogamos que revise la política periódicamente para conocer las actualizaciones.
 
 ## Menores de 16 años
 
@@ -27,7 +27,7 @@ Los residentes de California menores de 16 años pueden tener derechos adicional
 
 Recopilamos ciertos tipos de información de los usuarios de nuestros Productos y sobre ellos, incluida información relativa a:
 
--   Direcciones de billeteras de criptomonedas.
+-   Direcciones de wallets de criptomonedas.
 
 -   La ciudad, la región y el país de los usuarios.
 

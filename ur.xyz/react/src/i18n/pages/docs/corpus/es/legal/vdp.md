@@ -21,7 +21,7 @@ Al colaborar con nosotros conforme a esta política, puede esperar que:
 - Respondamos a su informe con prontitud y colaboremos con usted para comprenderlo y validarlo;
 - Procuremos mantenerle informado sobre el avance del tratamiento de una vulnerabilidad;
 - Trabajemos para corregir las vulnerabilidades descubiertas a su debido tiempo, dentro de nuestras limitaciones operativas; y
-- Concedamos Safe Harbor (protección jurídica) a su investigación de vulnerabilidades relacionada con esta política.
+- Concedamos Puerto Seguro a su investigación de vulnerabilidades relacionada con esta política.
 
 ## Nuestras expectativas
 
@@ -41,17 +41,17 @@ Al participar de buena fe en nuestro programa de divulgación de vulnerabilidade
 
 Comunique los problemas de seguridad a través de <security@ur.xyz>, aportando toda la información pertinente. Cuantos más detalles proporcione, más fácil nos resultará clasificar y corregir el problema.
 
-## Safe Harbor (protección jurídica)
+## Puerto Seguro
 
 Cuando se realice una investigación de vulnerabilidades conforme a esta política, consideramos que dicha investigación realizada al amparo de esta política es:
 
 - Autorizada en relación con cualquier ley aplicable contra la piratería informática, y no iniciaremos ni apoyaremos acciones legales contra usted por infracciones accidentales y de buena fe de esta política;
 - Autorizada en relación con cualquier ley pertinente contra la elusión de medidas de protección, y no presentaremos reclamaciones contra usted por eludir controles tecnológicos;
-- Exenta de las restricciones de nuestros Términos de Servicio (TOS) y/o de nuestra Política de Uso Aceptable (AUP) que impedirían realizar investigaciones de seguridad, y renunciamos a dichas restricciones de forma limitada; y
+- Exenta de las restricciones de nuestros Términos de Servicio (TOS) y/o de nuestra Política de Uso Aceptable (AUP) que interferirían en la realización de investigaciones de seguridad, y renunciamos a dichas restricciones de forma limitada; y
 - Lícita, útil para la seguridad general de Internet y realizada de buena fe.
 
 Como siempre, se espera que usted cumpla todas las leyes aplicables. Si un tercero inicia acciones legales contra usted y usted ha cumplido esta política, tomaremos medidas para dar a conocer que sus acciones se realizaron de conformidad con esta política.
 
 Si en algún momento tiene dudas o no está seguro de si su investigación de seguridad es coherente con esta política, presente un informe a través de uno de nuestros Canales Oficiales antes de continuar.
 
-> Tenga en cuenta que el Safe Harbor se aplica únicamente a las reclamaciones legales que estén bajo el control de la organización que participa en esta política, y que la política no vincula a terceros independientes.
+> Tenga en cuenta que el Puerto Seguro se aplica únicamente a las reclamaciones legales que estén bajo el control de la organización que participa en esta política, y que la política no vincula a terceros independientes.

@@ -63,7 +63,7 @@ export default {
     // The coverage exhibit (CoverageExhibit.jsx)
     coverage: {
         heading: 'Miners cluster in two regions today, capping the network near one million users',
-        subheading: 'Where the 100k+ network operators sit today, and where an incentive market puts them',
+        subheading: 'Where the 100k+ providers sit today, and where an incentive market puts them',
         before: {
             eyebrow: 'Before',
             title: 'Deep in two regions',

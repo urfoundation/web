@@ -3,21 +3,22 @@
 // The terms of all three units (this one, data/ and timeline/): epoch 周期 (a subscription's cycle is 计费周期);
 // settlement v2 结算 v2; version 1 版本 1; network operator 网络运营商; subnet owner 子网所有者; payout root 支付根;
 // commit 提交; challenge period 质疑期; claim 领取; earnings 报酬 (not 收益, which reads as returns); payout wallet 收款钱包; governance Safe 治理 Safe; timelock
-// 时间锁; vault 金库; capture the flag 夺旗 (the apps' name); draw 抽签 (never 抽奖, 彩票 or 奖池: it is not a
-// lottery); entry 参与者; slot 槽位; pot 累积池; carry forward 结转; relay 中继; credited to 计给 (not 获得计入);
+// 时间锁; vault 金库; capture the flag 夺旗 (the apps' name); draw 随机选取, to draw 随机选出 (a public, verifiable
+// random selection: never 抽签, a drawing of lots, and never 抽奖, 彩票 or 奖池: it is not a lottery); entry 参与者;
+// slot 槽位; pot 累积池; carry forward 结转; relay 中继; credited to 计给 (not 获得计入);
 // ISO 3166-1's 249 entries 国家和地区; the miner as software 矿工程序; quotes “”. Figures keep the English digits
 // and separators (9,240,028; 1,076.26 α); dates as 11月27日, times as 18:25 UTC.
 export default {
     meta: {
         title: 'SN25 主网上线时间线 | UR',
-        description: 'SN25 主网按支付周期的上线历程：10月8日起为版本 1，自周期 4（10月30日）起为结算 v2，首次领取于 11月8日开放。',
+        description: 'SN25 主网按支付周期的上线历程：10月8日起为版本 1，自周期 4（10月30日）起为结算 v2，自周期 8（11月27日）起加入夺旗。',
         breadcrumb: '主网',
     },
 
     intro: {
         eyebrow: 'SN25 · Bittensor 主网',
         title: '主网上线时间线',
-        lede: 'UR 的子网 SN25 于 2026年10月8日在 Bittensor 主网上线。本时间线按支付周期记录上线过程，从版本 1 的合约到结算 v2 的首次领取。',
+        lede: 'UR 的子网 SN25 于 2026年10月8日在 Bittensor 主网上线。本时间线按支付周期记录上线过程，从版本 1 的合约，经结算 v2，到自周期 8 开始的夺旗。',
         note: '标记为 {scheduled} 或 {planned} 的里程碑尚未发生，其日期可能变动。所有时间均为 UTC，标有 ≈ 的时间为近似值：大多数是根据区块号推算的。',
     },
 
@@ -28,6 +29,7 @@ export default {
             'SN25 按支付周期向提供者付款。这些是 UR 的结算周期，而不是链上 72 分钟的 tempo：周期 0 持续一天，之后每个周期持续 7 天（50,400 个区块）。',
             '版本 1 于 10月8日上线，结算周期 1 至 3。它只向验证者测量过的提供者付款，而这一测量每个周期上限约为 1,500 个提供者，因此大多数矿工得不到版本 1 的份额。',
             '结算 v2 按用量付款，并取消了这一上限。原计划由它从周期 3 起接手，但它的池没能在周期 3 于 10月23日开始之前注册，因此周期 3 也由版本 1 结算。它的池于 10月29日注册，自周期 4 起，结算 v2 已为每个周期付款；周期 4 约于 10月30日 18:25 UTC 开始。第一个 v2 周期约于 11月6日结束，其领取于 11月8日开放，此前它的根已提交，质疑期也已结束。',
+            '自周期 8 起（约于 11月27日 18:25 UTC 开始），每个网络运营商在其提供者池之外还有第二个池：夺旗，由结算 v2 在同一领取流程中付款。提供者池按用量付款，夺旗则为在某个国家的存在付款，每个周期每个国家十个槽位。',
         ],
         epochsAria: '支付周期',
     },
@@ -40,10 +42,12 @@ export default {
     },
 
     noticeDate: '通知 · {date}',
+    noticeToggle: { expand: '展开', collapse: '收起' },
 
     labels: {
         status: { done: '已完成', in_progress: '进行中', scheduled: '已排定', planned: '计划中' },
         settlement: { v1: '版本 1', v2: '结算 v2' },
+        captureTheFlag: '夺旗',
         view: { transaction: '查看交易', contract: '查看合约', block: '查看区块' },
         sourceAria: '{action}：{label}',
         sourcesAria: '{title} 的来源',

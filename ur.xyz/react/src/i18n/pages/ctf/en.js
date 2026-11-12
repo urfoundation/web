@@ -2,7 +2,11 @@
  * Capture the flag (ur.xyz/ctf and its 249 country pages /ctf/<cc>): the
  * English copy, the source of the five translations beside it. The program is
  * a per-country auction of reward slots on SN25: never call it a lottery, and
- * keep "draw", "pot" and "chance to win", the words the owner chose.
+ * keep "draw", "pot" and "chance to win", the words the owner chose. A
+ * translation names the draw as what it is, a public, verifiable random
+ * selection among the eligible entries, never with the words of drawing lots
+ * (the owner's decision of 2026-11-12; each translation's header lists its
+ * words, and ctf-copy.test.mjs holds them).
  *
  * Capture the flag is part of the SN25 protocol, not one operator's program:
  * every network operator runs a capture the flag pool beside its provider pool,

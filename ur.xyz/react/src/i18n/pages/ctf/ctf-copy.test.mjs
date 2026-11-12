@@ -8,7 +8,9 @@
 //   placeholders of the English forms.
 // - Words: no page in any language calls capture the flag a lottery, a
 //   jackpot or a bet (sn design/ctf/SEO.md §2.3); a translation says "the
-//   draw" and "chance to win" in its own words.
+//   draw" and "chance to win" in its own words, and names the draw as a
+//   public, verifiable random selection, never with the words of drawing lots
+//   (the owner's decision of 2026-11-12).
 // - Search: in every phase of the data (the committed snapshot and an answer
 //   of each phase, tests/ctf-fixtures.mjs), every title fits 60 graphemes and
 //   every description 175 characters, and none repeats within a language.
@@ -16,7 +18,10 @@
 // - Names: names/<lang>.js is what scripts/ctf-names.mjs writes (CLDR's names
 //   and A–Z, node's ICU permitting), complete, and each form a plain phrase;
 //   where the site departs from CLDR (format.js REGION_NAMES: 香港, 澳门 and
-//   台湾 in Chinese, Rumania and Arabia Saudita in Spanish), every form says so.
+//   台湾 in Chinese, Гонконг and Макао in Russian, Hongkong and Macau in
+//   German, Latin American CLDR's names in Spanish), every form says so, or is
+//   a shorter name of its own ("Georgia del Sur") that keeps nothing of
+//   CLDR's.
 //
 // Usage (from react/): node --test src/i18n/pages/ctf/ctf-copy.test.mjs
 import assert from 'node:assert/strict';
@@ -146,6 +151,27 @@ test('no page in any language calls capture the flag a lottery, a jackpot or a b
     }
 });
 
+// The draw is a public, verifiable random selection among the eligible entries
+// (the owner's decision of 2026-11-12): a translation names it случайный отбор,
+// الاختيار العشوائي, 随机选取, Zufallsauswahl or selección aleatoria, and its verb
+// "randomly selects", never the words of drawing lots (жеребьёвка, القرعة,
+// 抽签, Auslosung, sorteo), their verbs or their kin. English keeps "draw".
+// Each translation's header lists its words; DEFAULT_WIN (ctf/indexing.js)
+// holds its "wins by default".
+const DRAWING_LOTS = {
+    ru: /жеребь|жреби|розыгр|разыгр/iu,
+    ar: /قرع[ةت]|سحب/u,
+    zh: /抽签|抽取|抽出|抽中|摇号/u,
+    de: /auslos|ausgelost|losentscheid|losverfahren|(?<!\p{L})(?:ziehung|gezogen|lost)(?!\p{L})/iu,
+    es: /sorte(?:o|a|á|ad|ar|e)/iu,
+};
+
+test('no translation names the draw with the words of drawing lots', () => {
+    for (const lang of present) {
+        for (const [at, s] of strings(COPY[lang])) assert.doesNotMatch(s, DRAWING_LOTS[lang], `${lang} ${at}`);
+    }
+});
+
 // every phase the pages render: the committed snapshot and an answer of each kind
 const PHASES = {
     committed: SNAPSHOT,
@@ -245,15 +271,34 @@ test('the countries\' names are CLDR\'s, complete, in each language\'s A–Z, wi
 
 test('where the site names a place otherwise than CLDR, every form says the site\'s name', () => {
     // Chinese: Hong Kong, Macao and Taiwan as the English site names them (香港, 澳门, 台湾), never CLDR's 特别行政区
-    // forms or a 中国… prefix; Spanish: the Latin American name (format.js REGION_NAMES)
+    // forms or a 中国… prefix; Russian and German: Hong Kong and Macao by their short names, as the English site
+    // (Гонконг, Макао; Hongkong, Macau), never the SAR forms; Spanish: the Latin American name (es-419). The short
+    // forms say the site's name too, unless the short name is a shorter one of their own that keeps nothing of
+    // CLDR's (Spanish short.gs, "Georgia del Sur"). format.js REGION_NAMES
     for (const [lang, own] of Object.entries(REGION_NAMES)) {
         for (const [CODE, name] of Object.entries(own)) {
             const code = CODE.toLowerCase();
+            const cldr = new Intl.DisplayNames([lang], { type: 'region' }).of(CODE);
             assert.equal(NAMES[lang].name[code], name, `${lang} name.${code}`);
-            assert.equal(NAMES[lang].short[code], name, `${lang} short.${code}`);
-            for (const key of ['in', 'inShort']) assert.ok(NAMES[lang][key][code].includes(name), `${lang} ${key}.${code}: ${NAMES[lang][key][code]}`);
+            assert.ok(NAMES[lang].in[code].includes(name), `${lang} in.${code}: ${NAMES[lang].in[code]}`);
+            for (const key of ['short', 'inShort']) {
+                const form = NAMES[lang][key][code];
+                assert.ok(form.includes(name) || (cldr !== name && !form.includes(cldr)), `${lang} ${key}.${code}: ${form}`);
+            }
         }
     }
+    // the names the site replaced appear in no form
+    const REPLACED = {
+        ru: /\(САР\)/u,
+        de: /Sonderverwaltungsregion/u,
+        es: /Côte d’Ivoire|Timor-Leste|Islas Aland|Sandwich|Rumanía|Arabia Saudí(?!\p{L})/u,
+    };
+    for (const [lang, re] of Object.entries(REPLACED)) {
+        for (const key of ['name', 'short', 'in', 'inShort']) {
+            for (const [code, v] of Object.entries(NAMES[lang][key])) assert.doesNotMatch(v, re, `${lang} ${key}.${code}: ${v}`);
+        }
+    }
+    assert.equal(NAMES.es.name.cg, 'República del Congo');
     for (const key of ['name', 'short', 'in', 'inShort']) {
         for (const [code, v] of Object.entries(NAMES.zh[key])) assert.doesNotMatch(v, /特别行政区|中国(?:香港|澳门|台湾)/, `zh ${key}.${code}: ${v}`);
     }

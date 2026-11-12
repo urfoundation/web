@@ -436,7 +436,7 @@ export function countryDescription(m, c, updated) {
     if (m.phase === 'drawn' || m.phase === 'undrawn') {
         const pots = say(t.pots, { p: f.alpha(c.p.pot), x: f.alpha(c.x.pot) });
         const lead = m.drawn
-            ? say(t.drawnLead, { ...values, po: SLOTS_PER_ROLE - c.p.won, xo: SLOTS_PER_ROLE - c.x.won, pots })
+            ? say(t.drawnLead, { ...values, po: c.p.slots - c.p.won, xo: c.x.slots - c.x.won, pots })
             : say(t.undrawnLead, { ...values, pots });
         // with a slot open a newcomer wins by default; where all ten were won, or without a draw, it enters the draw
         const stay = m.drawn && (c.p.open || c.x.open) ? t.stayWin : t.stayDraw;
@@ -467,8 +467,8 @@ export function countryMessage(m, c) {
     if (m.phase === 'drawing') return say(t.drawing, { ...values, first: m.firstEpoch });
     if (m.phase === 'undrawn') return say(t.undrawn, { ...values, epoch: m.last.epoch, p: f.alpha(c.p.pot), x: f.alpha(c.x.pot) });
     if (!c.p.open && !c.x.open) return say(m.multi ? t.heldMany : t.held, { ...values, pp: chanceText(m, c.p), xp: chanceText(m, c.x) });
-    const p = c.p.open ? f.count(t.pSlots, SLOTS_PER_ROLE - c.p.won) : null;
-    const x = c.x.open ? f.count(t.xSlots, SLOTS_PER_ROLE - c.x.won) : null;
+    const p = c.p.open ? f.count(t.pSlots, c.p.slots - c.p.won) : null;
+    const x = c.x.open ? f.count(t.xSlots, c.x.slots - c.x.won) : null;
     return say(p && x ? t.both : p ? t.pOnly : t.xOnly, { ...values, p, x });
 }
 

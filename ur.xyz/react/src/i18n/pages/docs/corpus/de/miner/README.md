@@ -20,7 +20,7 @@ description: Starte das Mining auf UR in wenigen Schritten. Was ein Miner tut, w
 
 Ein UR-Miner teilt deine Internetverbindung als Exit für einen Netzbetreiber. Validatoren prüfen, dass er wirklich Verkehr trägt, und Bittensor SN25 (netuid 25) zahlt für diese Arbeit Belohnungen im α-Token des Subnets, der als $UR auftritt.
 
-Lieber eine App? Die Apps von URnetwork sind eine einfache Alternative, um vom Smartphone oder Computer aus zu minen: Installiere eine von [ur.io](https://ur.io), dann mint sie im Hintergrund, mit URnetwork als Betreiber. Diese Anleitung behandelt das Miner-Programm, das unter Linux, macOS und Windows läuft und für jeden Betreiber minen kann.
+Lieber eine App? Die Apps von URnetwork sind eine einfache Alternative, um vom Smartphone oder Computer aus zu minen: Installiere eine von [ur.io](https://ur.io), dann mint sie im Hintergrund, mit URnetwork als Betreiber. Dieser Leitfaden behandelt das Miner-Programm, das unter Linux, macOS und Windows läuft und für jeden Betreiber minen kann.
 
 Diese Seite bringt dich von null zu einem laufenden Miner. Der Rest des Miner-Leitfadens geht tiefer, ein Thema pro Seite:
 

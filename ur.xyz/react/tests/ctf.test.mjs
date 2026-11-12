@@ -344,6 +344,9 @@ test('two operators add up: slots, pots, awards, flags and entries, with each op
     const open = m.countries.find((c) => c.p.open && c.p.ops.every((o) => o.open));
     assert.match(opsList(m, open.p), /^open at bringyour\.com, about \d+\.\d\d α · open at example\.org, about \d+\.\d\d α$/);
     assert.match(nextStep(m, open).near, / of 20 slots here| left early/);
+    // the open slots a sentence counts are the role's slots at every operator that drew, less those won
+    assert.match(countryMessage(m, open), new RegExp(`^${open.p.slots - open.p.won} provider slots? `));
+    assert.match(countryDescription(m, open, DAY), new RegExp(`: ${open.p.slots - open.p.won} provider and ${open.x.slots - open.x.won} extender slots open`));
     const allHeld = m.countries.find((c) => !c.p.open && !c.x.open);
     if (allHeld) assert.match(countryMessage(m, allHeld), /at every operator, so a newcomer needs its operator's draw\. Chance to win as a provider: .* at bringyour\.com · .* at example\.org; as an extender:/);
     // one operator's page names no operator

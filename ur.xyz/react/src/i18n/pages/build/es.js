@@ -1,13 +1,13 @@
 // /build in Spanish: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: 'Construye en UR | Oportunidades para operadores de red',
+        title: 'Construye sobre UR | Oportunidades para operadores de red',
         description: 'Crea productos en UR como operador de red con capacidad residencial compartida, calidad de servicio medida y la capa de incentivos de SN25.',
-        breadcrumb: 'Construye en UR',
+        breadcrumb: 'Construye sobre UR',
     },
 
     hero: {
-        title: 'Construye en UR',
+        title: 'Construye sobre UR',
         eyebrow: 'Construir',
         intro: 'Lanza productos nuevos o migra los existentes a la red de privacidad residencial de UR. Los operadores de red son dueños de la experiencia del cliente y aportan la demanda; UR aporta la infraestructura. UR (SN25) está llevando la coordinación y los incentivos de la red a Bittensor.',
         proof: {

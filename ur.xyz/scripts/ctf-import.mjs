@@ -138,7 +138,7 @@ export function parseOperatorList(text) {
         const domain = o?.domain;
         const api = o?.api_url;
         if (typeof domain !== 'string' || !/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(domain)) throw new Error(`operator ${i + 1}: domain ${JSON.stringify(domain)}`);
-        if (typeof api !== 'string' || !/^https:\/\/[^/?#\s]+$/.test(api.replace(/\/+$/, ''))) throw new Error(`${domain}: api_url ${JSON.stringify(api)}`);
+        if (typeof api !== 'string' || !/^https:\/\/[^/?#@\s]+(\/[^?#\s]*)?$/.test(api)) throw new Error(`${domain}: api_url ${JSON.stringify(api)}`);
         if (seen.has(domain)) throw new Error(`${domain} is listed twice`);
         seen.add(domain);
         return { domain, api_url: api.replace(/\/+$/, '') };

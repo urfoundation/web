@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { englishOnPage, misplacedTranslateNo, pageText, withoutTranslateNo } from './localized-english-text.mjs';
+import { englishOnPage, misplacedTranslateNo, pageText, withoutTranslateNo, withoutUnits } from './localized-english-text.mjs';
 
 const page = (lang, body) => `<!doctype html><html lang="${lang}"><head><title>Fixture</title></head><body><main>${body}</main></body></html>`;
 const englishPage = page('en', '<p>Run <code translate="no">provider auth --operator=you</code> to sign in.</p>'
@@ -44,4 +44,20 @@ test('an element marked translate="no" goes with all it holds, its own kind nest
 test('only code, pre, kbd and samp may carry translate="no"', () => {
     assert.deepEqual(misplacedTranslateNo('<code translate="no">a</code><pre translate="no">b</pre><kbd translate="no">c</kbd><samp translate="no">d</samp>'), []);
     assert.deepEqual(misplacedTranslateNo('<p translate="no">prose</p><div class="x" translate="no">more</div><span translate="no">s</span>'), ['p', 'div', 'span']);
+});
+
+test('a unit of measure beside a figure, or alone, is no English prose; prose around it still is', () => {
+    const en = page('en', '<p>The median fell to <b>457.6 ms</b> from <b>2,552.3 → 543.7 ms</b>.</p><p><span>98.21</span><span>ms</span></p><p>Keep the ms budget low.</p>');
+    const english = new Set(pageText(en).map((s) => s.text));
+    // a Chinese page writes the figures and units as the English does, and translates the sentences
+    const zh = page('zh', '<p>中位数从 <b>2,552.3 → 543.7 ms</b> 降到 <b>457.6 ms</b>。</p><p><span>98.21</span><span>ms</span></p><p>保持低延迟。</p>');
+    assert.deepEqual(englishOnPage(zh, english), []);
+    // an untranslated sentence with a unit in it is still English
+    const half = page('zh', '<p>Keep the ms budget low.</p>');
+    assert.deepEqual(englishOnPage(half, english).map((f) => f.text), ['Keep the ms budget low.']);
+    assert.equal(withoutUnits('375.5/450.0/98.21 ns'), '375.5/450.0/98.21');
+    assert.equal(withoutUnits('12 GiB and 3 MiB/s'), '12 and 3');
+    assert.equal(withoutUnits('5 seconds'), '5 seconds', 'a word that starts like a unit is a word');
+    assert.equal(withoutUnits('ms'), '');
+    assert.equal(withoutUnits('3 us'), '3 us', '"us" is a word, not a unit');
 });

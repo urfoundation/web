@@ -275,14 +275,17 @@ operators: {
             date: '24 de agosto – 24 de octubre de 2026',
             title: 'Informe de investigación de agosto–octubre de 2026',
             body: 'La investigación busca dar a todos el mejor cifrado y la mejor velocidad para el uso diario, que hacen que tu internet sea mejor. El informe reúne en una línea de tiempo 39 cambios medidos en ese camino, hasta dónde llegó cada tipo de mejora y cómo se hizo la investigación.',
-            cta: 'Leer el informe (en inglés)'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'Leer el informe',
+            ctaEnglish: 'Leer el informe (en inglés)'
         },
         methodology: {
             tag: 'Metodología',
             topic: 'Tres ciclos de investigación',
             title: 'Ciclos de investigación que se mejoran a sí mismos',
             body: 'Cómo el laboratorio, la competencia abierta y los nodos de campo voluntarios mejoran cada uno la red y, a la vez, la forma de medir la siguiente ronda. Los tres comparten una disciplina: una línea base congelada, el ruido medido y cada intento en el registro.',
-            cta: 'Leer la metodología (en inglés)',
+            cta: 'Leer la metodología',
+            ctaEnglish: 'Leer la metodología (en inglés)',
             loops: [
                 { name: 'Laboratorio', detail: 'PERFVAR · cada cambio' },
                 { name: 'Competencia', detail: 'Apex SN1 · semanal' },

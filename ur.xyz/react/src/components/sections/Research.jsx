@@ -9,8 +9,8 @@ export default function Research() {
         <Section id="research" eyebrow={t.research.eyebrow} title={t.research.title} headingLevel="h1">
             <ResearchCompetition t={t} lang={code} />
             <p>{t.research.intro}</p>
-            <ResearchReportCard t={t} />
-            <ResearchMethodologyCard t={t} />
+            <ResearchReportCard t={t} lang={code} />
+            <ResearchMethodologyCard t={t} lang={code} />
             <ResearchAreas t={t} />
             <ResearchNotes t={t} />
             <ResearchFoot t={t} />

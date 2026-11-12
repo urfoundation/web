@@ -539,6 +539,23 @@ http {
             add_header 'Access-Control-Allow-Origin' $public_cors_origin always;
         }
 
+        # The signed settlement amendments: the tracked copy of sn/amendments.yml
+        # that ur.xyz/scripts/sync-amendments.mjs publishes. The price sheet's key
+        # signs its entries, and it is served as the price sheet is: as text/plain,
+        # so people read the lines the owner signed, with the same five-minute
+        # lifetime. The server, the validator and snclaim read it beside the price
+        # sheet, ask for application/yaml or text/plain, never check the type, and
+        # keep their last verified copy. An entry has to reach them before its
+        # first epoch starts. Only the file itself is served.
+        location = /amendments.yml {
+            types { text/plain yml; }
+            autoindex off;
+            try_files $uri =404;
+            add_header 'Cache-Control' 'public, max-age=300';
+            add_header 'X-Robots-Tag' $ur_preview_robots always;
+            add_header 'Access-Control-Allow-Origin' $public_cors_origin always;
+        }
+
         # Content-hashed bundles never change under the same name. The load
         # balancer picks a block for each request, so during a staged rollout
         # a page's bundles may come from a block of the other release. This

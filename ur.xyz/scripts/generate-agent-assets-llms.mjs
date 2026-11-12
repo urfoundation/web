@@ -54,12 +54,13 @@ const PAGE_ORDER = [
 const LEGAL = ['/terms', '/privacy', '/vdp'];
 const FILE_LABELS = { '/audits/masa-l2-2025.pdf': 'MASA L2 2025 audit (PDF): third-party peer audit' };
 // The machine-readable files the site publishes for programs, listed when the
-// build has them: the protocol repository's published operator list and the
-// price sheet with its change feed.
+// build has them: the protocol repository's published operator list, the price
+// sheet with its change feed, and the signed settlement amendments.
 const MACHINE_FILES = [
     ['/operators.yml', 'Network operator list (YAML)', 'the network operators miners and validators serve; they refresh it hourly'],
     ['/price.yml', 'Price sheet (YAML)', 'the published demand deposits, in alpha per GiB and per user for each 7-day block, by staked-alpha tier'],
     ['/price.rss', 'Price sheet changes (RSS)', 'a feed of changes to the published price sheet'],
+    ['/amendments.yml', 'Settlement amendments (YAML)', 'the signed changes to how SN25 settles from an epoch on, each one line signed with the price sheet\'s key'],
 ];
 const SOURCE_REPO = 'https://github.com/urfoundation/sn';
 // Capture the flag: the hub, its country pages' pattern, and the operator API

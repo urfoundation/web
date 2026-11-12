@@ -452,7 +452,7 @@ expect_public_cors() {
 }
 
 for path in /llms.txt /llms-full.txt /docs-md/miner.md /litepaper.md /operators.yml \
-    /price.yml /price.rss /sitemap-index.xml; do
+    /price.yml /price.rss /amendments.yml /sitemap-index.xml; do
     expect_public_cors ur.xyz "$path"
 done
 expect_header ur.xyz /investors Access-Control-Allow-Origin ''
@@ -463,6 +463,10 @@ expect_header ur.xyz /price.rss Cache-Control 'public, max-age=3600, stale-while
 # The signed price sheet opens as text in a browser and is at most five minutes
 # stale in any cache, so a new signed entry reaches its readers quickly.
 expect_header ur.xyz /price.yml Cache-Control 'public, max-age=300'
+
+# The signed settlement amendments, which the same key signs, cache the same
+# way: an entry has to reach its readers before its first epoch starts.
+expect_header ur.xyz /amendments.yml Cache-Control 'public, max-age=300'
 
 # ur.xyz publishes markdown twins of its legal documents from
 # scripts/generate-agent-assets.mjs; each points search engines at its page.
@@ -487,6 +491,7 @@ done
 expect_header ur.xyz /docs-md/miner.md Content-Type 'text/markdown; charset=utf-8'
 expect_header ur.xyz /operators.yml Content-Type 'application/yaml; charset=utf-8'
 expect_header ur.xyz /price.yml Content-Type 'text/plain; charset=utf-8'
+expect_header ur.xyz /amendments.yml Content-Type 'text/plain; charset=utf-8'
 expect_header ur.xyz /price.rss Content-Type 'application/rss+xml; charset=utf-8'
 
 # A synthetic edge request proves the only emitted page-view fields are the

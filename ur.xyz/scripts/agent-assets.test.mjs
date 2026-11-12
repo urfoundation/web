@@ -70,6 +70,7 @@ function fixtureBuild(run, more = () => {}) {
         file('operators.yml', 'operators: []\n');
         file('price.yml', 'sn: 25\n');
         file('price.rss', '<rss version="2.0"></rss>\n');
+        file('amendments.yml', 'sn: 25\n');
         more(page);
         run(buildLlms(dist));
     } finally {
@@ -84,6 +85,7 @@ test('llms.txt lists the machine-readable files, the source repository and the s
             'https://ur.xyz/operators.yml',
             'https://ur.xyz/price.yml',
             'https://ur.xyz/price.rss',
+            'https://ur.xyz/amendments.yml',
             'https://ur.xyz/.well-known/security.txt',
             'mailto:security@example.invalid',
             'https://github.com/urfoundation/sn)',

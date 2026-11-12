@@ -33,7 +33,7 @@ export default {
     custody: {
         heading: "الحفظ",
         threshold: "2 من 3",
-        accountLabel: "حساب الاحتياطي · توقيع متعدد {threshold}",
+        accountLabel: "حساب الاحتياطي · محفظة متعددة التوقيع ({threshold})",
         onChain: "على السلسلة",
         awaitingFunds: "بانتظار الأموال",
         modeNote: "حساب الاحتياطي محفظة أصلية متعددة التوقيع بنظام 2 من 3. لا يوقّع إلا لتسجيل مستلميه، ويدفع رسوم حرق تسجيلهم في SN25 من رصيده الخاص.",

@@ -9,8 +9,9 @@
 //   • the figures: every number of the English (a block, an amount, a time, a
 //     day of the month, a section of a document) appears as the English writes
 //     it, with its digits and separators, Western digits in Arabic too, and in
-//     Spanish as Intl writes it for the page (9.240.028, 1076,26), as /ctf and
-//     its other pages do (timeline.js INTL_FIGURES); every ≈ and UTC; and the
+//     Spanish, German and Russian as Intl writes it for the page (9.240.028,
+//     1076,26; 1.076,26; 1 076,26), as /ctf and their other pages do
+//     (timeline.js INTL_FIGURES); every ≈ and UTC; and the
 //     names that are not translated (SN25, STSettlement2, drand, the
 //     governance Safe, …);
 //   • capture the flag under the apps' name for it in each language, and never
@@ -81,8 +82,8 @@ const placeholders = (text) => [...String(text).matchAll(/\{[A-Za-z][A-Za-z0-9_]
 // a figure as the English writes it: 9,240,028, 1,076.26, 18:25, §8.6.7, 2026, 5
 const figures = (text) => [...new Set(String(text).match(/§?\d+(?:[.,:]\d+)*/g) || [])];
 
-// the figure as a translation writes it: as the English does, but in a language of INTL_FIGURES (Spanish), whose
-// numbers are Intl's for the page (9.240.028, 1076,26, 0,1); a section (§8.6.7), a time (18:25) and a whole number
+// the figure as a translation writes it: as the English does, but in a language of INTL_FIGURES (Spanish, German,
+// Russian), whose numbers are Intl's for the page (9.240.028, 1076,26, 0,1); a section (§8.6.7), a time (18:25) and a whole number
 // without separators (2026, 4294967297) read the same in every language
 const written = (figure, lang) => {
     if (!INTL_FIGURES.includes(lang) || !/^(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d+)$/.test(figure)) return figure;

@@ -53,6 +53,7 @@ import {
     staticSeed,
     uninhabitedSentence,
     localModel,
+    waveDelay,
     winEstimate,
 } from '../src/components/pages/ctf/model.js';
 import { PLACEHOLDER_CODE, countryIndexing, countryIndexingProblems, ownContent, placeholderModel } from '../src/components/pages/ctf/indexing.js';
@@ -323,6 +324,23 @@ test('titles fit 60 graphemes and descriptions 175 characters, and none repeats,
     assert.equal(countryTitle(byCode.get('ke')), 'Earn crypto in Kenya: open slots and pots | UR');
     assert.equal(countryTitle(byCode.get('vc')), 'Earn crypto in Saint Vincent and the Grenadines | UR');
     assert.equal(countryTitle(byCode.get('cd')), 'Earn crypto in the DR Congo: open slots and pots | UR');
+});
+
+test('the flags wave out of step as design.html staggers them: by the flag\'s place in its sprite, the same wherever it is shown', () => {
+    const m = MODELS.committed;
+    for (const [k, c] of m.countries.entries()) {
+        // the sprite has 16 flags to a row, in code order, the snapshot's order: column k % 16, row k / 16
+        const [fx, fy] = [k % 16, Math.floor(k / 16)];
+        assert.equal(c.wave, `-${(((fx * 7) + (fy * 11)) % 23 / 10).toFixed(1)}s`, c.code);
+        assert.equal(waveDelay(k), c.wave);
+    }
+    assert.equal(m.byCode.get('ad').wave, '-0.0s');
+    assert.equal(m.byCode.get('ke').wave, '-2.2s');
+    assert.equal(m.byCode.get('zw').wave, '-1.4s');
+    assert.ok(new Set(m.countries.map((c) => c.wave)).size >= 20, 'out of step, not in one phase');
+    // a translation and a sort keep each country's own
+    const de = localModel(MODELS.drawn, 'de');
+    for (const c of gridCountries(de, { sort: 'pot' })) assert.equal(c.wave, MODELS.drawn.byCode.get(c.code).wave, c.code);
 });
 
 test('Easy wins: up to eight big pots with an open slot, weighted, never a territory without people, the same for a seed', () => {

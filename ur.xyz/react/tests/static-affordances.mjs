@@ -171,6 +171,9 @@ async function main() {
             const inert = await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.map((el) => el.disabled));
             check(inert.length >= 4 && inert.every(Boolean), '/ctf without JavaScript disables the sorting, the search and the picker, which need the script');
             check(Boolean((await page.textContent('.ctf-live').catch(() => '')).trim()), '/ctf without JavaScript shows the live bar');
+            // the flags wave out of step, as design.html staggers them: each grid flag starts its wave at its own delay
+            const delays = await page.$$eval('.ctf-grid .ctf-flag', (els) => els.map((el) => el.style.animationDelay));
+            check(delays.length === 249 && delays.every((d) => /^-\d\.\ds$/.test(d)) && new Set(delays).size >= 20, `/ctf's flags wave out of step: each grid flag has its own delay (${new Set(delays).size} different)`);
             await close();
         }
         {

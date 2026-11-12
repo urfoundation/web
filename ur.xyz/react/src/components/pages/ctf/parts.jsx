@@ -33,10 +33,11 @@ import { BOLD, rich } from './rich';
 
 export const cx = (...names) => names.filter(Boolean).join(' ');
 
-export function Flag({ code, size = 's', lazy = true }) {
+/** A country's flag; `delay` starts its wave out of step with the others (model.js waveDelay), as design.html does. */
+export function Flag({ code, size = 's', lazy = true, delay = null }) {
     const dims = { s: [36, 27], m: [72, 54], l: [128, 96] }[size];
     if (!code) return <span className={cx('ctf-flag', `ctf-flag-${size}`, 'ctf-flag-none')} aria-hidden="true" />;
-    return <img className={cx('ctf-flag', `ctf-flag-${size}`)} src={flagSrc(code)} alt="" width={dims[0]} height={dims[1]} loading={lazy ? 'lazy' : 'eager'} decoding="async" />;
+    return <img className={cx('ctf-flag', `ctf-flag-${size}`)} src={flagSrc(code)} alt="" width={dims[0]} height={dims[1]} loading={lazy ? 'lazy' : 'eager'} decoding="async" style={delay ? { animationDelay: delay } : undefined} />;
 }
 
 export function Chevron() {
@@ -392,12 +393,13 @@ export function EasyWinCard({ m, c, i, mounted, tips, expanded, onExpand }) {
     const f = formats(m.lang);
     const step = nextStep(m, c);
     const open = c.p.open && c.x.open ? t.openBoth : c.p.open ? t.openP : t.openX;
-    const delay = `-${(((i * 7) + 3) % 23) / 10}s`;
+    // the card glows, and its flag waves, out of step with the others (model.js waveDelay)
+    const delay = c.wave;
     return (
         <article className={cx('ctf-fc', 'ctf-wave', expanded && 'ctf-expanded')} style={{ animationDelay: delay, '--ctf-vt': `f-${c.code}` }}>
             {mounted && <button type="button" className="ctf-fc-hit ctf-tap" onClick={() => onExpand(c.code)} aria-label={rich(t.showNext, { name: c.name }).join('')} aria-expanded={expanded} />}
             <div className="ctf-fc-top">
-                <span className="ctf-pole"><Flag code={c.code} size="m" /></span>
+                <span className="ctf-pole"><Flag code={c.code} size="m" delay={delay} /></span>
                 <Tip m={m} tip={tipOf(tips, `feat:${c.code}`)} cls="ctf-ribbon ctf-r-hot" text={c.near > 0 ? t.soClose : t.easyWin} label={all.next.label} near={step.near} body={stepBody(m, step)} cta={step.cta} />
             </div>
             <h3 className="ctf-fc-name"><a href={pagePath(m.lang, `/ctf/${c.code}`)}>{c.name}</a></h3>
@@ -512,7 +514,8 @@ export const GridCell = React.memo(function GridCell({ m, c, i, mounted, tipApi,
         : c.big ? <span className="ctf-ribbon ctf-r-open">{t.bigPot}</span> : c.flagHeld ? <span className="ctf-ribbon ctf-r-held">{t.held}</span> : null;
     const tier = c.hot ? 'ctf-hot' : c.big ? 'ctf-open' : null;
     const pinned = Boolean(tipPin);
-    const style = { '--ctf-vt': `c-${c.code}`, ...(c.hot ? { animationDelay: `-${(((i * 7) + 5) % 23) / 10}s` } : {}) };
+    // a hot cell glows, and a cell's flag waves (hot, or under the pointer), out of step with the others (model.js waveDelay)
+    const style = { '--ctf-vt': `c-${c.code}`, ...(c.hot ? { animationDelay: c.wave } : {}) };
     const mini = (r) => (m.drawn ? (r.open ? 'ctf-m-open' : 'ctf-m-held') : 'ctf-m-held');
     const summary = cellSummary(m, c);
     const cta = m.drawn && c.x.open && !c.p.open ? 'x' : m.drawn && c.p.open && !c.x.open ? 'p' : 'start';
@@ -521,7 +524,7 @@ export const GridCell = React.memo(function GridCell({ m, c, i, mounted, tipApi,
         <article className={cx('ctf-cell', tier, pinned && 'ctf-pinned', expanded && 'ctf-expanded')} style={style}>
             {/* tap to expand (touch sizes) needs the page to run: the static page has no control that does nothing */}
             {mounted && <button type="button" className="ctf-cell-hit ctf-tap" onClick={() => onExpand(c.code)} aria-label={say(t.showDetails, { name: c.name })} aria-expanded={expanded} />}
-            <div className="ctf-cell-top"><Flag code={c.code} />{ribbon}</div>
+            <div className="ctf-cell-top"><Flag code={c.code} delay={c.wave} />{ribbon}</div>
             <h3 className="ctf-cname" title={c.name}><a href={href}>{c.name}</a></h3>
             {m.potsKnown
                 ? <div className="ctf-amt"><b>{f.alpha(c.pots)}</b><span>α</span><span className="ctf-amt-l">{t.inPots}</span></div>

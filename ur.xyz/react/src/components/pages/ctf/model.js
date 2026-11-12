@@ -108,6 +108,15 @@ const potBucket = (rao) => Math.round(rao / 1e8);
 export const byPot = (a, b) => (potBucket(b.pots) - potBucket(a.pots)) || byName(a, b);
 export const byOnline = (a, b) => (b.online - a.online) || byName(a, b);
 
+/**
+ * When a country's flag starts its wave (a negative CSS animation-delay), so the
+ * flags of the cards and the grid wave out of step, as design.html staggers them:
+ * from the flag's place in the design's sprite, 16 to a row in code order, which
+ * is the snapshot's order (k, its index). The same for a country wherever it is
+ * shown and however the grid is sorted.
+ */
+export const waveDelay = (k) => `-${((((k % 16) * 7) + (Math.floor(k / 16) * 11)) % 23 / 10).toFixed(1)}s`;
+
 function roleOf(r, slot) {
     const drawn = r.won !== null;
     return {
@@ -130,7 +139,7 @@ export function buildModel(snap) {
     const drawn = phase === 'drawn';
     const slot = last ? last.slot : null;
     const threshold = slot === null ? null : BIG_POT_SLOTS * slot;
-    const countries = snap.countries.map((c) => {
+    const countries = snap.countries.map((c, k) => {
         const p = roleOf(c.providers, slot);
         const x = roleOf(c.extenders, slot);
         const pots = p.pot + x.pot;
@@ -168,6 +177,8 @@ export function buildModel(snap) {
             won: drawn ? p.won + x.won : null,
             // its local note (data/ctf-local-notes.js), shown on its page
             note: CTF_LOCAL_NOTES[c.code] || null,
+            // when its flag starts its wave (waveDelay)
+            wave: waveDelay(k),
         };
     });
     const az = countries.slice().sort(byFolded);

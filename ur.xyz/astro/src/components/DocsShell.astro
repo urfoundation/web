@@ -13,18 +13,25 @@
  */
 import '@react/components/Explorer.css';
 import DocsSearchIsland from '../islands/DocsSearchIsland.jsx';
-import { docGroups } from '@react/lib/docs.js';
-import { docPath } from '@react/lib/docs-shared.js';
-import en from '@react/i18n/en.js';
+import { docGroupsIn, docHrefIn, docsCopy } from '@react/lib/docs-i18n.js';
+import { getDict } from '../lib/i18n.js';
 
 interface Props {
     // the document the page shows, marked current in the sidebar
     activeSlug?: string | null;
+    // the page's language: a translated page lists the translations, in its words
+    lang?: string;
 }
-const { activeSlug = null } = Astro.props;
-const t = en;
+const { activeSlug = null, lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const words = docsCopy(lang);
+const english = lang === 'en';
+// a translated page's search box reads that language's index (pages/docs-search.[lang].json.js)
+const search = english
+    ? {}
+    : { indexUrl: `/docs-search.${lang}.json`, labels: words.search };
 ---
-<div class="explorer" id="docs-explorer">
+<div class="explorer" id="docs-explorer" data-copied={english ? undefined : words.code.status}>
     <button
         type="button"
         class="explorer-sidebar-toggle"
@@ -35,17 +42,17 @@ const t = en;
         <span class="explorer-sidebar-toggle-icon" aria-hidden="true">☰</span>
     </button>
 
-    <aside id="explorer-sidebar" class="explorer-sidebar" aria-label="Documentation navigation">
-        <DocsSearchIsland client:idle={{ timeout: 2000 }} />
-        <nav class="explorer-nav" aria-label="Documentation sections">
-            {docGroups.map((group) => (
+    <aside id="explorer-sidebar" class="explorer-sidebar" aria-label={words.nav.label}>
+        <DocsSearchIsland client:idle={{ timeout: 2000 }} {...search} />
+        <nav class="explorer-nav" aria-label={words.nav.sections}>
+            {docGroupsIn(lang).map((group) => (
                 <div class="explorer-group">
                     <div class="explorer-group-label">{group.label}</div>
                     <ul class="explorer-group-list">
                         {group.docs.map((d) => (
                             <li>
                                 <a
-                                    href={docPath(d.slug)}
+                                    href={docHrefIn(d.slug, lang)}
                                     class:list={['explorer-doc-link', { 'is-active': d.slug === activeSlug }]}
                                     aria-current={d.slug === activeSlug ? 'page' : undefined}
                                 >{d.title}</a>
@@ -107,7 +114,8 @@ const t = en;
             const [copyLabel, copiedLabel] = button.querySelectorAll('.md-codeblock-copy-label > span');
             copyLabel?.setAttribute('data-shown', String(!copied));
             copiedLabel?.setAttribute('data-shown', String(copied));
-            if (status) status.textContent = copied ? 'Copied to the clipboard' : '';
+            // a translated page names the status in its language (data-copied)
+            if (status) status.textContent = copied ? (explorer?.dataset.copied || 'Copied to the clipboard') : '';
         };
         button?.addEventListener('click', async () => {
             const text = code?.textContent ?? '';

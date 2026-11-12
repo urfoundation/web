@@ -1,0 +1,94 @@
+---
+/**
+ * The docs landing, /docs and its translations /<lang>/docs
+ * (pages/docs/index.astro, pages/[lang]/docs/index.astro): the corpus, one
+ * entry per document with its front-matter description, in the sidebar's
+ * order (the three role guides, then the litepaper; an unlisted document,
+ * docs-shared.js, is not among them). A translated landing lists the
+ * translations and says that the markdown versions are English.
+ */
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import DocsShell from '../DocsShell.astro';
+import FooterStatic from '../FooterStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import { docHrefIn, docsCopy, docsIndexIn, localizedHref } from '@react/lib/docs-i18n.js';
+import { Markdown } from '@react/lib/markdown.jsx';
+import { getDict } from '../../lib/i18n.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const english = lang === 'en';
+const t = await getDict(lang);
+const words = docsCopy(lang).index;
+const listed = docsIndexIn(lang);
+const url = english ? 'https://ur.xyz/docs' : `https://ur.xyz/${lang}/docs`;
+
+// the documents the landing page lists, in its order: the three role guides
+// and the litepaper (an unlisted document, docs-shared.js, is not among them)
+const jsonLd = [{
+    '@type': 'CollectionPage',
+    '@id': `${url}#docs`,
+    name: words.name,
+    url,
+    inLanguage: lang,
+    isPartOf: { '@id': 'https://ur.xyz/#website' },
+    mainEntity: {
+        '@type': 'ItemList',
+        numberOfItems: listed.length,
+        itemListElement: listed.map((d, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: d.title,
+            url: `https://ur.xyz${docHrefIn(d.slug, lang)}`,
+            ...(d.meta.description ? { description: d.meta.description } : {}),
+        })),
+    },
+}];
+---
+<Base
+    title={words.title}
+    description={words.description}
+    breadcrumbName={words.breadcrumb}
+    lang={lang}
+    jsonLd={jsonLd}
+>
+    {/* Static HTML, the landing the SPA's DocsExplorer renders (DocsLanding):
+        the corpus, one entry per document with its front-matter description.
+        The nav hydrates when the browser is idle; in the docs chrome only the
+        search box does (DocsShell.astro). */}
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="docs" lang={lang} client:idle={{ timeout: 1000 }} />
+        <DocsShell lang={lang}>
+            <header class="explorer-page-header">
+                <span class="explorer-page-eyebrow">{words.eyebrow}</span>
+                <h1 class="explorer-page-title">{words.heading}</h1>
+                <p class="explorer-page-meta">{english ? words.intro : `${words.intro} ${words.markdownEnglish}`}</p>
+            </header>
+            {words.notice && (english
+                ? <Markdown source={words.notice} baseHref="/docs/" />
+                : <Markdown source={words.notice} baseHref="/docs/" hrefFor={(href) => localizedHref(href, lang)} labels={docsCopy(lang).code} />)}
+
+            <div class="md">
+                {listed.map((d) => {
+                    const id = `docs-index-${d.slug.replace(/[^a-z0-9]+/gi, '-')}`;
+                    return (
+                        <section class="docs-index-entry" aria-labelledby={id}>
+                            <h2 id={id} class="md-h md-h2">
+                                <a class="md-link" href={docHrefIn(d.slug, lang)}>{d.title}</a>
+                            </h2>
+                            {d.meta.description && <p class="md-p">{d.meta.description}</p>}
+                        </section>
+                    );
+                })}
+            </div>
+        </DocsShell>
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

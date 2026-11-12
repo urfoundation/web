@@ -173,7 +173,8 @@ function CodeBlock({ lang, source, labels = null }) {
         reset.current = setTimeout(() => setCopied(false), 2000);
     };
 
-    const label = codeLabel(lang);
+    // a plain-text block's bar says so in the page's language (labels.text)
+    const label = words.text && codeLabel(lang) === codeLabel('text') ? words.text : codeLabel(lang);
     const lines = source.split('\n');
     const diagram = isDiagram(source);
 

@@ -1,5 +1,5 @@
 ---
-title: "Cómo eliminar tu cuenta de URnetwork — Docs de UR"
+title: "Cómo eliminar tu cuenta de URnetwork — Documentación de UR"
 description: "Elimina tu cuenta de URnetwork en la app: abre Account → Settings, toca Delete Account y confirma. Tu red y sus datos se eliminan de forma permanente."
 ---
 # Cómo eliminar tu cuenta

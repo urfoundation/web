@@ -1,14 +1,16 @@
 ---
 /**
- * Shared shell for the legal document pages (terms | privacy | vdp).
+ * Shared shell for the legal document pages (terms | privacy | vdp) and their
+ * translations (/<lang>/terms, …), built once the docs page group is
+ * localized (react/src/i18n/pages/docs/group.js).
  *
- * The documents are English only by design (a translated contract would be a
- * different contract), so they are built at their bare paths alone: no
- * /<lang>/terms pages, no hreflang cluster (lib/route-localization.js), and
- * the /<lang>/ URLs redirect to the English page. The whole page, chrome
- * included, renders from the one dictionary it is given, which the pages pass
- * as English. "Last revised:" would need a dictionary key if a translated
- * legal page is ever built again.
+ * The English page renders the canonical document (docs/legal/*.md, through
+ * the generated react/src/data/legal.js). A translated page renders the
+ * translation (react/src/i18n/pages/docs/corpus/<lang>/legal/) with the same
+ * converter (scripts/legal-md.mjs), opens with a note that the English page
+ * is the authoritative text, linking it, and gives the revision date in its
+ * language. The markdown twin (/terms.md) is the English document's and
+ * alternates the English page only.
  */
 import Base from '../layouts/Base.astro';
 import DisclaimerStatic from './DisclaimerStatic.astro';
@@ -19,7 +21,10 @@ import FooterStatic from './FooterStatic.astro';
 import '@react/components/Nav.css';
 import '@react/components/Legal.css';
 import { LEGAL_DOCS } from '@react/data/legal';
-import en from '@react/i18n/en.js';
+import { docIn, docsCopy } from '@react/lib/docs-i18n.js';
+import { legalRevisedDate, translatedLegal } from '@react/lib/legal-i18n.js';
+import { interpolate } from '@react/i18n/format.js';
+import { getDict } from '../lib/i18n.js';
 
 interface Props {
     t?: any;
@@ -27,22 +32,29 @@ interface Props {
     doc: 'terms' | 'privacy' | 'vdp';
 }
 
-const { t = en, lang = 'en', doc } = Astro.props;
-// full document from the generated data module (docs/legal/*.md is
-// canonical); the i18n entry supplies the meta description
-const d = LEGAL_DOCS[doc];
+const { lang = 'en', doc } = Astro.props;
+const english = lang === 'en';
+const t = Astro.props.t || await getDict(lang);
+const words = docsCopy(lang).legal;
+// the English document from the generated data module (docs/legal/*.md is
+// canonical); a translation from its markdown
+const d = english ? LEGAL_DOCS[doc] : translatedLegal(docIn(`legal/${doc}`, lang).content);
+// the revision date of the English document, in the page's language
+const updated = LEGAL_DOCS[doc].updated && interpolate(words.revised, { date: legalRevisedDate(LEGAL_DOCS[doc].updated, lang) });
+// the i18n entry supplies the meta description
 const meta = t.legal[doc];
 // the document as markdown, for agents (scripts/generate-agent-assets.mjs)
-const twin = { href: `/${doc}.md`, type: 'text/markdown' };
+const twin = english ? { href: `/${doc}.md`, type: 'text/markdown' } : null;
 ---
-<Base title={`${meta.title || d.title} — UR`} description={meta.body} lang={lang} dir="ltr" alternate={twin}>
+<Base title={`${meta.title || d.title} — UR`} description={meta.body} lang={lang} alternate={twin}>
     <div class="app">
         <DisclaimerStatic t={t} />
         <NavIsland lang={lang} client:idle={{ timeout: 1000 }} />
 
         <main class="section-page">
             <Section id={doc} eyebrow={t.legal.eyebrow} title={d.title} headingLevel="h1">
-                {d.updated && <p class="legal-updated">Last revised: {d.updated}</p>}
+                {!english && <p class="legal-translation-note" role="note">{words.notice} <a href={`/${doc}`} hreflang="en">{words.english}</a></p>}
+                {updated && <p class="legal-updated">{updated}</p>}
                 <div class="legal-doc" set:html={d.html} />
             </Section>
         </main>

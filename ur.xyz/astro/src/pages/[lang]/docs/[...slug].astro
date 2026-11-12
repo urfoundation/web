@@ -1,19 +1,20 @@
 ---
-import { NON_EN_LANGS } from '../../../lib/i18n.js';
+// A document's translation, /<lang>/docs/<slug>: the English page's twin
+// (pages/docs/[...slug].astro), built in every language once the docs page
+// group is localized (react/src/i18n/pages/docs/group.js). /<lang>/docs/whitepaper
+// is a redirect stub to the litepaper in the same language, as /docs/whitepaper
+// is to /docs/litepaper.
+import DocPage from '../../../components/routes/DocPage.astro';
+import { localizedStaticPaths } from '../../../lib/route-localization.js';
 import { docs } from '@react/lib/docs.js';
 import { DOC_PAGE_PATHS } from '@react/lib/docs-shared.js';
 
 export function getStaticPaths() {
-    const paths = [];
-    for (const lang of NON_EN_LANGS) {
-        // documents with their own page (/terms, …) have no /docs copy to point at
-        for (const doc of docs.filter(doc => doc.slug && !DOC_PAGE_PATHS[doc.slug])) {
-            paths.push({ params: { lang, slug: doc.slug } });
-        }
-    }
-    return paths;
+    const slugs = docs.filter(d => d.slug && !DOC_PAGE_PATHS[d.slug]).map(d => ({ params: { slug: d.slug } }));
+    return localizedStaticPaths('docs', [...slugs, { params: { slug: 'whitepaper' } }]);
 }
 
-const { slug } = Astro.params;
-return Astro.redirect(`/docs/${slug}`, 301);
+const { lang, slug } = Astro.params;
+if (slug === 'whitepaper') return Astro.redirect(`/${lang}/docs/litepaper`, 301);
 ---
+<DocPage slug={slug} lang={lang} />

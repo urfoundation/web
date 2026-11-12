@@ -71,8 +71,9 @@ const MIME = path.join(REPO, 'web/nginx/mime.types');
 const QUIET_MS = 400;
 // how long a settled page is watched for one more navigation
 const CONFIRM_MS = 1500;
-// how long a case may take before it counts as unsettled
-const BUDGET_MS = 10000;
+// how long a case may take before it counts as unsettled (a loop is found
+// sooner, by its count of navigations)
+const BUDGET_MS = 15000;
 // more navigations than this in one case is a loop
 const LOOP_NAVIGATIONS = 12;
 const WORKERS = Math.max(2, Math.min(10, os.availableParallelism?.() || os.cpus().length));
@@ -257,16 +258,18 @@ const launchOptions = (sinkPort) => ({
     ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
 });
 
+// The document is parsed: the stored-language redirect, in its head, has had
+// its turn. A navigation a script starts later is caught by confirm().
 async function loaded(page) {
     try {
-        return await page.evaluate(() => document.readyState === 'complete');
+        return await page.evaluate(() => document.readyState !== 'loading');
     } catch {
         return false; // between documents
     }
 }
 
 // Starts a navigation with `navigate` and waits until the page settles: no
-// main-frame navigation for QUIET_MS, the document loaded. Returns the chain
+// main-frame navigation for QUIET_MS, the document parsed. Returns the chain
 // of main-frame requests (each HTTP redirect and each scripted redirect is
 // one), where it ended, its status and its <html lang>, and confirm(), which
 // watches the page CONFIRM_MS longer and marks the outcome unsettled, with the

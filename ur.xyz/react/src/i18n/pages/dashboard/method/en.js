@@ -3,8 +3,10 @@
 // (unit dashboard, nav), and a definition whose term is a panel title elsewhere on the page is
 // headed with that title (unit dashboard, titles); the headings below are the others.
 //
-// Not translated: SN25, Bittensor, BringYour, Grafana, USDC, Gb/s, hostnames. "Alpha" is SN25's
-// token. Figures written into the text (7 days, 50,400 blocks, 90 days) are yours to format.
+// Not translated: SN25, Bittensor, BringYour, Grafana, USDC, hostnames. "Alpha" is SN25's token.
+// Gb/s is written as the page writes rates in the language (Intl's gigabit-per-second, short:
+// Гбит/с, غيغابت/ث, Gb/秒, Gb/s). Figures written into the text (7 days, 50,400 blocks, 90 days)
+// are yours to format.
 export default {
     headings: {
         usersPerEpoch: 'Users per epoch',

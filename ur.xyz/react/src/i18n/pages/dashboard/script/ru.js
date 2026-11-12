@@ -179,7 +179,7 @@ export default {
         ends: 'завершится {when}',
         // Э is эпоха's short form
         short: 'Э{n}',
-        shortNow: 'Э{n} · сейчас',
+        shortNow: 'Э{n} · идёт',
         shortOn: 'Э{n} · {date}',
         tableEpoch: 'Эпоха',
         tableDates: 'Даты',

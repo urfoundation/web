@@ -2,7 +2,7 @@
 export default {
     loadError: "No se pudo conectar con las fuentes de estadísticas. Recarga para intentarlo de nuevo.",
     previewError: "No se pudo conectar con la fuente de estadísticas. Se reintentará en 1 min.",
-    unavailable: "No se pudo cargar esto ahora",
+    unavailable: "No se pudo cargar en este momento",
     periodLength: {
         d1: "24 horas",
         d3: "3 días",
@@ -10,7 +10,7 @@ export default {
         d30: "30 días",
         d90: "90 días",
     },
-    lastPeriod: "Período: {period}",
+    lastPeriod: "{period} hasta ahora",
     periodAverage: {
         d1: "Promedio de 24 horas",
         d3: "Promedio de 3 días",
@@ -61,9 +61,9 @@ export default {
         onAverage: "{value} en promedio",
         labelValue: "{label} {value}",
         highest: {
-            hour: "hora más alta {value}",
-            sixHours: "bloque de 6 horas más alto {value}",
-            day: "día más alto {value}",
+            hour: "Máximo por hora {value}",
+            sixHours: "Máximo por bloque de 6 horas {value}",
+            day: "Máximo diario {value}",
         },
         newInLast: "nuevas en {period}",
         change24h: "{change} 24 h",
@@ -85,7 +85,7 @@ export default {
         worldwide: "Todo el mundo",
         worldwideHint: "Busca, haz clic en un punto o abre un continente",
         several: "Varios países coinciden. Sigue escribiendo o elige uno de la lista.",
-        none: "Ningún país llamado “{query}” tiene proveedores en línea.",
+        none: "Ningún país llamado «{query}» tiene proveedores en línea.",
         top3: "Los 3 primeros países concentran el {share} de los proveedores en línea.",
         changeLast: "Cambio en {period}",
         share: "Parte",
@@ -100,9 +100,9 @@ export default {
         },
         averageOnline: "Promedio en línea en {period}",
         highestLast: {
-            hour: "Hora más alta en {period}",
-            sixHours: "Bloque de 6 horas más alto en {period}",
-            day: "Día más alto en {period}",
+            hour: "Máximo por hora en {period}",
+            sixHours: "Máximo por bloque de 6 horas en {period}",
+            day: "Máximo diario en {period}",
         },
     },
     continents: {

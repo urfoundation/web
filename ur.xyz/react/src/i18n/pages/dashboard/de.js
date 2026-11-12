@@ -1,6 +1,6 @@
 // /dashboard ("UR Stats") in German: the translation of en.js beside it (same keys). The
 // Network Capacity Reserve keeps its English name; the period buttons are 1T … 90T (T for
-// Tage, as /reserve writes them). The CSS sets the labels in capitals.
+// Tage, as /reserve writes them). The CSS changes no letter case.
 export default {
     meta: {
         title: 'UR-Statistiken',
@@ -28,7 +28,7 @@ export default {
 
     ledes: {
         network: 'Datenverkehr, Nutzer und Wachstum im URnetwork.',
-        providers: 'Geräte, die ihre Verbindung teilen, gezählt nach Land und Stadt, nie nach einzelnem Standort.',
+        providers: 'Geräte, die ihre Verbindung teilen, gezählt nach Land und Stadt, nie nach einzelnen Standorten.',
         subnet: 'Auszahlungen, Conviction und die Network Capacity Reserve, gelesen aus dem Bittensor-Mainnet.',
         more: 'Weitere Kennzahlen aus dem Monitoring des Netzwerks.',
         method: 'Was jede Zahl bedeutet und woher sie stammt.',
@@ -56,7 +56,7 @@ export default {
         usersDay: 'Nutzer (24 Stunden)',
         dataDay: 'Übertragene Daten (24 Stunden)',
         dataSinceOpened: 'Übertragene Daten, seit du diese Seite geöffnet hast',
-        rightNow: 'Gerade jetzt',
+        rightNow: 'Live',
     },
 
     route: {

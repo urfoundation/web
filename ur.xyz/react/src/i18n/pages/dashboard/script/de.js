@@ -131,7 +131,7 @@ export default {
         epochDates: 'Epoche {n}, {from} bis {to}',
         networksAdded: 'Neue Netzwerke, letzte {period}',
         growthLast: 'Wachstum, letzte {period}',
-        growthRange: 'von {from} auf {to}',
+        growthRange: '{from} → {to}',
         newEvery: 'Ein neues Netzwerk alle',
         seconds: { one: '{count} Sekunde', other: '{count} Sekunden' },
         minutes: { one: '{count} Minute', other: '{count} Minuten' },
@@ -151,7 +151,7 @@ export default {
         ends: 'endet am {when}',
         short: 'E{n}',
         shortNow: 'E{n} · jetzt',
-        shortOn: 'E{n} · ab {date}',
+        shortOn: 'E{n} · {date}',
         tableEpoch: 'Epoche',
         tableDates: 'Zeitraum',
         now: 'jetzt',
@@ -184,7 +184,7 @@ export default {
     reserve: {
         inLastDays: { one: 'über den letzten {count} Tag', other: 'über die letzten {count} Tage' },
         wallet: 'Reserve-Wallet · Multisig (2 von 3)',
-        hotkey: 'Hotkey mit UID {uid}',
+        hotkey: 'Hotkey · UID {uid}',
         receives: 'Erhält auf SN25 über zwei eigene Hotkeys',
         // {name} is a wallet's label above
         copy: 'Adresse kopieren: {name}',

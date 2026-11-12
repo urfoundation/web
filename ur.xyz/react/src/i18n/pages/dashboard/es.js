@@ -2,7 +2,7 @@
 export default {
     meta: {
         title: "Estadísticas de UR",
-        description: "Estadísticas en vivo de URnetwork y SN25: usuarios, proveedores en línea, datos, épocas, pagos y la Network Capacity Reserve, de Grafana y la mainnet de Bittensor.",
+        description: "Estadísticas en vivo de URnetwork y SN25: usuarios, proveedores en línea, datos transportados, épocas, pagos y Network Capacity Reserve, de Grafana y la mainnet de Bittensor.",
     },
     heading: "Estadísticas de UR",
     rail: {
@@ -79,14 +79,14 @@ export default {
         providersByCountry: "Proveedores por país",
         details: "Detalles",
         allCountries: "Todos los países",
-        becomeProvider: "Hazte proveedor",
+        becomeProvider: "Conviértete en proveedor",
         payouts: "Pagos",
         earned: "Ganado por los proveedores",
         conviction: "Conviction",
         convictionLocks: "Bloqueos de conviction",
         totalLocked: "Total bloqueado",
-        perpetual: "Perpetuos",
-        decaying: "Decrecientes",
+        perpetual: "Perpetuo",
+        decaying: "Decreciente",
         reserveBalance: "Saldo de la reserva",
         reserveShort: "Reserva",
         walletAndHotkeys: "Billetera y hotkeys",

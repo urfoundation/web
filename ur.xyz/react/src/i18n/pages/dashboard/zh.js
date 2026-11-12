@@ -55,7 +55,7 @@ export default {
         exitsNote: "个国家",
     },
     titles: {
-        dailyUsers: "日用户",
+        dailyUsers: "每日用户",
         providersOnline: "在线提供者",
         dataCarried: "承载数据量",
         totalNetworks: "网络总数",
@@ -68,7 +68,7 @@ export default {
         sn25Subnet: "SN25 子网",
         alphaPrice: "Alpha 价格",
         reserve: "Network Capacity Reserve",
-        alphaLocked: "conviction 锁定的 Alpha",
+        alphaLocked: "Conviction 锁定的 Alpha",
         traffic: "流量",
         whenTrafficFlows: "流量时段分布",
         runningTotal: "累计总量",
@@ -109,7 +109,7 @@ export default {
         searchCountry: "搜索国家",
     },
     expand: {
-        users: "放大日用户图表",
+        users: "放大每日用户图表",
         providers: "放大在线提供者图表",
         data: "放大承载数据量图表",
         networks: "放大网络总数图表",
@@ -152,6 +152,6 @@ export default {
     footer: {
         method: "统计方法 →",
         home: "← 返回 ur.xyz",
-        updated: "更新于 {time}。",
+        updated: "更新于{time}。",
     },
 };

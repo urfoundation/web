@@ -102,8 +102,8 @@ export default {
         convictionLocks: 'Блокировки conviction',
         totalLocked: 'Всего заблокировано',
         // figure labels and the locks table's type column
-        perpetual: 'Бессрочные',
-        decaying: 'Убывающие',
+        perpetual: 'Бессрочно',
+        decaying: 'С убыванием',
         reserveBalance: 'Баланс резерва',
         reserveShort: 'Резерв',
         walletAndHotkeys: 'Кошелёк и хоткеи',

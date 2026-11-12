@@ -14,8 +14,8 @@ export default {
     },
     controls: {
         windowAria: "نطاق الرسم البياني",
-        last7: "7 أيام",
-        last30: "30 يومًا",
+        last7: "7ي",
+        last30: "30ي",
         all: "الكل",
         expand: "توسيع",
         collapse: "تصغير",

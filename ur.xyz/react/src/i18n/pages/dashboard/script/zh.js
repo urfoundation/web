@@ -60,9 +60,9 @@ export default {
         onAverage: "平均 {value}",
         labelValue: "{label} {value}",
         highest: {
-            hour: "最高小时 {value}",
-            sixHours: "最高 6 小时 {value}",
-            day: "最高日 {value}",
+            hour: "单小时最高 {value}",
+            sixHours: "6 小时时段最高 {value}",
+            day: "单日最高 {value}",
         },
         newInLast: "过去 {period}新增",
         change24h: "24 小时 {change}",
@@ -97,9 +97,9 @@ export default {
         },
         averageOnline: "过去 {period}平均在线",
         highestLast: {
-            hour: "过去 {period}最高小时",
-            sixHours: "过去 {period}最高 6 小时",
-            day: "过去 {period}最高日",
+            hour: "过去 {period}内单小时最高",
+            sixHours: "过去 {period}内 6 小时时段最高",
+            day: "过去 {period}内单日最高",
         },
     },
     continents: {
@@ -113,9 +113,9 @@ export default {
     chart: {
         expand: "放大“{title}”图表",
         noData: "无数据（监测缺口）",
-        nowOnline: "当前，在线",
-        nowLast24: "当前，过去 24 小时",
-        usersToThen: "用户，截至该时刻的 24 小时",
+        nowOnline: "当前在线",
+        nowLast24: "当前（过去 24 小时）",
+        usersToThen: "用户（截至该时刻的 24 小时）",
         carried: "已承载",
         carriedPer: {
             hour: "每小时承载",
@@ -127,8 +127,8 @@ export default {
             sixHours: "每 6 小时注册",
             day: "每天注册",
         },
-        onlineAverage: "在线，平均",
-        networksAllTime: "网络，历史累计",
+        onlineAverage: "平均在线",
+        networksAllTime: "累计网络数",
         sevenDayAverage: "7 天平均",
         totalCarried: "累计承载",
         approx: "约",
@@ -136,7 +136,7 @@ export default {
         total: "总计",
         withProvider: "有提供者在线",
         balance: "余额",
-        devicesDaily: "设备，日均",
+        devicesDaily: "日均设备数",
         aDay: "每天",
         perHour: "每小时 {value}",
         legendPer: {
@@ -174,7 +174,7 @@ export default {
         networksAdded: "过去 {period}新增网络",
         growthLast: "过去 {period}增长",
         growthRange: "{from} → {to}",
-        newEvery: "平均新增一个网络用时",
+        newEvery: "新增网络间隔",
         seconds: {
             other: "{count} 秒",
         },
@@ -199,7 +199,7 @@ export default {
         shortOn: "E{n} · {date}",
         tableEpoch: "周期",
         tableDates: "日期",
-        now: "当前",
+        now: "至今",
         paid: "已支付",
         pending: "待支付",
         inProgress: "进行中",
@@ -217,10 +217,10 @@ export default {
     conviction: {
         ofOutstanding: "占流通 Alpha 的 {percent}",
         perpetualLocks: {
-            other: "{count} 个锁定，无解锁日期",
+            other: "{count} 笔锁定，无解锁日期",
         },
         decayingLocks: {
-            other: "{count} 个锁定，逐步解锁",
+            other: "{count} 笔锁定，逐步解锁",
         },
         wallet: "钱包",
         locked: "锁定量",

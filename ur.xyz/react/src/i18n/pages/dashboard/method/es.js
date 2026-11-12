@@ -17,7 +17,7 @@ export default {
         usersPerEpoch: "Cuentas que movieron datos en una época, el período de pago de 7 días de SN25, contadas una sola vez sin importar cuántos días estuvieron activas.",
         networksAndSignups: "Una red es una cuenta. Una cuenta puede conectar varios dispositivos. Los registros son las redes creadas en el período.",
         whenTrafficFlows: "El día promedio del período, hora por hora, en hora local. La forma por horas sale del caudal y se escala para que las 24 horas sumen un día promedio de datos transportados.",
-        hourlyDataCarried: "En las vistas {d1} y {d3}, las últimas 24 horas y las 48 anteriores son totales medidos. Cada hora recibe la parte de su total que corresponde al caudal de esa hora.",
+        hourlyDataCarried: "En las vistas {d1} y {d3}, las últimas 24 horas y las 48 anteriores son totales medidos. Cada hora recibe una parte de su total proporcional al caudal de esa hora.",
         runningTotal: "Los datos transportados sumados día a día desde el primer día que guardan nuestras estadísticas.",
         providersOnline: "Dispositivos que comparten su conexión. El número grande es el recuento en línea ahora. Debajo se muestran el promedio y el punto más alto del período, y el promedio aparece como línea discontinua en el gráfico.",
         countriesAndCities: "Dónde están los proveedores, nunca dónde están los usuarios. Las ubicaciones se muestran por país y ningún proveedor se muestra de forma individual.",
@@ -26,7 +26,7 @@ export default {
         earned: "Alpha ganado por los proveedores en las épocas terminadas y en la actual, todavía en curso, a partir de las emisiones de los mineros de la subred. Aparece como pendiente hasta que se confirma el pago; los proveedores lo reclaman por su cuenta. El calendario de pagos está en {link}. Las épocas 0 y 1 fueron de prueba, cuando a los proveedores todavía se les pagaba en USDC.",
         operatorDeposits: "Alpha que los operadores de red pagan a SN25 por el tráfico que usan.",
         reserve: "Una billetera controlada por una multifirma 2 de 3 que recibe parte de las emisiones de los proveedores de SN25 a través de dos hotkeys propias, y financia capacidad de red.",
-        throughput: "Datos que circulan por la red cada segundo, contados en cada salto de una ruta, por eso supera a los datos transportados.",
+        throughput: "Datos que circulan por la red cada segundo, contados en cada salto de una ruta, por eso el caudal supera a los datos transportados.",
     },
     periods: "{d1} y {d3} terminan en la última hora completa, en pasos de una hora y de 6 horas. {d7}, {d30} y {d90} usan días UTC completos y terminan en el último día completo. Cada cambio se compara con el período de la misma duración inmediatamente anterior. Las cifras marcadas con «Ahora» son en vivo y no siguen el período. Las horas se muestran en hora local.",
     sources: {

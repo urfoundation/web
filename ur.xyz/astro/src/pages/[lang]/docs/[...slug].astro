@@ -1,9 +1,9 @@
 ---
 // A document's translation, /<lang>/docs/<slug>: the English page's twin
 // (pages/docs/[...slug].astro), built in every language once the docs page
-// group is localized (react/src/i18n/pages/docs/group.js). /<lang>/docs/whitepaper
-// is a redirect stub to the litepaper in the same language, as /docs/whitepaper
-// is to /docs/litepaper.
+// group is localized (react/src/i18n/pages/docs/group.js). No redirect stub is
+// built here: nginx serves a built /<lang>/ page as a page, and it answers
+// /<lang>/docs/whitepaper itself with a 301 to /<lang>/docs/litepaper.
 import DocPage from '../../../components/routes/DocPage.astro';
 import { localizedStaticPaths } from '../../../lib/route-localization.js';
 import { docs } from '@react/lib/docs.js';
@@ -11,10 +11,9 @@ import { DOC_PAGE_PATHS } from '@react/lib/docs-shared.js';
 
 export function getStaticPaths() {
     const slugs = docs.filter(d => d.slug && !DOC_PAGE_PATHS[d.slug]).map(d => ({ params: { slug: d.slug } }));
-    return localizedStaticPaths('docs', [...slugs, { params: { slug: 'whitepaper' } }]);
+    return localizedStaticPaths('docs', slugs);
 }
 
 const { lang, slug } = Astro.params;
-if (slug === 'whitepaper') return Astro.redirect(`/${lang}/docs/litepaper`, 301);
 ---
 <DocPage slug={slug} lang={lang} />

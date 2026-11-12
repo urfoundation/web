@@ -8,7 +8,9 @@
 //   placeholders of the English forms.
 // - Words: no page in any language calls capture the flag a lottery, a
 //   jackpot or a bet (sn design/ctf/SEO.md §2.3); a translation says "the
-//   draw" and "chance to win" in its own words.
+//   draw" and "chance to win" in its own words, and names the draw as a
+//   public, verifiable random selection, never with the words of drawing lots
+//   (the owner's decision of 2026-11-12).
 // - Search: in every phase of the data (the committed snapshot and an answer
 //   of each phase, tests/ctf-fixtures.mjs), every title fits 60 graphemes and
 //   every description 175 characters, and none repeats within a language.
@@ -143,6 +145,27 @@ const BANNED = {
 test('no page in any language calls capture the flag a lottery, a jackpot or a bet', () => {
     for (const [lang, copy] of [['en', EN], ...present.map((l) => [l, COPY[l]])]) {
         for (const [at, s] of strings(copy)) assert.ok(!BANNED[lang].test(s), `${lang} ${at}: ${s}`);
+    }
+});
+
+// The draw is a public, verifiable random selection among the eligible entries
+// (the owner's decision of 2026-11-12): a translation names it случайный отбор,
+// الاختيار العشوائي, 随机选取, Zufallsauswahl or selección aleatoria, and its verb
+// "randomly selects", never the words of drawing lots (жеребьёвка, القرعة,
+// 抽签, Auslosung, sorteo), their verbs or their kin. English keeps "draw".
+// Each translation's header lists its words; DEFAULT_WIN (ctf/indexing.js)
+// holds its "wins by default".
+const DRAWING_LOTS = {
+    ru: /жеребь|жреби|розыгр|разыгр/iu,
+    ar: /قرع[ةت]|سحب/u,
+    zh: /抽签|抽取|抽出|抽中|摇号/u,
+    de: /auslos|ausgelost|losentscheid|losverfahren|(?<!\p{L})(?:ziehung|gezogen|lost)(?!\p{L})/iu,
+    es: /sorte(?:o|a|á|ad|ar|e)/iu,
+};
+
+test('no translation names the draw with the words of drawing lots', () => {
+    for (const lang of present) {
+        for (const [at, s] of strings(COPY[lang])) assert.doesNotMatch(s, DRAWING_LOTS[lang], `${lang} ${at}`);
     }
 });
 

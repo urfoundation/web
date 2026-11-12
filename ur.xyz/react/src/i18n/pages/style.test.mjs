@@ -19,6 +19,12 @@
 //     format.js formatUsd writes the code's amounts so: "US$1,97"), never a
 //     bare $;
 //   - capture the flag is Captura la bandera, without quotes.
+// Every language (decision of 2026-11-12): capture the flag is an auction, and
+// its draw a public, verifiable random selection among the eligible entries,
+// so no page in any language names it with the words of drawing lots
+// (жеребьёвка, жребий, القرعة, 抽签, 摇号, Auslosung, Losentscheid, sorteo);
+// the capture the flag copy tests (pages/ctf, pages/mainnet) refuse their
+// verbs and kin too, which mean other things elsewhere on the site.
 //
 // Usage (from react/): node --test src/i18n/pages/style.test.mjs
 import assert from 'node:assert/strict';
@@ -92,6 +98,14 @@ test('Spanish is neutral Latin American Spanish in tú, names the dollar US$ and
         ['Captura la bandera in quotes', /[«“"]Captura la bandera[»”"]/iu],
     ]);
     assert.deepEqual(['ro', 'sa'].map((code) => displayRegion(code, 'es')), ['Rumania', 'Arabia Saudita']);
+});
+
+test('no page in any language names capture the flag\'s draw with the words of drawing lots', () => {
+    refuse('ru', [['a drawing of lots (the draw is случайный отбор)', /жеребь[её]вк|жреби[йяюеи]/iu]]);
+    refuse('ar', [['a drawing of lots (the draw is الاختيار العشوائي)', /قرع[ةت]/u]]);
+    refuse('zh', [['a drawing of lots (the draw is 随机选取)', /抽签|抽中|摇号/u]]);
+    refuse('de', [['a drawing of lots (the draw is Zufallsauswahl)', /auslos|ausgelost|losentscheid|losverfahren/iu]]);
+    refuse('es', [['a drawing of lots (the draw is selección aleatoria)', word('sorteos?|sortead[oa]s?')]]);
 });
 
 test('the code writes a Spanish dollar amount as US$ and Intl\'s figure, and every other language as Intl does', () => {

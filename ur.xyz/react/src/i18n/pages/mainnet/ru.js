@@ -4,8 +4,9 @@
 // версия 1; network operator сетевой оператор; subnet owner владелец подсети; pool пул; provider/extender/miner
 // провайдер/экстендер/майнер; payout root корень выплат; commit зафиксировать; challenge period период
 // оспаривания; claims получение выплат; payout wallet кошелёк для выплат; governance Safe Safe управления;
-// timelock таймлок; vault хранилище; capture the flag «Захват флага» (the apps' name); draw жеребьёвка (never
-// лотерея or розыгрыш: it is not a lottery); entry участник; slot слот; pot накопленный фонд; carry forward
+// timelock таймлок; vault хранилище; capture the flag «Захват флага» (the apps' name); draw случайный отбор, to
+// draw случайным образом выбрать (a public, verifiable random selection: never жеребьёвка, a drawing of lots, and
+// never лотерея or розыгрыш: it is not a lottery); entry участник; slot слот; pot накопленный фонд; carry forward
 // переносится; relay ретранслировать. Figures keep the English digits and separators (9,240,028; 1,076.26 α).
 export default {
     meta: {

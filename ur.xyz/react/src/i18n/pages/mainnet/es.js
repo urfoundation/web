@@ -4,7 +4,8 @@
 // mainnet red principal; network operator operador de red; subnet owner propietario de la subred; payout root
 // raíz de pagos; commit registrar; challenge period período de impugnación; claims reclamaciones; payout wallet
 // wallet de pago; governance Safe Safe de gobernanza; vault bóveda; capture the flag Captura la bandera (the
-// apps' name, without quotes, as /ctf writes it); draw sorteo (never lotería, rifa or apuesta: it is not a lottery);
+// apps' name, without quotes, as /ctf writes it); draw selección aleatoria, to draw seleccionar al azar (a public,
+// verifiable random selection: never sorteo, a drawing of lots, and never lotería, rifa or apuesta: it is not a lottery);
 // entry participante; pot fondo acumulado (not bote); carry forward se traslada; relay retransmitir; reader
 // addressed as tú. Figures are written as Intl writes Spanish numbers, as on /ctf (9.240.028; 1076,26 α;
 // timeline.js INTL_FIGURES).

@@ -16,7 +16,10 @@
 //   • capture the flag under the apps' name for it in each language, and never
 //     called a lottery or a game of chance: the draw picks slots, in plain
 //     words, without the words of gambling or of earnings promises
-//     (sn design/ctf/SEO.md §2.3).
+//     (sn design/ctf/SEO.md §2.3), and is a public, verifiable random
+//     selection, never named with the words of drawing lots (the owner's
+//     decision of 2026-11-12; each language's word is in its page unit's
+//     header, as on /ctf).
 //
 // Usage: node --test src/i18n/pages/mainnet/mainnet-copy.test.mjs   (from react/; no network)
 import assert from 'node:assert/strict';
@@ -117,6 +120,15 @@ const PROMISES = {
     es: /garantiz|rentabilidad|inversi|ingreso pasivo|salario|sueldo|hacerse rico|empleo/i,
 };
 const CTF_KEYS = (key) => key.startsWith('notices.notice-capture-the-flag.') || key.startsWith('events.capture-the-flag-');
+// the words of drawing lots, their verbs and kin, in every string: the draw is случайный отбор, الاختيار العشوائي,
+// 随机选取, Zufallsauswahl or selección aleatoria, as on /ctf (pages/ctf/ctf-copy.test.mjs)
+const DRAWING_LOTS = {
+    ru: /жеребь|жреби|розыгр|разыгр/iu,
+    ar: /قرع[ةت]|سحب/u,
+    zh: /抽签|抽取|抽出|抽中|摇号/u,
+    de: /auslos|ausgelost|losentscheid|losverfahren|(?<!\p{L})(?:ziehung|gezogen|lost)(?!\p{L})/iu,
+    es: /sorte(?:o|a|á|ad|ar|e)/iu,
+};
 
 test('the English units load', () => {
     for (const unit of UNITS) assert.ok(english[unit].size > 0, `${unit || 'mainnet'}/en.js`);
@@ -176,10 +188,11 @@ test('the figures and the names are the English\'s own, in Western digits', () =
     }
 });
 
-test('capture the flag keeps the apps\' name, and no translation reads as a lottery, a bet or a promise', () => {
+test('capture the flag keeps the apps\' name, and no translation reads as a lottery, a drawing of lots, a bet or a promise', () => {
     for (const t of translations) {
         for (const { key, text } of pairs(t)) {
             assert.doesNotMatch(text, GAMBLING[t.lang], `${t.name}: ${key}: "${text}"`);
+            assert.doesNotMatch(text, DRAWING_LOTS[t.lang], `${t.name}: ${key}: the draw is a random selection, not a drawing of lots: "${text}"`);
             if (CTF_KEYS(key)) assert.doesNotMatch(text, PROMISES[t.lang], `${t.name}: ${key}: "${text}"`);
         }
         if (t.unit === 'data') {

@@ -8,14 +8,15 @@
  * same fields in the language's own order and words ("12. Okt.", "окт. 26 г."),
  * compact figures in Intl's compact notation ("1,3 тыс.", "2,1 Mio."), and USD
  * as an Intl currency amount with the language's own symbol for the dollar
- * ("1,97 $" in German and Russian, "1,97 US$" in Spanish, "US$1.97" in
- * Chinese). Dates are UTC and Arabic keeps Western digits, so a static page
- * and its hydration agree.
+ * ("1,97 $" in German and Russian, "US$1.97" in Chinese; Spanish puts US$
+ * before the figure, "US$1,97", as its prose does: format.js formatUsd).
+ * Dates are UTC and Arabic keeps Western digits, so a static page and its
+ * hydration agree.
  *
  * Every formatter takes the language last (default English); formatsFor(lang)
  * binds them all to one language.
  */
-import { formatDate, formatNumber, formatPercent } from '../../../i18n/format.js';
+import { formatDate, formatNumber, formatPercent, formatUsd } from '../../../i18n/format.js';
 
 const LOCALE = 'en-US';
 const english = (lang) => !lang || lang === 'en';
@@ -122,7 +123,7 @@ export function usd(v, lang = 'en') {
     const a = Math.abs(n);
     if (!english(lang)) {
         const digits = a === 0 || a >= 1000 ? 0 : 2;
-        return formatNumber(n, lang, { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits });
+        return formatUsd(n, lang, { minimumFractionDigits: digits, maximumFractionDigits: digits });
     }
     const sign = n < 0 ? '−' : '';
     if (a === 0) return '$0';
@@ -136,7 +137,7 @@ export function usdCompact(v, lang = 'en') {
     const a = Math.abs(n);
     if (!english(lang)) {
         if (a < 1e4) return usd(n, lang);
-        return formatNumber(n, lang, { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: a >= 1e6 ? 2 : 1 });
+        return formatUsd(n, lang, { notation: 'compact', maximumFractionDigits: a >= 1e6 ? 2 : 1 });
     }
     const sign = n < 0 ? '−' : '';
     if (a >= 1e4) return `${sign}$${compact(a)}`;
@@ -145,7 +146,7 @@ export function usdCompact(v, lang = 'en') {
 
 /** A USD axis tick: "$300K", "$2.5M". */
 export function usdAxis(v, lang = 'en') {
-    if (!english(lang)) return formatNumber(Number(v) || 0, lang, { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 2 });
+    if (!english(lang)) return formatUsd(Number(v) || 0, lang, { notation: 'compact', maximumFractionDigits: 2 });
     return `$${axisCompact(v)}`;
 }
 

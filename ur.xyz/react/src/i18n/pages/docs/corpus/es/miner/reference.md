@@ -17,7 +17,7 @@ Los nombres entre paréntesis son otros nombres del mismo comando.
 | `provider status` | ¿Está configurado, en ejecución y conectado? Código de salida 0 cuando todo va bien, 3 cuando necesita configuración, 4 cuando no está en ejecución o no está conectado. `--json` para scripts. |
 | `provider doctor` | Por qué no puede iniciar sesión ni conectarse: carpeta de estado, DNS, conexión, TLS, reloj, actualizaciones. |
 | `provider login` (`auth`) | Inicia sesión con un código de autorización, que se escribe en una solicitud que no lo muestra. `provider login <auth_code>` toma el código directamente, pero lo deja en el historial de tu shell. `--user_auth='you@example.com'` inicia sesión con el correo de tu cuenta y pide la contraseña. |
-| `provider start` (`provide`) | Empieza a minar en esta terminal. El primer inicio en un dispositivo nuevo pregunta antes de registrarlo; `--allow-client-registration` lo registra sin preguntar. `provide` imprime el registro completo en lugar de la vista en directo. |
+| `provider start` (`provide`) | Empieza a minar en esta terminal. El primer inicio en un dispositivo nuevo pregunta antes de registrarlo; `--allow-client-registration` lo registra sin preguntar. `provide` imprime el registro completo en lugar de la vista en vivo. |
 | `provider service install` | Ejecuta el minero en segundo plano, con actualizaciones automáticas: en cada arranque en Linux, al iniciar sesión en macOS y en Windows. También `start`, `stop`, `restart`, `status`, `logs --follow` y `uninstall`. |
 | `provider update` | Actualiza a la versión más reciente. `--check` solo comprueba, `--status` muestra la configuración de las actualizaciones automáticas. Consulta [Actualizaciones](/docs/miner/updates). |
 | `provider --version` | Imprime la versión. |
@@ -109,9 +109,9 @@ Ninguna es necesaria para una configuración normal.
 
 | Término | Significado |
 | --- | --- |
-| Código de autorización (auth code) | Un código de un solo uso de tu cuenta de operador con el que un ordenador inicia sesión en ella. |
+| Código de autorización (auth code) | Un código de un solo uso de tu cuenta de operador con el que una computadora inicia sesión en ella. |
 | Operador | La red para la que tu minero proporciona salidas a internet. El predeterminado es `bringyour.com`. |
-| Dispositivo (identidad de proveedor) | Este ordenador como minero: la identidad en `~/.urnetwork` que se mantiene igual entre reinicios y actualizaciones. |
+| Dispositivo (identidad de proveedor) | Esta computadora como minero: la identidad en `~/.urnetwork` que se mantiene igual entre reinicios y actualizaciones. |
 | Coldkey | Tu wallet de Bittensor, como una dirección ss58 que empieza por `5`. Las recompensas se pagan a ella. |
 | Hotkey | Una segunda clave de Bittensor. Los mineros la usan para iniciar sesión con todos los operadores a la vez, y las flotas para registrarse en el nivel superior. |
 | Época | El periodo en el que se cuentan las recompensas. Una época de liquidación dura unos siete días en mainnet. |

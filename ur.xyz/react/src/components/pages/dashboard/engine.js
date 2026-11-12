@@ -25,10 +25,11 @@ const DF={},dtF=o=>{const k=JSON.stringify(o);return DF[k]||(DF[k]=new Intl.Date
 const UNITS={TB:'terabyte',PB:'petabyte',GB:'gigabyte','Gb/s':'gigabit-per-second'};
 const nf=UR.nf=n=>EN?Math.round(n).toLocaleString('en-US'):numF({maximumFractionDigits:0}).format(Math.round(n));
 // a number with d decimals; with a unit (TB, GB, Gb/s, or a symbol such as α); a percentage (v in %); a price in US$
+// (loader.js usd: Intl's, and in Spanish "US$1,97", since a bare "$" also means pesos there)
 const fx=UR.fx=(v,d)=>EN?v.toFixed(d):numF({minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
 const un=UR.un=(v,d,u)=>EN?v.toFixed(d)+' '+u:UNITS[u]?numF({style:'unit',unit:UNITS[u],unitDisplay:'short',minimumFractionDigits:d,maximumFractionDigits:d}).format(v):fx(v,d)+' '+u;
 UR.pc=(v,d)=>EN?v.toFixed(d)+'%':numF({style:'percent',minimumFractionDigits:d,maximumFractionDigits:d}).format(v/100);
-UR.usd=v=>EN?'$'+v.toFixed(2):numF({style:'currency',currency:'USD',currencyDisplay:'narrowSymbol'}).format(v);
+UR.usd=v=>EN?'$'+v.toFixed(2):I.usd(v);
 // a chart's number outside English: d decimals at most, compact (12K) or fixed, with the chart's unit (narrow: the
 // axis's shortest form, which keeps a long unit name such as Arabic's terabyte inside the chart's margin)
 const qn=(v,d,compact,u,narrow)=>{const o=compact?{notation:'compact',maximumFractionDigits:d}:{minimumFractionDigits:d,maximumFractionDigits:d};if(UNITS[u])Object.assign(o,{style:'unit',unit:UNITS[u],unitDisplay:narrow?'narrow':'short'});const s=numF(o).format(v);return u&&!UNITS[u]?s+' '+u:s};

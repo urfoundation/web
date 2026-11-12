@@ -141,7 +141,7 @@ export default {
             stat: { v: '3967,8 → 745,0 ms', l: 'mediana de carga de Wikipedia en la prueba low-bar en teléfono' },
             more: 'Primer byte del documento 1575,2 → 248,1 ms · Cloudflare 1 MiB en 33,279 → 3,892 s',
             meaning: 'Cuatro ajustes cambiaron a la vez, así que es un resultado conjunto, no cuatro mejoras separadas.',
-            change: 'Reequilibrio low-bar de memoria/rendimiento en móviles',
+            change: 'Reequilibrio low-bar de memoria/rendimiento en dispositivos móviles',
             measured: 'El conjunto aceptado llevó la mediana de carga de Wikipedia de <b>3967,8→745,0 ms</b>, el TTFB del documento de <b>1575,2→248,1 ms</b> y la descarga completa de 1 MiB en Cloudflare de <b>33,279→3,892 s</b> (<b>0,25→2,16 Mbps</b>).',
             suites: 'Una mejora conjunta en el dispositivo: objetivo 20→24 MiB, ventana de calidad/velocidad 3/1→4/1, GOGC 10→25 y conjunto en caliente 256→512 KiB cambiaron juntos. El pico de <b>24,73 MiB</b> cumplió la regla de ese experimento de <b>28 MiB activos / 24 MiB estables</b>; no cumple la regla absoluta posterior de 24 MiB.',
         },
@@ -174,7 +174,7 @@ export default {
             meaning: 'Una mejora local en la ruta de paquetes, medida dentro de un proceso. No es velocidad de internet ni memoria del teléfono.',
             change: 'Envíos de grupos completos del proveedor y ruta rápida de ACK TCP puros',
             measured: 'Agrupamiento: <b>25.579→9105 ns/vaciado</b>, <b>19.440→4024 B/vaciado</b>, <b>147→51 asignaciones</b>, <b>16→8 Packs en el cable</b>. Ruta rápida de ACK: <b>577,8→596,5 MB/s</b>, aproximadamente <b>5351→2560 B/op</b>, <b>46→37 asignaciones</b>.',
-            suites: 'Mejoras de eficiencia conservadas en la ruta local de paquetes. Límites dentro del mismo proceso; no son mediciones de rendimiento de internet ni de memoria pico en móviles.',
+            suites: 'Mejoras de eficiencia conservadas en la ruta local de paquetes. Límites dentro del mismo proceso; no son mediciones de rendimiento de internet ni de memoria pico en dispositivos móviles.',
         },
         'e-aug-25-2': {
             stat: { v: '+85,2%', l: 'rendimiento TLS local con tamaño de ACK (167,03 → 309,30 MB/s)' },
@@ -191,7 +191,7 @@ export default {
             },
             more: 'Pico activo 17,60 MiB · 762/762 esperas de Pack completadas · cero pérdidas de portador o de Pack · mediana de carga de Wikipedia 439,2 ms',
             meaning: 'Evidencia sólida de que la ruta H1 de tamaño fijo puede alcanzar el objetivo de 40 Mbps sin gastar más memoria.',
-            change: 'Traspaso/contrapresión H1 fiable y aislamiento de flujos lógicos',
+            change: 'Traspaso/contrapresión H1 confiable y aislamiento de flujos lógicos',
             measured: 'H1 físico con proveedor exacto: Fast.com <b>38/41/52 Mbps</b>, mediana de TTFB/carga de Wikipedia <b>181,5/439,2 ms</b>, pico activo en ejecución <b>17,60 MiB</b>; p95 en reposo <b>17,61 MiB</b> durante 345 segundos. <b>762/762</b> esperas de Pack completadas, cero pérdidas de portador/Pack. Una comparación sintética degradada de carriles con cuatro flujos midió <b>20,247→29,058 Mbps (+43,5%)</b>.',
             suites: 'Evidencia sólida de que H1 de capacidad fija puede alcanzar el objetivo de 40 Mbps sin gastar más memoria. La comparación de carriles es una señal de escenario; los tramos públicos actual–línea base–actual variaron según el proveedor y no respaldan un porcentaje único de aceleración. El trabajo posterior de custodia de recepción afina el manejo de la sobrecarga; esto es evidencia histórica, no un permiso para bloquear todo el trabajo de recepción compartido.',
         },
@@ -243,9 +243,9 @@ export default {
             },
             more: 'Escrituras máximas 3902 → 36 · medianas de carga útil 20,9 → 21,2 y 19,5 → 19,9 Mbps',
             meaning: 'La mejora está en los peores casos, no en la ejecución típica.',
-            rejected: 'Una regla propuesta de carril fiable causó bloqueos, 0/120 desactivada frente a 8/120 activada (Fisher p = 0,0069), y se quedó desactivada.',
+            rejected: 'Una regla propuesta de carril confiable causó bloqueos, 0/120 desactivada frente a 8/120 activada (Fisher p = 0,0069), y se quedó desactivada.',
             change: 'Acotar la amplificación de la retransmisión; rechazar reglas de carril dañinas',
-            measured: 'Veinte ejecuciones por brazo en dos celdas de tormenta: tormentas de timeouts <b>5/40→0/40</b>, escrituras máximas <b>3902→36</b>; medianas de carga útil solo <b>20,9→21,2</b> y <b>19,5→19,9 Mbps</b>. Una regla de carril fiable propuesta por separado produjo bloqueos del mecanismo, <b>0/120 desactivada frente a 8/120 activada</b> (Fisher p=0,0069), y se quedó <b>desactivada</b>.',
+            measured: 'Veinte ejecuciones por brazo en dos celdas de tormenta: tormentas de timeouts <b>5/40→0/40</b>, escrituras máximas <b>3902→36</b>; medianas de carga útil solo <b>20,9→21,2</b> y <b>19,5→19,9 Mbps</b>. Una regla de carril confiable propuesta por separado produjo bloqueos del mecanismo, <b>0/120 desactivada frente a 8/120 activada</b> (Fisher p=0,0069), y se quedó <b>desactivada</b>.',
             suites: 'La mejora principal es una menor amplificación en la cola. Un A/A con fuente idéntica marcó <b>15/17</b> celdas con cinco repeticiones; se retiraron los veredictos pequeños anteriores. El comportamiento rechazado de la regla de carril no debe contarse como una mejora.',
         },
         'e-sep-13': {
@@ -317,13 +317,13 @@ export default {
             meaning: 'Usar menos memoria lo hizo mucho más lento, así que el cambio se rechazó. Una menor residencia por sí sola no es mejor rendimiento.',
             change: 'Rechazar límites blandos de Go más bajos de forma general y la reducción de la topología',
             measured: 'El límite blando de 32→24 MiB cambió el eco local de <b>280,20→180,67 Mbps</b>, el RTT p95 de <b>6,426→12,629 ms</b>, los ciclos de GC de <b>177→357</b>, a cambio de solo unos <b>1,14 MiB</b> menos en ejecución en reposo. Los experimentos con ventanas de cliente más pequeñas tuvieron brazos de tráfico incompletos.',
-            suites: 'Rechazado: una menor residencia por sí sola no fue mejor rendimiento. El sustituto histórico tenía además una limitación de fiabilidad del portador descubierta más tarde, así que no es una predicción para la app actual. Los brazos de tráfico fallidos no se eliminaron para mejorar las medianas de los supervivientes.',
+            suites: 'Rechazado: una menor residencia por sí sola no fue mejor rendimiento. El sustituto histórico tenía además una limitación de confiabilidad del portador descubierta más tarde, así que no es una predicción para la app actual. Los brazos de tráfico fallidos no se eliminaron para mejorar las medianas de los supervivientes.',
         },
         'e-sep-19-21': {
             stat: { v: '22,55 MiB', l: 'pico muestreado en una ejecución física H1 acotada' },
             more: 'Mediana de carga de Wikipedia 355,3 ms, primer byte 127,7 ms · mediana de Fast.com 40 Mbps',
             meaning: 'Un aprobado solo para este ámbito: no para cada portador o rol, y sin garantía de pico continuo.',
-            change: 'Recuperación de P2P de oferta fija, asignación de paquetes y trabajo de retención/registro en móviles',
+            change: 'Recuperación de P2P de oferta fija, asignación de paquetes y trabajo de retención/registro en dispositivos móviles',
             measured: 'Una ejecución física H1 acotada posterior a glog observó un pico de <b>23.646.240 B (22,55 MiB)</b>, medianas de carga/TTFB de Wikipedia de <b>355,3/127,7 ms</b> y una mediana de Fast.com de <b>40 Mbps</b>.',
             suites: 'Un resultado aprobado <b>muestreado y acotado de 24 MiB</b>, no para todos los portadores/roles ni una garantía de pico continuo. Las pasadas anteriores en reposo con excesos del límite durante ráfagas siguieron siendo fallos.',
         },
@@ -331,8 +331,8 @@ export default {
             stat: { v: '49,33 → 23,88 ns', l: 'anexar a un grupo de paquetes existente, ahora sin asignaciones' },
             more: 'Recepción en bruto 193,9 → 169,3 ns y 280 → 168 B · tres búferes de log de 256 → 32 KiB cada uno, 688.128 B menos',
             meaning: 'Menos asignaciones y más margen. Un sumidero de logs saturado cuesta algo más, y esa compensación queda registrada.',
-            change: 'Asignación de paquetes y registro en móviles',
-            measured: 'Anexar a un grupo existente <b>49,33→23,88 ns/op</b>, <b>136→0 B/op</b>, <b>2→0 asignaciones</b>; recepción en bruto <b>193,9→169,3 ns/op</b>, <b>280→168 B/op</b>. Tres búferes de log en móviles <b>de 256→32 KiB cada uno</b>, exactamente <b>688.128 B</b> menos de capacidad.',
+            change: 'Asignación de paquetes y registro en dispositivos móviles',
+            measured: 'Anexar a un grupo existente <b>49,33→23,88 ns/op</b>, <b>136→0 B/op</b>, <b>2→0 asignaciones</b>; recepción en bruto <b>193,9→169,3 ns/op</b>, <b>280→168 B/op</b>. Tres búferes de log en dispositivos móviles <b>de 256→32 KiB cada uno</b>, exactamente <b>688.128 B</b> menos de capacidad.',
             suites: 'Mejoras de asignación/margen conservadas. El costo de un sumidero de logs saturado aumentó <b>43,54→46,13 ns/línea</b>; la compensación queda registrada en lugar de describirse como una mejora de CPU gratuita.',
         },
         'e-sep-22': {
@@ -419,7 +419,7 @@ export default {
         'e-oct-7-10': {
             meaning: 'Mejoró la medición, no la puntuación del producto: las respuestas se resuelven con sus propios plazos y todas cuentan.',
             change: 'Diagnóstico del tráfico H1 bajo carga y reparación de la medición',
-            measured: 'El fallo histórico de sondas con carga de <b>0/64</b> motivó el trabajo de propietarios/trazas. Las ejecuciones posteriores tuvieron recuentos de ofertas variables y fallos de calibración; algunas aparentes mejoras de p95/fiabilidad usaron cohortes distintas o excluyeron respuestas sin resolver.',
+            measured: 'El fallo histórico de sondas con carga de <b>0/64</b> motivó el trabajo de propietarios/trazas. Las ejecuciones posteriores tuvieron recuentos de ofertas variables y fallos de calibración; algunas aparentes mejoras de p95/confiabilidad usaron cohortes distintas o excluyeron respuestas sin resolver.',
             suites: 'Aquí no puede asignarse ninguna mejora general calificada de la velocidad de H1. Una mejor resolución, las protecciones de fuente/propietario y los denominadores completos mejoraron el sistema de medición, no la puntuación del producto.',
         },
         'e-oct-14': {
@@ -450,7 +450,7 @@ export default {
         'e-oct-20-21': {
             meaning: 'Corrección y cobertura frente a regresiones. No es un arreglo medido de las pausas vistas en dispositivos reales.',
             change: 'Conservar los canales ocupados ante el rechazo de una sonda local; aislar la admisión de la entrada nativa',
-            measured: 'Las pruebas deterministas reprodujeron un retraso serializado en la lectura nativa cuando espera una llamada de envío de paquetes; la admisión remota se hizo sin espera conservando una propiedad fiable. Las pruebas anteriores sencillas de 100 páginas pasaron con el código antiguo y el nuevo, así que no explicaban la sesión reportada.',
+            measured: 'Las pruebas deterministas reprodujeron un retraso serializado en la lectura nativa cuando espera una llamada de envío de paquetes; la admisión remota se hizo sin espera conservando una propiedad confiable. Las pruebas anteriores sencillas de 100 páginas pasaron con el código antiguo y el nuevo, así que no explicaban la sesión reportada.',
             suites: 'Corrección y cobertura frente a regresiones, no un arreglo de pausas en dispositivos reales medido de forma independiente. Hicieron falta pruebas posteriores con cuerpos en flujo para revelar atascos más profundos.',
         },
         'e-oct-21': {

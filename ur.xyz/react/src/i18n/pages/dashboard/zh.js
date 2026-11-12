@@ -52,7 +52,7 @@ export default {
         usersNote: "过去 24 小时",
         operator: "网络运营商",
         exits: "出口",
-        exitsNote: "个国家",
+        exitsNote: "个国家和地区",
     },
     titles: {
         dailyUsers: "每日用户",
@@ -62,7 +62,7 @@ export default {
         thisEpoch: "本周期",
         totalDataCarried: "累计承载数据量",
         coverage: "覆盖",
-        countries: "国家",
+        countries: "国家和地区",
         cities: "城市",
         byContinent: "按大洲",
         sn25Subnet: "SN25 子网",

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Section from './Section';
 import './PriceSection.css';
 import { useLanguage, intlLocale } from '../i18n';
+import { formatUsd as intlUsd } from '../i18n/format.js';
 import { useAlphaPrice } from '../lib/usePrice';
 import { copyText } from '../lib/clipboard';
 import { PRICE_FEED_URL, PRICE_SHEET_URL, SOURCING_WALLETS, formatAlphaExact } from '../lib/price';
@@ -10,15 +11,17 @@ import { PRICE_FEED_URL, PRICE_SHEET_URL, SOURCING_WALLETS, formatAlphaExact } f
 // browser's.
 
 // USD equivalents: 2 decimals at cents scale, 4 below a cent, and enough to
-// stay above zero under that, so a priced rate never reads as $0.00.
-const formatUsd = (n, locale) => {
+// stay above zero under that, so a priced rate never reads as $0.00. Spanish
+// names the dollar US$ ("US$0,05", format.js formatUsd), since a bare "$" also
+// means pesos where Spanish is read; every other language keeps "$".
+const formatUsd = (n, locale, code) => {
     if (!isFinite(n)) return '—';
-    if (n > 0 && n < 0.00005) return '$' + n.toLocaleString(locale, { maximumSignificantDigits: 2 });
     const digits = n >= 0.01 || n === 0 ? 2 : 4;
-    return '$' + n.toLocaleString(locale, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: digits
-    });
+    const options = n > 0 && n < 0.00005
+        ? { maximumSignificantDigits: 2 }
+        : { minimumFractionDigits: 2, maximumFractionDigits: digits };
+    if (code === 'es') return intlUsd(n, code, options);
+    return '$' + n.toLocaleString(locale, options);
 };
 
 /** An address in the code face, whole, breaking if it must only at its middle (as on /reserve). */
@@ -113,7 +116,7 @@ export default function PriceSection({ initialSheet = null }) {
     const { t, code } = useLanguage();
     const locale = intlLocale(code);
     const fmtAlphaExact = (text) => formatAlphaExact(text, locale);
-    const fmtUsd = (n) => formatUsd(n, locale);
+    const fmtUsd = (n) => formatUsd(n, locale, code);
     const p = t.price;
     const { sheet: liveSheet, alphaUsd, alphaUsdSource } = useAlphaPrice();
     const sheet = liveSheet || initialSheet;

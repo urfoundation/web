@@ -3,10 +3,11 @@
 // The terms of all three units (this one, data/ and timeline/): epoch época; settlement v2 liquidación v2;
 // mainnet red principal; network operator operador de red; subnet owner propietario de la subred; payout root
 // raíz de pagos; commit registrar; challenge period período de impugnación; claims reclamaciones; payout wallet
-// wallet de pago; governance Safe Safe de gobernanza; vault bóveda; capture the flag «Captura la bandera» (the
-// apps' name); draw sorteo (never lotería, rifa or apuesta: it is not a lottery); entry participante; pot fondo
-// acumulado (not bote); carry forward se traslada; relay retransmitir; reader addressed as tú. Figures keep the
-// English digits and separators (9,240,028; 1,076.26 α).
+// wallet de pago; governance Safe Safe de gobernanza; vault bóveda; capture the flag Captura la bandera (the
+// apps' name, without quotes, as /ctf writes it); draw sorteo (never lotería, rifa or apuesta: it is not a lottery);
+// entry participante; pot fondo acumulado (not bote); carry forward se traslada; relay retransmitir; reader
+// addressed as tú. Figures are written as Intl writes Spanish numbers, as on /ctf (9.240.028; 1076,26 α;
+// timeline.js INTL_FIGURES).
 export default {
     meta: {
         title: 'Cronología del lanzamiento de SN25 en la red principal | UR',
@@ -25,8 +26,8 @@ export default {
         eyebrow: 'Liquidación',
         title: 'Versión 1, luego liquidación v2',
         paragraphs: [
-            'SN25 paga a los proveedores por época de pago. Son las épocas de liquidación de UR, no el tempo de 72 minutos de la cadena: la época 0 duró un día, y cada época posterior dura 7 días (50,400 bloques).',
-            'La versión 1 se lanzó el 8 de octubre y liquida las épocas 1 a 3. Solo paga a los proveedores que el validador ha medido, y esa medición tiene un tope de unos 1,500 proveedores por época, así que la mayoría de los mineros no recibe ninguna parte de la versión 1.',
+            'SN25 paga a los proveedores por época de pago. Son las épocas de liquidación de UR, no el tempo de 72 minutos de la cadena: la época 0 duró un día, y cada época posterior dura 7 días (50.400 bloques).',
+            'La versión 1 se lanzó el 8 de octubre y liquida las épocas 1 a 3. Solo paga a los proveedores que el validador ha medido, y esa medición tiene un tope de unos 1500 proveedores por época, así que la mayoría de los mineros no recibe ninguna parte de la versión 1.',
             'La liquidación v2 paga según el uso y elimina ese tope. Estaba previsto que tomara el relevo desde la época 3, pero su pool no se registró antes de que la época 3 comenzara el 23 de octubre, así que la versión 1 liquida también la época 3. Su pool se registró el 29 de octubre, y la liquidación v2 ha pagado cada época desde la época 4, que comenzó hacia las 18:25 UTC del 30 de octubre. La primera época v2 terminó hacia el 6 de noviembre, y sus reclamaciones se abrieron el 8 de noviembre, después de que se registrara su raíz y terminara su período de impugnación.',
         ],
         epochsAria: 'Épocas de pago',
@@ -35,7 +36,7 @@ export default {
     milestones: {
         eyebrow: 'Cronología',
         title: 'Hitos',
-        fine: 'La hora de un hito programado o previsto es una proyección, a partir de su número de bloque a 12 segundos por bloque o del plan, y se marca con ≈ salvo que se haya fijado para una hora exacta. Una hora proyectada se mueve un poco si los bloques van más rápido o más lento. Desde la época 1, cada época se cierra dentro de los 120 bloques siguientes a su fin, su raíz de pagos debe registrarse dentro de los 1,200 bloques siguientes a su fin, y sus reclamaciones se abren 14,400 bloques (unos dos días) después de ella. Los hitos programados y previstos pueden cambiar.',
+        fine: 'La hora de un hito programado o previsto es una proyección, a partir de su número de bloque a 12 segundos por bloque o del plan, y se marca con ≈ salvo que se haya fijado para una hora exacta. Una hora proyectada se mueve un poco si los bloques van más rápido o más lento. Desde la época 1, cada época se cierra dentro de los 120 bloques siguientes a su fin, su raíz de pagos debe registrarse dentro de los 1200 bloques siguientes a su fin, y sus reclamaciones se abren 14.400 bloques (unos dos días) después de ella. Los hitos programados y previstos pueden cambiar.',
         updated: 'Actualizado el {date}.',
     },
 

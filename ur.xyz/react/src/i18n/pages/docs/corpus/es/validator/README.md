@@ -8,7 +8,7 @@ El validador de UR funciona en **Bittensor SN25, netuid 25**. El [`sn/validator`
 
 Los validadores ganan **dividendos nativos de Bittensor**. Son independientes de las recompensas de los proveedores que se reclaman de la bóveda de liquidación de UR. En la versión 1.0 no hay comando `validator claim` ni recompensa por el esfuerzo del validador. El procedimiento de retiro se describe más abajo.
 
-Esta guía trata de un validador de SN25. Un **validador de root en netuid 0** tiene registro, operación y reclamaciones de cesta propios; registrarse en root no inicia la validación de UR. Consulta la [guía del minero](/docs/miner) y la [guía del operador de red](/docs/operator) para los otros roles de UR.
+Esta guía trata de un validador de SN25. Un **validador de root en netuid 0** tiene registro, operación y reclamaciones de canasta propios; registrarse en root no inicia la validación de UR. Consulta la [guía del minero](/docs/miner) y la [guía del operador de red](/docs/operator) para los otros roles de UR.
 
 ## Antes de empezar
 
@@ -84,7 +84,7 @@ btcli -n finney query subnet-hyperparameters --netuid 25 --json
 btcli -n finney query metagraph --netuid 25 --json
 ```
 
-Revisa la disponibilidad y el coste actuales del registro antes de enviarlo. Previsualiza el [registro](https://www.bittensor.com/docs/tx/burned-register) y luego envía la misma operación con confirmación:
+Revisa la disponibilidad y el costo actuales del registro antes de enviarlo. Previsualiza el [registro](https://www.bittensor.com/docs/tx/burned-register) y luego envía la misma operación con confirmación:
 
 ```bash
 btcli -n finney -w "$VALIDATOR_WALLET" tx burned-register \
@@ -261,4 +261,4 @@ btcli -n finney -w "$VALIDATOR_WALLET" wallet balance
 
 [`remove-stake`](https://www.bittensor.com/docs/tx/remove-stake) intercambia el alpha disponible por TAO y lo abona al saldo libre de la coldkey que firma. Comprueba el resultado de la transacción finalizada y los saldos actualizados. Tu posición acumulada contiene tanto el principal como las recompensas: no existe un saldo de SN25 aparte para «reclamar solo mis ganancias». Retirar stake puede afectar a tu permiso; los bloqueos, las garantías, las comisiones y la protección de precio del pool pueden limitar una operación. Si tus recompensas se han dirigido a otra hotkey de stake, selecciona esa posición real.
 
-**Las recompensas de root son distintas.** Si también haces stake en netuid 0, el rendimiento de su cesta tiene un flujo nativo propio de reclamación de root antes del retiro. Sigue las [instrucciones de Bittensor sobre el stake en root y los dividendos](https://www.bittensor.com/docs/guides/staking#root-stake-and-dividends). No uses una reclamación de root para cobrar las recompensas ordinarias de alpha de SN25.
+**Las recompensas de root son distintas.** Si también haces stake en netuid 0, el rendimiento de su canasta tiene un flujo nativo propio de reclamación de root antes del retiro. Sigue las [instrucciones de Bittensor sobre el stake en root y los dividendos](https://www.bittensor.com/docs/guides/staking#root-stake-and-dividends). No uses una reclamación de root para cobrar las recompensas ordinarias de alpha de SN25.

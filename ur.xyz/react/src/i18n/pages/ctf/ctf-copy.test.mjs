@@ -14,7 +14,9 @@
 //   every description 175 characters, and none repeats within a language.
 // - Before a draw no sentence shows a chance (a percentage).
 // - Names: names/<lang>.js is what scripts/ctf-names.mjs writes (CLDR's names
-//   and A–Z, node's ICU permitting), complete, and each form a plain phrase.
+//   and A–Z, node's ICU permitting), complete, and each form a plain phrase;
+//   where the site departs from CLDR (format.js REGION_NAMES: 香港, 澳门 and
+//   台湾 in Chinese, Rumania and Arabia Saudita in Spanish), every form says so.
 //
 // Usage (from react/): node --test src/i18n/pages/ctf/ctf-copy.test.mjs
 import assert from 'node:assert/strict';
@@ -45,6 +47,7 @@ import {
 } from '../../../components/pages/ctf/model.js';
 import { ctfCardAlt } from '../../../components/pages/ctf/og.js';
 import { CHANCE_SHOWN, DEFAULT_WIN } from '../../../components/pages/ctf/indexing.js';
+import { REGION_NAMES } from '../../format.js';
 import group from './group.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -238,4 +241,20 @@ test('the countries\' names are CLDR\'s, complete, in each language\'s A–Z, wi
         assert.equal(NAMES.en.in[c.code], `in ${c.the}`);
     }
     assert.deepEqual(NAMES.en.order.split(' '), en.az.map((c) => c.code));
+});
+
+test('where the site names a place otherwise than CLDR, every form says the site\'s name', () => {
+    // Chinese: Hong Kong, Macao and Taiwan as the English site names them (香港, 澳门, 台湾), never CLDR's 特别行政区
+    // forms or a 中国… prefix; Spanish: the Latin American name (format.js REGION_NAMES)
+    for (const [lang, own] of Object.entries(REGION_NAMES)) {
+        for (const [CODE, name] of Object.entries(own)) {
+            const code = CODE.toLowerCase();
+            assert.equal(NAMES[lang].name[code], name, `${lang} name.${code}`);
+            assert.equal(NAMES[lang].short[code], name, `${lang} short.${code}`);
+            for (const key of ['in', 'inShort']) assert.ok(NAMES[lang][key][code].includes(name), `${lang} ${key}.${code}: ${NAMES[lang][key][code]}`);
+        }
+    }
+    for (const key of ['name', 'short', 'in', 'inShort']) {
+        for (const [code, v] of Object.entries(NAMES.zh[key])) assert.doesNotMatch(v, /特别行政区|中国(?:香港|澳门|台湾)/, `zh ${key}.${code}: ${v}`);
+    }
 });

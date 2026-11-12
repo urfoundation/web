@@ -33,9 +33,9 @@ Un archivo descargado con un navegador web queda en cuarentena. Ejecuta `xattr -
 
 ### No aparece nada al pegar el código de autorización
 
-Es intencionado: la solicitud oculta el código. Pégalo y pulsa Enter.
+Es intencionado: la solicitud oculta el código. Pégalo y presiona Enter.
 
-Para desistir, pulsa Ctrl-C: dice `Cancelled.` y no cambia nada. Pulsar Enter en la solicitud sin escribir nada dice `No auth code was entered`. Ten el código preparado antes de ejecutar `provider login` o `provider setup`.
+Para desistir, presiona Ctrl-C: dice `Cancelled.` y no cambia nada. Presionar Enter en la solicitud sin escribir nada dice `No auth code was entered`. Ten el código preparado antes de ejecutar `provider login` o `provider setup`.
 
 ### `That auth code wasn't accepted`
 
@@ -47,7 +47,7 @@ Este dispositivo ya tiene la sesión iniciada. Responde `y` para volver a inicia
 
 ### `Couldn't reach the URnetwork API`
 
-En un registro aparece como `panic: http request attempts exhausted`. El minero no pudo comunicarse con el operador. Comprueba la conexión a internet del ordenador y que las URL del operador sean correctas (`provider network`).
+En un registro aparece como `panic: http request attempts exhausted`. El minero no pudo comunicarse con el operador. Comprueba la conexión a internet de la computadora y que las URL del operador sean correctas (`provider network`).
 
 En una red que inspecciona el tráfico cifrado con su propia autoridad de certificación, como algunas redes de empresa, el minero rechaza esa autoridad. Haz que `URNETWORK_CONNECT_EXTRA_ROOT_CA_FILE` apunte a un archivo PEM que contenga solo los certificados de CA de esa red y vuelve a intentarlo. Para el servicio en segundo plano, define la variable y vuelve a ejecutar `provider service install`.
 
@@ -66,7 +66,7 @@ En una red que inspecciona el tráfico cifrado con su propia autoridad de certif
 
 `provider provide` solo lo dice cuando el dispositivo no ha iniciado sesión. En un dispositivo que nunca se registró, escribe `startup_recovery_required` en el registro a menos que añadas `--allow-client-registration`.
 
-En los demás casos, el minero imprime una línea JSON con `"event":"startup_recovery_required"` y sale. Con `provider provide`, como lo ejecutan los instaladores, sale con el código 0 y sigue detenido. `provider start` y el minero en segundo plano de `provider service` salen con el código 1, y el servicio lo reinicia cada 15 a 30 segundos: detenlo con `provider service stop` mientras restauras la carpeta. Esto suele significar que **los archivos de identidad de este dispositivo faltan o no coinciden**, por ejemplo después de pasar a un ordenador nuevo o de restaurar parte de una copia de seguridad. Restaura la carpeta `~/.urnetwork` completa desde tu copia de seguridad. Volver a iniciar sesión no sustituye una identidad perdida, y `--allow-client-registration` tampoco la recupera: solo registra dispositivos nuevos.
+En los demás casos, el minero imprime una línea JSON con `"event":"startup_recovery_required"` y sale. Con `provider provide`, como lo ejecutan los instaladores, sale con el código 0 y sigue detenido. `provider start` y el minero en segundo plano de `provider service` salen con el código 1, y el servicio lo reinicia cada 15 a 30 segundos: detenlo con `provider service stop` mientras restauras la carpeta. Esto suele significar que **los archivos de identidad de este dispositivo faltan o no coinciden**, por ejemplo después de pasar a una computadora nueva o de restaurar parte de una copia de seguridad. Restaura la carpeta `~/.urnetwork` completa desde tu copia de seguridad. Volver a iniciar sesión no sustituye una identidad perdida, y `--allow-client-registration` tampoco la recupera: solo registra dispositivos nuevos.
 
 ### `The state folder … can be changed by other users`
 
@@ -83,7 +83,7 @@ En Windows, ejecuta el comando `icacls` que imprime el mensaje.
 
 El minero se inició, pero el operador no acepta su conexión, y sigue reintentando cada pocos segundos. La página de estado sigue diciendo `"status":"ok"`, porque el proceso en sí está bien.
 
-- Asegúrate de que el ordenador tiene una conexión a internet normal, doméstica o de servidor, sin VPN ni proxy delante del minero.
+- Asegúrate de que la computadora tiene una conexión a internet normal, doméstica o de servidor, sin VPN ni proxy delante del minero.
 - Comprueba que iniciaste sesión con el operador que usa el minero (`provider network`).
 - Si continúa, pregunta a tu operador o [en nuestro Discord](https://discord.gg/urnetwork), con las líneas que rodean a `refused`.
 
@@ -106,7 +106,7 @@ Con `--all-operators`, ese operador aún no tiene sesión iniciada. Ejecuta `pro
 El minero no pudo escuchar en el puerto TCP 443, así que su extensor está desactivado. Vuelve a intentarlo cada 3 minutos.
 
 - `tcp_443_permission_denied`: en Linux, un minero que se ejecuta con tu usuario no tiene permiso para escuchar en los puertos por debajo de 1024. Instálalo como un servicio del sistema que sí pueda: con el instalador, `curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_Install_Linux.sh | sh -s -- --system`; con `provider service`, `sudo "$(command -v provider)" service install --system --as="$USER"`. Consulta [Permitir que el minero escuche en el puerto 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443).
-- `tcp_443_in_use`: otro programa tiene el puerto, como un servidor web u otro proceso del minero en el mismo ordenador. Solo un programa por ordenador puede tenerlo; el minero lo toma en los 3 minutos siguientes a que quede libre.
+- `tcp_443_in_use`: otro programa tiene el puerto, como un servidor web u otro proceso del minero en la misma computadora. Solo un programa por computadora puede tenerlo; el minero lo toma en los 3 minutos siguientes a que quede libre.
 - `tcp_443_bind_failed`: falló por otro motivo. Lee las líneas del registro que hay alrededor.
 
 ### El extensor no es accesible por TCP 443

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CTF } from './ctf/data';
 import Board from './ctf/Board';
-import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, OPERATOR_YML, alpha, dayName, utcClock, utcDay } from './ctf/model';
+import { API_STATE, EPOCH4_SLOT_RAO, EXTENDER_URL, FLAGS_LICENSE, METHOD_URL, OPERATOR_YML, SOURCE_URL, alpha, dayName, defaultWinRule, utcClock, utcDay } from './ctf/model';
 import './Ctf.css';
 
 /**
@@ -33,7 +33,7 @@ export default function CtfPage({ updated = null, board = null }) {
                     <p className="ctf-intro">
                         <span className="ctf-answer">Run the free URnetwork app as a provider or an extender, and you can win weekly crypto rewards wherever you are.</span>{' '}
                         {m.phase === 'prelaunch' && <>Capture the flag starts with epoch {m.firstEpoch}, at about {utcClock(m.startsAt)} on {utcDay(m.startsAt)}. </>}
-                        Every country has ten slots each epoch (one week): five for providers and five for extenders. A slot nobody wins rolls into that country's pot, and each winner there takes its slot and a fifth of the pot. Where a slot went unclaimed, a new miner who stays online for half the epoch wins by default.
+                        Every country has ten slots each epoch (one week): five for providers and five for extenders. A slot nobody wins rolls into that country's pot, and each winner there takes its slot and a fifth of the pot. {defaultWinRule(m)}
                     </p>
                 </header>
 
@@ -91,7 +91,9 @@ function HubQuestions({ m }) {
             title="Questions"
             items={[
                 ['What is capture the flag?', <>A weekly reward on URnetwork, Bittensor subnet 25. Every country has five provider slots and five extender slots each epoch (one week), and winners are paid in alpha, the subnet's token. A slot that nobody wins adds its amount to that country's pot, so a newcomer to an empty country takes a fifth of the pot every epoch it stays.{!live && <> It starts with epoch {m.firstEpoch}, at about {utcClock(m.startsAt)} on {utcDay(m.startsAt)}.</>}</>],
-                ['How do I win a slot?', <>Run the free URnetwork app as a provider or an extender, keep it online in your country for at least half the epoch, and be online when it ends. Where a slot went unclaimed last epoch, a newcomer wins by default. Where all five were won, a public draw picks five winners.</>],
+                ['How do I win a slot?', m.drawn
+                    ? <>Run the free URnetwork app as a provider or an extender, keep it online in your country for at least half the epoch, and be online when it ends. Where a slot went unclaimed last epoch, a newcomer wins by default. Where all five were won, a public draw picks five winners.</>
+                    : <>Run the free URnetwork app as a provider or an extender, keep it online in your country for at least half the epoch, and be online when it ends. A public draw then picks up to five winners per country for each role, and with five entries or fewer, everyone wins.</>],
                 ['How much can I earn?', <>{slotWorth(m)}, and a winner in a country with a pot also takes a fifth of that pot. Amounts change every epoch with the network's emission and with how many people run in each country, and alpha's price moves. Nothing is guaranteed.</>],
                 ['Is it passive income, or a job?', <>Neither, quite. The app runs in the background on a phone or computer you already have, but it earns only while it stays online. It is not a job, with no employer, hours or wage, and not an investment, with no fixed return.</>],
                 ['What is the difference between a provider and an extender?', <>A provider shares your internet connection with the people who use URnetwork. An extender is a relay for people who cannot reach the network directly, for example behind censorship. The desktop app runs both by default, and one device can win in both roles. An extender works only where the internet can reach your computer on TCP port 443: <a href={EXTENDER_URL}>Run an extender</a> says how to open it.</>],
@@ -109,8 +111,9 @@ export function FinePrint({ m, updated }) {
             {m.potsKnown
                 ? <p>Up for grabs is an estimate: the pots carried in, plus this epoch's ten slots at last epoch's slot amount of {alpha(m.slot, 3)} α. Every draw can be checked against its on-chain census and drand round at <a href={API_STATE}>/sn/ctf</a>.</p>
                 : <p>Every draw can be checked against its on-chain census and drand round, published at <a href={API_STATE}>/sn/ctf</a> from epoch {m.firstEpoch}.</p>}
-            <p id="chance-to-win">Chance to win shows where all five of a role's slots were won last epoch. Its entries are last epoch's eligible units in that role plus you, and it is 5 ÷ entries, the exact odds of a draw of five winners; with five entries or fewer, everyone wins. Where a slot went unclaimed, a new miner wins by default.</p>
-            <p>Rewards are paid in alpha, the token of Bittensor subnet 25, whose value changes and can fall. They depend on uptime, on how many others run in each country and on the network's emission. They are not wages, a salary, a guaranteed income or an investment, and you pay your own costs, such as power and data.</p>
+            <p id="chance-to-win">Chance to win shows where all five of a role's slots were won last epoch. Its entries are last epoch's eligible units in that role plus you, and it is 5 ÷ entries, the exact odds of a draw of five winners; with five entries or fewer, everyone wins.{m.drawn && ' Where a slot went unclaimed, a new miner wins by default.'}</p>
+            <p>Rewards are paid in alpha, the token of Bittensor subnet 25, whose value changes and can fall. They depend on uptime, on how many others run in each country and on the network's emission. They are not wages, a salary, a guaranteed income or an investment, and you pay your own costs, such as power and data. Local law applies.</p>
+            <p>Capture the flag is paid by the CTF pool of URnetwork, SN25's network operator 1 (<a href="https://ur.io">ur.io</a>, <a href="mailto:support@ur.xyz">support@ur.xyz</a>). Its rules are public: the method in <a href={METHOD_URL}>CAPTURETHEFLAG.md</a>, and the code in <a href={SOURCE_URL}>the subnet's repository</a>.</p>
             <p>
                 Country pages are built from each epoch's public data.
                 {m.presence && <> Providers online are the network dashboard's count at the end of {dayName(m.presence.day)}.</>}

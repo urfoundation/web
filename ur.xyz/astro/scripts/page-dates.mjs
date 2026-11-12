@@ -233,7 +233,8 @@ function sourcesFor(urlPath) {
         return ['react/src/components/pages/Mainnet.jsx', 'react/src/components/pages/mainnet/timeline.js', 'react/src/data/mainnet-timeline.json', 'react/src/data/mainnet.js', 'astro/src/pages/mainnet.astro'];
     }
     if (name === 'ctf' || name.startsWith('ctf/')) {
-        return ['react/src/components/pages/Ctf.jsx', 'react/src/components/pages/CtfCountry.jsx', 'react/src/components/pages/ctf/model.js', 'react/src/data/ctf-epoch.json', 'astro/src/pages/ctf.astro', 'astro/src/pages/ctf/[cc].astro'];
+        const ctf = ['model.js', 'parts.jsx', 'Board.jsx', 'CountryIslands.jsx', 'data.js', 'og.js'].map((f) => `react/src/components/pages/ctf/${f}`);
+        return ['react/src/components/pages/Ctf.jsx', 'react/src/components/pages/CtfCountry.jsx', 'react/src/components/pages/Ctf.css', ...ctf, 'react/src/data/ctf-epoch.json', 'react/src/data/ctf-local-notes.js', 'astro/src/pages/ctf.astro', 'astro/src/pages/ctf/[cc].astro'];
     }
     if (name === 'research/methodology') {
         return ['react/src/components/pages/ResearchMethodology.jsx', 'react/src/components/ResearchLoops.jsx', 'react/src/data/research-methodology.js', 'astro/src/pages/research/methodology.astro'];

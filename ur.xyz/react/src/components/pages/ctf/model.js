@@ -28,7 +28,9 @@ export const API_ORIGIN = 'https://api.bringyour.com';
 export const API_STATE = `${API_ORIGIN}/sn/ctf`;
 export const API_HERE = `${API_ORIGIN}/sn/ctf/here`;
 export const apiCountry = (code) => `${API_ORIGIN}/sn/ctf/country/${code}`;
-export const OPERATOR_YML = 'https://github.com/urfoundation/sn/blob/main/api/operator.yml';
+export const SOURCE_URL = 'https://github.com/urfoundation/sn';
+export const OPERATOR_YML = `${SOURCE_URL}/blob/main/api/operator.yml`;
+export const METHOD_URL = `${SOURCE_URL}/blob/main/CAPTURETHEFLAG.md`;
 export const FLAGS_LICENSE = '/ctf/flags/LICENSE.txt';
 // where the calls to action go: the free URnetwork app (design.html), and for
 // an extender the miner guide's chapter on running one (its TCP port 443)
@@ -123,8 +125,9 @@ export function countdown(ms) {
 // ── the model ───────────────────────────────────────────────────────────────
 
 // A name's place in A–Z, the same in every engine (no locale collation, so a
-// page renders and hydrates in one order): accents folded, then the code.
-const foldName = (name) => name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+// page renders and hydrates in one order): accents folded, then the code. The
+// search and the picker fold the same way ("cote" finds Côte d'Ivoire).
+export const foldName = (name) => name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 export const byName = (a, b) => (a.sortKey < b.sortKey ? -1 : a.sortKey > b.sortKey ? 1 : a.code < b.code ? -1 : 1);
 // Pots within 0.1 α of each other count as equal and fall back to A–Z (bucketed, so the order is consistent).
 const potBucket = (rao) => Math.round(rao / 1e8);
@@ -167,6 +170,7 @@ export function buildModel(snap) {
             short: the.replace(/^the /, ''),
             The: the.charAt(0).toUpperCase() + the.slice(1),
             sortKey: foldName(c.name),
+            shortKey: foldName(the.replace(/^the /, '')),
             inhabited: c.inhabited,
             flagHeld: c.flag_held,
             openEpochs: c.open_epochs,
@@ -174,6 +178,8 @@ export function buildModel(snap) {
             awarded: c.awarded,
             online: c.online,
             seenDays: c.seen_days,
+            lastSeen: c.last_seen,
+            peak: c.peak,
             p,
             x,
             pots,
@@ -230,18 +236,58 @@ export function hubDescription(m) {
     return `${lead} Capture the flag starts with epoch ${m.firstEpoch} on ${utcDay(m.startsAt)}: see every country's slots.`;
 }
 
-/** The providers the dashboard counted online in a country, as a sentence (null without the counts). */
+/**
+ * The providers the dashboard counted online in a country, as a sentence
+ * (null without the counts): at the end of the snapshot's day, and over the
+ * window the days with any, the last of them and the most at the end of a day.
+ */
 export function presenceSentence(m, c) {
     if (!m.presence || c.online === null) return null;
     const { day, days } = m.presence;
     const when = `at the end of ${dayName(day)}`;
     if (c.seenDays === 0) return `The network's dashboard counted no provider online in ${c.the} ${when}, or at the end of any of the ${days} days before.`;
-    const seen = `and had providers there on ${int(c.seenDays)} of the last ${days} days`;
-    if (c.online === 0) return `The network's dashboard counted no provider online in ${c.the} ${when}, ${seen}.`;
-    return `The network's dashboard counted ${plural(c.online, 'provider', 'providers')} online in ${c.the} ${when}, ${seen}.`;
+    const most = c.peak === 1 ? 'one at most' : `${int(c.peak)} at most`;
+    if (c.online === 0) {
+        return `The network's dashboard counted no provider online in ${c.the} ${when}; it last counted any there at the end of ${dayName(c.lastSeen)}, and on ${int(c.seenDays)} of the last ${days} days, ${most}.`;
+    }
+    return `The network's dashboard counted ${plural(c.online, 'provider', 'providers')} online in ${c.the} ${when}, and providers there on ${int(c.seenDays)} of the last ${days} days, ${most}.`;
 }
 
-/** A country page's meta description, from its data; within 175 characters (`updated` is the day the page last changed). */
+/** A territory without a permanent population: what becomes of its slots. */
+export function uninhabitedSentence(c) {
+    return c.inhabited ? null : `${c.The} has no permanent population, so its slots may never be won: its pots grow every epoch and stay on the grid, and Easy wins leaves it out.`;
+}
+
+/**
+ * The rule a newcomer meets, as the data allows: after a draw, an unclaimed
+ * slot is a default win; without one, only the draw's own rule (five entries
+ * or fewer all win), since there is no last epoch to say which slots were open.
+ */
+export function defaultWinRule(m) {
+    return m.drawn
+        ? 'Where a slot went unclaimed, a new miner who stays online for half the epoch wins by default.'
+        : "Each country's draw picks up to five winners per role, and with five entries or fewer, every entry wins a slot.";
+}
+
+/** What a country's last epoch adds to its page: its winners' take, its near misses and the epochs without a winner. */
+export function lastEpochFacts(m, c) {
+    if (!m.potsKnown) return null;
+    const parts = [];
+    if (m.drawn) {
+        parts.push(c.won > 0 ? `Its ${plural(c.won, 'winner', 'winners')} took ${alpha(c.awarded)} α in all.` : 'Nobody won a slot there.');
+        if (c.near > 0) parts.push(`${plural(c.near, 'miner was', 'miners were')} there but fell short of the presence rule.`);
+    }
+    if (c.openEpochs > 0) parts.push(`It has had no winner for ${plural(c.openEpochs, 'epoch', 'epochs')}.`);
+    return parts.join(' ') || null;
+}
+
+/**
+ * A country page's meta description, from its data; within 175 characters.
+ * `updated` is the day the page last changed (the build passes the lastmod
+ * token, which becomes a YYYY-MM-DD day): the length is measured with a day's
+ * ten characters, and the token goes in after.
+ */
+const A_DAY = '0000-00-00';
 export function countryDescription(m, c, updated) {
     let forms;
     if (m.phase === 'drawn' || m.phase === 'undrawn') {
@@ -249,7 +295,9 @@ export function countryDescription(m, c, updated) {
         const lead = m.drawn
             ? `${c.The} this epoch: ${SLOTS_PER_ROLE - c.p.won} provider and ${SLOTS_PER_ROLE - c.x.won} extender slots open, with ${pots}.`
             : `${c.The} this epoch: no draw last epoch, so every slot carried, with ${pots}.`;
-        forms = [`${lead} Stay online for half the epoch to win. Updated ${updated}.`, `${lead} Updated ${updated}.`, lead];
+        // with a slot open a newcomer wins by default; where all ten were won, or without a draw, it enters the draw
+        const stay = m.drawn && (c.p.open || c.x.open) ? 'Stay online for half the epoch to win.' : 'Stay online for half the epoch to enter the draw.';
+        forms = [`${lead} ${stay} Updated ${A_DAY}.`, `${lead} Updated ${A_DAY}.`, lead];
     } else {
         const start = {
             prelaunch: () => `${c.The} has five provider and five extender reward slots each epoch from epoch ${m.firstEpoch}, ${utcDay(m.startsAt)}.`,
@@ -261,7 +309,7 @@ export function countryDescription(m, c, updated) {
             : ` No provider was online there on ${dayName(m.presence.day)}.`;
         forms = [`${start}${seen}`, start];
     }
-    return forms.find((d) => d.length <= DESCRIPTION_MAX) || forms[forms.length - 1];
+    return (forms.find((d) => d.length <= DESCRIPTION_MAX) || forms[forms.length - 1]).replace(A_DAY, updated);
 }
 
 /** What a newcomer can do in a country this epoch, in a sentence: the page's intro and its card. */
@@ -411,14 +459,14 @@ const rank = (c) => (c.hot ? 0 : c.big ? 1 : 2);
 
 /** The grid's countries for a sort, a filter, a search and a focus (a stats filter). */
 export function gridCountries(m, { sort = 'az', show = 'all', q = '', focus = null } = {}) {
-    const query = q.trim().toLowerCase();
+    const query = foldName(q.trim());
     const rows = m.countries.filter((c) => {
         if (focus === 'held') return c.flagHeld;
         if (focus === 'np') return c.p.open;
         if (focus === 'nx') return c.x.open;
         if (show === 'big' && !c.big) return false;
         if (show === 'held' && !c.flagHeld) return false;
-        if (query && !c.name.toLowerCase().includes(query) && !c.short.toLowerCase().includes(query) && c.code !== query) return false;
+        if (query && !c.sortKey.includes(query) && !c.shortKey.includes(query) && c.code !== query) return false;
         return true;
     });
     let order = byName;
@@ -428,6 +476,17 @@ export function gridCountries(m, { sort = 'az', show = 'all', q = '', focus = nu
     else if (!focus && sort === 'online') order = (a, b) => ((b.online || 0) - (a.online || 0)) || byName(a, b);
     else if (!focus && sort === 'fewest') order = (a, b) => (Number(a.inhabited === false) - Number(b.inhabited === false)) || ((a.online || 0) - (b.online || 0)) || byName(a, b);
     return rows.sort(order);
+}
+
+/** The grid cell a tip belongs to: its key is "<kind>:<code>" for the cell's ribbon, chips and chances (an Easy wins card's "feat:" is not the cell's). */
+export const GRID_TIP_KINDS = ['grid', 'p', 'x', 'pc', 'xc'];
+export const isCellTip = (key, code) => Boolean(key) && GRID_TIP_KINDS.some((kind) => key === `${kind}:${code}`);
+
+/** The country a typed choice names: its name, its sentence name or its code, accents folded; null for none. */
+export function findCountry(m, text) {
+    const v = foldName(text.trim());
+    if (!v) return null;
+    return m.countries.find((c) => c.sortKey === v || c.shortKey === v || c.code === v) || null;
 }
 
 /** The pages before and after a country's in A–Z, wrapping around. */

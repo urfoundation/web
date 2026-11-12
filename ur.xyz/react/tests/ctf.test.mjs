@@ -31,19 +31,26 @@ import {
     countryDescription,
     countryMessage,
     countryTitle,
+    defaultWinRule,
     easyPool,
+    findCountry,
     easyWins,
     gridCountries,
     hubDescription,
+    isCellTip,
+    lastEpochFacts,
     neighbours,
     neutralCountry,
     nextStep,
     pct,
+    presenceSentence,
     roleDetail,
     roleLine,
     staticSeed,
+    uninhabitedSentence,
     winEstimate,
 } from '../src/components/pages/ctf/model.js';
+import { CTF_LOCAL_NOTES } from '../src/data/ctf-local-notes.js';
 import { ctfOgImage } from '../src/components/pages/ctf/og.js';
 import { buildPath, parseRoute } from '../src/router.js';
 import { SLOT, SNAPSHOT, amount, drawnAnswer, firstAnswer } from './ctf-fixtures.mjs';
@@ -118,8 +125,8 @@ test('the pre-launch import reads the server\'s country table and the dashboard\
     const history = { countries: { '2026-11-09': { AD: 2, CD: 0 }, '2026-11-10': { AD: 1, US: 9 } } };
     const presence = presenceFrom(history, '2026-11-10');
     assert.deepEqual(presence.meta, { source: 'https://ur.xyz/dashboard', day: '2026-11-10', days: 2 });
-    assert.deepEqual(presence.byCode.ad, { online: 1, seen_days: 2 });
-    assert.deepEqual(presence.byCode.cd, { online: 0, seen_days: 0 });
+    assert.deepEqual(presence.byCode.ad, { online: 1, seen_days: 2, last_seen: '2026-11-10', peak: 2 });
+    assert.deepEqual(presence.byCode.cd, { online: 0, seen_days: 0, last_seen: null, peak: 0 });
     const s = prelaunch({ names, presence, now: Date.UTC(2026, 10, 11), bounds: { startBlock: 9_600_028, endBlock: 9_650_428, startMs: Date.UTC(2026, 10, 27, 18, 25, 24), endMs: Date.UTC(2026, 11, 4, 18, 25, 24) } });
     assert.equal(s.countries.find((c) => c.code === 'cd').online, 0);
     assert.equal(s.countries.find((c) => c.code === 'ci').seen_days, 0);
@@ -190,7 +197,7 @@ test('without a draw last epoch the pages claim no default win and show no chanc
     for (const phase of ['committed', 'first', 'pending', 'undrawn']) {
         const m = MODELS[phase];
         for (const c of m.countries) {
-            const said = [countryMessage(m, c), roleLine(m, c, 'p'), roleLine(m, c, 'x'), countryDescription(m, c, DAY)].join(' ');
+            const said = [countryMessage(m, c), roleLine(m, c, 'p'), roleLine(m, c, 'x'), countryDescription(m, c, DAY), lastEpochFacts(m, c) || '', defaultWinRule(m)].join(' ');
             assert.ok(!/wins by default|win by default|chance to win|\d%/.test(said), `${phase} ${c.code}: ${said}`);
             assert.equal(c.p.chance, null);
             assert.equal(c.p.open, false);
@@ -200,6 +207,69 @@ test('without a draw last epoch the pages claim no default win and show no chanc
     }
     const m = MODELS.undrawn;
     assert.ok(/no draw last epoch/.test(roleDetail(m, m.countries[0], 'p')));
+});
+
+test('a later draw pending after a drawn epoch is refused: the pages would be an epoch off', () => {
+    const answer = drawnAnswer();
+    answer.current_epoch = { ...answer.current_epoch, epoch: 10 };
+    answer.pending_draw = { epoch: 9, census_hash: null, census_block: null, round: null };
+    assert.deepEqual(apiProblems(answer), [], 'the answer itself is valid');
+    assert.match(snapshotProblems(normalize(answer, null)).join(' '), /epoch 9's draw is pending after a drawn epoch/);
+});
+
+test('a country page says what its dashboard counts and its last epoch add, and a territory without people says so', () => {
+    const m = MODELS.committed;
+    const byCode = m.byCode;
+    const lastSeenOnly = m.countries.find((c) => c.online === 0 && c.seenDays > 0);
+    assert.match(presenceSentence(m, lastSeenOnly), new RegExp(`last counted any there at the end of [A-Z][a-z]+ \\d+, and on ${lastSeenOnly.seenDays} of the last \\d+ days, (one|\\d+) at most\\.$`));
+    const online = m.countries.find((c) => c.online > 1);
+    assert.match(presenceSentence(m, online), /providers online in .* at the end of [A-Z][a-z]+ \d+, and providers there on \d+ of the last \d+ days, [\d,]+ at most\.$/);
+    assert.match(uninhabitedSentence(byCode.get('aq')), /^Antarctica has no permanent population/);
+    assert.equal(uninhabitedSentence(byCode.get('ke')), null);
+    assert.equal(lastEpochFacts(m, byCode.get('ke')), null, 'nothing before a root');
+    const d = MODELS.drawn;
+    const winners = d.countries.find((c) => c.won > 0);
+    assert.match(lastEpochFacts(d, winners), new RegExp(`winners? took ${winners.awarded / 1e9 >= 0 ? '' : ''}`));
+    assert.match(lastEpochFacts(MODELS.undrawn, MODELS.undrawn.countries.find((c) => c.openEpochs > 0)), /no winner for \d+ epochs?/);
+});
+
+test('the description measures a day, not the build\'s lastmod token, and a flag held enters the draw', () => {
+    const TOKEN = '__UR_PAGE_LASTMOD__';
+    for (const m of [MODELS.drawn, MODELS.undrawn, MODELS.committed]) {
+        for (const c of m.countries) {
+            assert.equal(countryDescription(m, c, TOKEN).replace(TOKEN, DAY), countryDescription(m, c, DAY), c.code);
+        }
+    }
+    const d = MODELS.drawn;
+    const held = d.countries.find((c) => c.flagHeld);
+    if (held) assert.ok(!/to win\./.test(countryDescription(d, held, DAY)), 'a held flag promises no win');
+    const open = d.countries.find((c) => c.p.open && countryDescription(d, c, DAY).includes('Stay online'));
+    assert.match(countryDescription(d, open, DAY), /Stay online for half the epoch to win\./);
+});
+
+test('a grid cell\'s tips are its own: an Easy wins card\'s is not', () => {
+    for (const kind of ['grid', 'p', 'x', 'pc', 'xc']) assert.equal(isCellTip(`${kind}:ke`, 'ke'), true, kind);
+    assert.equal(isCellTip('feat:ke', 'ke'), false);
+    assert.equal(isCellTip('p:ke', 'ng'), false);
+    assert.equal(isCellTip(null, 'ke'), false);
+});
+
+test('the search and the picker fold accents', () => {
+    const m = MODELS.committed;
+    for (const [typed, code] of [['cote d\'ivoire', 'ci'], ['turkiye', 'tr'], ['reunion', 're'], ['curacao', 'cw'], ['Aland Islands', 'ax'], ['the dr congo', null], ['dr congo', 'cd'], ['KE', 'ke'], ['niger', 'ne']]) {
+        assert.equal(findCountry(m, typed)?.code ?? null, code, typed);
+    }
+    assert.ok(gridCountries(m, { q: 'cote' }).some((c) => c.code === 'ci'));
+    assert.ok(gridCountries(m, { q: 'türk' }).some((c) => c.code === 'tr'));
+});
+
+test('local notes, when written, are dated and reviewed for one of the 249', () => {
+    const codes = new Set(SNAPSHOT.countries.map((c) => c.code));
+    for (const [code, note] of Object.entries(CTF_LOCAL_NOTES)) {
+        assert.ok(codes.has(code), code);
+        assert.match(note.reviewed, /^\d{4}-\d{2}-\d{2}$/, code);
+        assert.ok(typeof note.text === 'string' && note.text.length > 40, code);
+    }
 });
 
 test('after a draw, an open role wins by default and a fully captured one shows its chance', () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { CTF } from './data';
 import { countryPath, easyWins, staticSeed } from './model';
-import { CountryCard, CountryPicker, EasyWinsSection, LiveBar, useMounted, useNow, useTips } from './parts';
+import { CountryCard, CountryPicker, EasyWinsSection, LiveBar, useMounted, useNow, useTips, useViewTransition } from './parts';
 
 /**
  * The islands of a country page (ur.xyz/ctf/<cc>), from design.html's
@@ -18,7 +18,7 @@ export function CountryLive({ code, m = CTF }) {
     const tips = useTips();
     return (
         <>
-            <LiveBar m={m} now={now} hub />
+            <LiveBar m={m} now={now} mounted={mounted} hub />
             <CountryCard
                 m={m}
                 c={c}
@@ -33,21 +33,24 @@ export function CountryLive({ code, m = CTF }) {
 export function CountryEasyWins({ code, m = CTF }) {
     const tips = useTips();
     const mounted = useMounted();
+    const [ref, transition] = useViewTransition();
     const [seed, setSeed] = useState(() => staticSeed(m, code));
     const [expanded, setExpanded] = useState(null);
     useEffect(() => { setSeed(Math.floor(Math.random() * 0xffffffff)); }, []);
     const picks = useMemo(() => easyWins(m, seed, code), [m, seed, code]);
     if (!picks.length) return null;
     return (
-        <EasyWinsSection
-            m={m}
-            picks={picks}
-            title="Other big pots this epoch"
-            mounted={mounted}
-            tips={tips}
-            expanded={expanded}
-            onExpand={(other) => setExpanded((cur) => (cur === other ? null : other))}
-            onShuffle={() => { setSeed(Math.floor(Math.random() * 0xffffffff)); tips.api.clear(); }}
-        />
+        <div ref={ref}>
+            <EasyWinsSection
+                m={m}
+                picks={picks}
+                title="Other big pots this epoch"
+                mounted={mounted}
+                tips={tips}
+                expanded={expanded}
+                onExpand={(other) => transition(() => { setExpanded((cur) => (cur === other ? null : other)); tips.api.clear(); })}
+                onShuffle={() => { setSeed(Math.floor(Math.random() * 0xffffffff)); tips.api.clear(); }}
+            />
+        </div>
     );
 }

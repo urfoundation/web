@@ -2,7 +2,8 @@ import React from 'react';
 import { CTF } from './ctf/data';
 import { CountryEasyWins, CountryLive } from './ctf/CountryIslands';
 import { Flag } from './ctf/parts';
-import { HUB_PATH, alpha, countryMessage, countryPath, dayName, int, neighbours, pct, presenceSentence, utcClock, utcDay, utcTime } from './ctf/model';
+import { HUB_PATH, alpha, countryMessage, countryPath, dayName, int, lastEpochFacts, neighbours, pct, presenceSentence, uninhabitedSentence, utcClock, utcDay, utcTime } from './ctf/model';
+import { CTF_LOCAL_NOTES } from '../../data/ctf-local-notes';
 import { FinePrint, HowItWorks, Questions, slotWorth } from './Ctf';
 import './Ctf.css';
 
@@ -25,6 +26,8 @@ export default function CtfCountryPage({ code, updated = null, live = null, easy
     const c = m.byCode.get(code);
     if (!c) return null;
     const presence = presenceSentence(m, c);
+    const facts = lastEpochFacts(m, c);
+    const empty = uninhabitedSentence(c);
     const asOf = m.potsKnown ? `As of epoch ${m.last.epoch}'s ${m.drawn ? 'draw' : 'close'}, ${utcDay(m.asOf)}: ` : '';
     const { prev, next } = neighbours(m, code);
     return (
@@ -33,10 +36,10 @@ export default function CtfCountryPage({ code, updated = null, live = null, easy
                 <header className="ctf-hdr">
                     <nav className="ctf-crumbs" aria-label="Breadcrumb"><a href={HUB_PATH}>Capture the flag</a><span aria-hidden="true">›</span><span aria-current="page">{c.short}</span></nav>
                     <h1>Earn crypto in {c.the} with your internet connection</h1>
-                    <p className="ctf-mission">Five provider and five extender slots in {c.the} every epoch</p>
+                    <p className="ctf-mission">Five provider and five extender slots in {c.the} every epoch (one week)</p>
                     <p className="ctf-intro">
                         <span className="ctf-answer">Run the free URnetwork app in {c.the} as a provider or an extender, and you can win weekly crypto rewards.</span>{' '}
-                        {asOf}{countryMessage(m, c)}{presence && <> {presence}</>} Rewards are paid in alpha, the token of Bittensor subnet 25, and are not guaranteed.
+                        {asOf}{countryMessage(m, c)}{facts && <> {facts}</>}{empty && <> {empty}</>}{presence && <> {presence}</>} Rewards are paid in alpha, the token of Bittensor subnet 25, and are not guaranteed.
                     </p>
                 </header>
 
@@ -46,7 +49,8 @@ export default function CtfCountryPage({ code, updated = null, live = null, easy
 
                 {easyWins || <CountryEasyWins code={code} />}
 
-                <nav className="ctf-sec ctf-around" aria-label="More countries">
+                {/* about other countries: the seo-audit leaves it out of what this page says of its own */}
+                <nav className="ctf-sec ctf-around" aria-label="More countries" data-ctf-elsewhere="">
                     <Around m={m} c={prev} dir="prev" />
                     <a className="ctf-btn ctf-btn-s" href={HUB_PATH}>All 249 countries</a>
                     <Around m={m} c={next} dir="next" />
@@ -80,9 +84,10 @@ const entries = (won, units, role) => (units === 0
 
 function CountryQuestions({ m, c }) {
     const the = c.the;
+    const note = CTF_LOCAL_NOTES[c.code] || null;
     let earn;
     if (m.drawn) {
-        earn = <>Yes, in small amounts. {slotWorth(m)}, and the pots carried in {the} are <b>{alpha(c.p.pot)} α</b> for providers and <b>{alpha(c.x.pot)} α</b> for extenders. Each winner takes its slot and a fifth of its role's pot. Last epoch, {entries(c.p.won, c.p.units, 'provider')} and {entries(c.x.won, c.x.units, 'extender')}. Rewards are paid in alpha, whose value changes, and nothing is guaranteed.</>;
+        earn = <>Yes, in small amounts. {slotWorth(m)}, and the pots carried in {the} are <b>{alpha(c.p.pot)} α</b> for providers and <b>{alpha(c.x.pot)} α</b> for extenders. Each winner takes its slot and a fifth of its role's pot. Last epoch, {entries(c.p.won, c.p.units, 'provider')} and {entries(c.x.won, c.x.units, 'extender')}{c.won > 0 && <>, and its winners took {alpha(c.awarded)} α</>}. Rewards are paid in alpha, whose value changes, and nothing is guaranteed.</>;
     } else if (m.phase === 'undrawn') {
         earn = <>Yes, in small amounts. Epoch {m.last.epoch} had no draw, so every slot carried: the pots in {the} are now <b>{alpha(c.p.pot)} α</b> for providers and <b>{alpha(c.x.pot)} α</b> for extenders. {slotWorth(m)}, and each winner takes its slot and a fifth of its role's pot. Rewards are paid in alpha, whose value changes, and nothing is guaranteed.</>;
     } else {
@@ -108,7 +113,7 @@ function CountryQuestions({ m, c }) {
                 [`Is it remote work in ${the}?`, <>No. Capture the flag is not a job: there is no employer, no hours and no wage. It can run alongside remote work or any other job, on the internet connection you already have.</>],
                 [`Provider or extender: which should I run in ${the}?`, advice],
                 ['How are winners chosen, and can I check?', <>When the epoch ends, the operator commits the list of eligible miners in {the} on chain, and a drand round published after it draws up to five winners per role. With five entries or fewer, everyone wins. Miners in one /29 or /48 share a single entry. Each draw's census and round are public.</>],
-                ['How do I get paid?', <>Winnings go to the payout wallet the app already uses, and you claim them with your pool earnings in the app.</>],
+                ['How do I get paid?', <>Winnings go to the payout wallet the app already uses, and you claim them with your pool earnings in the app. Local law in {the} applies to what you earn and how you cash it out.{note && <><br /><br />Local note for {the}, reviewed <time dateTime={note.reviewed}>{note.reviewed}</time>: {note.text}</>}</>],
             ]}
         />
     );

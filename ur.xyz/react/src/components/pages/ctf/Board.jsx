@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { CTF } from './data';
 import {
     alpha,
@@ -25,6 +24,7 @@ import {
     useMounted,
     useNow,
     useTips,
+    useViewTransition,
 } from './parts';
 
 /**
@@ -51,8 +51,7 @@ import {
  * comes after.
  */
 export default function Board({ m = CTF }) {
-    const rootRef = useRef(null);
-    const running = useRef(0);
+    const [rootRef, transition] = useViewTransition();
     const now = useNow();
     const mounted = useMounted();
     const tips = useTips();
@@ -72,28 +71,6 @@ export default function Board({ m = CTF }) {
         const asked = new URLSearchParams(window.location.search).get('focus');
         if (m.drawn && ['held', 'np', 'nx'].includes(asked)) setFocus(asked);
     }, [m]);
-
-    // A change that moves the page's sections runs as a view transition where
-    // the browser has them, with the parts named only while it runs.
-    const transition = useCallback((mutate) => {
-        const page = rootRef.current?.closest('.ctf-page');
-        const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-        if (!page || reduce || !document.startViewTransition) {
-            mutate();
-            return;
-        }
-        // the parts keep their names until the last of overlapping transitions ends
-        running.current += 1;
-        page.classList.add('ctf-vt');
-        const t = document.startViewTransition(() => flushSync(mutate));
-        // a transition skipped by the next one (a quick second tap) rejects `ready`;
-        // the change itself has still been made
-        t.ready.catch(() => {});
-        t.finished.catch(() => {}).finally(() => {
-            running.current -= 1;
-            if (!running.current) page.classList.remove('ctf-vt');
-        });
-    }, []);
 
     const onFocus = useCallback((arg) => transition(() => {
         setFocus((cur) => (arg && cur !== arg ? arg : null));
@@ -117,7 +94,7 @@ export default function Board({ m = CTF }) {
     const card = viewer ? m.byCode.get(viewer) : neutralCountry(m);
     const cardLabel = viewer
         ? (picked ? 'Your choice' : 'Your country · from your connection')
-        : card ? 'Biggest open pot this epoch' : 'Your country';
+        : card ? 'Biggest open pot this epoch' : 'Ten slots in every country';
 
     const sorts = sortsFor(m);
     const shows = showsFor(m);
@@ -130,7 +107,7 @@ export default function Board({ m = CTF }) {
 
     return (
         <div className="ctf-board" ref={rootRef}>
-            <LiveBar m={m} now={now} focus={focus} onFocus={onFocus} />
+            <LiveBar m={m} now={now} mounted={mounted} focus={focus} onFocus={onFocus} />
 
             {!focus && (
                 <CountryCard
@@ -163,17 +140,17 @@ export default function Board({ m = CTF }) {
                         <div className="ctf-controls">
                             <div className="ctf-segs">
                                 <div className="ctf-seg" role="group" aria-label="Sort">
-                                    {sorts.map(([key, label]) => <button key={key} type="button" aria-pressed={sort === key} onClick={() => setSort(key)}>{label}</button>)}
+                                    {sorts.map(([key, label]) => <button key={key} type="button" aria-pressed={sort === key} disabled={!mounted} onClick={() => setSort(key)}>{label}</button>)}
                                 </div>
                                 {shows.length > 0 && (
                                     <div className="ctf-seg" role="group" aria-label="Show">
-                                        {shows.map(([key, label]) => <button key={key} type="button" aria-pressed={show === key} onClick={() => setShow(key)}>{label}</button>)}
+                                        {shows.map(([key, label]) => <button key={key} type="button" aria-pressed={show === key} disabled={!mounted} onClick={() => setShow(key)}>{label}</button>)}
                                     </div>
                                 )}
                             </div>
                             <div className="ctf-find">
                                 <label htmlFor="ctf-q" className="ctf-label">Find</label>
-                                <input id="ctf-q" className="ctf-field ctf-search" type="search" placeholder="Country or code" value={q} onChange={(event) => setQ(event.target.value)} />
+                                <input id="ctf-q" className="ctf-field ctf-search" type="search" placeholder="Country or code" disabled={!mounted} value={q} onChange={(event) => setQ(event.target.value)} />
                             </div>
                         </div>
                         <Legend m={m} tips={tips} shown={cells.length} />

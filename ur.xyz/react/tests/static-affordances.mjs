@@ -13,10 +13,11 @@
 //                         first use; the phone sidebar toggle and the code
 //                         blocks' Copy buttons work without React
 //   /ctf, /ctf/<cc>       every figure and every country's link in the HTML;
-//                         the static page offers no control that needs the
-//                         script, and the hydrated board finds a country,
-//                         opens on the visitor's (/sn/ctf/here) and lets a
-//                         tap open a card
+//                         a control that needs the script (sorting, the
+//                         search, the picker; the tap to open a card is not
+//                         drawn at all) is disabled until it runs, and the
+//                         hydrated board finds a country, opens on the
+//                         visitor's (/sn/ctf/here) and lets a tap open a card
 //
 // Usage (from astro/, after a build):  node ../react/tests/static-affordances.mjs
 import { chromium } from 'playwright-core';
@@ -159,6 +160,8 @@ async function main() {
             const links = await page.$$eval('.ctf-grid .ctf-cname a', (els) => els.map((a) => a.getAttribute('href')));
             check(links.length === 249 && links.every((h) => /^\/ctf\/[a-z]{2}$/.test(h)) && new Set(links).size === 249, '/ctf without JavaScript links all 249 country pages');
             check(await page.locator('.ctf-cell-hit, .ctf-fc-hit').count() === 0, '/ctf without JavaScript draws no tap control that needs the script');
+            const inert = await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.map((el) => el.disabled));
+            check(inert.length >= 4 && inert.every(Boolean), '/ctf without JavaScript disables the sorting, the search and the picker, which need the script');
             check(Boolean((await page.textContent('.ctf-live').catch(() => '')).trim()), '/ctf without JavaScript shows the live bar');
             await close();
         }
@@ -176,6 +179,7 @@ async function main() {
             await page.goto(`${base}/ctf`, { waitUntil: 'networkidle' });
             await page.waitForSelector('.ctf-cell-hit', { timeout: 8000 }).catch(() => {});
             check(await page.textContent('.ctf-me-name').catch(() => '') === 'Kenya', '/ctf opens on the visitor\'s country from /sn/ctf/here');
+            check(await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.length >= 4 && els.every((el) => !el.disabled)), '/ctf, hydrated, enables its controls');
             await page.fill('#ctf-q', 'nigeria');
             await page.waitForTimeout(200);
             check(JSON.stringify(await page.$$eval('.ctf-grid .ctf-cname a', (els) => els.map((a) => a.textContent))) === '["Nigeria"]', '/ctf finds a country by name');

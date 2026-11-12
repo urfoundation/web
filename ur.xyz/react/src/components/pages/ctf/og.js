@@ -19,6 +19,12 @@ export function ctfCard(m) {
     return { kicker: 'Capture the flag', title: 'Earn crypto by sharing your internet in 249 countries', footer };
 }
 
+/** What the card shows, in words: its alt text (on a country page the description names the country, the card does not). */
+export function ctfCardAlt(m) {
+    const card = ctfCard(m);
+    return `${card.kicker}: ${card.title}. ${card.footer}.`;
+}
+
 /** The card's path on the site. */
 export function ctfOgImage(m) {
     const card = ctfCard(m);

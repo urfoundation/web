@@ -4,8 +4,8 @@
 // indexable and carries its own country's data from the epoch's snapshot,
 // never only its name: what is open there and what its pots hold after a
 // draw, before it the providers the network's dashboard counted online there
-// (the seo-audit refuses two country pages that differ by the country's name
-// alone).
+// (the seo-audit refuses a page that drops its own figures, and lists the
+// countries whose data is the same and so read alike).
 //
 // The page body is the React component the SPA renders for this route
 // (react/src/components/pages/CtfCountry.jsx), rendered to static HTML. Its
@@ -21,7 +21,7 @@ import CtfCountryPage from '@react/components/pages/CtfCountry.jsx';
 import { CountryEasyWins, CountryLive } from '@react/components/pages/ctf/CountryIslands.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
 import { SITE, apiCountry, countryDescription, countryTitle } from '@react/components/pages/ctf/model.js';
-import { ctfOgImage } from '@react/components/pages/ctf/og.js';
+import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
 import en from '@react/i18n/en.js';
 import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
 
@@ -60,6 +60,7 @@ const jsonLd = [{
     jsonLd={jsonLd}
     alternate={{ href: apiCountry(cc), type: 'application/json' }}
     ogImage={ctfOgImage(CTF)}
+    ogImageAlt={ctfCardAlt(CTF)}
 >
     <div class="app">
         <DisclaimerStatic t={en} />

@@ -529,24 +529,38 @@ for (const p of pages.values()) {
 
 // ── capture the flag: 249 country pages, each its own ──
 // Every /ctf/<cc> page is indexable (sn design/ctf/SEO.md §2.1), so none may
-// be another with only the country's name swapped: that template is a doorway
-// in Google's spam policies, and near-duplicates are clustered into one page.
-// The text of each page's <main>, with its own country named out (its name
-// and the forms a sentence uses), must differ from every other's; and the
-// pages are exactly the snapshot's 249 countries.
+// be another with only the country's name swapped: a template that shows no
+// data of its own is a doorway in Google's spam policies. This reads what each
+// page says of its own country: the text of its <main> without the parts about
+// other countries (marked data-ctf-elsewhere: its neighbours in A–Z and its
+// other big pots), with its own names masked. Pages that then read the same
+// must be countries whose data, as the pages state it, is the same: otherwise
+// a page has left out its own figures. Countries whose data is the same read
+// the same and are listed (every page is indexable by the owner's decision;
+// such a page needs data or a local note of its own). Without a draw last
+// epoch no capture the flag page may claim a default win or show a chance to
+// win (the API's draw figures are null). And the pages are exactly the
+// snapshot's 249.
 {
   const CTF_SNAPSHOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../react/src/data/ctf-epoch.json");
   const countryPages = [...pages.values()].filter((p) => /^\/ctf\/[a-z]{2}$/.test(p.urlPath) && !p.redirectStub);
   if (countryPages.length || pages.has("/ctf")) {
-    const countries = existsSync(CTF_SNAPSHOT) ? JSON.parse(readFileSync(CTF_SNAPSHOT, "utf8")).countries : [];
-    const byCode = new Map(countries.map((c) => [c.code, c]));
-    if (countryPages.length !== countries.length) err(`/ctf: ${countryPages.length} country pages for the snapshot's ${countries.length} countries`);
-    const mainText = (html) => decodeHtmlEntities(
-      ((html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "")
-        .replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ")
-        .replace(/<[^>]+>/g, " "),
-    ).replace(/\s+/g, " ").trim();
-    const seen = new Map();
+    const snapshot = existsSync(CTF_SNAPSHOT) ? JSON.parse(readFileSync(CTF_SNAPSHOT, "utf8")) : { countries: [] };
+    const byCode = new Map(snapshot.countries.map((c) => [c.code, c]));
+    if (countryPages.length !== snapshot.countries.length) err(`/ctf: ${countryPages.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
+    const mainText = (html, { own = true } = {}) => {
+      let main = ((html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "").replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ");
+      if (own) main = main.replace(/<(nav|section)\b[^>]*\sdata-ctf-elsewhere\b[^>]*>[\s\S]*?<\/\1>/gi, " ");
+      return decodeHtmlEntities(main.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+    };
+    // the data a country page states (CtfCountry.jsx and ctf/model.js): its dashboard counts, its
+    // territory flag, and after a root its roles' winners, units and pots, its near misses, awards
+    // and epochs without a winner
+    const stated = (c) => JSON.stringify([
+      c.inhabited, c.online, c.seen_days, c.last_seen, c.peak, c.open_epochs, c.near_misses, c.awarded,
+      ...["providers", "extenders"].map((r) => [c[r].won, c[r].units, c[r].pot]),
+    ]);
+    const same = new Map();
     for (const p of countryPages) {
       const c = byCode.get(p.urlPath.slice("/ctf/".length));
       if (!c) {
@@ -558,8 +572,28 @@ for (const p of pages.values()) {
       const names = [c.name, the, the.charAt(0).toUpperCase() + the.slice(1), the.replace(/^the /, "")].sort((a, b) => b.length - a.length);
       let text = mainText(p.html);
       for (const name of names) text = text.split(name).join("\u0000");
-      if (seen.has(text)) err(`${p.urlPath}: differs from ${seen.get(text)} by the country's name alone`);
-      else seen.set(text, p.urlPath);
+      if (!same.has(text)) same.set(text, []);
+      same.get(text).push({ urlPath: p.urlPath, data: stated(c) });
+    }
+    const alike = [];
+    for (const group of same.values()) {
+      if (group.length < 2) continue;
+      if (new Set(group.map((g) => g.data)).size > 1) {
+        err(`${group.map((g) => g.urlPath).join(", ")}: read the same but for the country's name, though their data differs (a page leaves out its own figures)`);
+      } else {
+        alike.push(group.map((g) => g.urlPath.slice("/ctf/".length)));
+      }
+    }
+    if (alike.length) {
+      const pagesAlike = alike.reduce((n, g) => n + g.length, 0);
+      console.log(`seo-audit: note: ${pagesAlike} country pages read like another but for the name, their countries' data being the same (${alike.length} group(s)): ${alike.map((g) => g.join(" ")).join(" | ")}`);
+    }
+    if (!snapshot.last_epoch?.drawn) {
+      for (const p of [...countryPages, pages.get("/ctf")].filter(Boolean)) {
+        const text = mainText(p.html, { own: false });
+        const claim = text.match(/[^.]*\bwins? by default\b[^.]*\.|[^.]*\b\d+(?:\.\d+)?%[^.]*\./);
+        if (claim) err(`${p.urlPath}: without a draw last epoch it says "${claim[0].trim()}"`);
+      }
     }
   }
 }

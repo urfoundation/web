@@ -22,7 +22,7 @@ import CtfPage from '@react/components/pages/Ctf.jsx';
 import Board from '@react/components/pages/ctf/Board.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
 import { API_STATE, HUB_TITLE, SITE, hubDescription } from '@react/components/pages/ctf/model.js';
-import { ctfOgImage } from '@react/components/pages/ctf/og.js';
+import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
 import { epochBounds } from '@react/lib/epoch.js';
 import en from '@react/i18n/en.js';
 import { LASTMOD_TOKEN } from '../lib/lastmod.js';
@@ -55,6 +55,7 @@ const jsonLd = [{
     jsonLd={jsonLd}
     alternate={{ href: API_STATE, type: 'application/json' }}
     ogImage={ctfOgImage(CTF)}
+    ogImageAlt={ctfCardAlt(CTF)}
 >
     {/* the board's first chain of requests is the visitor's country */}
     <link slot="head" rel="preconnect" href="https://api.bringyour.com" crossorigin />

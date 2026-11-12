@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import {
     API_HERE,
     START_URL,
@@ -9,23 +10,29 @@ import {
     countryPath,
     dayName,
     drawLine,
+    findCountry,
     flagSrc,
     int,
+    isCellTip,
     nextStep,
     pct,
     presenceSentence,
     roleDetail,
     roleLine,
+    uninhabitedSentence,
     utcTime,
 } from './model';
 
 /**
- * The parts the capture the flag islands share (ctf/Board.jsx, CountryCard.jsx,
- * EasyWins.jsx): the flags, the next-step tips, the live bar, a country's card,
- * an Easy wins card and a grid cell, as design.html draws them. Their first
- * render is the static page's (no clock, no visitor, the epoch's seed), so an
- * island hydrates onto exactly the HTML the build wrote; the clock, the
- * visitor's country and the next-step text arrive after.
+ * The parts the capture the flag islands share (ctf/Board.jsx and
+ * ctf/CountryIslands.jsx): the flags, the next-step tips, the live bar, a
+ * country's card, an Easy wins card and a grid cell, as design.html draws
+ * them, and the view transitions. Their first render is the static page's (no
+ * clock, no visitor, the epoch's seed), so an island hydrates onto exactly the
+ * HTML the build wrote; the clock, the visitor's country and the next-step
+ * text arrive after. A control that needs the script (sorting, the filters,
+ * the search, Shuffle, the picker) is disabled in the static page and enabled
+ * once the island runs.
  */
 
 export const cx = (...names) => names.filter(Boolean).join(' ');
@@ -51,6 +58,40 @@ export function Pips({ won, role, big = false }) {
 /** A grid cell's five pips as one element (the stylesheet draws them), so the grid's 2,490 pips are not 2,490 nodes. */
 export function CellPips({ won, role }) {
     return <span className={cx('ctf-cpips', `ctf-n${won || 0}`, `ctf-cp-${role}`)} aria-hidden="true" />;
+}
+
+/**
+ * A change that moves the page's sections, as a view transition where the
+ * browser has them (design.html): the page's parts are named only while one
+ * runs (.ctf-vt on the page, and .ctf-vt-on on the document for the
+ * transition's own styles), until the last of overlapping transitions ends.
+ * Returns the ref to put on an element inside the page, and `transition`.
+ */
+export function useViewTransition() {
+    const ref = useRef(null);
+    const running = useRef(0);
+    const transition = useCallback((mutate) => {
+        const page = ref.current?.closest('.ctf-page');
+        const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        if (!page || reduce || !document.startViewTransition) {
+            mutate();
+            return;
+        }
+        running.current += 1;
+        page.classList.add('ctf-vt');
+        document.documentElement.classList.add('ctf-vt-on');
+        const t = document.startViewTransition(() => flushSync(mutate));
+        // a transition skipped by the next one (a quick second tap) rejects `ready`;
+        // the change itself has still been made
+        t.ready.catch(() => {});
+        t.finished.catch(() => {}).finally(() => {
+            running.current -= 1;
+            if (running.current) return;
+            page.classList.remove('ctf-vt');
+            document.documentElement.classList.remove('ctf-vt-on');
+        });
+    }, []);
+    return [ref, transition];
 }
 
 /** The visitor's clock, after hydration (null in the static render), ticking every 30 seconds. */
@@ -116,9 +157,9 @@ export function useTips() {
 /** A tip's state from the tips' state: whether it is open and whether it is pinned. */
 export const tipOf = (tips, id) => ({ id, api: tips.api, open: id === tips.state.hover || id === tips.state.focus || id === tips.state.pin, pinned: id === tips.state.pin });
 
-/** The part of the tips' state that belongs to one grid cell (its keys end in ":<code>"), as values a memo can compare. */
+/** The part of the tips' state that belongs to one grid cell (model.js isCellTip), as values a memo can compare. */
 export const cellTips = (tips, code) => {
-    const mine = (key) => (key && key.endsWith(`:${code}`) ? key : null);
+    const mine = (key) => (isCellTip(key, code) ? key : null);
     return { hover: mine(tips.state.hover), focus: mine(tips.state.focus), pin: mine(tips.state.pin) };
 };
 
@@ -161,9 +202,9 @@ function clock(m, now) {
     return now < drawAt ? ['Draw in', countdown(drawAt - now)] : ['Draw', 'under way'];
 }
 
-function FocusControl({ arg, focus, onFocus, hub, className, title, children }) {
+function FocusControl({ arg, focus, onFocus, hub, mounted, className, title, children }) {
     if (hub) return <a className={className} href={`/ctf?focus=${arg}`} title={title}>{children}</a>;
-    return <button type="button" className={className} aria-pressed={focus === arg} onClick={() => onFocus(arg)} title={title}>{children}</button>;
+    return <button type="button" className={className} aria-pressed={focus === arg} disabled={!mounted} onClick={() => onFocus(arg)} title={title}>{children}</button>;
 }
 
 /**
@@ -172,7 +213,7 @@ function FocusControl({ arg, focus, onFocus, hub, className, title, children }) 
  * country page links to the hub filtered (`hub`). Without a draw last epoch
  * there is nothing to filter on, and the bar says what is known instead.
  */
-export function LiveBar({ m, now, focus = null, onFocus = null, hub = false }) {
+export function LiveBar({ m, now, mounted = false, focus = null, onFocus = null, hub = false }) {
     const [clockLabel, clockValue] = clock(m, now);
     const items = [];
     const it = (label, value, key = label) => items.push(<div className="ctf-it" key={key}><span className="ctf-label">{label}</span><b>{value}</b></div>);
@@ -185,15 +226,15 @@ export function LiveBar({ m, now, focus = null, onFocus = null, hub = false }) {
         it('Carried into this epoch', `${alpha(m.last.carried)} α`);
         it('Paid last epoch', `${alpha(m.last.awarded)} α · ${int(m.last.won)} winners`);
         items.push(
-            <FocusControl key="held" arg="held" focus={focus} onFocus={onFocus} hub={hub} className="ctf-it ctf-it-btn" title="Show only the flags held on both roles">
+            <FocusControl key="held" arg="held" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it ctf-it-btn" title="Show only the flags held on both roles">
                 <span className="ctf-label ctf-it-hint">Flags held<Chevron /></span><b>{int(m.totals.flagsHeld)} / 249</b>
             </FocusControl>,
             <div className="ctf-it ctf-it-group" role="group" aria-labelledby="ctf-nc-label" key="nfc">
                 <span className="ctf-label" id="ctf-nc-label">Not fully captured</span>
-                <FocusControl arg="np" focus={focus} onFocus={onFocus} hub={hub} className="ctf-it-row" title="Show only countries with a provider slot open">
+                <FocusControl arg="np" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it-row" title="Show only countries with a provider slot open">
                     <span>Providers</span><b>{int(m.totals.openP)}</b><Chevron />
                 </FocusControl>
-                <FocusControl arg="nx" focus={focus} onFocus={onFocus} hub={hub} className="ctf-it-row" title="Show only countries with an extender slot open">
+                <FocusControl arg="nx" focus={focus} onFocus={onFocus} hub={hub} mounted={mounted} className="ctf-it-row" title="Show only countries with an extender slot open">
                     <span>Extenders</span><b>{int(m.totals.openX)}</b><Chevron />
                 </FocusControl>
             </div>,
@@ -246,8 +287,7 @@ function ChanceTip({ m, c, role, tips }) {
 export function CountryPicker({ m, mounted, onPick }) {
     const [value, setValue] = useState('');
     const pick = (text) => {
-        const v = text.trim().toLowerCase();
-        const hit = v && m.countries.find((c) => c.name.toLowerCase() === v || c.short.toLowerCase() === v || c.code === v);
+        const hit = findCountry(m, text);
         if (hit) {
             setValue('');
             onPick(hit.code);
@@ -262,6 +302,7 @@ export function CountryPicker({ m, mounted, onPick }) {
                 list="ctf-countries"
                 placeholder="Type a country"
                 autoComplete="off"
+                disabled={!mounted}
                 value={value}
                 onChange={(event) => {
                     setValue(event.target.value);
@@ -288,6 +329,7 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
     const anyClosed = c && (c.p.held || c.x.held);
     // before a draw the dashboard's count is what is known of a country; after one, its draw says more
     const presence = c && !m.potsKnown ? presenceSentence(m, c) : null;
+    const empty = c ? uninhabitedSentence(c) : null;
     const where = c ? c.the : 'your country';
     return (
         <section className={cx('ctf-mine', anyOpen && 'ctf-wave')} aria-labelledby="ctf-mine-h">
@@ -302,7 +344,7 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
                 {c && c.avail === null && c.online !== null && (
                     <div className="ctf-me-amtrow"><b className="ctf-px ctf-me-amt">{int(c.online)}</b><span className="ctf-me-what">{c.online === 1 ? 'provider' : 'providers'} online at the end of {dayName(m.presence.day)}</span></div>
                 )}
-                <p className="ctf-me-msg">{msg}{presence && <> {presence}</>}</p>
+                <p className="ctf-me-msg">{msg}{empty && <> {empty}</>}{presence && <> {presence}</>}</p>
                 {c && (
                     <div className="ctf-roles">
                         {['p', 'x'].map((role) => (
@@ -359,14 +401,14 @@ export function EasyWinCard({ m, c, i, mounted, tips, expanded, onExpand }) {
 /** The Easy wins section: eight of the big pots this epoch, with Shuffle. */
 export function EasyWinsSection({ m, picks, title, mounted, tips, expanded, onExpand, onShuffle }) {
     return (
-        <section className="ctf-sec ctf-feat-sec" aria-labelledby="ctf-feat-h">
+        <section className="ctf-sec ctf-feat-sec" aria-labelledby="ctf-feat-h" data-ctf-elsewhere="">
             <div className="ctf-sec-head">
                 <div className="ctf-sec-title">
                     <div className="ctf-label ctf-label-acc">Easy wins</div>
                     <h2 id="ctf-feat-h" className="ctf-h2">{title}</h2>
                     <p className="ctf-sub">Eight countries drawn at random from the biggest pots, weighted by pot size. Each has an open slot, so a newcomer who stays online there for half the epoch wins by default.</p>
                 </div>
-                <button type="button" className="ctf-btn ctf-btn-s" onClick={onShuffle}>Shuffle</button>
+                <button type="button" className="ctf-btn ctf-btn-s" disabled={!mounted} onClick={onShuffle}>Shuffle</button>
             </div>
             {/* drawn again on each visit: the static page's draw is the epoch's */}
             <div className="ctf-feat" data-parity-ignore="">
@@ -451,7 +493,7 @@ export const GridCell = React.memo(function GridCell({ m, c, i, mounted, tipApi,
             <div className="ctf-last">
                 <RoleRow m={m} c={c} role="p" tip={tip} />
                 <RoleRow m={m} c={c} role="x" tip={tip} />
-                <span aria-hidden="true">{m.drawn ? `${c.won} won · ${alpha(c.awarded)} α` : m.potsKnown ? 'no draw last epoch' : c.seenDays !== null ? `seen ${c.seenDays}/${m.presence.days} days` : 'from epoch 8'}</span>
+                <span aria-hidden="true">{m.drawn ? `${c.won} won · ${alpha(c.awarded)} α` : m.potsKnown ? 'no draw last epoch' : c.seenDays !== null ? `seen ${c.seenDays}/${m.presence.days} days` : `from epoch ${m.firstEpoch}`}</span>
                 {summary && <span className="ctf-sr">{summary}</span>}
             </div>
             {expanded && (

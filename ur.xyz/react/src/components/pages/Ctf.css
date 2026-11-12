@@ -8,7 +8,9 @@
  *
  * Global stylesheet (the SPA bundles every component's CSS into one sheet that
  * is loaded on every route), so every rule is scoped under the page's
- * .ctf-page wrapper and every class carries the ctf- prefix. The design's
+ * .ctf-page wrapper and every class carries the ctf- prefix; the view
+ * transitions' own pseudo-elements belong to the document, so their rules
+ * apply only while the page runs one (html.ctf-vt-on). The design's
  * faces are the site's own: PPNeueMontreal for Inter, the code face
  * (--code-font, JetBrains Mono) for its mono, and PPNeueBit for its pixel
  * type (Silkscreen); the network-privacy gate allows no font host. The flags
@@ -196,6 +198,9 @@
 .ctf-page .ctf-seg button:hover { color: var(--ctf-ink); }
 .ctf-page .ctf-seg button[aria-pressed="true"] { background: var(--ctf-ink); color: #101010; }
 .ctf-page .ctf-seg button:focus-visible { outline: 2px solid var(--ctf-acc); outline-offset: 1px; }
+/* a control that needs the script waits for it, looking the same, so the page does not shift when it arrives */
+.ctf-page button:disabled, .ctf-page .ctf-field:disabled { cursor: default; opacity: 1; }
+.ctf-page .ctf-field:disabled { color: var(--ctf-ink); -webkit-text-fill-color: var(--ctf-ink); }
 .ctf-page .ctf-ghead { display: flex; flex-direction: column; gap: 16px; }
 .ctf-page .ctf-controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; }
 .ctf-page .ctf-segs { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -253,14 +258,14 @@
 .ctf-page.ctf-vt .ctf-fbar { view-transition-name: ctf-fbar; }
 .ctf-page.ctf-vt .ctf-how { view-transition-name: ctf-how; }
 .ctf-page.ctf-vt .ctf-faq-sec { view-transition-name: ctf-faq; }
-::view-transition-group(*) { animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.22, 0.9, 0.24, 1); }
-::view-transition-old(*):only-child { animation: ctf-vt-out 0.32s cubic-bezier(0.4, 0, 1, 1) both; }
-::view-transition-new(*):only-child { animation: ctf-vt-in 0.42s cubic-bezier(0, 0, 0.2, 1) 0.12s both; }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.3s; }
+html.ctf-vt-on::view-transition-group(*) { animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.22, 0.9, 0.24, 1); }
+html.ctf-vt-on::view-transition-old(*):only-child { animation: ctf-vt-out 0.32s cubic-bezier(0.4, 0, 1, 1) both; }
+html.ctf-vt-on::view-transition-new(*):only-child { animation: ctf-vt-in 0.42s cubic-bezier(0, 0, 0.2, 1) 0.12s both; }
+html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(root) { animation-duration: 0.3s; }
 @keyframes ctf-vt-out { to { opacity: 0; transform: scale(0.86) translateY(8px); } }
 @keyframes ctf-vt-in { from { opacity: 0; transform: scale(0.92) translateY(12px); } }
 @media (prefers-reduced-motion: reduce) {
-    ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+    html.ctf-vt-on::view-transition-group(*), html.ctf-vt-on::view-transition-old(*), html.ctf-vt-on::view-transition-new(*) { animation: none !important; }
 }
 
 /* how it works */

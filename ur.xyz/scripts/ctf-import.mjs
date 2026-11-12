@@ -18,8 +18,14 @@
 // the draw figures null together, the slot and pot arithmetic, and the totals.
 // Each country also gets the providers the network's dashboard counted online
 // there (react/public/dashboard/history.json, panel 33 at the end of each UTC
-// day): its count on the snapshot's day and the days it had any over the 90
-// before.
+// day): its count on the snapshot's day, and over the 90 days to it the days
+// it had any, the last such day and the most at the end of a day.
+//
+// An answer taken while an epoch's draw is pending after a drawn epoch is
+// refused: its pots and open slots are last epoch's, carried into a draw that
+// newcomers can no longer enter, so the pages would be an epoch off. Import
+// once that epoch's root is committed. (Before the first root, a pending
+// draw is the whole story, and the pages say so.)
 //
 // Before capture the flag starts (epoch 8, the owner's decision) there is no
 // answer to import: --prelaunch writes the pre-launch snapshot from the
@@ -93,24 +99,30 @@ export function presenceFrom(history, day) {
     for (const d of days) {
         for (const [cc, count] of Object.entries(history.countries[d])) {
             const code = cc.toLowerCase();
-            const entry = (byCode[code] ||= { online: 0, seen_days: 0 });
-            if (count > 0) entry.seen_days += 1;
-            if (d === last) entry.online = Math.round(count);
+            const entry = (byCode[code] ||= { online: 0, seen_days: 0, last_seen: null, peak: 0 });
+            const n = Math.round(count);
+            if (n > 0) {
+                entry.seen_days += 1;
+                entry.last_seen = d; // days run in order
+                entry.peak = Math.max(entry.peak, n);
+            }
+            if (d === last) entry.online = n;
         }
     }
     return { meta: { source: 'https://ur.xyz/dashboard', day: last, days: days.length }, byCode };
 }
 
 function withPresence(country, presence) {
-    if (!presence) return { ...country, online: null, seen_days: null };
-    const p = presence.byCode[country.code] || { online: 0, seen_days: 0 };
-    return { ...country, online: p.online, seen_days: p.seen_days };
+    if (!presence) return { ...country, online: null, seen_days: null, last_seen: null, peak: null };
+    const p = presence.byCode[country.code] || { online: 0, seen_days: 0, last_seen: null, peak: 0 };
+    return { ...country, online: p.online, seen_days: p.seen_days, last_seen: p.last_seen, peak: p.peak };
 }
 
 const about = 'The capture the flag pages (ur.xyz/ctf and /ctf/<cc>): a snapshot of GET https://api.bringyour.com/sn/ctf, '
     + 'written by scripts/ctf-import.mjs; do not edit it by hand. Amounts are integers of rao (1 alpha is 10^9 rao). '
     + 'A role\'s won, units and near_misses, and a country\'s near_misses, are null without a draw last epoch. '
-    + 'online and seen_days are the providers the dashboard counted online in the country (react/public/dashboard/history.json).';
+    + 'online, seen_days, last_seen and peak are the providers the dashboard counted online in the country at the end of a day '
+    + '(react/public/dashboard/history.json): on the presence day, the days of the window with any, the last of them, and the most.';
 
 /** The snapshot before capture the flag starts: no draw, no pots, the epoch 8 schedule. */
 export function prelaunch({ names, presence, now, bounds }) {
@@ -320,6 +332,7 @@ export function snapshotProblems(s) {
     const drawn = Boolean(s.last_epoch?.drawn);
     const potsKnown = Boolean(s.last_epoch);
     if (s.prelaunch && (s.last_epoch || s.pending_draw || s.current_epoch?.epoch !== s.first_epoch)) bad('a pre-launch snapshot with a draw');
+    if (s.pending_draw && s.last_epoch) bad(`epoch ${s.pending_draw.epoch}'s draw is pending after a drawn epoch: import once its root is committed`);
     let won = 0;
     let pots = 0;
     let awarded = 0;
@@ -346,7 +359,10 @@ export function snapshotProblems(s) {
         }
         if (c.flag_held !== (both === 2)) bad(`${c.code}: flag_held ${c.flag_held}`);
         if (c.awarded !== c.providers.awarded + c.extenders.awarded) bad(`${c.code}: awarded is not its roles' sum`);
-        if (c.online !== null && (!isInt(c.online) || c.online < 0 || !isInt(c.seen_days))) bad(`${c.code}: online ${c.online}`);
+        if (c.online !== null && (!isInt(c.online) || c.online < 0 || !isInt(c.seen_days) || !isInt(c.peak) || c.peak < c.online
+            || (c.seen_days > 0) !== (c.last_seen !== null) || (c.last_seen !== null && !/^\d{4}-\d{2}-\d{2}$/.test(c.last_seen)))) {
+            bad(`${c.code}: dashboard counts ${JSON.stringify([c.online, c.seen_days, c.last_seen, c.peak])}`);
+        }
         if (c.flag_held) held += 1;
         pots += c.providers.pot + c.extenders.pot;
         awarded += c.awarded;

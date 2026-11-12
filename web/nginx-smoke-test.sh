@@ -166,18 +166,61 @@ for host in ur.xyz preview.ur.xyz; do
     expect_response "$host" '/index.html?smoke=1' 301 /
 done
 
+# A page group's page in another language (ur.xyz react/src/i18n/pages/):
+# served when the build has it, else a 301 to the English page; its
+# trailing-slash and .html forms go to the right one of those in one hop.
+expect_localized_page() {
+    local lang=$1
+    local path=$2
+
+    if [[ -f "/www/preview.ur.xyz/$lang$path.html" ]]; then
+        expect_response ur.xyz "/$lang$path" 200
+        grep -q "<html lang=\"$lang\"" "$test_dir/ur_xyz.body" || fail "ur.xyz/$lang$path is not a page in $lang"
+        expect_response ur.xyz "/$lang$path?smoke=1" 200
+        expect_response ur.xyz "/$lang$path/" 301 "https://ur.xyz/$lang$path"
+        expect_response ur.xyz "/$lang$path.html" 301 "https://ur.xyz/$lang$path"
+    else
+        expect_response ur.xyz "/$lang$path" 301 "$path"
+        expect_response ur.xyz "/$lang$path?smoke=1" 301 "$path?smoke=1"
+        expect_response ur.xyz "/$lang$path/" 301 "$path"
+        expect_response ur.xyz "/$lang$path.html" 301 "$path"
+    fi
+}
+
 expect_response ur.xyz /investors 200
 expect_response ur.xyz /reserve 200
 expect_response ur.xyz /mainnet 200
 expect_response ur.xyz /ctf 200
 expect_response ur.xyz /ctf/ke 200
 expect_response ur.xyz /ctf/flags/ke.svg 200
-expect_response ur.xyz /de/ctf 301 /ctf
-expect_response ur.xyz /de/ctf/ke 301 /ctf/ke
 expect_response ur.xyz /research/2026-q3-report 200
-expect_response ur.xyz /de/research/2026-q3-report 301 /research/2026-q3-report
 expect_response ur.xyz /research/methodology 200
-expect_response ur.xyz /de/research/methodology 301 /research/methodology
+for lang in ru ar zh de es; do
+    for path in /about /build /ctf /ctf/ke /dashboard /docs /docs/miner /docs/litepaper /terms /privacy /vdp \
+        /investors /investors/deck /mainnet /price /reserve /research/2026-q3-report /research/methodology; do
+        expect_localized_page "$lang" "$path"
+    done
+    # the docs corpus copies of the legal documents, and the retired aliases,
+    # go to their page in one hop, in the language when the build has it
+    for doc in terms privacy vdp; do
+        if [[ -f "/www/preview.ur.xyz/$lang/$doc.html" ]]; then target="/$lang/$doc"; else target="/$doc"; fi
+        expect_response ur.xyz "/$lang/docs/legal/$doc" 301 "$target"
+    done
+    if [[ -f "/www/preview.ur.xyz/$lang/docs/litepaper.html" ]]; then target="/$lang/docs/litepaper"; else target=/docs/litepaper; fi
+    expect_response ur.xyz "/$lang/docs/whitepaper" 301 "$target"
+    if [[ -f "/www/preview.ur.xyz/$lang/investors/our-letter-to-bittensor.html" ]]; then target="/$lang/investors/our-letter-to-bittensor"; else target=/investors/our-letter-to-bittensor; fi
+    expect_response ur.xyz "/$lang/investors/august-investment-letter" 301 "$target"
+    # a miss under the language's prefix is a 404 with that language's
+    # not-found page when the build has it, else the English one
+    expect_response ur.xyz "/$lang/no-such-page" 404
+    if [[ -f "/www/preview.ur.xyz/$lang/404.html" ]]; then not_found_lang=$lang; else not_found_lang=en; fi
+    grep -q "<html lang=\"$not_found_lang\"" "$test_dir/ur_xyz.body" || \
+        fail "ur.xyz/$lang/no-such-page did not render the $not_found_lang not-found page"
+    expect_response ur.xyz "/$lang/404" 404
+done
+expect_response ur.xyz /docs/legal/terms 301 /terms
+expect_response ur.xyz /no-such-page 404
+grep -q '<html lang="en"' "$test_dir/ur_xyz.body" || fail 'ur.xyz/no-such-page did not render the not-found page'
 expect_operator_list
 expect_response www.ur.xyz / 301 https://ur.xyz/
 
@@ -247,14 +290,6 @@ for variant in / .html; do
 done
 expect_successor ur.xyz /sitemap.xml /sitemap-index.xml
 
-# A localized docs URL goes to the English document in one hop, from its
-# trailing-slash and .html forms too.
-for lang in ru ar zh de es; do
-    for variant in '' / .html; do
-        expect_response ur.xyz "/$lang/docs$variant" 301 /docs
-        expect_response ur.xyz "/$lang/docs/miner$variant" 301 /docs/miner
-    done
-done
 expect_response ur.xyz /docs 200
 expect_response ur.xyz /docs/miner 200
 

@@ -1,8 +1,9 @@
 // English text on localized pages — a guard against copy that never reached
 // the dictionaries.
 //
-// Every translated page (/<lang>/…) is compared with its English twin in the
-// BUILT output. Text a visitor meets on the localized page (text nodes, SVG
+// Every translated page (/<lang>/…: the home page, the sections, and every page
+// of a localized page group, react/src/i18n/pages/) is compared with its
+// English twin in the BUILT output. Text a visitor meets on the localized page (text nodes, SVG
 // labels, the <title>, and the accessible names in aria-label / alt / title /
 // placeholder) is split into sentences, and a sentence fails the page when it
 // is English that the translation should have replaced:
@@ -12,7 +13,9 @@
 //     or code name like "Bittensor", "MASA L2 2025" or "transport.go");
 //   • label leak: the sentence equals an English dictionary value that this
 //     language translates differently everywhere it occurs, e.g. a hard-coded
-//     "Operators" on a German page whose dictionary says "Betreiber".
+//     "Operators" on a German page whose dictionary says "Betreiber". A page
+//     group's page is held to its group's copy units as well as to the site
+//     dictionaries.
 //
 // It also asserts <html lang> matches the page language, that no localized
 // page carries NUL bytes (streamed React SSR once split a multibyte character
@@ -24,11 +27,15 @@
 //        (default ../astro/build/$UR_ENV, UR_ENV defaulting to main)
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
-    LOCALIZED_BASE_PATHS,
+    LOCALIZED_GROUPS,
     NON_EN_SITE_LANG_CODES,
+    NOT_FOUND_PATH,
+    PAGE_GROUPS,
+    groupForPath,
+    hasLocalizedVersion,
 } from '../../astro/src/lib/route-localization.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,11 +44,13 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../../astro/
 const I18N = path.join(__dirname, '../src/i18n');
 
 // Sentences deliberately left in English in every language. Keep this short:
-// each entry is a decision, not a convenience.
+// each entry is a decision, not a convenience. A page group lists its own in
+// its group.js (`allowEnglish`), and they hold for its pages only.
 const ALLOWED_ENGLISH = new Set([
     // the paper's published title (research.publications.items[0].title)
     'Whole Internet Encryption for the whole world',
 ]);
+const PAGES_DIR = path.join(I18N, 'pages');
 
 // Accessible text a visitor meets without it being a text node.
 const TEXT_ATTRIBUTES = ['aria-label', 'alt', 'title', 'placeholder', 'aria-description', 'aria-roledescription'];
@@ -107,6 +116,25 @@ async function dictionary(code) {
     return flatten((await import(path.join(I18N, `${code}.js`))).default);
 }
 
+/** A page group's copy units (directories holding an en.js), by path under pages/. */
+function groupUnits(group, dir = path.join(PAGES_DIR, group), out = []) {
+    if (!fs.existsSync(dir)) return out;
+    if (fs.existsSync(path.join(dir, 'en.js'))) out.push(path.relative(PAGES_DIR, dir).split(path.sep).join('/'));
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) if (e.isDirectory()) groupUnits(group, path.join(dir, e.name), out);
+    return out;
+}
+
+/** A page group's copy in one language, every unit's keys prefixed by its unit. */
+async function groupDictionary(group, code) {
+    const out = new Map();
+    for (const unit of groupUnits(group)) {
+        const file = path.join(PAGES_DIR, unit, `${code}.js`);
+        if (!fs.existsSync(file)) continue;
+        for (const [key, value] of flatten((await import(pathToFileURL(file).href)).default)) out.set(`${unit}:${key}`, value);
+    }
+    return out;
+}
+
 // "reads as English prose": a whitespace-delimited all-lowercase ASCII word.
 // A dot inside a token (llms.txt, ur.io, transport.go) makes it a name, not a
 // word, so trailing punctuation only counts when a space or the end follows.
@@ -116,6 +144,33 @@ const fileFor = (lang, base) => {
     if (lang === 'en') return base === '/' ? 'index.html' : `${base.slice(1)}.html`;
     return base === '/' ? `${lang}.html` : `${lang}${base}.html`;
 };
+
+const isRedirectStub = (html) => /<meta http-equiv="refresh"/i.test(html.slice(0, html.indexOf('</head>') + 1 || undefined));
+
+/**
+ * The English pages that have translations in this build, by public path: the
+ * home page, the sections and the localized groups' pages (their families
+ * found on disk), and the not-found page once its group is localized.
+ */
+function translatedEnglishPages() {
+    const out = [];
+    const walk = (dir) => {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+            const abs = path.join(dir, e.name);
+            const rel = path.relative(BUILD, abs).split(path.sep).join('/');
+            if (e.isDirectory()) {
+                if (!NON_EN_SITE_LANG_CODES.includes(rel) && rel !== '_astro') walk(abs);
+            } else if (e.name.endsWith('.html')) {
+                const base = rel === 'index.html' ? '/' : `/${rel.replace(/\.html$/, '')}`;
+                if (NON_EN_SITE_LANG_CODES.includes(base.slice(1))) continue; // /de.html is German's home
+                const notFound = base === NOT_FOUND_PATH && LOCALIZED_GROUPS.includes('not-found');
+                if ((hasLocalizedVersion(base) || notFound) && !isRedirectStub(fs.readFileSync(abs, 'utf8'))) out.push(base);
+            }
+        }
+    };
+    walk(BUILD);
+    return out.sort();
+}
 
 async function main() {
     if (!fs.existsSync(path.join(BUILD, 'index.html'))) {
@@ -139,16 +194,35 @@ async function main() {
             }
         }
     };
-    for (const base of LOCALIZED_BASE_PATHS) {
+    const englishPages = translatedEnglishPages();
+    const englishText = new Map();
+    for (const base of englishPages) {
         const twinFile = path.join(BUILD, fileFor('en', base));
-        if (fs.existsSync(twinFile)) placeholders(base === '/' ? '' : base.slice(1), fs.readFileSync(twinFile, 'utf8'));
+        const html = fs.readFileSync(twinFile, 'utf8');
+        placeholders(base === '/' ? '' : base.slice(1), html);
+        englishText.set(base, new Set(pageText(html).map((s) => s.text)));
     }
+
+    // English values → their keys, in the site dictionaries and in each group's copy
+    const valueKeys = (entries) => {
+        const out = new Map();
+        for (const [key, value] of entries) {
+            if (!out.has(value)) out.set(value, []);
+            out.get(value).push(key);
+        }
+        return out;
+    };
+    const groupsOnPages = [...new Set(englishPages.map((base) => groupForPath(base)).filter(Boolean))];
+    const groupEnglish = new Map();
+    for (const group of groupsOnPages) groupEnglish.set(group, valueKeys([...en, ...(await groupDictionary(group, 'en'))]));
 
     let pagesChecked = 0;
     for (const lang of NON_EN_SITE_LANG_CODES) {
         const dict = await dictionary(lang);
-        for (const base of LOCALIZED_BASE_PATHS) {
-            const twinFile = path.join(BUILD, fileFor('en', base));
+        const groupDicts = new Map();
+        for (const group of groupsOnPages) groupDicts.set(group, new Map([...dict, ...(await groupDictionary(group, lang))]));
+        for (const base of englishPages) {
+            const group = groupForPath(base);
             const pageFile = path.join(BUILD, fileFor(lang, base));
             const route = lang + (base === '/' ? '' : base);
             if (!fs.existsSync(pageFile)) {
@@ -162,15 +236,18 @@ async function main() {
             if (htmlLang !== lang) failures.push(`/${route}: <html lang="${htmlLang}">, expected "${lang}"`);
             placeholders(route, html);
 
-            const english = new Set(pageText(fs.readFileSync(twinFile, 'utf8')).map((s) => s.text));
+            const english = englishText.get(base);
+            const allowed = new Set([...ALLOWED_ENGLISH, ...((group && PAGE_GROUPS[group].allowEnglish) || [])]);
+            const keysOf = group ? groupEnglish.get(group) : enValueKeys;
+            const translations = group ? groupDicts.get(group) : dict;
             const seen = new Set();
             for (const { source, text } of pageText(html)) {
                 const id = `${source}\u0000${text}`;
-                if (seen.has(id) || ALLOWED_ENGLISH.has(text)) continue;
+                if (seen.has(id) || allowed.has(text)) continue;
                 seen.add(id);
                 const prose = english.has(text) && PROSE_WORD.test(text);
-                const keys = enValueKeys.get(text);
-                const label = keys && keys.every((key) => dict.has(key) && dict.get(key) !== text);
+                const keys = keysOf.get(text);
+                const label = keys && keys.every((key) => translations.has(key) && translations.get(key) !== text);
                 if (prose || label) {
                     const why = label ? `English for ${keys.join(', ')}` : 'identical to the English page';
                     failures.push(`/${route} ${source}: "${text}" (${why})`);

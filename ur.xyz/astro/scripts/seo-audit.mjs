@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { DOC_ORDER, DOC_PAGE_PATHS, UNLISTED_DOC_SLUGS, slugFor, splitFrontMatter } from "../../react/src/lib/docs-shared.js";
 import { contentDay, investorLetterMetadata } from "./pdf-freshness.mjs";
 import { reserve } from "../../react/src/data/reserve.js";
+import { LOCALIZED_GROUPS, NON_EN_SITE_LANG_CODES, NOT_FOUND_PATH, PAGE_GROUPS, SITE_LANG_CODES, basePathFor, groupForPath, hasLocalizedVersion, langForPath } from "../src/lib/route-localization.js";
 
 const DIST = path.resolve(process.argv[2] || "dist");
 if (!existsSync(DIST)) {
@@ -115,6 +116,7 @@ for (const f of htmlFiles) {
     attr((head.match(/<meta name="description"[^>]*>/) || [])[0] || "", "content"),
   );
   const lang = attr((html.match(/<html[^>]*>/) || [])[0] || "", "lang") || "";
+  const dir = attr((html.match(/<html[^>]*>/) || [])[0] || "", "dir") || "";
   const hreflangs = new Map(
     [...head.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [m[1], m[2]]),
   );
@@ -150,7 +152,7 @@ for (const f of htmlFiles) {
     }
   }
 
-  pages.set(urlPath, { f, urlPath, canonical, noindex, robotsContents, redirectStub, title, description, lang, hreflangs, ogImage, videoObjects, html });
+  pages.set(urlPath, { f, urlPath, canonical, noindex, robotsContents, redirectStub, title, description, lang, dir, hreflangs, ogImage, videoObjects, html });
 }
 
 // ── robots directives ──
@@ -255,12 +257,64 @@ for (const p of canonicalSelf) {
     }
     const targetPage = pages.get(target === "/" ? "/" : target);
     if (!targetPage) continue;
+    // a cluster is pages that are indexed: a page and its translations are indexed alike
+    const targetSelf = targetPage.canonical && toPath(targetPage.canonical) === target;
+    if (targetPage.noindex || !targetSelf) err(`${p.urlPath}: hreflang ${lang} points at ${target}, which is ${targetPage.noindex ? "noindex" : "not its own canonical"}`);
     if (lang === "x-default") continue;
+    if (targetPage.lang !== lang) err(`${p.urlPath}: hreflang ${lang} points at ${target}, whose <html lang> is "${targetPage.lang}"`);
     const targetSet = new Set([...targetPage.hreflangs.keys()]);
     const mySet = new Set([...p.hreflangs.keys()]);
     if (targetSet.size && (targetSet.size !== mySet.size || [...mySet].some((l) => !targetSet.has(l)))) {
       err(`${p.urlPath}: hreflang set differs from ${target} (${[...mySet]} vs ${[...targetSet]})`);
     }
+  }
+}
+
+// ── translated pages: every language, or none ──
+// A page group (src/lib/route-localization.js, react/src/i18n/pages/) marked
+// localized publishes each of its English pages in every site language: a
+// /<lang>/ twin for each, a page in its own right (not a redirect stub)
+// wherever the English is one, in its language and direction, and indexed
+// alike. Until a group is localized none of its /<lang>/ pages is built (nginx
+// 301s their URLs to the English page, and serves a built one as it is). Every
+// page states its language's direction (right to left for Arabic).
+{
+  const DIRS = { ar: "rtl" };
+  const twinOf = (lang, urlPath) => `/${lang}${urlPath === "/" ? "" : urlPath}`;
+  const localizedGroups = new Set(LOCALIZED_GROUPS);
+  const twinsBuilt = new Map(LOCALIZED_GROUPS.map((id) => [id, 0]));
+  for (const p of pages.values()) {
+    if (p.redirectStub) continue;
+    const lang = langForPath(p.urlPath);
+    // a left-to-right page may leave dir to its default; a right-to-left one must say so
+    if (SITE_LANG_CODES.includes(p.lang) && (p.dir || "ltr") !== (DIRS[p.lang] || "ltr")) {
+      err(`${p.urlPath}: <html lang="${p.lang}" dir="${p.dir}">, expected dir="${DIRS[p.lang] || "ltr"}"`);
+    }
+    if (lang !== "en") {
+      const base = basePathFor(p.urlPath);
+      const group = groupForPath(p.urlPath);
+      const known = hasLocalizedVersion(base) || (base === NOT_FOUND_PATH && localizedGroups.has("not-found"));
+      if (!known) err(`${p.urlPath}: built in ${lang}, but ${group ? `page group ${group} is not localized (react/src/i18n/pages/${group}/group.js)` : "the page has no translations (src/lib/route-localization.js)"}`);
+      else if (group) twinsBuilt.set(group, (twinsBuilt.get(group) || 0) + 1);
+      continue;
+    }
+    const group = groupForPath(p.urlPath);
+    if (!group || !localizedGroups.has(group)) continue;
+    for (const l of NON_EN_SITE_LANG_CODES) {
+      const twin = pages.get(twinOf(l, p.urlPath));
+      if (!twin) err(`${p.urlPath}: page group ${group} is localized, but /${l}${p.urlPath === "/" ? "" : p.urlPath} is not built`);
+      else if (twin.redirectStub) err(`${twin.urlPath}: a redirect stub, where ${p.urlPath} is a page`);
+      else {
+        if (twin.lang !== l) err(`${twin.urlPath}: <html lang="${twin.lang}">, expected "${l}"`);
+        if (twin.noindex !== p.noindex) err(`${twin.urlPath}: ${twin.noindex ? "noindex" : "indexable"}, but ${p.urlPath} is ${p.noindex ? "noindex" : "indexable"} (a page and its translations are indexed alike)`);
+      }
+    }
+  }
+  for (const [group, built] of twinsBuilt) {
+    if (!built) err(`page group ${group} is localized, but none of its pages is built in another language`);
+  }
+  for (const id of Object.keys(PAGE_GROUPS)) {
+    if (!Array.isArray(PAGE_GROUPS[id].paths) || !PAGE_GROUPS[id].paths.length) err(`page group ${id}: group.js names no paths`);
   }
 }
 

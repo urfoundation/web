@@ -21,7 +21,15 @@ export default {
         browseDocs:   'Документация',
         search:       'Поиск',
         ctaAria:    'Стоимость — текущая цена сети',
-        denomAria:  'Валюта отображения цены'
+        denomAria:  'Валюта отображения цены',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'О проекте',
+        build:       'Разработка',
+        investors:   'Инвесторам',
+        dashboard:   'Дашборд',
+        liveDashboard: 'Дашборд онлайн',
+        ctf:         'Захват флага'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'Подсеть UR в Telegram',
         socialDiscord:  'Discord URnetwork',
         socialGithub:   'Подсеть UR на GitHub',
-        productsAria:   'Продукты URnetwork на ur.io'
+        productsAria:   'Продукты URnetwork на ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'Создавайте на UR',
+        reserve:       'Резерв',
+        mainnet:       'Мейннет',
+        investorCentre:  'Центр для инвесторов'
     },
 
     disclaimer: {

@@ -8,18 +8,21 @@
 // Chromium. Re-run when the tagline or the letter title changes:
 //   node scripts/generate-og.mjs
 //
-// With --ctf it renders only the capture the flag pages' card instead, for
-// the epoch's snapshot (react/src/data/ctf-epoch.json): run it after each
-// import (scripts/ctf-import.mjs). The card is named for its epoch and words
-// (react/src/components/pages/ctf/og.js), written to react/public/ctf/og and
-// astro/public/ctf/og, and the cards of earlier snapshots are removed; the
-// seo-audit fails a build whose pages name a card that is not there.
+// With --ctf it renders only the capture the flag pages' cards instead, one
+// per site language, for the epoch's snapshot (react/src/data/ctf-epoch.json):
+// run it after each import (scripts/ctf-import.mjs). A card is named for its
+// epoch and words (react/src/components/pages/ctf/og.js), written to
+// react/public/ctf/og and astro/public/ctf/og (a card already there has the
+// same words and is kept as it is), and the cards of earlier snapshots are
+// removed; the seo-audit fails a build whose pages name a card that is not
+// there.
 
 import path from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
-import { mkdirSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { createRequire } from "node:module";
-import { buildModel } from "../react/src/components/pages/ctf/model.js";
+import { buildModel, localModel } from "../react/src/components/pages/ctf/model.js";
+import { SITE_LANG_CODES } from "../astro/src/lib/route-localization.js";
 import { ctfCard, ctfOgImage } from "../react/src/components/pages/ctf/og.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -34,8 +37,10 @@ import { readFileSync } from "node:fs";
 const fontUrl = (f) =>
   `data:font/woff2;base64,${readFileSync(path.join(PUB, f)).toString("base64")}`;
 
-function cardHtml({ kicker, title, footer }) {
-  return `<!doctype html><meta charset="utf-8"><style>
+function cardHtml({ kicker, title, footer }, lang = null) {
+  // a card in another language states it, for its fonts and its direction (Arabic reads right to left)
+  const root = lang ? `<html lang="${lang}" dir="${lang === "ar" ? "rtl" : "ltr"}">` : "";
+  return `<!doctype html>${root}<meta charset="utf-8"><style>
   @font-face { font-family: 'PPNeueBit'; src: url('${fontUrl("PPNeueBit-Bold.woff2")}') format('woff2'); font-weight: 700; }
   @font-face { font-family: 'PPNeueMontreal'; src: url('${fontUrl("PPNeueMontreal-Regular.woff2")}') format('woff2'); }
   * { margin: 0; box-sizing: border-box; }
@@ -64,13 +69,18 @@ const CTF_DIRS = [path.join(ROOT, "react/public/ctf/og"), path.join(PUB, "ctf/og
 
 function ctfCards() {
   const m = buildModel(JSON.parse(readFileSync(path.join(ROOT, "react/src/data/ctf-epoch.json"), "utf8")));
-  const name = path.basename(ctfOgImage(m));
+  const cards = SITE_LANG_CODES.map((lang) => {
+    const lm = localModel(m, lang);
+    return { name: path.basename(ctfOgImage(lm)), html: cardHtml(ctfCard(lm), lang === "en" ? null : lang) };
+  });
+  const names = new Set(cards.map((c) => c.name));
   for (const dir of CTF_DIRS) {
     mkdirSync(dir, { recursive: true });
-    for (const old of readdirSync(dir)) if (old.endsWith(".png") && old !== name) rmSync(path.join(dir, old));
+    for (const old of readdirSync(dir)) if (old.endsWith(".png") && !names.has(old)) rmSync(path.join(dir, old));
   }
-  const html = cardHtml(ctfCard(m));
-  return CTF_DIRS.map((dir) => ({ out: path.join(dir, name), html }));
+  return cards.flatMap(({ name, html }) => CTF_DIRS
+    .map((dir) => ({ out: path.join(dir, name), html }))
+    .filter((card) => !existsSync(card.out)));
 }
 
 const CARDS = process.argv.includes("--ctf") ? ctfCards() : [

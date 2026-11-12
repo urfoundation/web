@@ -354,27 +354,28 @@ http {
 
         # Retired sections of the earlier site, in every language and with
         # their .html and trailing-slash forms, 301 to their successors in
-        # one hop. The provider and extender roles became the miner role,
-        # whose page has localized copies, so they keep the language; the
-        # other successors are English-only pages.
+        # one hop, in the language of the URL: every successor has
+        # translations (the miner role, which the provider and extender roles
+        # became, the about page, the docs, the Investor Centre and the
+        # litepaper).
         location ~ ^(?<role_lang>/(?:ru|ar|zh|de|es))?/(?:providers|extenders)(?:\.html|/)?$ {
             return 301 $role_lang/miners;
         }
 
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?community(?:\.html|/)?$ {
-            return 301 /about;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/community(?:\.html|/)?$ {
+            return 301 $retired_lang/about;
         }
 
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?api(?:\.html|/)?$ {
-            return 301 /docs;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/api(?:\.html|/)?$ {
+            return 301 $retired_lang/docs;
         }
 
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?roadmap(?:\.html|/)?$ {
-            return 301 /investors;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/roadmap(?:\.html|/)?$ {
+            return 301 $retired_lang/investors;
         }
 
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?whitepaper(?:\.html|/)?$ {
-            return 301 /docs/litepaper;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/whitepaper(?:\.html|/)?$ {
+            return 301 $retired_lang/docs/litepaper;
         }
 
         # where crawlers guess the sitemap
@@ -385,32 +386,33 @@ http {
         # The docs corpus is four documents, /docs/miner, /docs/validator,
         # /docs/operator and /docs/litepaper (2026-09-25). Each retired document,
         # with its .html and trailing-slash variants and its localized paths,
-        # 301s to the document that replaced it or to the index; the markdown
+        # 301s to the document that replaced it or to the index, in the
+        # language of its path (the docs have translations); the markdown
         # twins under /docs-md follow their pages.
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?docs/provider(?:\.html|/.*)?$ {
-            return 301 /docs/miner;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/docs/provider(?:\.html|/.*)?$ {
+            return 301 $retired_lang/docs/miner;
         }
 
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?docs/protocol/protocol-research(?:\.html|/)?$ {
-            return 301 /research;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/docs/protocol/protocol-research(?:\.html|/)?$ {
+            return 301 $retired_lang/research;
         }
 
         # the trust-and-safety document is the miner guide's "Safety rules"
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?docs/trust-and-safety/trust-and-safety(?:\.html|/)?$ {
-            return 301 "/docs/miner#safety-rules";
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/docs/trust-and-safety/trust-and-safety(?:\.html|/)?$ {
+            return 301 "$retired_lang/docs/miner#safety-rules";
         }
 
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?docs/archive/whitepaper(?:\.html|/)?$ {
-            return 301 /docs/litepaper;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/docs/archive/whitepaper(?:\.html|/)?$ {
+            return 301 $retired_lang/docs/litepaper;
         }
 
         # the platform guides (CLI, EdgeOS, RouterOS, Raspberry Pi) folded into the miner guide
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?docs/(?:cli|edgeos|routeros|rpi)(?:\.html|/.*)?$ {
-            return 301 /docs/miner;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/docs/(?:cli|edgeos|routeros|rpi)(?:\.html|/.*)?$ {
+            return 301 $retired_lang/docs/miner;
         }
 
-        location ~ ^/(?:(?:ru|ar|zh|de|es)/)?docs/(?:economic-model|changelog|mcp|router|protocol|trust-and-safety|archive)(?:\.html|/.*)?$ {
-            return 301 /docs;
+        location ~ ^(?<retired_lang>/(?:ru|ar|zh|de|es))?/docs/(?:economic-model|changelog|mcp|router|protocol|trust-and-safety|archive)(?:\.html|/.*)?$ {
+            return 301 $retired_lang/docs;
         }
 
         location = /docs-md/provider.md {
@@ -437,34 +439,39 @@ http {
         # corpus copies (/docs/legal/*, /<lang>/docs/legal/*) are the same
         # document, so they 301 there in one hop, in the copy's language when
         # the build has the page in it. Ahead of the localized-page rule below,
-        # which would add a hop.
+        # which would add a hop. A 301 to English for want of a translation is
+        # never cached (see the localized-page rule).
         location ~ ^/docs/legal/(?<legal_doc>terms|privacy|vdp)(?:\.html|/)?$ {
             return 301 /$legal_doc;
         }
 
         location ~ ^/(?<legal_lang>ru|ar|zh|de|es)/docs/legal/(?<legal_doc>terms|privacy|vdp)(?:\.html|/)?$ {
-            if (-f $document_root/$legal_lang/$legal_doc.html) {
-                return 301 /$legal_lang/$legal_doc;
+            if (!-f $document_root/$legal_lang/$legal_doc.html) {
+                add_header 'Cache-Control' 'no-store' always;
+                return 301 /$legal_doc;
             }
-            return 301 /$legal_doc;
+            return 301 /$legal_lang/$legal_doc;
         }
 
         # The retired aliases' translations: /<lang>/docs/whitepaper and
         # /<lang>/investors/august-investment-letter 301 in one hop to their
-        # successor in that language when the build has it, else in English. The
-        # build may write meta-refresh stubs at those paths; this answers first.
+        # successor in that language when the build has it, else in English,
+        # uncached. The build may write meta-refresh stubs at those paths; this
+        # answers first.
         location ~ ^/(?<alias_lang>ru|ar|zh|de|es)/docs/whitepaper(?:\.html|/)?$ {
-            if (-f $document_root/$alias_lang/docs/litepaper.html) {
-                return 301 /$alias_lang/docs/litepaper$is_args$args;
+            if (!-f $document_root/$alias_lang/docs/litepaper.html) {
+                add_header 'Cache-Control' 'no-store' always;
+                return 301 /docs/litepaper$is_args$args;
             }
-            return 301 /docs/litepaper$is_args$args;
+            return 301 /$alias_lang/docs/litepaper$is_args$args;
         }
 
         location ~ ^/(?<alias_lang>ru|ar|zh|de|es)/investors/august-investment-letter(?:\.html|/)?$ {
-            if (-f $document_root/$alias_lang/investors/our-letter-to-bittensor.html) {
-                return 301 /$alias_lang/investors/our-letter-to-bittensor$is_args$args;
+            if (!-f $document_root/$alias_lang/investors/our-letter-to-bittensor.html) {
+                add_header 'Cache-Control' 'no-store' always;
+                return 301 /investors/our-letter-to-bittensor$is_args$args;
             }
-            return 301 /investors/our-letter-to-bittensor$is_args$args;
+            return 301 /$alias_lang/investors/our-letter-to-bittensor$is_args$args;
         }
 
         # The page groups' pages in another language (ur.xyz
@@ -472,13 +479,31 @@ http {
         # and its country pages, the dashboard, the docs and the legal pages,
         # the investor pages, mainnet, price, reserve and the research pages
         # under the translated /research). /<lang>/<page> serves the translated
-        # page when the build has it, and 301s to the English page until its
-        # group is localized; its .html and trailing-slash forms go to the
-        # right one of those in one hop. The build writes no redirect stub at
-        # these paths (a stub here would be served as a page).
+        # page when the build has it, its .html and trailing-slash forms 301 to
+        # it in one hop, and:
+        #   - a page the build has in English only (its group not localized
+        #     yet) 301s to the English page, from those forms too, with
+        #     Cache-Control: no-store. The translation may come with any build,
+        #     and a browser that kept the 301 would then send a visitor who
+        #     chose the language back to English, which the stored-language
+        #     redirect sends to the translation: a loop.
+        #   - a page the build has in neither language is a 404, which
+        #     error_page renders with that language's not-found page. A 301 to
+        #     the English URL would show the English one.
+        # The build writes no redirect stub at these paths (a stub here would
+        # be served as a page). No `if` below may match a page that is served:
+        # try_files does not apply in an `if` that matched.
         location ~ ^/(?<page_lang>ru|ar|zh|de|es)(?<page_path>/(?:about|build|ctf|dashboard|docs|investors|mainnet|price|reserve|terms|privacy|vdp|research/[^/]+?)(?:/[^/]+?)*?)(?<page_variant>\.html|/+)?$ {
+            set $page_english "";
             if (!-f $document_root/$page_lang$page_path.html) {
+                set $page_english $document_root$page_path.html;
+            }
+            if (-f $page_english) {
+                add_header 'Cache-Control' 'no-store' always;
                 return 301 $page_path$is_args$args;
+            }
+            if ($page_english) {
+                return 404;
             }
             if ($page_variant) {
                 return 301 https://$host/$page_lang$page_path$is_args$args;

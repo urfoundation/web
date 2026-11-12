@@ -66,6 +66,19 @@ export const NOT_FOUND_PATH = '/404';
 // The visitor's explicit language choice, written by the language switcher.
 export const LANG_STORAGE_KEY = 'ur.xyz.lang';
 
+// The stored-language redirect's last target, when it went there, and whether
+// that was its retry past the cache (sessionStorage, "<target> <ms>[ 1]"); and
+// how long a repeat of a redirect counts as a bounce (storedLanguageRedirectScript).
+export const LANG_REDIRECT_GUARD_KEY = 'ur.xyz.lang.redirect';
+export const LANG_REDIRECT_GUARD_MS = 10000;
+
+// Following a link marked data-lang-choice="<lang>" (a translation's link to
+// its English original) is an explicit choice of that language, as the
+// language switcher is: this inline script, on every page (Base.astro),
+// records it, or the stored-language redirect would send the visitor straight
+// back to the translation.
+export const LANG_CHOICE_SCRIPT = `document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-lang-choice]');if(!a)return;try{localStorage.setItem(${JSON.stringify(LANG_STORAGE_KEY)},a.getAttribute('data-lang-choice'))}catch(_){}});`;
+
 const LANG_PREFIX = new RegExp(`^/(${NON_EN_SITE_LANG_CODES.join('|')})(?=/|$)`);
 
 const exactPaths = (group) => group.paths.filter(p => !p.endsWith('/*'));
@@ -136,11 +149,19 @@ export function createRouteLocalization(groups) {
     /**
      * Where the nav and the footer link a page of a page group in `lang`: the
      * page itself in English, its translation once its group is localized, and
-     * nowhere (null: no link) while it is English-only.
+     * nowhere (null: no link) while it is English-only. A page's own links use
+     * it too, as `groupPageHref(href, lang) || href`, so a translated page
+     * links the translations; the href's ?query and #fragment stay, and an
+     * href that is no page on this site (another site's, a #fragment, a file
+     * such as /docs/litepaper.md or a PDF) is null.
      */
     function groupPageHref(path, lang) {
         if (!NON_EN_SITE_LANG_CODES.includes(lang)) return path;
-        return hasLocalizedVersion(path) ? localizedPathFor(path, lang) : null;
+        if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//')) return null;
+        const rest = path.search(/[?#]/);
+        const file = (rest < 0 ? path : path.slice(0, rest)).split('/').pop();
+        if (/\.(?!html$)[^.]+$/.test(file) || !hasLocalizedVersion(path)) return null;
+        return localizedPathFor(path, lang) + (rest < 0 ? '' : path.slice(rest));
     }
 
     /**
@@ -189,6 +210,24 @@ export function createRouteLocalization(groups) {
      * static pages: it has to run before the first paint, so it cannot wait for
      * a module. The route data is embedded; a storage failure (private mode,
      * blocked cookies) leaves the page alone.
+     *
+     * A page carries it only when it has translations (Base.astro), never the
+     * not-found page: nginx serves that at every missing URL, and a missing
+     * /docs/<x> reads like a docs page to the family rule here.
+     *
+     * Two more cases keep the English page:
+     *   - the visitor followed a link to it from the translation, the English
+     *     original opened in this tab or another: the referrer is the target,
+     *     and no redirect brought the visitor here;
+     *   - the redirect came back twice. A browser may hold a 301 from
+     *     /<lang>/<page> to the English page, cached under the config before
+     *     the pages were translated, which brings the visitor straight back.
+     *     The script keeps its last target and the time in sessionStorage:
+     *     when the same redirect comes round within LANG_REDIRECT_GUARD_MS it
+     *     goes once more with a query (<target>?, or <target>?<query>&), an
+     *     address no such 301 is cached for, and when that comes back too,
+     *     the page stays. No loop outlasts two round trips, and a cached 301
+     *     does not keep the visitor from the translation.
      */
     function storedLanguageRedirectScript() {
         const langs = JSON.stringify(NON_EN_SITE_LANG_CODES);
@@ -197,13 +236,21 @@ export function createRouteLocalization(groups) {
         const family = LOCALIZED_PATH_PREFIXES.length
             ? `&&!/^(?:${LOCALIZED_PATH_PREFIXES.map(escapeRegExp).join('|')})[^\\/]+$/.test(p)`
             : '';
+        const guard = JSON.stringify(LANG_REDIRECT_GUARD_KEY);
         return [
             '(function(){try{',
             `var l=localStorage.getItem(${JSON.stringify(LANG_STORAGE_KEY)});`,
             `if(${langs}.indexOf(l)<0)return;`,
             "var p=location.pathname.replace(/\\/index\\.html$/,'/').replace(/\\.html$/,'').replace(/\\/$/,'')||'/';",
             `if(${paths}.indexOf(p)<0${family})return;`,
-            "location.replace('/'+l+(p==='/'?'':p)+location.search+location.hash);",
+            "var t='/'+l+(p==='/'?'':p),r=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];",
+            // a link from the translation to this English original: stay
+            "if(document.referrer.split(/[?#]/)[0]===location.origin+t&&!(r&&r.redirectCount))return;",
+            // the same redirect again this soon came back: once more past the cache, then stay
+            `var n=Date.now(),g=(sessionStorage.getItem(${guard})||'').split(' '),b=g[0]===t&&n-g[1]>=0&&n-g[1]<${LANG_REDIRECT_GUARD_MS};`,
+            'if(b&&g[2])return;',
+            `sessionStorage.setItem(${guard},t+' '+n+(b?' 1':''));`,
+            "location.replace(t+(b?(location.search?location.search+'&':'?'):location.search)+location.hash);",
             '}catch(e){}})();',
         ].join('');
     }

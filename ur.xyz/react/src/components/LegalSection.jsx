@@ -1,11 +1,19 @@
 import React from 'react';
 import Section from './Section';
-import { useLanguage } from '../i18n';
+import { LANG_KEY, useLanguage } from '../i18n';
 import { LEGAL_DOCS } from '../data/legal';
 import { docIn, docsCopy } from '../lib/docs-i18n';
 import { legalRevisedDate, translatedLegal } from '../lib/legal-i18n';
 import { interpolate } from '../i18n/format.js';
 import './Legal.css';
+
+// Following the link to the English page chooses English, as the language
+// switcher does: record it, or the stored language would send the visitor
+// back to the translation. The static page's link says data-lang-choice,
+// which Base.astro records; this does the same in the SPA.
+function rememberEnglish() {
+    try { window.localStorage.setItem(LANG_KEY, 'en'); } catch (e) { /* private mode */ }
+}
 
 /**
  * LegalSection — a legal document page (terms | privacy | vdp). The English
@@ -29,7 +37,7 @@ export default function LegalSection({ doc, lang = null }) {
         <Section id={doc} eyebrow={t.legal.eyebrow} title={d.title} headingLevel="h1">
             {translated && (
                 <p className="legal-translation-note" role="note">
-                    {words.notice} <a href={`/${doc}`} hrefLang="en">{words.english}</a>
+                    {words.notice} <a href={`/${doc}`} hrefLang="en" data-lang-choice="en" onClick={rememberEnglish}>{words.english}</a>
                 </p>
             )}
             {updated && <p className="legal-updated">{updated}</p>}

@@ -5,6 +5,7 @@ import timeline from '../../data/mainnet-timeline.json';
 import { mainnetActions, mainnetAfterEpochs, mainnetBeforeEpochs, mainnetEpochs, mainnetNotices } from '../../data/mainnet';
 import { loadPageCopy } from '../../i18n/page-copy.js';
 import { interpolate, plural } from '../../i18n/format.js';
+import { groupPageHref } from '../../../../astro/src/lib/route-localization.js';
 import {
     epochBlocks,
     epochDays,
@@ -69,7 +70,7 @@ export default function MainnetPage({ lang = 'en', updated = null, summary = nul
     return (
         <div className="mainnet-page">
             {notices.map((notice) => <MainnetNotice key={notice.id} notice={notice} t={t} />)}
-            <MinerActions actions={localizeActions(mainnetActions, data)} t={t} />
+            <MinerActions actions={localizeActions(mainnetActions, data)} lang={lang} t={t} />
 
             <Section id="mainnet" eyebrow={t.intro.eyebrow} title={t.intro.title} headingLevel="h1">
                 <div className="mainnet-lede">
@@ -156,12 +157,19 @@ function MainnetNotice({ notice, t }) {
 }
 
 /**
+ * A link of the page's data to a page of this site, in the page's language
+ * once that page has translations (/docs/miner#1-install is
+ * /de/docs/miner#1-install on /de/mainnet); any other link as it is.
+ */
+const localHref = (href, lang) => groupPageHref(href, lang) || href;
+
+/**
  * The box at the top: mainnet is live, and what miners need to do now
  * (data/mainnet.js, copy.js localizeActions). It comes before the timeline's
  * own title, so its headline is an h2 under the page's single h1.
  */
-function MinerActions({ actions, t }) {
-    const links = Object.fromEntries(actions.links.map((link, index) => [`link${index + 1}`, <a href={link.href}>{link.text}</a>]));
+function MinerActions({ actions, lang, t }) {
+    const links = Object.fromEntries(actions.links.map((link, index) => [`link${index + 1}`, <a href={localHref(link.href, lang)}>{link.text}</a>]));
     return (
         <section className="mainnet-actions" id="actions" aria-labelledby="actions-heading">
             <div className="mainnet-actions-box">
@@ -173,7 +181,7 @@ function MinerActions({ actions, t }) {
                             <span className="mainnet-actions-no" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                             <div className="mainnet-actions-step">
                                 <p><strong>{step.title}</strong> {step.detail}</p>
-                                {step.link && <a className="mainnet-actions-link" href={step.link.href}>{step.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>}
+                                {step.link && <a className="mainnet-actions-link" href={localHref(step.link.href, lang)}>{step.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>}
                             </div>
                         </li>
                     ))}
@@ -235,7 +243,7 @@ function Milestone({ event, explorers, lang, t }) {
                 <p className="roadmap-body">{event.detail}</p>
                 {rows.length > 0 && (
                     <ul className="mainnet-sources" aria-label={interpolate(t.labels.sourcesAria, { title: event.title })}>
-                        {rows.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} t={t} />)}
+                        {rows.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} lang={lang} t={t} />)}
                     </ul>
                 )}
                 {/* a run of transactions (a deployment's) is listed, closed, under its contracts */}
@@ -243,7 +251,7 @@ function Milestone({ event, explorers, lang, t }) {
                     <details className="mainnet-sources-more">
                         <summary>{runs(plural(lang, folded.length, t.labels.transactions), { count: folded.length })}</summary>
                         <ul className="mainnet-sources" aria-label={interpolate(t.labels.transactionsAria, { title: event.title })}>
-                            {folded.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} t={t} />)}
+                            {folded.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} lang={lang} t={t} />)}
                         </ul>
                     </details>
                 )}
@@ -253,11 +261,11 @@ function Milestone({ event, explorers, lang, t }) {
 }
 
 /** A source with a ref: its label, a contract's address in the code face, and the link. */
-function Source({ source, link, t }) {
+function Source({ source, link, lang, t }) {
     const external = isExternal(link.href) ? EXTERNAL : {};
     const arrow = external.target ? <span aria-hidden="true"> ↗</span> : null;
     if (source.kind === 'doc') {
-        return <li><a href={link.href} {...external}>{link.text}{arrow}</a></li>;
+        return <li><a href={localHref(link.href, lang)} {...external}>{link.text}{arrow}</a></li>;
     }
     return (
         <li>

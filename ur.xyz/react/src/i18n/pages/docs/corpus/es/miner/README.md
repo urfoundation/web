@@ -51,7 +51,7 @@ La mayoría de los mineros se unen al **pool** de un operador. No necesitas tu p
 
 ## Qué necesitas
 
-- **Un ordenador con Linux, macOS o Windows que permanezca en línea.** Sirven un PC doméstico, un servidor o una Raspberry Pi 2 o posterior. En Windows el minero funciona mientras tengas la sesión iniciada.
+- **Una computadora con Linux, macOS o Windows que permanezca en línea.** Sirven un PC doméstico, un servidor o una Raspberry Pi 2 o posterior. En Windows el minero funciona mientras tengas la sesión iniciada.
 - **Una dirección pública de internet estable por minero.** Para ejecutar más de una salida desde un host, consulta [Varias salidas en un mismo host](/docs/miner/advanced#several-exits-on-one-host).
 - **Puertos abiertos para el extensor.** El minero también ejecuta un extensor, que gana una parte de cada contrato que transporta. Necesita el puerto TCP 443 entrante; se recomiendan los puertos UDP 443 y 4053, y el UDP 53 es opcional. En Linux también necesita permiso para escuchar en el puerto 443. Consulta [Ejecutar un extensor](/docs/miner/extender).
 - **Una cuenta con un operador de red.** El minero usa el operador predeterminado, `bringyour.com`, a menos que [elijas otro](/docs/miner/run#choose-an-operator). Obtendrás de tu cuenta un **código de autorización** (auth code) para iniciar la sesión del minero.
@@ -99,7 +99,7 @@ Te guía por cuatro pasos, y puedes detenerlo y volver a ejecutarlo en cualquier
 
 1. **Iniciar sesión.** Pega un código de autorización de tu cuenta de operador. La solicitud oculta lo que pegas.
 2. **Registrar este dispositivo.** Un dispositivo nuevo obtiene su propia identidad de minero, guardada en `~/.urnetwork`.
-3. **Dirección de pago.** La dirección de tu coldkey de Bittensor. Setup imprime un mensaje corto; fírmalo en tu app de wallet (Polkadot.js, Talisman o btcli) y pega la firma. Puedes pulsar Enter para omitir este paso y [configurarla más tarde](/docs/miner/rewards#set-your-payout-wallet).
+3. **Dirección de pago.** La dirección de tu coldkey de Bittensor. Setup imprime un mensaje corto; fírmalo en tu app de wallet (Polkadot.js, Talisman o btcli) y pega la firma. Puedes presionar Enter para omitir este paso y [configurarla más tarde](/docs/miner/rewards#set-your-payout-wallet).
 4. **Mantenerlo en marcha.** Inicia el minero en segundo plano ahora y de nuevo tras cada reinicio (en Windows, cada vez que inicias sesión), y lo mantiene actualizado.
 
 Si usaste un instalador, ya inició tu sesión, registró este dispositivo y ejecuta el minero en segundo plano. Ejecuta `urnetwork setup --no-service` para añadir tu dirección de pago; `--no-service` evita que setup añada un segundo minero en segundo plano junto al del instalador.

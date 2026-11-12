@@ -43,14 +43,14 @@ El comando impreso conserva el operador y el dispositivo que estás usando, así
 
 ### Firmar con un archivo de seed en el minero
 
-Si guardas a propósito la seed de la coldkey en el ordenador del minero, el minero puede obtener y firmar la declaración por sí mismo:
+Si guardas a propósito la seed de la coldkey en la computadora del minero, el minero puede obtener y firmar la declaración por sí mismo:
 
 ```bash
 provider wallet set '<coldkey_ss58>' \
   --coldkey_seed_file=/absolute/private/coldkey.seed
 ```
 
-El archivo debe existir ya, pertenecerte, ser privado (por ejemplo con modo `0600`) y no tener enlaces simbólicos en su ruta. Contiene el mini secreto sr25519 en bruto de 32 bytes, o lo mismo como 64 caracteres hexadecimales con un `0x` opcional. No es una frase mnemónica. El comando rechaza una seed que no corresponda a la dirección, y la seed nunca sale de tu ordenador.
+El archivo debe existir ya, pertenecerte, ser privado (por ejemplo con modo `0600`) y no tener enlaces simbólicos en su ruta. Contiene el mini secreto sr25519 en bruto de 32 bytes, o lo mismo como 64 caracteres hexadecimales con un `0x` opcional. No es una frase mnemónica. El comando rechaza una seed que no corresponda a la dirección, y la seed nunca sale de tu computadora.
 
 También puedes configurar la wallet al iniciar el minero: `provider provide --wallet='<coldkey_ss58>' --coldkey_seed_file=/absolute/private/coldkey.seed`. Si eso falla, el minero registra el fallo y sigue funcionando, así que revisa el registro antes de confiar en ello.
 
@@ -58,13 +58,13 @@ También puedes configurar la wallet al iniciar el minero: `provider provide --w
 
 Las recompensas se cuentan por **épocas**. Una nueva configuración de wallet empieza en la **siguiente** época y dura 65.536 épocas, así que configúrala antes de la época en la que quieras ganar y renuévala antes de que caduque. Nunca cambia adónde van las recompensas anteriores. Para elegir en cambio un rango exacto, pasa tanto `--wallet-from-epoch=<epoch>` como `--wallet-through-epoch=<epoch>` a `wallet challenge` y `wallet set`; el operador sigue decidiendo la época más temprana que acepta.
 
-El minero guarda cada declaración firmada en `.provider.jwt.wallet-consent/history.json` dentro de `~/.urnetwork`. Guárdalo con tu [copia de seguridad](/docs/miner/run#back-up-your-miner). Si el envío de una declaración se interrumpe, volver a ejecutar el mismo comando envía la misma declaración firmada, aunque la seed ya no esté en el ordenador.
+El minero guarda cada declaración firmada en `.provider.jwt.wallet-consent/history.json` dentro de `~/.urnetwork`. Guárdalo con tu [copia de seguridad](/docs/miner/run#back-up-your-miner). Si el envío de una declaración se interrumpe, volver a ejecutar el mismo comando envía la misma declaración firmada, aunque la seed ya no esté en la computadora.
 
 Cada dispositivo que deba ganar necesita su propia wallet firmada; varios dispositivos pueden usar la misma coldkey. Para salidas adicionales en un mismo host, selecciona cada una con `--provider-jwt`: consulta [Varias salidas en un mismo host](/docs/miner/advanced#several-exits-on-one-host). Para firmar una sola vez para todos los operadores de la lista, consulta [Firmar una vez para todos los operadores de la lista](/docs/miner/advanced#sign-once-for-every-listed-operator).
 
 ## Cómo se cuentan las recompensas
 
-Las recompensas del pool dependen del tráfico que tu minero completó y de lo fiable que resultó al medirlo. El operador anota el trabajo completado a nombre de tu dispositivo y paga a la wallet firmada para esa época. **El tráfico de pago y el gratuito del mismo tamaño ganan el mismo crédito.** Los saldos de cuenta, las reservas, los pagos de suscripciones y los contratos sin terminar no son prueba de trabajo.
+Las recompensas del pool dependen del tráfico que tu minero completó y de lo confiable que resultó al medirlo. El operador anota el trabajo completado a nombre de tu dispositivo y paga a la wallet firmada para esa época. **El tráfico de pago y el gratuito del mismo tamaño ganan el mismo crédito.** Los saldos de cuenta, las reservas, los pagos de suscripciones y los contratos sin terminar no son prueba de trabajo.
 
 La parte de cada dispositivo en el pool es proporcional a:
 
@@ -73,7 +73,7 @@ completed usage bytes × reliability
 reliability = confirmations / max(assignments, reliability_a_min)
 ```
 
-Para cobrar por una época, un dispositivo necesita un uso completado mayor que cero, al menos el número requerido de comprobaciones de verificación, al menos una confirmación, una wallet firmada para esa época y ninguna vinculación activa al nivel superior. Los dispositivos que pagan a la misma coldkey se suman en un solo pago. Desde la época de cambio de la liquidación v2, el pool se reparte solo por uso completado, sin factor de fiabilidad ni mínimo, en una cuenta por cada coldkey de pago que nunca caduca (consulta el [litepaper](/docs/litepaper)).
+Para cobrar por una época, un dispositivo necesita un uso completado mayor que cero, al menos el número requerido de comprobaciones de verificación, al menos una confirmación, una wallet firmada para esa época y ninguna vinculación activa al nivel superior. Los dispositivos que pagan a la misma coldkey se suman en un solo pago. Desde la época de cambio de la liquidación v2, el pool se reparte solo por uso completado, sin factor de confiabilidad ni mínimo, en una cuenta por cada coldkey de pago que nunca caduca (consulta el [litepaper](/docs/litepaper)).
 
 Los validadores miden la calidad del enrutamiento por su cuenta y ponderan los pools de los operadores y las flotas del nivel superior. A los mineros se les paga **momentum**: la parte de la emisión de la subred para mineros que se usa ahora para impulsar la red, repartida entre el nivel de pools y el nivel superior según una política. El momentum es del 10 %; la política publicada por tu operador indica el valor actual. La [Network Capacity Reserve](/reserve), la cuenta `ur-reserve`, recibe el resto: emisión de los mineros × (1 − momentum). Su parte no es fija; se reduce a medida que crece el momentum. El momentum es una parte de la emisión, no un precio fijo por byte; la política publicada por tu operador y los archivos de pago muestran las ganancias reales. La reserva es independiente de la garantía de reclamaciones de la bóveda de liquidación.
 
@@ -125,4 +125,4 @@ El crédito aplazado no caduca. Una reclamación posterior paga el crédito acum
 
 Reclama antes de que caduque el derecho. En mainnet son ocho épocas más una época de gracia; después, las recompensas sin reclamar pueden volver al pool del mismo operador. La caducidad no elimina el crédito ya aceptado. Desde la época de cambio de la liquidación v2, las cuentas nunca caducan.
 
-Para reclamar automáticamente, o enviar desde un ordenador distinto del minero, consulta [Avanzado](/docs/miner/advanced#claim-automatically).
+Para reclamar automáticamente, o enviar desde una computadora distinta del minero, consulta [Avanzado](/docs/miner/advanced#claim-automatically).

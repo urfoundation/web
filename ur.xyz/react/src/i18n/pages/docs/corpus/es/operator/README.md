@@ -303,7 +303,7 @@ Para el mapa de puertos en loopback de arriba, configura así tu proxy inverso H
 | --- | --- | --- |
 | `https://api.example.net` | `http://127.0.0.1:8080` | reenvía las rutas de la API y la dirección real del cliente |
 | `wss://connect.example.net` | `http://127.0.0.1:8081` | conserva las actualizaciones a WebSocket y las conexiones de larga duración |
-| estado del worker | `http://127.0.0.1:8082/status` | mantenlo privado, para la monitorización |
+| estado del worker | `http://127.0.0.1:8082/status` | mantenlo privado, para el monitoreo |
 | Intercambio de Connect | TCP `127.0.0.1:5080` | solo interno |
 
 Termina TLS con certificados para tus nombres públicos. El ingress debe **sobrescribir `X-UR-Forwarded-For` con un único par `IP:port` real del cliente**, con corchetes alrededor de una dirección IPv6. El [resolvedor de direcciones del servidor](https://github.com/urnetwork/server/blob/main/session/client_session.go) ignora a propósito el `X-Forwarded-For` estándar; `/verify` depende de observar la dirección de salida real del minero. Solo tu ingress de confianza debe llegar a los listeners internos. Enruta `/verify`, `/sn/*` y el tráfico WebSocket sin reglas de autenticación ni de almacenamiento en búfer que interfieran con sus propios protocolos.

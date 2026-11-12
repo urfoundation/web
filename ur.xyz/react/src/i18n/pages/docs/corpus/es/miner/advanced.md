@@ -68,7 +68,7 @@ provider wallet hotkey set '<coldkey_ss58>' \
   --signature='0x<64-byte sr25519 signature>'
 ```
 
-La declaración espera en `hotkey-wallet/pending.json` hasta que se configura o se reemplaza. Si guardas a propósito la seed de la coldkey en este ordenador, pasa `--coldkey_seed_file=/absolute/private/coldkey.seed` a `set` en lugar de `--message` y `--signature`.
+La declaración espera en `hotkey-wallet/pending.json` hasta que se configura o se reemplaza. Si guardas a propósito la seed de la coldkey en esta computadora, pasa `--coldkey_seed_file=/absolute/private/coldkey.seed` a `set` en lugar de `--message` y `--signature`.
 
 `set` añade la firma de la hotkey, agrega la nueva entrada a la cadena y luego guarda la cadena y la delegación en cada operador con sesión iniciada, informando de cada uno; que falle un operador nunca detiene a los demás. `provider provide --all-operators` con `--hotkey_seed_file` mantiene delegados a todos los operadores con sesión iniciada, al iniciar y cada hora, incluidos los operadores añadidos después a la lista, así que la coldkey firma una sola vez. `provider wallet hotkey status` muestra la cadena, cualquier declaración pendiente y la delegación en cada operador.
 
@@ -102,9 +102,9 @@ Usa el flag de registro solo cuando añadas salidas realmente nuevas; los reinic
 
 ## Reclamar automáticamente
 
-### Enviar reclamaciones desde otro ordenador
+### Enviar reclamaciones desde otra computadora
 
-Para mantener la clave del relayer fuera del minero, comprueba la reclamación en el minero con `provider claim` y luego envía sus datos exactos de reclamación y la dirección de la bóveda desde otro ordenador con `snclaim`. Compílalo desde el mismo código fuente:
+Para mantener la clave del relayer fuera del minero, comprueba la reclamación en el minero con `provider claim` y luego envía sus datos exactos de reclamación y la dirección de la bóveda desde otra computadora con `snclaim`. Compílalo desde el mismo código fuente:
 
 ```bash
 # From sn/:
@@ -119,7 +119,7 @@ snclaim submit --calldata='0x<verified claim calldata>' \
   --chain_id=964 --key_file=/absolute/private/relayer.key --dry-run
 ```
 
-Usa el ID de cadena real de tu despliegue y quita `--dry-run` para enviarla. El ordenador que envía sigue necesitando una conexión RPC. Para ver si una reclamación ya fue aceptada:
+Usa el ID de cadena real de tu despliegue y quita `--dry-run` para enviarla. La computadora que envía sigue necesitando una conexión RPC. Para ver si una reclamación ya fue aceptada:
 
 ```bash
 snclaim status --epoch='<settlement_epoch>' --no_id='<operator id>' \
@@ -183,7 +183,7 @@ Para ver dónde estás, la página **Top 200** de ur.io muestra la puntuación y
 
 ### Cómo reclamar uno
 
-Necesitas una coldkey de Bittensor con suficiente TAO para la quema, una hotkey para la flota y los archivos de identidad de los mineros (`~/.urnetwork`). Mantén la coldkey en un único ordenador de registro; los mineros solo necesitan sus propias identidades. El registro, la publicación, la vinculación y la revocación en mainnet solo funcionan en Linux y macOS.
+Necesitas una coldkey de Bittensor con suficiente TAO para la quema, una hotkey para la flota y los archivos de identidad de los mineros (`~/.urnetwork`). Mantén la coldkey en una única computadora de registro; los mineros solo necesitan sus propias identidades. El registro, la publicación, la vinculación y la revocación en mainnet solo funcionan en Linux y macOS.
 
 1. **Escribe el manifiesto de la flota.** Enumera el ID de cadena de la red, el netuid y el coordinador, un ID de flota, la hotkey de la flota, una generación, y el ID de cliente y la clave pública de cada dispositivo. `provider fleet init` lo construye a partir de los archivos de los mineros, y `provider fleet manifest --manifest=<path>` lo comprueba.
 2. **Registra el UID.** Ejecuta `provider fleet register` con el manifiesto, los archivos de seed de la hotkey y de la coldkey y los endpoints `--substrate`. Sin `--apply` es una ejecución de prueba que indica la quema y la comisión actuales. Añade `--apply` para firmar y difundir, con `--burn_limit_rao` y `--fee_limit_rao` como topes: la cadena rechaza un registro que quemaría más de tu límite.

@@ -30,7 +30,7 @@ export default {
             title: 'Situación actual',
             headline: 'UR llega a Bittensor con una red P2P de privacidad que ya existe hoy y tiene distribución masiva',
             alt: 'Situación actual: más de 350K usuarios activos mensuales, más de 100K proveedores de red, más de 100 países y $0 de coste de adquisición de clientes.',
-            summary: 'La red ya tiene demanda (350K+ usuarios activos mensuales), oferta (100K+ proveedores de red), cobertura (100+ países) y distribución ($0 de CAC): aplicaciones de consumo operativas en iOS, Android, macOS y el navegador, con Windows y Linux muy pronto. Paga a quienes contribuyen por el ancho de banda, y la subred convierte la capacidad de enrutamiento en un mercado puntuado por fiabilidad, geografía, tiempo de actividad y tráfico real atendido.',
+            summary: 'La red ya tiene demanda (350K+ usuarios activos mensuales), oferta (100K+ proveedores de red), cobertura (100+ países) y distribución ($0 de CAC): aplicaciones de consumo operativas en iOS, Android, macOS y el navegador, con Windows y Linux muy pronto. Paga a quienes contribuyen por el ancho de banda, y la subred convierte la capacidad de enrutamiento en un mercado puntuado por confiabilidad, geografía, tiempo de actividad y tráfico real atendido.',
         },
         {
             title: 'La misión',

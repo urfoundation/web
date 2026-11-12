@@ -64,6 +64,19 @@ export default {
         intro: 'Cada país tiene diez slots por época (una semana): cinco para proveedores y cinco para extensores. Un slot que nadie gana pasa al fondo de ese país, y cada ganador allí se lleva su slot y una quinta parte del fondo. {rule}',
     },
 
+    start: {
+        note: 'Captura la bandera empieza con la época {first}, en el bloque {block}, hacia las {clock} del {day}.',
+        live: 'Captura la bandera está en marcha desde la época {first}.',
+        in: 'Empieza en aproximadamente',
+        days: 'días',
+        hours: 'horas',
+        minutes: 'minutos',
+        seconds: 'segundos',
+        blocks: 'Bloques restantes',
+        go: 'En marcha',
+        about: 'Empieza en aproximadamente {time}.',
+    },
+
     rule: {
         drawn: 'Donde un slot quedó sin reclamar, un minero nuevo que se mantenga en línea la mitad de la época gana sin selección aleatoria.',
         open: 'La selección aleatoria de cada país elige hasta cinco ganadores por rol, y con cinco participantes o menos, cada participante gana un slot.',

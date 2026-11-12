@@ -17,15 +17,20 @@
 // prop. Its first render is this one, and nothing in it varies by build: Easy
 // wins is the epoch's draw and the card shows the biggest open pot, so the
 // page's fingerprint, and its sitemap <lastmod>, change only when the data
-// does.
+// does. Until capture the flag starts, a note above everything else says when
+// (in the HTML, from the snapshot's prelaunch block) and counts down to it on
+// the visitor's clock (ctf/Countdown.jsx, a small island that brings its words
+// with it and hydrates on load, as the clock is at the top of the page); the
+// build of a snapshot from after the start leaves it out (model.js startNote).
 import Base from '../../layouts/Base.astro';
 import DisclaimerStatic from '../DisclaimerStatic.astro';
 import NavIsland from '../../islands/NavIsland.jsx';
 import FooterStatic from '../FooterStatic.astro';
 import CtfPage from '@react/components/pages/Ctf.jsx';
 import Board from '@react/components/pages/ctf/Board.jsx';
+import Countdown from '@react/components/pages/ctf/Countdown.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
-import { API_STATE, SITE, hubDescription, hubTitle, localModel } from '@react/components/pages/ctf/model.js';
+import { API_STATE, SITE, hubDescription, hubTitle, localModel, startNote } from '@react/components/pages/ctf/model.js';
 import { ctfCopy } from '@react/components/pages/ctf/i18n.js';
 import { pagePath } from '@react/components/pages/ctf/links.js';
 import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
@@ -47,6 +52,8 @@ const islandLang = lang === 'en' ? {} : { lang };
 const copy = ctfCopy(lang);
 const url = `${SITE}${pagePath(lang, '/ctf')}`;
 const description = hubDescription(m);
+// the note until capture the flag starts: null once the snapshot is from after the start
+const note = startNote(m);
 // The data as a Dataset (Dataset Search), its distribution the JSON API; a
 // translation's is the same data described in its language.
 const jsonLd = [{
@@ -88,6 +95,7 @@ const jsonLd = [{
             {/* "Updated" states the sitemap's lastmod: the build fills the
                 token in once the page is fingerprinted (src/lib/lastmod.js) */}
             <CtfPage lang={lang} updated={LASTMOD_TOKEN}>
+                {note && <Countdown slot="countdown" {...note} client:load />}
                 <Board slot="board" {...islandLang} client:idle={{ timeout: 1500 }} />
             </CtfPage>
         </main>

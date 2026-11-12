@@ -278,25 +278,30 @@ expect_successor() {
     expect_response "$host" "$target" 200
 }
 
-# ur.xyz's retired sections, in every language, go to their successors in one
-# hop, from their .html and trailing-slash forms too. The provider and
-# extender roles keep the language: the miner page has localized copies.
+# ur.xyz's retired sections and documents, in every language, go to their
+# successors in one hop, from their .html and trailing-slash forms too, in the
+# language of the URL: every successor has translations.
 for lang in '' /ru /ar /zh /de /es; do
     for path in providers extenders; do
         expect_successor ur.xyz "$lang/$path" "$lang/miners"
     done
-    expect_successor ur.xyz "$lang/community" /about
-    expect_successor ur.xyz "$lang/api" /docs
-    expect_successor ur.xyz "$lang/roadmap" /investors
-    expect_successor ur.xyz "$lang/whitepaper" /docs/litepaper
+    expect_successor ur.xyz "$lang/community" "$lang/about"
+    expect_successor ur.xyz "$lang/api" "$lang/docs"
+    expect_successor ur.xyz "$lang/roadmap" "$lang/investors"
+    expect_successor ur.xyz "$lang/whitepaper" "$lang/docs/litepaper"
+    expect_successor ur.xyz "$lang/docs/provider" "$lang/docs/miner"
+    expect_successor ur.xyz "$lang/docs/cli" "$lang/docs/miner"
+    expect_successor ur.xyz "$lang/docs/archive/whitepaper" "$lang/docs/litepaper"
+    expect_successor ur.xyz "$lang/docs/protocol/protocol-research" "$lang/research"
+    expect_successor ur.xyz "$lang/docs/economic-model" "$lang/docs"
 done
 for variant in / .html; do
     expect_response ur.xyz "/de/providers$variant" 301 /de/miners
     expect_response ur.xyz "/extenders$variant" 301 /miners
     expect_response ur.xyz "/community$variant" 301 /about
-    expect_response ur.xyz "/es/api$variant" 301 /docs
+    expect_response ur.xyz "/es/api$variant" 301 /es/docs
     expect_response ur.xyz "/roadmap$variant" 301 /investors
-    expect_response ur.xyz "/zh/whitepaper$variant" 301 /docs/litepaper
+    expect_response ur.xyz "/zh/whitepaper$variant" 301 /zh/docs/litepaper
 done
 expect_successor ur.xyz /sitemap.xml /sitemap-index.xml
 

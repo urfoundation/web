@@ -254,6 +254,13 @@ export default {
                 'Die vollständige Mitteilung im sn-Repo',
             ],
         },
+        'extender-relay-share': {
+            title: 'Extender erhalten ihren Anteil nur bei Verträgen, die sie weiterleiten können',
+            detail: 'Ab dem Server-Release des Netzbetreibers vom 12. November ist ein Extender nur dann einer der Hops eines Vertrags und erhält seinen Anteil an dessen Nutzung, wenn er den Vertrag weitergeleitet haben kann, wie der Subnet-Eigentümer am 11. November entschieden hat. Eine Verbindung zählt als weitergeleitet, wenn sie von der Adresse eines Extenders kommt, und drei Arten kommen von dieser Adresse, ohne weitergeleitet zu sein: die eigene Verbindung des Extender-Hosts, andere Geräte aus dem eigenen Netzwerk des Extenders, die seine Adresse teilen, und Provider anderer Netzwerke, die sie teilen, während sie öffentlich bereitstellen, und sich immer direkt mit der Plattform verbinden. Diese machen den Extender nicht mehr zu einem Hop, sodass ihren Providern die gesamte Nutzung ihrer Verträge angerechnet wird, wo bisher einem Extender ein Anteil davon angerechnet wurde. Eine Verbindung von einer anderen Adresse aus dem IPv6-/64 eines Extenders, von der Hosts üblicherweise senden, zählt jetzt als von ihm weitergeleitet. Verträge, die vor dem Release erstellt wurden, behalten ihre Hops, und SN25-Pool-Belohnungen werden weiterhin nach abgeschlossener Nutzung aufgeteilt.',
+            sources: [
+                'Die vollständige Mitteilung im sn-Repo',
+            ],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Claims für Epoche 5',
             detail: 'Epoche 5 endet mit Block 9,499,228, und die Claims folgen nach ihrer Anfechtungsfrist von 14,400 Blöcken. Die zurückgewonnene Finanzierung der Epochen 1 und 3 ist nicht Teil der Auszahlung von Epoche 5: Ihre Aufnahme wurde nicht rechtzeitig eingeplant (siehe die Mitteilung zu Epoche 3 oben).',

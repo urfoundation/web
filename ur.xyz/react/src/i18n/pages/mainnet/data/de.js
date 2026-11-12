@@ -3,6 +3,17 @@
 // `node tests/i18n-staleness.mjs --unit mainnet/data --accept de <key> ...` from react/.
 export default {
     notices: {
+        'notice-extender-relay-share': {
+            title: 'Extender erhalten ihren Anteil nur bei Verträgen, die sie weiterleiten können. Provider auf der Adresse eines Extenders werden voll angerechnet.',
+            paragraphs: [
+                'Ab dem Server-Release des Netzbetreibers vom 12. November ist ein Extender nur dann einer der Hops eines Vertrags und erhält seinen Anteil an dessen Nutzung, wenn er den Vertrag weitergeleitet haben kann. Das ist die Regel, die der Subnet-Eigentümer am 11. November festgelegt hat: Ein Vertrag, der über einen Extender kommt, zählt den Extender als einen seiner n Hops, denen jeweils 1/n der Nutzung angerechnet wird.',
+                'Der Netzbetreiber zählt eine Verbindung als weitergeleitet, wenn sie von der Adresse eines Extenders kommt. Drei Arten von Verbindungen kommen von dieser Adresse, ohne weitergeleitet zu sein, und machen den Extender nicht mehr zu einem Hop: die eigene Verbindung des Extender-Hosts, andere Geräte aus dem eigenen Netzwerk des Extenders, die seine Adresse teilen, und Provider anderer Netzwerke, die seine Adresse teilen, während sie öffentlich bereitstellen, da sich ein öffentlicher Provider immer direkt mit der Plattform verbindet.',
+                'Einem Provider eines anderen Netzwerks auf der Adresse eines Extenders wird also die gesamte Nutzung seiner Verträge angerechnet, wo bisher dem Netzwerk des Extenders ein Anteil davon angerechnet wurde, meist die Hälfte. Ebenso einem Provider, der ein Gerät bedient, das sich über einen Extender aus dem eigenen Netzwerk des Geräts verbindet, wo bisher dem eigenen Netzwerk des Geräts ein Anteil angerechnet wurde. Innerhalb eines Netzwerks wird den Providern einer Flotte auf der Adresse ihres eigenen Extenders die Nutzung angerechnet, die sie bedienen, und die Summe des Netzwerks bleibt unverändert. Die eigenen Verträge eines Extender-Hosts bleiben unverändert.',
+                'Eine Art der Weiterleitung zählt jetzt, die bisher nicht zählte: eine Verbindung von einer anderen Adresse aus dem IPv6-/64 eines Extenders. Hosts senden üblicherweise von einer temporären Adresse ihres /64 statt von der, mit der sie aktiviert wurden, sodass Weiterleitungen eines Extenders von einer solchen Adresse ihm nichts einbrachten. Bei diesen Verträgen ist der Extender jetzt einer der Hops, neben dem Provider.',
+                'SN25-Pool-Belohnungen werden weiterhin nach abgeschlossener Nutzung aufgeteilt, und die Provider-Subvention des Netzbetreibers, die für Verkehr seit dem Stichtag 6. Oktober nur für die wöchentlichen Punkte zählt, die er vergibt, folgt denselben Hops. Verträge, die vor dem Release erstellt wurden, behalten ihre Hops. Du musst nichts tun.',
+            ],
+            link: 'Vollständige Mitteilung lesen',
+        },
         'notice-capture-the-flag': {
             title: 'Capture the Flag startet mit Epoche 8: zehn Slots in jedem Land, neben dem Provider-Pool.',
             paragraphs: [

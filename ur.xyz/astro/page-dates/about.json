@@ -1,0 +1,9 @@
+{
+  "about": "The day each page of the ur.xyz page group about (react/src/i18n/pages/about/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
+  "pages": {
+    "/about": {
+      "fingerprint": "13612a862c104ff3",
+      "lastmod": "2026-11-06"
+    }
+  }
+}

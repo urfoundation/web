@@ -3,6 +3,7 @@ import './Footer.css';
 import { useLanguage, LANG_ORDER, pathForLang } from '../i18n';
 import { buildPath, isTranslatedRoute, useRoute } from '../router';
 import { LAUNCH_VIDEO_HASH } from './LaunchVideo';
+import { groupPageHref } from '../../../astro/src/lib/route-localization.js';
 
 const GENERAL_DISCORD = 'https://discord.gg/urnetwork';
 const TELEGRAM_URL = 'https://t.me/ursn25';
@@ -40,11 +41,11 @@ export default function Footer() {
             <div className="footer-directory">
                 <nav className="footer-column" aria-label={t.footer.learn}>
                     <h2>{t.footer.learn}</h2>
-                    <a href="/docs">{t.nav.docs}</a>
-                    {code === 'en' && <a href="/build">Build on UR</a>}
+                    <a href={path('docs')}>{t.nav.docs}</a>
+                    {groupPageHref('/build', code) && <a href={groupPageHref('/build', code)}>{t.footer.buildOnUr}</a>}
                     <a href={path('research')}>{t.nav.research}</a>
-                    {code === 'en' && <a href="/about">About</a>}
-                    <a href="/docs/litepaper">{t.nav.whitepaper}</a>
+                    {groupPageHref('/about', code) && <a href={groupPageHref('/about', code)}>{t.nav.about}</a>}
+                    <a href={path('docs', 'litepaper')}>{t.nav.whitepaper}</a>
                 </nav>
 
                 <nav className="footer-column" aria-label={t.nav.network}>
@@ -52,17 +53,17 @@ export default function Footer() {
                     <a href={path('operators')}>{t.nav.operators}</a>
                     <a href={path('miners')}>{t.nav.miners}</a>
                     <a href={path('validators')}>{t.nav.validators}</a>
-                    {code === 'en' && <a href="/dashboard">Dashboard</a>}
-                    {code === 'en' && <a href="/reserve">Reserve</a>}
-                    {code === 'en' && <a href="/mainnet">Mainnet</a>}
-                    {code === 'en' && <a href="/ctf">Capture the flag</a>}
+                    {groupPageHref('/dashboard', code) && <a href={groupPageHref('/dashboard', code)}>{t.nav.dashboard}</a>}
+                    {groupPageHref('/reserve', code) && <a href={groupPageHref('/reserve', code)}>{t.footer.reserve}</a>}
+                    {groupPageHref('/mainnet', code) && <a href={groupPageHref('/mainnet', code)}>{t.footer.mainnet}</a>}
+                    {groupPageHref('/ctf', code) && <a href={groupPageHref('/ctf', code)}>{t.nav.ctf}</a>}
                 </nav>
 
                 <nav className="footer-column" aria-label={t.footer.resources}>
                     <h2>{t.footer.resources}</h2>
                     <a href={`${path('home')}${LAUNCH_VIDEO_HASH}`}>{t.footer.launchVideo}</a>
                     <a href={BRAND_KIT} target="_blank" rel="noopener noreferrer">{t.footer.brandKit}</a>
-                    {code === 'en' && <a href="/investors">Investor Centre</a>}
+                    {groupPageHref('/investors', code) && <a href={groupPageHref('/investors', code)}>{t.footer.investorCentre}</a>}
                     <a href="/llms.txt">llms.txt</a>
                 </nav>
             </div>

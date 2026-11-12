@@ -279,6 +279,11 @@ test('local notes, when written, are dated and reviewed for one of the 249', () 
         assert.ok(codes.has(code), code);
         assert.match(note.reviewed, /^\d{4}-\d{2}-\d{2}$/, code);
         assert.ok(typeof note.text === 'string' && note.text.length > 40, code);
+        // its translations, under the site languages' codes
+        for (const [key, value] of Object.entries(note)) {
+            if (key === 'reviewed' || key === 'text') continue;
+            assert.ok(LANGS.includes(key) && key !== 'en' && typeof value === 'string' && value.length > 40, `${code}.${key}`);
+        }
     }
 });
 

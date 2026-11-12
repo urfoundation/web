@@ -49,7 +49,9 @@ export default function InvestorLetterTranslation({ lang = 'en' }) {
                 <p className="letter-kicker">{doc.title}</p>
                 <h1>{doc.title}</h1>
                 <div className="letter-meta">
-                    <time dateTime={letter.dateIso}>{formatDate(letter.dateIso, lang, { year: 'numeric', month: 'short', day: 'numeric' })}</time>
+                    {/* Intl's wording of a date can differ between the build and a browser:
+                        the hydrated page keeps the server's */}
+                    <time dateTime={letter.dateIso} suppressHydrationWarning>{formatDate(letter.dateIso, lang, { year: 'numeric', month: 'short', day: 'numeric' })}</time>
                     <span>{doc.readTime}</span>
                     <a className="letter-download" href={letter.pdfHref} download hrefLang={english ? undefined : 'en'}>
                         {`${english ? shared.downloadPdf : shared.downloadPdfEnglish} `}<i aria-hidden="true">↓</i>

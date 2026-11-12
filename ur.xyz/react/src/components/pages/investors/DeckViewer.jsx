@@ -151,7 +151,7 @@ export default function DeckViewer({ lang = 'en' }) {
                 <div className="deck-title-row">
                     <h1>{doc.title}</h1>
                     <div className="deck-meta">
-                        <time dateTime={deck.dateIso}>{docDate(deck, lang)}</time>
+                        <time dateTime={deck.dateIso} suppressHydrationWarning>{docDate(deck, lang)}</time>
                         <span aria-hidden="true">·</span>
                         <span>{interpolate(plural(lang, deck.slideCount, t.slideCount), { count: deck.slideCount })}</span>
                     </div>

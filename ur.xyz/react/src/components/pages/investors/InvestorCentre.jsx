@@ -20,6 +20,10 @@ import './InvestorCentre.css';
 
 const { featured, deck, updates, materials, metrics } = investorCentre;
 const SHOW_METRICS = false;
+// A translated date is formatted by Intl, whose wording can differ by a
+// character between the build's ICU and a visitor's browser; the elements
+// that show one keep the server's text when the page hydrates
+// (suppressHydrationWarning). English dates are the registry's own strings.
 const copy = await loadPageCopy('investors/centre');
 
 // The research links' prompt is English, the registry's; on a translated page
@@ -106,7 +110,7 @@ export default function InvestorCentre({ lang = 'en' }) {
                 </div>
                 <p className="investor-updated">
                     <span aria-hidden="true"></span>
-                    {rich(t.updated, {}, { date: <time dateTime={investorCentre.updatedIso}>{updated}</time> })}
+                    {rich(t.updated, {}, { date: <time dateTime={investorCentre.updatedIso} suppressHydrationWarning>{updated}</time> })}
                 </p>
             </header>
 
@@ -133,7 +137,7 @@ export default function InvestorCentre({ lang = 'en' }) {
 
                     <a className="featured-letter" href={pagePath(lang, featured.href)}>
                         <p className="resource-meta">
-                            <time dateTime={featured.dateIso}>{docDate(featured, lang)}</time>
+                            <time dateTime={featured.dateIso} suppressHydrationWarning>{docDate(featured, lang)}</time>
                             <span aria-hidden="true">·</span>
                             {categoryLabel(shared, featured.category)}
                             <span aria-hidden="true">·</span>
@@ -158,7 +162,7 @@ export default function InvestorCentre({ lang = 'en' }) {
                             <h2 id="all-investor-materials">{t.archiveHeading}</h2>
                             <p>{t.archiveIntro}</p>
                         </div>
-                        <span>{interpolate(t.updated, { date: updated })}</span>
+                        <span suppressHydrationWarning>{interpolate(t.updated, { date: updated })}</span>
                     </div>
 
                     <div className="archive-controls" aria-label={t.filterAria}>
@@ -198,7 +202,7 @@ export default function InvestorCentre({ lang = 'en' }) {
                                 data-kind={item.kind.toLowerCase()}
                                 hidden={!shown[index]}
                             >
-                                <time dateTime={item.dateIso || undefined}>{item.date}</time>
+                                <time dateTime={item.dateIso || undefined} suppressHydrationWarning>{item.date}</time>
                                 <div className="archive-row__title">
                                     <a href={localHref(lang, item.href)}>{item.title}</a>
                                     <small>{[item.category, item.readTime || item.detail].filter(Boolean).join(' · ')}</small>

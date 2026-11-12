@@ -152,12 +152,15 @@ export function createRouteLocalization(groups) {
      * nowhere (null: no link) while it is English-only. A page's own links use
      * it too, as `groupPageHref(href, lang) || href`, so a translated page
      * links the translations; the href's ?query and #fragment stay, and an
-     * href that is no path on this site (another site's, #fragment) is null.
+     * href that is no page on this site (another site's, a #fragment, a file
+     * such as /docs/litepaper.md or a PDF) is null.
      */
     function groupPageHref(path, lang) {
         if (!NON_EN_SITE_LANG_CODES.includes(lang)) return path;
-        if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//') || !hasLocalizedVersion(path)) return null;
+        if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//')) return null;
         const rest = path.search(/[?#]/);
+        const file = (rest < 0 ? path : path.slice(0, rest)).split('/').pop();
+        if (/\.(?!html$)[^.]+$/.test(file) || !hasLocalizedVersion(path)) return null;
         return localizedPathFor(path, lang) + (rest < 0 ? '' : path.slice(rest));
     }
 

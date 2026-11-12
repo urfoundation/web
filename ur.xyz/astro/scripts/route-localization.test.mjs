@@ -227,7 +227,9 @@ test('a localized group translates its pages, its family and nothing else', () =
     assert.equal(localized.groupPageHref('/about?ref=home#team', 'ar'), '/ar/about?ref=home#team');
     assert.equal(localized.groupPageHref('/operators#apps', 'es'), '/es/operators#apps');
     assert.equal(localized.groupPageHref('/#roles', 'ru'), '/ru#roles');
-    for (const href of ['/build#brief-x', '#epoch-4', '//ur.xyz/about', 'https://github.com/urfoundation', '']) {
+    // a file under a translated family is no page: it has no translation
+    assert.equal(localized.groupPageHref('/ctf/ke.html#pot', 'de'), '/de/ctf/ke#pot');
+    for (const href of ['/build#brief-x', '#epoch-4', '//ur.xyz/about', 'https://github.com/urfoundation', '', '/ctf/ke.png', '/ctf/ke.md?raw=1']) {
         assert.equal(localized.groupPageHref(href, 'de'), null, href);
     }
     assert.equal(localized.groupPageHref('/ctf/ke#pot', 'en'), '/ctf/ke#pot');

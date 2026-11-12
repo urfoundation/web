@@ -2,7 +2,7 @@
 export default {
     meta: {
         title: '投资者中心 | UR',
-        description: 'UR 的投资者动态、资料和公开研究：信函、Litepaper 和第三方审计，以及实时网络仪表板。',
+        description: 'UR 的投资者动态、资料和公开研究：信函、Litepaper 和第三方审计，以及实时网络数据面板。',
     },
     eyebrow: '投资者',
     title: '投资者中心',
@@ -40,8 +40,8 @@ export default {
     empty: '没有符合这些筛选条件的投资者资料。',
     exploreAria: '网络与研究资源',
     exploreHeading: '探索网络',
-    exploreText: '在 UR 仪表板上关注网络表现，并通过 TaoMarketCap 和 taostats 查看子网市场数据。',
-    dashboard: 'UR 仪表板',
+    exploreText: '在 UR 数据面板上关注网络表现，并通过 TaoMarketCap 和 taostats 查看子网市场数据。',
+    dashboard: 'UR 数据面板',
     networkLinksAria: '网络数据来源',
     researchHeading: '研究 UR',
     researchText: '向 ChatGPT 或 Claude 询问 UR 的产品、研究、子网开发、已发布的动态和公开资料。',
@@ -57,12 +57,12 @@ export default {
             {
                 label: '网络流量',
                 context: '最近 30 天',
-                change: '较上一周期 +12.4%',
+                change: '环比 +12.4%',
             },
             {
                 label: '月活跃用户',
                 context: '最近 30 天',
-                change: '较上一周期 +6.8%',
+                change: '环比 +6.8%',
             },
         ],
     },

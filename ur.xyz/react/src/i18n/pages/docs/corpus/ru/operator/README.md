@@ -4,7 +4,7 @@ description: Запустите оператора URnetwork одним бина
 
 # Как стать сетевым оператором
 
-Сетевой оператор запускает серверы сети конфиденциальности UR: службы API и connect, к которым подключаются пользователи и майнеры, конечную точку `/verify`, которую проходят валидаторы, и конвейер эпох, который проводит расчёты по вознаграждениям его майнеров в **Bittensor SN25 (netuid 25)**. Оператор приходит со своими пользователями и продуктами (приложения ur.io — это приложения одного из операторов), вносит депозиты в α как подкреплённый выручкой сигнал реального спроса и в каждую расчётную эпоху фиксирует Merkle-список выплат, который делит его пул между его майнерами. Он сообщает об использовании, по которому идёт это деление, но никогда не хранит чужой α: пулом владеет неизменяемое расчётное хранилище, и каждый майнер забирает свою долю из него напрямую.
+Сетевой оператор запускает серверы сети конфиденциальности UR: службы API и Connect, к которым подключаются пользователи и майнеры, конечную точку `/verify`, которую проходят валидаторы, и конвейер эпох, который проводит расчёты по вознаграждениям его майнеров в **Bittensor SN25 (netuid 25)**. Оператор приходит со своими пользователями и продуктами (приложения ur.io — это приложения одного из операторов), вносит депозиты в α как подкреплённый выручкой сигнал реального спроса и в каждую расчётную эпоху фиксирует Merkle-список выплат, который делит его пул между его майнерами. Он сообщает об использовании, по которому идёт это деление, но никогда не хранит чужой α: пулом владеет неизменяемое расчётное хранилище, и каждый майнер забирает свою долю из него напрямую.
 
 Точка входа [`server/cli/all/main.go`](https://github.com/urnetwork/server/blob/main/cli/all/main.go) запускает вместе API, Connect и производственный taskworker. Вы развёртываете один исполняемый файл оператора; PostgreSQL, Redis, хранилище артефактов и публичный входной шлюз с TLS остаются вспомогательными службами. О механизме читайте в [Litepaper](/docs/litepaper); о других ролях — на страницах [Как запустить майнер](/docs/miner) и [Как запустить валидатор](/docs/validator).
 
@@ -54,7 +54,7 @@ sudo install -d -o root -g urnetwork -m 0750 /etc/urnetwork
 ```text
 /usr/local/bin/ur-operator
 /etc/urnetwork/operator.env
-/etc/urnetwork/durable-volumes.json   # external declaration for artifact storage
+/etc/urnetwork/durable-volumes.json  # external declaration for artifact storage
 /srv/urnetwork-data/                 # separately mounted persistent filesystem
   operator-blob/                     # preprovisioned artifact root
   operator-identity/                 # external volume marker and root lease
@@ -66,9 +66,9 @@ sudo install -d -o root -g urnetwork -m 0750 /etc/urnetwork
       tls.yml
       provider_egress_probe.yml
       sn.yml                         # reviewed earnings/activation declaration
-      operator-gas-authority.yml      # independently provisioned public approval
+      operator-gas-authority.yml     # independently provisioned public approval
       mmdb/
-        geolite2.mmdb                 # real GeoLite2-City database
+        geolite2.mmdb                # real GeoLite2-City database
         places.yml                   # place export from the same database
     all/                             # optional resources shared by environments
   vault/

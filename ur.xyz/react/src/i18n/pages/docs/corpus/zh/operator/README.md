@@ -4,7 +4,7 @@ description: 用一个二进制文件运行 URnetwork 运营商，为 main 环�
 
 # 如何成为网络运营商
 
-网络运营商运行 UR 隐私网络的服务器：供用户和矿工接入的 API 和 connect 服务、验证者遍历的 `/verify` 端点，以及在 **Bittensor SN25（netuid 25）**上为其矿工结算奖励的周期流水线。运营商带来自己的用户和产品（ur.io 的各款应用就属于其中一个运营商），存入 α 作为有收入支撑的真实需求信号，并在每个结算周期提交 Merkle 支付清单，把自己的池分配给旗下矿工。它报告分配所依据的使用量，但从不持有任何他人的 α：不可变的结算金库拥有该池，每个矿工都直接从中领取。
+网络运营商运行 UR 隐私网络的服务器：供用户和矿工接入的 API 和 Connect 服务、验证者遍历的 `/verify` 端点，以及在 **Bittensor SN25（netuid 25）**上为其矿工结算奖励的周期流水线。运营商带来自己的用户和产品（ur.io 的各款应用就属于其中一个运营商），存入 α 作为有收入支撑的真实需求信号，并在每个结算周期提交 Merkle 支付清单，把自己的池分配给旗下矿工。它报告分配所依据的使用量，但从不持有任何他人的 α：不可变的结算金库拥有该池，每个矿工都直接从中领取。
 
 [`server/cli/all/main.go`](https://github.com/urnetwork/server/blob/main/cli/all/main.go) 入口点同时运行 API、Connect 和生产 taskworker。你只需部署一个运营商可执行文件；PostgreSQL、Redis、工件存储和公网 TLS 入口仍然是后端服务。机制请阅读 [Litepaper](/docs/litepaper)；其他角色请参阅[如何运行矿工](/docs/miner)和[如何运行验证者](/docs/validator)。
 
@@ -54,7 +54,7 @@ sudo install -d -o root -g urnetwork -m 0750 /etc/urnetwork
 ```text
 /usr/local/bin/ur-operator
 /etc/urnetwork/operator.env
-/etc/urnetwork/durable-volumes.json   # external declaration for artifact storage
+/etc/urnetwork/durable-volumes.json  # external declaration for artifact storage
 /srv/urnetwork-data/                 # separately mounted persistent filesystem
   operator-blob/                     # preprovisioned artifact root
   operator-identity/                 # external volume marker and root lease
@@ -66,9 +66,9 @@ sudo install -d -o root -g urnetwork -m 0750 /etc/urnetwork
       tls.yml
       provider_egress_probe.yml
       sn.yml                         # reviewed earnings/activation declaration
-      operator-gas-authority.yml      # independently provisioned public approval
+      operator-gas-authority.yml     # independently provisioned public approval
       mmdb/
-        geolite2.mmdb                 # real GeoLite2-City database
+        geolite2.mmdb                # real GeoLite2-City database
         places.yml                   # place export from the same database
     all/                             # optional resources shared by environments
   vault/

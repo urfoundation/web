@@ -1376,3 +1376,5 @@
    to left. Arrows that point the way through the page turn around. */
 [dir="rtl"] .build-page .model-stage{direction:ltr}
 [dir="rtl"] .build-page .model-stage .architecture-readout{direction:rtl}
+/* a figure such as "100K+" keeps its sign after the number */
+[dir="rtl"] .build-page .proof-strip b{direction:ltr;unicode-bidi:isolate}

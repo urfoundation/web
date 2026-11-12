@@ -1,0 +1,43 @@
+---
+// /build, "Build on UR" (the Network Operator opportunities page), in any site
+// language: pages/build.astro and its translations (pages/[lang]/build.astro)
+// render this.
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/Build.jsx), rendered on the server here and
+// hydrated on load: its ?model= / ?op= / ?brief= handling and the model's
+// interactions (opportunity tabs, the reveal scrub, the session trace, the
+// brief) run client-side. The shell around it is the section pages' exactly,
+// so the SPA and this render are pixel-identical. The page's words are the
+// `build` copy units (react/src/i18n/pages/build/), the shell's the site
+// dictionary's.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import BuildPage from '@react/components/pages/Build.jsx';
+import { getDict } from '../../lib/i18n.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const { meta } = (await loadPageCopy('build'))(lang);
+---
+<Base title={meta.title} description={meta.description} breadcrumbName={meta.breadcrumb} lang={lang}>
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="build" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            <BuildPage lang={lang} client:load />
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

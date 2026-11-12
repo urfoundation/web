@@ -1,43 +1,7 @@
 ---
-// /dashboard — UR's network and SN25 stats, read live.
-//
-// The page is the React component the SPA renders for this route
-// (react/src/components/pages/Dashboard.jsx), rendered on the server here and
-// hydrated on load. It is standalone (this shell, not the site's Base layout):
-// react/src/components/pages/dashboard/loader.js builds the data in the
-// visitor's browser from grafana.bringyour.com (public dashboard + stats.json)
-// and Bittensor mainnet (the public RPC, as /reserve reads it), on top of
-// /dashboard/history.json, the daily history scripts/dashboard-history.mjs
-// keeps. Linked from the nav and footer and listed in the sitemap.
-import DashboardPage from '@react/components/pages/Dashboard.jsx';
+// /dashboard — UR's network and SN25 stats, read live, in English. The page is
+// components/routes/DashboardRoute.astro, which pages/[lang]/dashboard.astro
+// renders in the other site languages.
+import DashboardRoute from '../components/routes/DashboardRoute.astro';
 ---
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UR Stats</title>
-<meta name="description" content="Live URnetwork and SN25 stats: users, providers online, data carried, epochs, payouts and the Network Capacity Reserve, read from Grafana and Bittensor mainnet.">
-<meta name="robots" content="max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-<link rel="canonical" href="https://ur.xyz/dashboard">
-<meta name="theme-color" content="#101010">
-<meta property="og:site_name" content="UR">
-<meta property="og:title" content="UR Stats">
-<meta property="og:description" content="Live URnetwork and SN25 stats: users, providers online, data carried, epochs, payouts and the Network Capacity Reserve, read from Grafana and Bittensor mainnet.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ur.xyz/dashboard">
-<meta property="og:image" content="https://ur.xyz/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="UR Stats">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@urnetwork">
-<meta name="twitter:title" content="UR Stats">
-<meta name="twitter:description" content="Live URnetwork and SN25 stats: users, providers online, data carried, epochs, payouts and the Network Capacity Reserve, read from Grafana and Bittensor mainnet.">
-<meta name="twitter:image" content="https://ur.xyz/og.png">
-<link rel="preconnect" href="https://grafana.bringyour.com" crossorigin>
-</head>
-<body class="is-loading">
-<DashboardPage client:load />
-</body>
-</html>
+<DashboardRoute lang="en" />

@@ -82,3 +82,7 @@
     .core-contributor__portrait img,
     .contribute-cta a { transition: none; }
 }
+
+/* Right to left (Arabic): the external-link arrows point the way the line reads. */
+[dir="rtl"] .core-contributor__identity a span[aria-hidden="true"],
+[dir="rtl"] .contribute-cta a i { display: inline-block; transform: scaleX(-1); }

@@ -1,0 +1,12 @@
+---
+// the not-found page (/<lang>/404.html, which nginx serves for a miss under /<lang>/), in the site's other languages: the same route as the English
+// page (components/routes/NotFoundRoute.astro), built per language once the
+// `not-found` page group is localized.
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+import NotFoundRoute from '../../components/routes/NotFoundRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('not-found');
+}
+---
+<NotFoundRoute lang={Astro.params.lang} />

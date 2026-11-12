@@ -1,9 +1,29 @@
 {
   "about": "The day each page of the ur.xyz page group dashboard (react/src/i18n/pages/dashboard/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
+    "/ar/dashboard": {
+      "fingerprint": "06fed300567a59c4",
+      "lastmod": "2026-11-12"
+    },
     "/dashboard": {
       "fingerprint": "30306a8b33a6be31",
       "lastmod": "2026-11-09"
+    },
+    "/de/dashboard": {
+      "fingerprint": "69b5aa9b4c966b6d",
+      "lastmod": "2026-11-12"
+    },
+    "/es/dashboard": {
+      "fingerprint": "3b539e76a372d3b5",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/dashboard": {
+      "fingerprint": "9ac7ac7d26aca385",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/dashboard": {
+      "fingerprint": "016f2f71bbec5980",
+      "lastmod": "2026-11-12"
     }
   }
 }

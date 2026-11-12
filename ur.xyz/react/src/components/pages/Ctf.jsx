@@ -36,7 +36,6 @@ import './Ctf.css';
 export default function CtfPage({ lang = 'en', updated = null, board = null, countdown = null }) {
     const m = localModel(CTF, lang);
     const t = ctfCopy(m.lang);
-    const f = formats(m.lang);
     const note = startNote(m);
     return (
         <div className="ctf-page">
@@ -48,7 +47,6 @@ export default function CtfPage({ lang = 'en', updated = null, board = null, cou
                     <p className="ctf-mission">{t.hub.mission}</p>
                     <p className="ctf-intro">
                         <span className="ctf-answer">{t.hub.answer}</span>{t.gap}
-                        {m.phase === 'prelaunch' && rich(t.hub.starts, { first: m.firstEpoch, clock: f.utcClock(m.startsAt), day: f.utcDay(m.startsAt) })}
                         {rich(t.hub.intro, { rule: defaultWinRule(m) })}
                     </p>
                 </header>

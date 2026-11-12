@@ -80,7 +80,6 @@ export default {
         eyebrow: 'SN25 · cada país, cada época',
         mission: 'Proveedores y extensores en cada país',
         answer: 'Mina como proveedor o extensor, con el programa minero o la app gratuita de URnetwork, y podrás ganar recompensas semanales en cripto estés donde estés.',
-        starts: 'Captura la bandera empieza con la época {first}, hacia las {clock} del {day}. ',
         intro: 'Cada operador de red de SN25 tiene un pool de Captura la bandera junto a su pool de proveedores, con diez slots en cada país por época (una semana): cinco para proveedores y cinco para extensores. Un slot que nadie gana pasa al fondo del país en ese operador, y cada ganador allí se lleva su slot y una quinta parte del fondo. {rule}',
     },
 

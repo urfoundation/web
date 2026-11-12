@@ -102,7 +102,6 @@ export default {
         eyebrow: 'SN25 · every country, every epoch',
         mission: 'Providers and extenders in every country',
         answer: 'Mine as a provider or an extender, with the miner or the free URnetwork app, and you can win weekly crypto rewards wherever you are.',
-        starts: 'Capture the flag starts with epoch {first}, at about {clock} on {day}. ',
         intro: "Every SN25 network operator runs a capture the flag pool beside its provider pool, with ten slots in every country each epoch (one week): five for providers and five for extenders. A slot nobody wins rolls into the country's pot at that operator, and each winner there takes its slot and a fifth of the pot. {rule}",
     },
 

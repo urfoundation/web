@@ -4,6 +4,20 @@ description: Start mining on UR in a few steps. What a miner does, what you need
 
 # How to run a miner
 
+> **If `provider setup` or `provider service install` set up your miner's background service, update it by hand once.** Since release 2026.10.22, these miners haven't updated themselves, on Linux, macOS or Windows. The miner's updater accepted versions written like `2026.10.27-1083160450`, but releases are stamped `2026.10.27+1083160450`, so every release took itself for a development build:
+>
+> - `provider status` says "development build, never updates itself".
+> - `provider update`, and the automatic updates, refuse with "this is a development build … which never replaces itself with a release".
+> - The 10-minute check that rolls back a new version that doesn't come back connected never ran.
+>
+> The fix is in the first release after November 11, 2026, and your miner can't install it by itself. Once that release is out, download and unpack it as in [Manual download](/docs/miner/install#manual-download), and instead of installing it, run its update: `./linux/amd64/provider update` with your folder from the table (`sudo` in front for a system service), or on Windows `& "$env:TEMP\windows\$Arch\provider.exe" update`. Typing just `provider update` runs the miner you have, which still refuses. The update replaces the miner your service runs and restarts it.
+>
+> After that, updates are automatic again: spread over about 16 hours after each release, with the 10-minute connected check, a rollback, and a 7-day skip of a release that fails it. `provider status` then shows that updates are automatic, or that you're up to date.
+>
+> If you run the miner yourself, without that service, `provider update` refuses too: install the new release as in [Manual download](/docs/miner/install#manual-download) and restart the miner.
+>
+> Not affected: the Docker image, the apps, and miners an installer set up, which update through `urnet-tools`.
+
 A UR miner shares your internet connection as an exit for a network operator. Validators check that it really carries traffic, and Bittensor SN25 (netuid 25) pays rewards for that work in the subnet's α token, branded $UR.
 
 This page gets you from nothing to a running miner. The rest of the miner guide goes deeper, one topic per page:

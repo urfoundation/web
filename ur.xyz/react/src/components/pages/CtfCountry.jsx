@@ -57,7 +57,8 @@ export default function CtfCountryPage({ code, lang = 'en', updated = null, live
 
                 {easyWins || <CountryEasyWins code={code} lang={lang} />}
 
-                {/* about other countries: the seo-audit leaves it out of what this page says of its own */}
+                {/* about other countries: left out of what this page says of its own, which decides
+                    whether it is indexed (ctf/indexing.js) */}
                 <nav className="ctf-sec ctf-around" aria-label={t.country.more} data-ctf-elsewhere="">
                     <Around m={m} c={prev} dir="prev" />
                     <a className="ctf-btn ctf-btn-s" href={hub}>{t.country.all}</a>

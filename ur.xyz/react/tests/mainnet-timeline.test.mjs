@@ -779,12 +779,13 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     assert.deepEqual([alpha(share), alpha(share * 9 / 10), alpha(share / 10)], ['1,195.84 α', '1,076.26 α', '119.58 α']);
     assert.ok(start.detail.includes(` The provider pool gets 9/10 of the providers' share instead of all of it, ${alpha(share * 9 / 10)} instead of ${alpha(share)} at epoch 4's scale, and 4/10 once top-level fleets are weighted. `));
     assert.match(start.detail, / it takes effect once the signed amendment entry is published before epoch 8 starts\.$/);
-    // the design and the notice's full text are in the sn repo; the entry and the block do not exist yet
+    // the design and the notice's full text are in the sn repo, and the signed entry will be in the published
+    // amendments file, which ur.xyz serves; the block does not exist yet
     const notice = mainnetNotices.find((n) => n.id === 'notice-capture-the-flag');
     assert.deepEqual(start.sources.map((s) => [s.label, s.ref]), [
         ['The design, CAPTURETHEFLAG.md', 'https://github.com/urfoundation/sn/blob/main/CAPTURETHEFLAG.md'],
         ['The full notice in the sn repo', notice.link.href],
-        ['Signed amendment entry', ''],
+        ['Signed amendment entry', 'https://ur.xyz/amendments.yml'],
         [`Epoch 8's first block, ${thousands(epoch7.end.block)}`, ''],
     ]);
 

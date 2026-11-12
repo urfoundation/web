@@ -456,7 +456,7 @@
       "sources": [
         { "label": "The design, CAPTURETHEFLAG.md", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/CAPTURETHEFLAG.md" },
         { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-capture-the-flag.md" },
-        { "label": "Signed amendment entry", "kind": "doc", "ref": "" },
+        { "label": "Signed amendment entry", "kind": "doc", "ref": "https://ur.xyz/amendments.yml" },
         { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
       ]
     },

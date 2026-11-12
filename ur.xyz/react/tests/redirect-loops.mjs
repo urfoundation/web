@@ -21,15 +21,19 @@
 // investor pages, mainnet, the not-found page, price, the research pages and
 // reserve):
 //   - with each language stored (the visitor's explicit choice), a real page
-//     settles in at most one redirect, in the stored language, and so does its
-//     /<lang>/ twin, in its own; a missing page settles in at most one redirect
-//     as a 404 page in its URL's language;
+//     settles in at most one redirect, in the stored language when it has
+//     translations, and so does its /<lang>/ twin, in its own; a missing page
+//     settles in at most one redirect as a 404 page in its URL's language;
 //   - the language switcher on a missing page settles, in the chosen language;
 //   - a profile holding the 301s of the config before the pages were
-//     translated (web 7aaef8b9^1) settles too, on every real page;
-// and a retired URL goes to its successor in its own language, in one redirect.
+//     translated (web 7aaef8b9^1) settles too, on every real page, and reaches
+//     the translation;
+// and a retired URL goes to its successor in its own language, in one
+// redirect, and a translation's link to its English original keeps the
+// English page, followed in the tab or opened in another.
 // A page settles when no navigation follows its last one for QUIET_MS; a loop
-// never does.
+// never does. Each settled page is watched CONFIRM_MS longer, so a slow loop
+// (one a script starts after the page loads) fails too.
 //
 // Needs nginx (brew install nginx; apt-get install nginx-light) and the
 // Chromium of `make install-playwright-browser`.
@@ -50,6 +54,7 @@ import {
     PAGE_GROUPS,
     SECTION_BASE_PATHS,
     SITE_LANG_CODES,
+    hasLocalizedVersion,
 } from '../../astro/src/lib/route-localization.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -64,6 +69,8 @@ const MIME = path.join(REPO, 'web/nginx/mime.types');
 // A page has settled when no navigation follows its last one for this long. The
 // stored-language redirect runs in the head, before the first paint.
 const QUIET_MS = 400;
+// how long a settled page is watched for one more navigation
+const CONFIRM_MS = 1500;
 // how long a case may take before it counts as unsettled
 const BUDGET_MS = 10000;
 // more navigations than this in one case is a loop
@@ -261,7 +268,9 @@ async function loaded(page) {
 // Starts a navigation with `navigate` and waits until the page settles: no
 // main-frame navigation for QUIET_MS, the document loaded. Returns the chain
 // of main-frame requests (each HTTP redirect and each scripted redirect is
-// one), where it ended, its status and its <html lang>.
+// one), where it ended, its status and its <html lang>, and confirm(), which
+// watches the page CONFIRM_MS longer and marks the outcome unsettled, with the
+// late navigations, if it moved.
 async function settle(page, navigate) {
     const requests = [];
     let last = Date.now();
@@ -272,6 +281,10 @@ async function settle(page, navigate) {
         }
     };
     const onCommit = (frame) => { if (frame === page.mainFrame()) last = Date.now(); };
+    const detach = () => {
+        page.off('request', onRequest);
+        page.off('framenavigated', onCommit);
+    };
     page.on('request', onRequest);
     page.on('framenavigated', onCommit);
     let looped = false;
@@ -285,12 +298,12 @@ async function settle(page, navigate) {
             if (Date.now() - start > BUDGET_MS) break;
             if (Date.now() - last >= QUIET_MS && await loaded(page)) break;
         }
-    } finally {
-        page.off('request', onRequest);
-        page.off('framenavigated', onCommit);
+    } catch (error) {
+        detach();
+        throw error;
     }
     const response = requests.length ? await requests.at(-1).response().catch(() => null) : null;
-    return {
+    const outcome = {
         settled: !looped && Date.now() - last >= QUIET_MS,
         looped,
         redirects: Math.max(0, requests.length - 1),
@@ -299,6 +312,17 @@ async function settle(page, navigate) {
         path: pathOf(page.url()),
         lang: await page.evaluate(() => document.documentElement.lang).catch(() => null),
     };
+    const settledAt = requests.length;
+    outcome.confirm = async () => {
+        if (outcome.settled) await sleep(CONFIRM_MS);
+        detach();
+        if (requests.length > settledAt) {
+            outcome.settled = false;
+            outcome.late = requests.slice(settledAt).map((r) => pathOf(r.url()));
+        }
+        return outcome;
+    };
+    return outcome;
 }
 
 // Problems with a case's outcome, none when it met its expectations: each
@@ -307,6 +331,7 @@ function judge(expect, outcome) {
     const problems = [];
     const chain = outcome.chain.slice(0, 6).join(' → ') + (outcome.chain.length > 6 ? ' → …' : '');
     if (outcome.looped) problems.push({ what: 'loops', text: `${outcome.chain.length}+ navigations within seconds: ${chain}` });
+    else if (outcome.late) problems.push({ what: 'moves again after settling', text: `${chain}, then ${outcome.late.join(' → ')}` });
     else if (!outcome.settled) problems.push({ what: 'never settles', text: `still navigating after ${BUDGET_MS / 1000} s: ${chain}` });
     else if (outcome.redirects > expect.maxRedirects) problems.push({ what: `more than ${expect.maxRedirects} redirect(s)`, text: chain });
     if (!outcome.looped && outcome.settled) {
@@ -381,6 +406,13 @@ function families() {
     return out;
 }
 
+// Where a page's URL in `lang` leads: its twin when it has translations (a
+// group not yet localized has none), else the English page, and the language
+// it is read in there.
+const landing = (base, lang) => (hasLocalizedVersion(base) ? { path: twin(lang, base), lang } : { path: base, lang: 'en' });
+// the language a 404 under /<lang>/ is rendered in: that language's not-found page when the build has it
+const notFoundLang = (lang) => (lang === 'en' || existsSync(path.join(BUILD, lang, '404.html')) ? lang : 'en');
+
 // Retired URLs and their successors (nginx.conf.j2): a retired URL in a
 // language leads to the successor in that language.
 const RETIRED = [
@@ -406,24 +438,24 @@ function storedCases(list) {
     for (const f of list) {
         for (const stored of SITE_LANG_CODES) {
             if (f.real) {
-                cases.push({ kind: 'a real page', family: f.family, url: f.real, stored, expect: { maxRedirects: 1, path: twin(stored, f.real), lang: stored, status: 200 } });
+                cases.push({ kind: 'a real page', family: f.family, url: f.real, stored, expect: { maxRedirects: 1, ...landing(f.real, stored), status: 200 } });
             }
             cases.push({ kind: 'a missing page', family: f.family, url: f.missing, stored, expect: { maxRedirects: 1, path: f.missing, lang: 'en', status: 404 } });
         }
         for (const lang of NON_EN_SITE_LANG_CODES) {
             // a /<lang>/ URL names its language, whatever the visitor stored
             if (f.real) {
-                cases.push({ kind: 'a real page', family: f.family, url: twin(lang, f.real), stored: other(lang), expect: { maxRedirects: 1, path: twin(lang, f.real), lang, status: 200 } });
+                cases.push({ kind: 'a real page', family: f.family, url: twin(lang, f.real), stored: other(lang), expect: { maxRedirects: 1, ...landing(f.real, lang), status: 200 } });
             }
-            cases.push({ kind: 'a missing page', family: f.family, url: twin(lang, f.missing), stored: lang, expect: { maxRedirects: 1, path: twin(lang, f.missing), lang, status: 404 } });
+            cases.push({ kind: 'a missing page', family: f.family, url: twin(lang, f.missing), stored: lang, expect: { maxRedirects: 1, path: twin(lang, f.missing), lang: notFoundLang(lang), status: 404 } });
         }
     }
     for (const [old, successor] of RETIRED) {
         for (const lang of NON_EN_SITE_LANG_CODES) {
-            cases.push({ kind: 'a retired URL', family: old, url: twin(lang, old), stored: lang, expect: { maxRedirects: 1, path: twin(lang, successor), lang, status: 200 } });
+            cases.push({ kind: 'a retired URL', family: old, url: twin(lang, old), stored: lang, expect: { maxRedirects: hasLocalizedVersion(successor) ? 1 : 2, ...landing(successor, lang), status: 200 } });
         }
         // in English, nginx's 301 and then the stored-language redirect
-        cases.push({ kind: 'a retired URL', family: old, url: old, stored: 'de', expect: { maxRedirects: 2, path: twin('de', successor), lang: 'de', status: 200 } });
+        cases.push({ kind: 'a retired URL', family: old, url: old, stored: 'de', expect: { maxRedirects: 2, ...landing(successor, 'de'), status: 200 } });
     }
     return cases;
 }
@@ -442,6 +474,24 @@ function switcherCases(list) {
     return cases;
 }
 
+// The English original a translated document links (the legal pages, an
+// investor document): followed in the tab, the click records the choice of
+// English; opened in another tab, the referrer says where the visitor came
+// from. Either way the English page stays, with the translation's language
+// stored.
+const ORIGINALS = ['/terms', '/privacy', '/vdp', '/investors/deck'];
+function originalCases() {
+    const cases = [];
+    for (const base of ORIGINALS.filter((b) => hasLocalizedVersion(b))) {
+        for (const lang of NON_EN_SITE_LANG_CODES) {
+            const expect = { maxRedirects: 0, path: base, lang: 'en', status: 200 };
+            cases.push({ kind: "a translation's link to its English original", family: `${base}, followed`, url: twin(lang, base), stored: lang, click: 'main a[hreflang="en"]:not([download])', expect });
+            cases.push({ kind: "a translation's link to its English original", family: `${base}, in a new tab`, url: base, stored: lang, referer: twin(lang, base), expect });
+        }
+    }
+    return cases;
+}
+
 // ── the run ──────────────────────────────────────────────────────────────────
 
 const results = new Map(); // kind -> { total, failures: [] }
@@ -452,8 +502,26 @@ function record(c, problems) {
     if (problems.length) r.failures.push({ c, problems });
 }
 
+// The settled pages being watched for one more navigation (settle's confirm),
+// each recording its case when done.
+let watching = [];
+const watch = (c, outcome, after) => {
+    watching.push(outcome.confirm()
+        .then((o) => record(c, judge(c.expect, o)))
+        .catch((error) => record(c, [{ what: 'fails to run', text: error.message.split('\n')[0] }]))
+        .finally(after));
+};
+async function watched() {
+    while (watching.length) {
+        const now = watching;
+        watching = [];
+        await Promise.all(now);
+    }
+}
+
 async function freshCase(browser, origin, c) {
     const context = await browser.newContext({ viewport: VIEWPORT });
+    const close = () => context.close().catch(() => {});
     try {
         const page = await context.newPage();
         await storeLanguage(page, origin, c.stored);
@@ -461,20 +529,24 @@ async function freshCase(browser, origin, c) {
         if (c.choose) {
             await page.goto(origin + c.url);
             outcome = await settle(page, () => chooseLanguage(page, c.choose));
+        } else if (c.click) {
+            await page.goto(origin + c.url);
+            outcome = await settle(page, () => page.locator(c.click).first().click({ noWaitAfter: true, timeout: 5000 }));
         } else {
-            outcome = await settle(page, () => page.goto(origin + c.url, { waitUntil: 'commit', timeout: BUDGET_MS }).catch(() => {}));
+            const referer = c.referer ? origin + c.referer : undefined;
+            outcome = await settle(page, () => page.goto(origin + c.url, { waitUntil: 'commit', timeout: BUDGET_MS, referer }).catch(() => {}));
         }
-        record(c, judge(c.expect, outcome));
+        watch(c, outcome, close);
     } catch (error) {
         record(c, [{ what: 'fails to run', text: error.message.split('\n')[0] }]);
-    } finally {
-        await context.close().catch(() => {});
+        await close();
     }
 }
 
 // The returning visitor: a profile that followed /<lang>/<page> under the old
 // config, then, the language stored, visits the pages under this one.
 async function cachedCases(binary, work, sinkPort, list) {
+    const kind = 'a returning visitor with the old 301s cached';
     const port = await freePort();
     const origin = `http://127.0.0.1:${port}`;
     const profile = path.join(work, 'profile');
@@ -482,52 +554,56 @@ async function cachedCases(binary, work, sinkPort, list) {
     let bounced = 0;
 
     const old = await startNginx(binary, path.join(work, 'nginx-old'), port, oldConfig(port, BUILD));
-    let context = await chromium.launchPersistentContext(profile, { ...launchOptions(sinkPort), viewport: VIEWPORT });
     try {
-        const visits = NON_EN_SITE_LANG_CODES.flatMap((lang) => real.map((p) => twin(lang, p)));
-        await pool(visits, async (url) => {
-            const page = await context.newPage();
-            await page.goto(origin + url).catch(() => {});
-            await page.close();
-        });
+        const context = await chromium.launchPersistentContext(profile, { ...launchOptions(sinkPort), viewport: VIEWPORT });
+        try {
+            const visits = NON_EN_SITE_LANG_CODES.flatMap((lang) => real.map((p) => twin(lang, p)));
+            await pool(visits, async (url) => {
+                const page = await context.newPage();
+                await page.goto(origin + url).catch(() => {});
+                await page.close().catch(() => {});
+            });
+        } finally {
+            await context.close().catch(() => {});
+        }
     } finally {
-        await context.close();
         await old.stop();
     }
 
     const current = await startNginx(binary, path.join(work, 'nginx-new'), port, urXyzConfig(readFileSync(CONF, 'utf8'), port, BUILD));
-    context = await chromium.launchPersistentContext(profile, { ...launchOptions(sinkPort), viewport: VIEWPORT });
     try {
-        for (const lang of NON_EN_SITE_LANG_CODES) {
-            const first = context.pages()[0] || await context.newPage();
-            await storeLanguage(first, origin, lang);
-            const cases = real.flatMap((p) => [
-                // a page's English URL, and its /<lang>/ URL, which the cache sends to English
-                { kind: 'a returning visitor with the old 301s cached', family: p, url: p, stored: lang, expect: { maxRedirects: 3 } },
-                { kind: 'a returning visitor with the old 301s cached', family: p, url: twin(lang, p), stored: lang, expect: { maxRedirects: 3 } },
-            ]);
-            await pool(cases, async (c) => {
-                const page = await context.newPage();
-                try {
-                    const outcome = await settle(page, () => page.goto(origin + c.url, { waitUntil: 'commit', timeout: BUDGET_MS }).catch(() => {}));
-                    // the cache sent the visitor from the page's /<lang>/ URL back to English
-                    const english = c.family;
-                    if (outcome.chain.some((step, i) => step === twin(lang, english) && outcome.chain[i + 1] === english)) bounced += 1;
-                    record(c, judge(c.expect, outcome));
-                } catch (error) {
-                    record(c, [{ what: 'fails to run', text: error.message.split('\n')[0] }]);
-                } finally {
-                    await page.close().catch(() => {});
-                }
-            });
+        const context = await chromium.launchPersistentContext(profile, { ...launchOptions(sinkPort), viewport: VIEWPORT });
+        try {
+            for (const lang of NON_EN_SITE_LANG_CODES) {
+                const first = context.pages()[0] || await context.newPage();
+                await storeLanguage(first, origin, lang);
+                // a page's English URL, and its /<lang>/ URL, which the cache
+                // sends to English: both end on the translation, past the cache
+                const cases = real.flatMap((p) => [p, twin(lang, p)].map((url) => (
+                    { kind, family: p, url, stored: lang, expect: { maxRedirects: 4, ...landing(p, lang), status: 200 } })));
+                await pool(cases, async (c) => {
+                    const page = await context.newPage();
+                    try {
+                        const outcome = await settle(page, () => page.goto(origin + c.url, { waitUntil: 'commit', timeout: BUDGET_MS }).catch(() => {}));
+                        // the cache sent the visitor from the page's /<lang>/ URL back to English
+                        if (outcome.chain.some((step, i) => step === twin(lang, c.family) && outcome.chain[i + 1] === c.family)) bounced += 1;
+                        watch(c, outcome, () => page.close().catch(() => {}));
+                    } catch (error) {
+                        record(c, [{ what: 'fails to run', text: error.message.split('\n')[0] }]);
+                        await page.close().catch(() => {});
+                    }
+                });
+                // the next language is stored in the same profile
+                await watched();
+            }
+        } finally {
+            await context.close().catch(() => {});
         }
     } finally {
-        await context.close();
         await current.stop();
     }
     // Without a 301 from the cache, these cases prove nothing: the profile
     // must have kept the old config's.
-    const kind = 'a returning visitor with the old 301s cached';
     if (!bounced) record({ kind, family: 'the profile' }, [{ what: 'kept no 301 of the old config', text: 'no case went from /<lang>/<page> to the English page' }]);
     else results.get(kind).note = `the cached 301s sent ${bounced} back to English`;
 }
@@ -546,23 +622,23 @@ async function main() {
     const work = mkdtempSync(path.join(os.tmpdir(), 'ur-redirect-loops-'));
     const sink = await startSink();
     const list = families();
-    let browser;
-    let nginx;
     try {
         const port = await freePort();
         const origin = `http://127.0.0.1:${port}`;
-        nginx = await startNginx(binary, path.join(work, 'nginx'), port, urXyzConfig(readFileSync(CONF, 'utf8'), port, BUILD));
-        browser = await chromium.launch(launchOptions(sink.port));
-        await pool(storedCases(list), (c) => freshCase(browser, origin, c));
-        await pool(switcherCases(list), (c) => freshCase(browser, origin, c));
-        await browser.close();
-        browser = null;
-        await nginx.stop();
-        nginx = null;
+        const nginx = await startNginx(binary, path.join(work, 'nginx'), port, urXyzConfig(readFileSync(CONF, 'utf8'), port, BUILD));
+        try {
+            const browser = await chromium.launch(launchOptions(sink.port));
+            try {
+                await pool([...storedCases(list), ...switcherCases(list), ...originalCases()], (c) => freshCase(browser, origin, c));
+                await watched();
+            } finally {
+                await browser.close().catch(() => {});
+            }
+        } finally {
+            await nginx.stop();
+        }
         await cachedCases(binary, work, sink.port, list);
     } finally {
-        if (browser) await browser.close().catch(() => {});
-        if (nginx) await nginx.stop().catch(() => {});
         await sink.close();
         rmSync(work, { recursive: true, force: true });
     }
@@ -581,13 +657,14 @@ async function main() {
                 byWhat.get(problem.what).push({ c, problem });
             }
         }
-        for (const [what, list] of byWhat) {
-            const families = [...new Set(list.map(({ c }) => c.family))];
-            console.log(`      ${list.length} ${what}, in ${families.length} famil${families.length === 1 ? 'y' : 'ies'} (${families.slice(0, 8).join(', ')}${families.length > 8 ? ', …' : ''}), e.g.`);
+        for (const [what, found] of byWhat) {
+            const families = [...new Set(found.map(({ c }) => c.family))];
+            console.log(`      ${found.length} ${what}, in ${families.length} famil${families.length === 1 ? 'y' : 'ies'} (${families.slice(0, 8).join(', ')}${families.length > 8 ? ', …' : ''}), e.g.`);
             // an example from each of the first families
-            const examples = families.slice(0, 3).map((family) => list.find(({ c }) => c.family === family));
-            for (const { c, problem } of examples) {
-                const how = c.choose ? `chose ${c.choose.toUpperCase()} on ${c.url}` : `${c.url}${c.stored ? ` with ${c.stored} stored` : ''}`;
+            for (const { c, problem } of families.slice(0, 3).map((family) => found.find(({ c: x }) => x.family === family))) {
+                const how = c.choose ? `chose ${c.choose.toUpperCase()} on ${c.url}`
+                    : c.click ? `followed the English link on ${c.url}${c.stored ? ` with ${c.stored} stored` : ''}`
+                        : `${c.url}${c.referer ? ` from ${c.referer}` : ''}${c.stored ? ` with ${c.stored} stored` : ''}`;
                 console.log(`        ${c.family}: ${how}: ${problem.text}`);
             }
         }

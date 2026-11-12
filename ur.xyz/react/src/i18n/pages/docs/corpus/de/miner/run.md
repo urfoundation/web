@@ -15,7 +15,7 @@ Um in einem Terminal zu minen:
 provider start
 ```
 
-Er zeigt eine kurze Live-Ansicht (Connecting, Connected, ● Mining) und läuft, bis du ihn mit Ctrl-C stoppst. Das ausführliche Log geht nach `miner.log` in `~/.urnetwork`; füge `-v` hinzu, um es stattdessen im Terminal zu sehen.
+Er zeigt eine kurze Live-Ansicht (Connecting, Connected, ● Mining) und läuft, bis du ihn mit Ctrl-C stoppst. Das ausführliche Log geht nach `miner.log` im Ordner `~/.urnetwork`; füge `-v` hinzu, um es stattdessen im Terminal zu sehen.
 
 Der erste Start auf einem neuen Gerät fragt nach, bevor er es registriert, und speichert seine Identität in `~/.urnetwork`. Jeder spätere Start verwendet diese Identität wieder. In einem Skript, in dem niemand antworten kann, füge beim ersten Start `--allow-client-registration` hinzu. `provider provide` ist derselbe Befehl mit der vollständigen Log-Ausgabe, für Skripte und Dienste.
 
@@ -70,8 +70,8 @@ provider service install
 Er startet den Miner jetzt, startet ihn danach von selbst wieder, startet ihn bei einem Absturz neu und sucht alle 6 Stunden nach [Updates](/docs/miner/updates):
 
 - **Linux:** ein systemd-Benutzerdienst, `urnetwork-provider.service`, der beim Booten startet. Er schaltet Lingering ein, damit der Dienst nach dem Abmelden weiterläuft, oder gibt den auszuführenden Befehl `sudo loginctl enable-linger` aus.
-- **macOS:** ein launchd-Agent, der bei der Anmeldung startet. Sein Log ist `service.log` in `~/.urnetwork`.
-- **Windows:** eine Autostart-App, die den Miner unsichtbar startet, wenn du dich bei Windows anmeldest, und stoppt, wenn du dich abmeldest. Sie braucht keine Administratorrechte. Ihr Log ist `service.log` in `%USERPROFILE%\.urnetwork`.
+- **macOS:** ein launchd-Agent, der bei der Anmeldung startet. Sein Log ist `service.log` im Ordner `~/.urnetwork`.
+- **Windows:** eine Autostart-App, die den Miner unsichtbar startet, wenn du dich bei Windows anmeldest, und stoppt, wenn du dich abmeldest. Sie braucht keine Administratorrechte. Ihr Log ist `service.log` im Ordner `%USERPROFILE%\.urnetwork`.
 
 So verwaltest du ihn:
 
@@ -134,7 +134,7 @@ Sucht, warum sich der Miner nicht anmelden oder verbinden kann: ob der Zustandso
 
 ### Das Log
 
-`provider start` schreibt sein Log nach `miner.log` in `~/.urnetwork`. Für einen Hintergrund-Miner verwende `provider service logs --follow` oder mit einem Installer `urnet-tools logs`.
+`provider start` schreibt sein Log nach `miner.log` im Ordner `~/.urnetwork`. Für einen Hintergrund-Miner verwende `provider service logs --follow` oder mit einem Installer `urnet-tools logs`.
 
 Der Miner schreibt viele Log-Zeilen in einigen Formaten; die meisten sind Routine. Diese Zeilen sind gute Zeichen:
 

@@ -36,7 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Prov
 
 Öffne dann ein neues Terminal oder führe die `export PATH=…`-Zeile aus, die er ausgibt. Er läuft auf 64-Bit- und 32-Bit-Systemen mit Intel, AMD und ARM, einschließlich eines Raspberry Pi 2 oder neuer mit 32-Bit-Betriebssystem (nicht auf einem Pi Zero oder Pi 1), und braucht `curl` oder `wget` sowie `jq` oder `python3` (die meisten Systeme haben eines davon). Er:
 
-- installiert `urnetwork` und `urnet-tools` nach `~/.local/share/urnetwork-provider/bin` und fügt diesen Ordner deinem `PATH` in `~/.bashrc` hinzu (und legt die Datei bei Bedarf an) sowie in `~/.zshrc`, falls vorhanden. Übergib `-B`, damit er diese Dateien nicht anfasst. Wenn ein neues Terminal `urnetwork` immer noch nicht findet, führe die `export PATH=…`-Zeile aus, die der Installer ausgegeben hat;
+- installiert `urnetwork` und `urnet-tools` nach `~/.local/share/urnetwork-provider/bin` und fügt diesen Ordner deinem `PATH` in der Datei `~/.bashrc` hinzu (und legt die Datei bei Bedarf an) sowie in `~/.zshrc`, falls vorhanden. Übergib `-B`, damit er diese Dateien nicht anfasst. Wenn ein neues Terminal `urnetwork` immer noch nicht findet, führe die `export PATH=…`-Zeile aus, die der Installer ausgegeben hat;
 - betreibt den Miner als systemd-Benutzerdienst, `urnetwork.service`, mit einem Update-Timer und schaltet Lingering ein, damit der Dienst nach dem Abmelden weiterläuft (braucht das einen Administrator, gibt er den auszuführenden Befehl `sudo loginctl enable-linger` aus);
 - installiert in einer Shell ohne systemd-Benutzersitzung (eine `sudo su`-Shell, viele Container, WSL) trotzdem, aber ohne Hintergrunddienst und ohne automatische Updates, und sagt dir, wie du den Miner im Vordergrund betreibst. Führe dann ab und zu selbst `urnet-tools update` aus. Als root in einer solchen Shell ausgeführt, installiert er stattdessen einen Systemdienst.
 
@@ -60,7 +60,7 @@ curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Prov
 
 Öffne dann ein neues Terminal-Fenster. Er braucht macOS 12 oder neuer und sonst nichts und funktioniert auf Macs mit Apple Silicon und Intel (auch aus einem Rosetta-Terminal, er wählt den nativen Build). Er:
 
-- installiert `urnetwork` und `urnet-tools` nach `~/.local/share/urnetwork-provider/bin` und fügt diesen Ordner deinem `PATH` in `~/.zshrc` hinzu (und in `~/.bash_profile`, wenn du bash verwendest). Übergib `-B`, damit er diese Dateien nicht anfasst;
+- installiert `urnetwork` und `urnet-tools` nach `~/.local/share/urnetwork-provider/bin` und fügt diesen Ordner deinem `PATH` in der Datei `~/.zshrc` hinzu (und in `~/.bash_profile`, wenn du bash verwendest). Übergib `-B`, damit er diese Dateien nicht anfasst;
 - betreibt den Miner als launchd-Agent, der beim Anmelden startet und den Miner neu startet, wenn er abstürzt. macOS zeigt eventuell eine Mitteilung „Background Items Added“; das ist zu erwarten. Er erscheint als `urnet-tools` unter System Settings → General → Login Items;
 - entfernt für dich das Quarantäne-Flag des Downloads und verweigert die Ausführung mit `sudo`.
 

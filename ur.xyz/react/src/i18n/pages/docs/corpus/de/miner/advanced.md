@@ -98,7 +98,7 @@ provider provide --allow-client-registration
 
 Verwende das Registrierungs-Flag nur, wenn du wirklich neue Exits hinzufügst; normale Neustarts sind `provider provide`. Jeder Exit behält eine `.provider-<hash>.jwt` und seine Registrierungs-Nebendateien. Wähle diese Datei mit `--provider-jwt`, wenn du seine Wallet festlegst und für ihn beanspruchst. Der gemeinsame `.provider.key` und die Dateien jedes Exits gehören in dasselbe Backup. Was zählt, sind verschiedene, routbare Exits: Weitere Konten hinter demselben Exit erhöhen die Abdeckung nicht.
 
-`provider proxy remove` entfernt Exits, und `provider proxy auth add` und `provider proxy auth remove` verwalten Proxy-Zugangsdaten; siehe `provider proxy --help`. Mit `--all-operators` wird die Datei `proxy` in `~/.urnetwork` in den Ordner jedes Betreibers kopiert, wenn sein Miner startet.
+`provider proxy remove` entfernt Exits, und `provider proxy auth add` und `provider proxy auth remove` verwalten Proxy-Zugangsdaten; siehe `provider proxy --help`. Mit `--all-operators` wird die Datei `proxy` aus `~/.urnetwork` in den Ordner jedes Betreibers kopiert, wenn sein Miner startet.
 
 ## Automatisch beanspruchen
 

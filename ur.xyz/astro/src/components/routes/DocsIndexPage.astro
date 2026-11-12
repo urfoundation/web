@@ -69,7 +69,7 @@ const jsonLd = [{
             <header class="explorer-page-header">
                 <span class="explorer-page-eyebrow">{words.eyebrow}</span>
                 <h1 class="explorer-page-title">{words.heading}</h1>
-                <p class="explorer-page-meta">{english ? words.intro : `${words.intro} ${words.markdownEnglish}`}</p>
+                <p class="explorer-page-meta">{english ? words.intro : `${words.intro}${/[。！？]$/u.test(words.intro) ? '' : ' '}${words.markdownEnglish}`}</p>
             </header>
             {words.notice && (english
                 ? <Markdown source={words.notice} baseHref="/docs/" />

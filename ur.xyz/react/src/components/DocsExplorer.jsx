@@ -72,7 +72,7 @@ function DocsLanding({ code }) {
                 <span className="explorer-page-eyebrow">{words.eyebrow}</span>
                 <h1 className="explorer-page-title">{words.heading}</h1>
                 <p className="explorer-page-meta">
-                    {code === 'en' ? words.intro : `${words.intro} ${words.markdownEnglish}`}
+                    {code === 'en' ? words.intro : `${words.intro}${/[。！？]$/u.test(words.intro) ? '' : ' '}${words.markdownEnglish}`}
                 </p>
             </header>
 

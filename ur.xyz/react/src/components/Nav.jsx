@@ -140,11 +140,12 @@ function NetworkMenu({ code, route, t, mobile = false }) {
 
 
 // The call to action for /dashboard, top right in a language with the dashboard
-// (hidden below 1020px, where the drawer's Network menu lists Dashboard).
-function DashboardCta({ href, label }) {
+// (hidden below 1020px, where the drawer's Network menu lists Dashboard). Its arrow
+// points the way the language reads.
+function DashboardCta({ href, label, rtl }) {
     return (
         <a className="nav-cta" href={href}>
-            <i aria-hidden="true" />{label}<span className="nav-cta-arrow" aria-hidden="true">→</span>
+            <i aria-hidden="true" />{label}<span className="nav-cta-arrow" aria-hidden="true">{rtl ? '←' : '→'}</span>
         </a>
     );
 }
@@ -258,7 +259,7 @@ export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
                     </nav>
 
                     <div className="nav-actions">
-                        {dashboardHref && <DashboardCta href={dashboardHref} label={t.nav.liveDashboard} />}
+                        {dashboardHref && <DashboardCta href={dashboardHref} label={t.nav.liveDashboard} rtl={langs[code].dir === 'rtl'} />}
                         <LanguageSelector />
                         <button
                             type="button"

@@ -369,6 +369,7 @@
 .nav-cta i { width: 6px; height: 6px; border-radius: 50%; flex: none; background: #101010; animation: nav-cta-beat 2s infinite; }
 .nav-cta-arrow { display: inline-block; font-size: 0.85rem; letter-spacing: 0; transition: transform .2s; }
 .nav-cta:hover .nav-cta-arrow { transform: translateX(3px); }
+.nav-cta:hover .nav-cta-arrow:dir(rtl) { transform: translateX(-3px); }
 @keyframes nav-cta-beat { 0% { box-shadow: 0 0 0 0 rgba(16, 16, 16, .5); } 70% { box-shadow: 0 0 0 6px rgba(16, 16, 16, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 16, 16, 0); } }
 @media (prefers-reduced-motion: reduce) { .nav-cta i { animation: none; } }
 @media (max-width: 1020px) { .nav-actions > .nav-cta { display: none; } }

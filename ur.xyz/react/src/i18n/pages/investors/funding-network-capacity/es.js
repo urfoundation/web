@@ -4,7 +4,7 @@ export default {
         heading: 'Introducción',
         paragraphs: [
             'UR (SN25) aspira a apoyar la visión de código abierto de Bittensor construyendo un mercado de conectividad privada: coordinar a proveedores independientes para construir la capacidad de red privada que los operadores necesitan para dar servicio a sus clientes.',
-            'ur.io es el primer ejemplo orientado al cliente; la oportunidad más amplia es una infraestructura compartida por múltiples operadores. En última instancia, nuestra prioridad es crear una red sólida y fiable que permita crecer a cualquier operador, y hacer que las redes privadas sean accesibles para todos.',
+            'ur.io es el primer ejemplo orientado al cliente; la oportunidad más amplia es una infraestructura compartida por múltiples operadores. En última instancia, nuestra prioridad es crear una red sólida y confiable que permita crecer a cualquier operador, y hacer que las redes privadas sean accesibles para todos.',
             'De este modo, los operadores aportan productos, clientes y demanda, y nuestros mineros independientes suministran conectividad, mientras UR (SN25) coordina los incentivos y la verificación para ayudar a que se desarrolle una oferta útil.',
             'Para UR:',
         ],
@@ -18,10 +18,10 @@ export default {
     workingCapital: {
         heading: '¿Por qué retener emisiones como capital circulante?',
         paragraphs: [
-            'No esperamos que la capacidad de la red y la demanda de los clientes crezcan en perfecta sintonía. En las conversaciones con los operadores, estos buscan pruebas de una oferta fiable ANTES de lanzarse en la subred. Pensemos en un nuevo operador de VPN que quizá ya tenga un producto y clientes: una cobertura más amplia o una disponibilidad fiable en determinados mercados será clave para respaldar su crecimiento. UR necesita coordinar lo antes posible a los proveedores que puedan cumplir esos requisitos.',
+            'No esperamos que la capacidad de la red y la demanda de los clientes crezcan en perfecta sintonía. En las conversaciones con los operadores, estos buscan pruebas de una oferta confiable ANTES de lanzarse en la subred. Pensemos en un nuevo operador de VPN que quizá ya tenga un producto y clientes: una cobertura más amplia o una disponibilidad confiable en determinados mercados será clave para respaldar su crecimiento. UR necesita coordinar lo antes posible a los proveedores que puedan cumplir esos requisitos.',
             'Por ello, SN25 utiliza el excedente de emisiones, es decir, las emisiones de los mineros que superan lo que va directamente a los proveedores, para impulsar la llegada de mineros y demostrar la solidez de la red con el fin de atraer a nuevos operadores de red.',
         ],
-        diagramAlt: 'Los operadores quieren oferta antes de que llegue la demanda. La capacidad se establece antes de que un operador se lance, mientras que el tráfico de clientes crece más tarde. La Network Capacity Reserve financia esa brecha y se libera contra entregas verificadas. Los operadores se lanzan con la capacidad ya disponible; la reserva asume el coste hasta que el tráfico se pone al día, de modo que los primeros clientes reciben un servicio completo desde el primer día.',
+        diagramAlt: 'Los operadores quieren oferta antes de que llegue la demanda. La capacidad se establece antes de que un operador se lance, mientras que el tráfico de clientes crece más tarde. La Network Capacity Reserve financia esa brecha y se libera contra entregas verificadas. Los operadores se lanzan con la capacidad ya disponible; la reserva asume el costo hasta que el tráfico se pone al día, de modo que los primeros clientes reciben un servicio completo desde el primer día.',
         diagramLink: 'Ver el diagrama a tamaño completo ↗',
     },
     page2Aria: '{title}, página 2',
@@ -30,7 +30,7 @@ export default {
         intro: 'Por ello lanzamos la «Network Capacity Reserve», que utiliza el excedente de emisiones para cubrir esa brecha:',
         uses: [
             'Encargar capacidad antes de la expansión de un operador.',
-            'Mejorar la cobertura y la fiabilidad donde la oferta existente es insuficiente.',
+            'Mejorar la cobertura y la confiabilidad donde la oferta existente es insuficiente.',
             'Responder al aumento de la demanda sin depender únicamente de las emisiones de ese periodo.',
             'Mantener disponible la capacidad estratégicamente útil durante los periodos más tranquilos.',
             'Liberar fondos contra entregas verificadas en lugar de distribuir todo el presupuesto de inmediato.',
@@ -53,7 +53,7 @@ export default {
     operations: {
         heading: 'Operaciones de la reserva',
         items: [
-            'La reserva es una multifirma dedicada, separada de las emisiones del propietario y no utilizada para costes del equipo ni operativos: 5CcHGEqKK3RXeEA2sVycHQAQGrqsyhWaYu9FjGtDVN6nwMwR (UID 170 y 250 de SN25).',
+            'La reserva es una multifirma dedicada, separada de las emisiones del propietario y no utilizada para costos del equipo ni operativos: 5CcHGEqKK3RXeEA2sVycHQAQGrqsyhWaYu9FjGtDVN6nwMwR (UID 170 y 250 de SN25).',
             'Publicar los objetivos, los requisitos de participación, la medición y la duración cuando se utilicen recompensas excedentes de los mineros.',
             'Reservar fondos para los compromisos aceptados y tener en cuenta las recompensas de base existentes.',
             'Verificar la entrega, publicar el cálculo de la recompensa, aprobar los pagos a través de la multifirma y divulgar cada transferencia saliente.',

@@ -60,7 +60,7 @@ export default {
     entries: {
         'e-aug-24': {
             date: '24 ago',
-            title: 'Reequilibrar juntos los ajustes de memoria y velocidad en móviles',
+            title: 'Reequilibrar juntos los ajustes de memoria y velocidad en dispositivos móviles',
             meters: {
                 load: {
                     baseline: 'línea base del conjunto low-bar',
@@ -204,13 +204,13 @@ export default {
         },
         'e-sep-21': {
             date: '21 sept',
-            title: 'Asignar menos por paquete y reducir los búferes de log en móviles',
+            title: 'Asignar menos por paquete y reducir los búferes de log en dispositivos móviles',
             meters: {
                 path: [
                     { l: 'Anexar a un grupo existente', t: '49,33 → 23,88 ns/op' },
                 ],
                 memory: [
-                    { l: 'Búferes de log en móviles', t: '688.128 B menos' },
+                    { l: 'Búferes de log en dispositivos móviles', t: '688.128 B menos' },
                 ],
             },
         },

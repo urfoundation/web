@@ -5,7 +5,7 @@ description: El extensor del minero de UR: puertos que abrir, cortafuegos, grupo
 
 # Ejecutar un extensor
 
-Un extensor es un relé que permite a la gente llegar a la red desde lugares donde los servidores del propio operador están bloqueados. Cada minero ejecuta uno junto a su salida, activado de forma predeterminada. Solo funciona cuando internet puede alcanzar tu ordenador en el puerto TCP 443. Si usaste un instalador, escribe `urnetwork` donde esta página diga `provider`.
+Un extensor es un relé que permite a la gente llegar a la red desde lugares donde los servidores del propio operador están bloqueados. Cada minero ejecuta uno junto a su salida, activado de forma predeterminada. Solo funciona cuando internet puede alcanzar tu computadora en el puerto TCP 443. Si usaste un instalador, escribe `urnetwork` donde esta página diga `provider`.
 
 Un extensor es una de las partes de cada contrato que pasa por él, así que gana una parte de cada contrato que transporta.
 
@@ -22,13 +22,13 @@ Abre estos puertos para las conexiones entrantes desde cualquier dirección, en 
 
 El operador prueba el puerto TCP 443 desde internet antes de incluir tu extensor en la lista. Los puertos UDP dan a los clientes más formas de llegar a él.
 
-Solo un programa de un ordenador puede escuchar en el puerto TCP 443. Cuando varios procesos del minero se ejecutan en un mismo host, por ejemplo con `--all-operators`, el primero que toma el puerto sirve el extensor para el host, y otro toma el relevo en los 3 minutos siguientes a que se detenga. Un servidor web o cualquier otro programa en el puerto 443 mantiene el extensor desactivado.
+Solo un programa de una computadora puede escuchar en el puerto TCP 443. Cuando varios procesos del minero se ejecutan en un mismo host, por ejemplo con `--all-operators`, el primero que toma el puerto sirve el extensor para el host, y otro toma el relevo en los 3 minutos siguientes a que se detenga. Un servidor web o cualquier otro programa en el puerto 443 mantiene el extensor desactivado.
 
 ## Abrir los puertos
 
-Puede haber tres cortafuegos entre internet y el minero: el del propio ordenador, el del proveedor de la nube y un router doméstico. Cada uno tiene que dejar pasar los puertos.
+Puede haber tres cortafuegos entre internet y el minero: el de la propia computadora, el del proveedor de la nube y un router doméstico. Cada uno tiene que dejar pasar los puertos.
 
-### El cortafuegos del ordenador
+### El cortafuegos de la computadora
 
 Con ufw (Ubuntu, Debian):
 
@@ -73,11 +73,11 @@ Un servidor en la nube suele tener también un cortafuegos delante. Permite el t
 
 ### Routers domésticos
 
-En casa, el router bloquea las conexiones entrantes. En su configuración (a menudo llamada reenvío de puertos, servidores virtuales o NAT), reenvía TCP 443, UDP 443 y UDP 4053 al ordenador que ejecuta el minero. Asigna a ese ordenador una dirección fija en tu red (una reserva DHCP), para que el reenvío siga apuntando a él. Solo un ordenador detrás de una dirección IPv4 pública puede tener el puerto 443.
+En casa, el router bloquea las conexiones entrantes. En su configuración (a menudo llamada reenvío de puertos, servidores virtuales o NAT), reenvía TCP 443, UDP 443 y UDP 4053 a la computadora que ejecuta el minero. Asigna a esa computadora una dirección fija en tu red (una reserva DHCP), para que el reenvío siga apuntando a ella. Solo una computadora detrás de una dirección IPv4 pública puede tener el puerto 443.
 
 Algunas conexiones no se pueden reenviar. Si la dirección de internet (WAN) del router está entre `100.64.0.0` y `100.127.255.255`, o no es la dirección que ven los sitios web, tu proveedor de internet te tiene detrás de un NAT de operador (CGNAT). Pide a tu proveedor una dirección IPv4 pública, o usa IPv6.
 
-Muchos routers dan a cada dispositivo una dirección IPv6 pública, pero bloquean las conexiones IPv6 entrantes. Permite el tráfico entrante TCP 443, UDP 443 y UDP 4053 hacia este ordenador en el cortafuegos IPv6 del router.
+Muchos routers dan a cada dispositivo una dirección IPv6 pública, pero bloquean las conexiones IPv6 entrantes. Permite el tráfico entrante TCP 443, UDP 443 y UDP 4053 hacia esta computadora en el cortafuegos IPv6 del router.
 
 ### Docker
 
@@ -157,13 +157,13 @@ Tres líneas componen toda la concesión:
 - `CapabilityBoundingSet=CAP_NET_BIND_SERVICE` impide que llegue a tener ningún otro.
 - `NoNewPrivileges=yes` impide que él, y cualquier cosa que inicie, obtenga privilegios, por ejemplo a través de un programa setuid.
 
-La contrapartida: mientras el servicio se ejecuta, el programa que inicia puede escuchar en los puertos por debajo de 1024. El binario está en tu carpeta, así que cualquiera que pueda reemplazarlo (tú, o un programa que se ejecute con tu usuario) puede ejecutar código que escuche en puertos bajos bajo esta unidad. Ese código no obtiene ningún otro privilegio: no se ejecuta como root, `NoNewPrivileges` está activado y el conjunto delimitador solo contiene esa capacidad. Si eso no es aceptable en un ordenador compartido, no uses `--system`. El minero sigue minando sin su extensor.
+La contrapartida: mientras el servicio se ejecuta, el programa que inicia puede escuchar en los puertos por debajo de 1024. El binario está en tu carpeta, así que cualquiera que pueda reemplazarlo (tú, o un programa que se ejecute con tu usuario) puede ejecutar código que escuche en puertos bajos bajo esta unidad. Ese código no obtiene ningún otro privilegio: no se ejecuta como root, `NoNewPrivileges` está activado y el conjunto delimitador solo contiene esa capacidad. Si eso no es aceptable en una computadora compartida, no uses `--system`. El minero sigue minando sin su extensor.
 
 Otras formas de conceder el puerto, y por qué el minero no las usa:
 
 - `setcap` sobre el binario: las capacidades de archivo se pierden cada vez que una actualización reemplaza el binario.
 - Un binario setuid: muchísimo más privilegio del que necesita un puerto.
-- `net.ipv4.ip_unprivileged_port_start`: cambia la regla para todos los programas y todos los usuarios del ordenador.
+- `net.ipv4.ip_unprivileged_port_start`: cambia la regla para todos los programas y todos los usuarios de la computadora.
 
 Para volver a un servicio de usuario: con el instalador, ejecuta `urnet-tools uninstall` y luego vuelve a instalar sin `--system` (tu identidad en `~/.urnetwork` se conserva). Con `provider service`, ejecuta `sudo "$(command -v provider)" service uninstall --system` y luego `provider service install`.
 
@@ -181,7 +181,7 @@ En el registro (`provider service logs --follow`, o `urnet-tools logs`), la entr
 | `reason` | Qué significa | Qué hacer |
 | --- | --- | --- |
 | `tcp_443_permission_denied` | El minero no tiene permiso para escuchar en el puerto 443. | [Permitir que el minero escuche en el puerto 443](#linux-let-the-miner-listen-on-port-443). |
-| `tcp_443_in_use` | Otro programa tiene el puerto TCP 443: otro proceso del minero, o un servidor web. | Solo un programa por ordenador puede tenerlo. El minero toma el puerto en los 3 minutos siguientes a que quede libre. |
+| `tcp_443_in_use` | Otro programa tiene el puerto TCP 443: otro proceso del minero, o un servidor web. | Solo un programa por computadora puede tenerlo. El minero toma el puerto en los 3 minutos siguientes a que quede libre. |
 | `tcp_443_bind_failed` | La escucha en el puerto 443 falló por otro motivo. | Lee las líneas del registro que hay alrededor. |
 | `unreachable_on_tcp_443` | El minero escucha, pero la prueba del operador no pudo alcanzarlo desde internet. | [Abre los puertos](#open-the-ports) y luego reinicia el minero. |
 

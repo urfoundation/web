@@ -23,7 +23,7 @@ Los tres:
 
 - descargan la última versión para tu procesador, la verifican con el SHA-256 que GitHub publica para ella (eso detecta una descarga dañada) e instalan solo el programa de tu máquina;
 - instalan el minero como **`urnetwork`**: escribe `urnetwork` donde esta guía diga `provider`, también en los comandos que el minero imprime para que los copies;
-- piden tu código de autorización si aún no has iniciado sesión (pulsa Enter para hacerlo más tarde; `--auth-code <code>`, o `-AuthCode` en Windows, inicia la sesión sin preguntar, pero deja el código en el historial de tu shell; `URNETWORK_AUTH_CODE` o la solicitud interactiva no lo dejan);
+- piden tu código de autorización si aún no has iniciado sesión (presiona Enter para hacerlo más tarde; `--auth-code <code>`, o `-AuthCode` en Windows, inicia la sesión sin preguntar, pero deja el código en el historial de tu shell; `URNETWORK_AUTH_CODE` o la solicitud interactiva no lo dejan);
 - registran un dispositivo nuevo en su primer inicio, una vez que has iniciado sesión;
 - activan las [actualizaciones automáticas](/docs/miner/updates), cada 6 horas de forma predeterminada;
 - pueden ejecutarse de nuevo en cualquier momento: una segunda ejecución actualiza en el mismo lugar y conserva tus ajustes y tu identidad.
@@ -110,7 +110,7 @@ Quita el minero, su tarea en segundo plano y su entrada en `PATH`, y **conserva*
 
 Cada versión en la [página de versiones de build](https://github.com/urnetwork/build/releases) tiene un archivo llamado `urnetwork-provider-<version>.tar.gz`. Es una descarga grande (unos 240 MB), porque contiene un programa `provider` para cada sistema, en `<os>/<arch>/provider` (`provider.exe` en Windows). También incluye compilaciones MIPS para routers.
 
-| Tu ordenador | Carpeta en la descarga |
+| Tu computadora | Carpeta en la descarga |
 | --- | --- |
 | PC o servidor Linux (Intel o AMD, 64 bits) | `linux/amd64` |
 | Raspberry Pi 3, 4 o 5 con un sistema operativo de 64 bits, u otro Linux ARM de 64 bits | `linux/arm64` |

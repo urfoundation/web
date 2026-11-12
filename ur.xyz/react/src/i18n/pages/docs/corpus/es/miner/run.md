@@ -15,7 +15,7 @@ Para minar en una terminal:
 provider start
 ```
 
-Muestra una vista en directo breve (Connecting, Connected, ● Mining) y se ejecuta hasta que lo detengas con Ctrl-C. El registro detallado va a `miner.log` en `~/.urnetwork`; añade `-v` para verlo en la terminal en su lugar.
+Muestra una vista en vivo breve (Connecting, Connected, ● Mining) y se ejecuta hasta que lo detengas con Ctrl-C. El registro detallado va a `miner.log` en `~/.urnetwork`; añade `-v` para verlo en la terminal en su lugar.
 
 El primer inicio en un dispositivo nuevo pregunta antes de registrarlo y guarda su identidad en `~/.urnetwork`. Cada inicio posterior reutiliza esa identidad. En un script, donde nadie puede responder, añade `--allow-client-registration` al primer inicio. `provider provide` es el mismo comando con la salida completa del registro, para scripts y servicios.
 
@@ -83,7 +83,7 @@ provider service stop
 provider service uninstall       # your sign-in and identity are kept
 ```
 
-En un servidor, o para minar para todos los usuarios del ordenador en Linux o macOS, usa un servicio para todo el sistema que se ejecute como root, con su estado en `/var/lib/urnetwork`: `sudo provider setup --system`, o `sudo provider service install --system`. Añade `--system` a los demás comandos de `provider service` para gestionarlo. Windows no tiene servicio para todo el sistema. En Linux, un servicio de usuario no puede escuchar en el puerto TCP 443 para el extensor del minero; `sudo "$(command -v provider)" service install --system --as="$USER"` lo ejecuta como un servicio del sistema que se sigue ejecutando con tu usuario y puede escuchar en ese puerto. Consulta [Permitir que el minero escuche en el puerto 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443). Para muchas máquinas, `provider setup --yes --auth-code-file=<path>` configura sin hacer preguntas; se salta el paso del pago, así que [configura la wallet de pago](/docs/miner/rewards#set-your-payout-wallet) después.
+En un servidor, o para minar para todos los usuarios de la computadora en Linux o macOS, usa un servicio para todo el sistema que se ejecute como root, con su estado en `/var/lib/urnetwork`: `sudo provider setup --system`, o `sudo provider service install --system`. Añade `--system` a los demás comandos de `provider service` para gestionarlo. Windows no tiene servicio para todo el sistema. En Linux, un servicio de usuario no puede escuchar en el puerto TCP 443 para el extensor del minero; `sudo "$(command -v provider)" service install --system --as="$USER"` lo ejecuta como un servicio del sistema que se sigue ejecutando con tu usuario y puede escuchar en ese puerto. Consulta [Permitir que el minero escuche en el puerto 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443). Para muchas máquinas, `provider setup --yes --auth-code-file=<path>` configura sin hacer preguntas; se salta el paso del pago, así que [configura la wallet de pago](/docs/miner/rewards#set-your-payout-wallet) después.
 
 En Linux y Windows, `provider service install` no añade un segundo minero junto al de un instalador. En macOS no puede ver el agente del instalador, así que si usaste el instalador de macOS, sigue usando `urnet-tools` y no instales un segundo servicio.
 
@@ -124,7 +124,7 @@ Para que siga funcionando después de cerrar sesión, activa lingering una vez: 
 provider status
 ```
 
-Una línea para cada uno de estos: el minero, el inicio de sesión, el registro del dispositivo, la conexión y las actualizaciones; y el comando que hay que ejecutar después cuando algo no va bien. Sale con 0 cuando todo va bien, 3 cuando el dispositivo necesita configuración y 4 cuando el minero no está en ejecución o no está conectado. `provider status --json` imprime lo mismo para scripts y monitorización.
+Una línea para cada uno de estos: el minero, el inicio de sesión, el registro del dispositivo, la conexión y las actualizaciones; y el comando que hay que ejecutar después cuando algo no va bien. Sale con 0 cuando todo va bien, 3 cuando el dispositivo necesita configuración y 4 cuando el minero no está en ejecución o no está conectado. `provider status --json` imprime lo mismo para scripts y monitoreo.
 
 ```bash
 provider doctor
@@ -164,13 +164,13 @@ curl -s http://127.0.0.1:8080/
 
 Muestra la `version` del minero (las compilaciones de versiones publicadas la tienen), su nombre de `host` y una sección `diagnostics` con el último resultado del inicio de sesión (`authentication`), `keys`, `extender` y `runtime`. El `"status":"ok"` de nivel superior solo significa que el proceso del minero está en marcha; no significa que esté conectado ni ganando, así que lee también `diagnostics`.
 
-La página de estado escucha en todas las interfaces de red, no solo en la local. Bloquea ese puerto en tu cortafuegos, o permite solo tu red de monitorización.
+La página de estado escucha en todas las interfaces de red, no solo en la local. Bloquea ese puerto en tu cortafuegos, o permite solo tu red de monitoreo.
 
 ## Opciones útiles
 
 | Opción | Qué hace |
 | --- | --- |
-| `--max-memory=1gib` | Un objetivo de memoria flexible, en bytes o con `b`, `kib`, `mib` o `gib`. Sin ella, el minero elige uno según la memoria del ordenador. |
+| `--max-memory=1gib` | Un objetivo de memoria flexible, en bytes o con `b`, `kib`, `mib` o `gib`. Sin ella, el minero elige uno según la memoria de la computadora. |
 | `-v`, `-vv` | Más detalle en el registro. |
 | `--port=<port>` | Servir la [página de estado](#the-status-page) en ese puerto. `0`, el valor predeterminado, la desactiva. |
 

@@ -1,7 +1,7 @@
-// The capture the flag pages' country names in Chinese: `name` and `order` from CLDR 48.0, `short`, `in` and `inShort` by hand.
+// The capture the flag pages' country names in Chinese: `name` and `order` from CLDR 48.0 (the site's own hk, mo, tw: REGION_NAMES in react/src/i18n/format.js), `short`, `in` and `inShort` by hand.
 // Written by scripts/ctf-names.mjs, which keeps the hand-written forms; see it for what each holds.
 export default {
-    order: "al dz af ar ae aw om az eg et ie ee ad ao ai ag at ax au bb pg bs pk py ps bh pa br by bm bg mp mk bj be is pr pl ba bo bz bw bt bf bi bv kp gq dk de tl tg do dm ru ec er fr fo pf gf tf mf va ph fj fi cv fk gm cg cd co cr gd gl ge gg cu gp gu gy kz ht kr nl bq sx hm me hn ki dj kg gn gw ca gh ga kh cz zw cm qa ky cc km ci kw hr ke ck cw lv ls la lb lt lr ly li re lu rw ro mg im mv mt mw my ml mh mq yt mu mr us um as vi mn ms bd pe fm mm md ma mc mz mx na za aq gs ss nr ni np ne ng nu no nf pw pn pt jp se ch sv ws rs sl sn cy sc sa bl cx st sh kn lc sm pm vc lk sk si sj sz sd sr sb so tj tw th tz to tc tt tn tv tr tm tk wf vu gt ve bn ug ua uy uz es eh gr sg nc nz hu sy jm am ye iq ir il it in id gb vg io jo vn zm je td gi cl cf cn mo hk",
+    order: "al dz af ar ae aw om az eg et ie ee ad ao ai ag at ax au mo bb pg bs pk py ps bh pa br by bm bg mp mk bj be is pr pl ba bo bz bw bt bf bi bv kp gq dk de tl tg do dm ru ec er fr fo pf gf tf mf va ph fj fi cv fk gm cg cd co cr gd gl ge gg cu gp gu gy kz ht kr nl bq sx hm me hn ki dj kg gn gw ca gh ga kh cz zw cm qa ky cc km ci kw hr ke ck cw lv ls la lb lt lr ly li re lu rw ro mg im mv mt mw my ml mh mq yt mu mr us um as vi mn ms bd pe fm mm md ma mc mz mx na za aq gs ss nr ni np ne ng nu no nf pw pn pt jp se ch sv ws rs sl sn cy sc sa bl cx st sh kn lc sm pm vc lk sk si sj sz sd sr sb so tj tw th tz to tc tt tn tv tr tm tk wf vu gt ve bn ug ua uy uz es eh gr hk sg nc nz hu sy jm am ye iq ir il it in id gb vg io jo vn zm je td gi cl cf cn",
     name: {
         ad: "安道尔",
         ae: "阿拉伯联合酋长国",
@@ -97,7 +97,7 @@ export default {
         gu: "关岛",
         gw: "几内亚比绍",
         gy: "圭亚那",
-        hk: "中国香港特别行政区",
+        hk: "香港",
         hm: "赫德岛和麦克唐纳群岛",
         hn: "洪都拉斯",
         hr: "克罗地亚",
@@ -150,7 +150,7 @@ export default {
         ml: "马里",
         mm: "缅甸",
         mn: "蒙古",
-        mo: "中国澳门特别行政区",
+        mo: "澳门",
         mp: "北马里亚纳群岛",
         mq: "马提尼克",
         mr: "毛里塔尼亚",

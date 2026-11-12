@@ -52,7 +52,7 @@ Los mineros de nivel superior son la cúspide de la oferta. Las aproximadamente 
 
 Los dos niveles forman un solo torneo: un minero empieza en un pool, asciende a un slot superior a medida que crece su amplitud de IPs enrutables y vuelve al pool si retrocede. Una proporción fijada por la gobernanza divide la parte de la emisión de los proveedores entre la cabeza y la cola.
 
-- Nivel de pool: la puerta de entrada. Únete a un operador sin slot y sin coste de registro; los validadores ponderan el pool según la demanda y la calidad; la parte de cada minero se acumula en cada período de liquidación y se reclama con una prueba (con la liquidación v2, en una sola cuenta que nunca caduca).
+- Nivel de pool: la puerta de entrada. Únete a un operador sin slot y sin costo de registro; los validadores ponderan el pool según la demanda y la calidad; la parte de cada minero se acumula en cada período de liquidación y se reclama con una prueba (con la liquidación v2, en una sola cuenta que nunca caduca).
 - Mineros de nivel superior: la cúspide. Las aproximadamente 200 flotas con la cobertura de IPs enrutables más amplia reclaman su propio slot y reciben el pago directamente de la red, sin operador, pool ni intermediario.
 
 ## V. Custodia, liquidación y descentralización

@@ -51,7 +51,7 @@ export default {
         items: [
             {
                 label: 'Convicción total',
-                context: 'Convicción de la clave del propietario: 640.000 α (1,41 millones de USD)',
+                context: 'Convicción de la clave del propietario: 640.000 α (US$1,41 millones)',
                 change: '+11,7 % en 30 días',
             },
             {

@@ -31,7 +31,7 @@ export default {
         'conviction-lock': {
             title: 'El equipo de UR bloquea 550.000 alpha a perpetuidad',
             headline: 'El equipo de UR bloquea 550.000 alpha en convicción perpetua',
-            summary: 'Aproximadamente 1,44 millones de dólares estadounidenses bloqueados en convicción perpetua, lo que eleva el total de alpha bloqueado en respaldo de SN25 al 27,1 % del suministro circulante.',
+            summary: 'Aproximadamente US$1,44 millones bloqueados en convicción perpetua, lo que eleva el total de alpha bloqueado en respaldo de SN25 al 27,1 % del suministro circulante.',
             description: 'El equipo directivo de UR ha bloqueado 550.000 alpha en convicción perpetua, con lo que el total de alpha bloqueado en respaldo de SN25 llega al 27,1 % del suministro circulante.',
             cta: 'Leer el comunicado',
             readTime: '3 min de lectura',

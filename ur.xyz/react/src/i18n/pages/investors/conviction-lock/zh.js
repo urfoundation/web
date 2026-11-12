@@ -23,7 +23,7 @@ export default {
     },
     aboutHeading: '关于 UR (SN25)',
     about: [
-        'UR (SN25) 是构建在 Bittensor 上、面向私密互联网访问的开源带宽市场。目前，UR (SN25) 与 100 多个国家的 80,000 多个网络提供者合作承载流量。UR 由 UR Foundation 公开开发，协议位于 github.com/urfoundation/sn。更多信息请访问 ur.xyz。',
+        'UR (SN25) 是构建在 Bittensor 上、面向私密互联网访问的开源带宽市场。目前，UR (SN25) 与 100 多个国家和地区的 80,000 多个网络提供者合作承载流量。UR 由 UR Foundation 公开开发，协议位于 github.com/urfoundation/sn。更多信息请访问 ur.xyz。',
         'BringYour 是首个网络运营商 ur.io，运营一款为超过 350,000 名月活跃用户提供服务的消费级 VPN。它在 github.com/urnetwork 上完全开源，并已在 iOS、Android、Windows、macOS、Linux、Chrome 和 Firefox 上线。',
     ],
     figuresAsAt: '所有数据均截至 2026年9月9日，可能发生变化。',

@@ -54,7 +54,7 @@ export default {
     overview: {
         last24: "过去 24 小时",
         onlineInCountries: {
-            other: "当前在线，分布在 {count} 个国家",
+            other: "当前在线，分布在 {count} 个国家和地区",
         },
         aDayOnAverage: "平均每天 {value}",
         onAverage: "平均 {value}",
@@ -77,14 +77,14 @@ export default {
         continentShare: "占大洲比例",
         nearby: "排名相近",
         continent: {
-            other: "大洲 · {count} 个国家",
+            other: "大洲 · {count} 个国家和地区",
         },
         topCountries: "主要国家",
         worldwide: "全球",
         worldwideHint: "搜索、点击圆点，或展开一个大洲",
-        several: "有多个国家匹配。继续输入或从列表中选择一个。",
+        several: "有多个国家和地区匹配。继续输入或从列表中选择一个。",
         none: "没有名为“{query}”且有在线提供者的国家。",
-        top3: "前 3 个国家拥有 {share} 的在线提供者。",
+        top3: "前 3 个国家和地区拥有 {share} 的在线提供者。",
         changeLast: "过去 {period}变化",
         share: "占比",
         clickToPin: "点击固定",
@@ -93,7 +93,7 @@ export default {
         newChip: "新",
         showTop: "显示前 15 个",
         showAll: {
-            other: "显示全部 {count} 个国家",
+            other: "显示全部 {count} 个国家和地区",
         },
         averageOnline: "过去 {period}平均在线",
         highestLast: {
@@ -146,7 +146,7 @@ export default {
         },
         latest: "最新",
         allRecorded: "全部记录",
-        countriesAria: "国家",
+        countriesAria: "国家和地区",
         citiesAria: "城市",
         connectionsAria: "每天新连接",
         busiest: "最忙",

@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { loadPageCopy } from '../../page-copy.js';
 import { mainnetActions, mainnetEpochs, mainnetNotices, noticeDay } from '../../../data/mainnet.js';
 import { localizeActions, localizeEpochs, localizeEvents, localizeNotices, noticeDate } from '../../../components/pages/mainnet/copy.js';
-import { epochBlocks, groupByEpoch, isApproximate, parseWhen, sourceRows, whenText } from '../../../components/pages/mainnet/timeline.js';
+import { epochBlocks, figure, groupByEpoch, isApproximate, parseWhen, sourceRows, whenText } from '../../../components/pages/mainnet/timeline.js';
 import { axisNow, summaryModel } from '../../../components/pages/mainnet/summary.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -99,7 +99,7 @@ test('every milestone, step and epoch is translated, with the data\'s dates, sta
     }
 });
 
-test('dates and blocks are written in each language, at the same UTC times, with the English figures', () => {
+test('dates and blocks are written in each language, at the same UTC times, with the English figures (Spanish: Intl\'s)', () => {
     const at = (value, t, options = {}) => whenText(parseWhen(value), { ...options, t });
     for (const lang of LANGS) {
         const t = page(lang);
@@ -112,13 +112,17 @@ test('dates and blocks are written in each language, at the same UTC times, with
         // a planned milestone keeps its ≈
         const planned = events.find((e) => e.id === 'capture-the-flag-epoch-8');
         assert.match(whenText(parseWhen(planned.date), { approxStart: isApproximate(planned), t }), /≈18:25 UTC$/, lang);
-        // 50,400 blocks and 7 days, and epoch 0's 7,200 blocks and 1 day
+        // 50,400 blocks and 7 days, and epoch 0's 7,200 blocks and 1 day, each as the language writes figures
         const week = epochBlocks(mainnetEpochs[1], { lang, t });
-        assert.ok(['9,247,228', '9,297,628', '50,400', '7'].every((figure) => week.includes(figure)), `${lang}: ${week}`);
+        assert.ok([9247228, 9297628, 50400, 7].every((n) => week.includes(figure(n, lang))), `${lang}: ${week}`);
         const day = epochBlocks(mainnetEpochs[0], { lang, t });
-        assert.ok(['9,240,028', '9,247,228', '7,200', '1'].every((figure) => day.includes(figure)), `${lang}: ${day}`);
+        assert.ok([9240028, 9247228, 7200, 1].every((n) => day.includes(figure(n, lang))), `${lang}: ${day}`);
     }
     assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'ru', t: page('ru') }), 'Блоки 9,247,228 → 9,297,628 · 50,400 блоков, 7 дней');
+    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'de', t: page('de') }), 'Blöcke 9,247,228 → 9,297,628 · 50,400 Blöcke, 7 Tage');
+    // Spanish writes figures as Intl does for the page, as on /ctf and its other pages
+    assert.equal(epochBlocks(mainnetEpochs[1], { lang: 'es', t: page('es') }), 'Bloques 9.247.228 → 9.297.628 · 50.400 bloques, 7 días');
+    assert.equal(epochBlocks(mainnetEpochs[0], { lang: 'es', t: page('es') }), 'Bloques 9.240.028 → 9.247.228 · 7200 bloques, 1 día');
     assert.equal(epochBlocks(mainnetEpochs[0], { lang: 'ar', t: page('ar') }), 'الكتل 9,240,028 ← 9,247,228 · 7,200 كتلة، 1 يوم');
     assert.equal(at('2026-10-08T18:36:12Z', page('de')), 'Do., 8. Okt. · 18:36 UTC');
     assert.equal(at('2026-10-08T18:36:12Z', page('zh')), '10月8日周四 · 18:36 UTC');

@@ -3,14 +3,14 @@ export default {
     documentTitle: 'El equipo directivo de UR (SN25) bloquea 550.000 alpha en convicción perpetua y eleva el total de alpha bloqueado en respaldo de la subred al 27,1 % del suministro circulante',
     highlightsHeading: 'Aspectos destacados',
     highlights: [
-        '<strong>Bloqueo del equipo</strong>: 550.000 alpha, equivalentes a 5451 TAO o aproximadamente 1,44 millones de dólares estadounidenses.',
+        '<strong>Bloqueo del equipo</strong>: 550.000 alpha, equivalentes a 5451 TAO o aproximadamente US$1,44 millones.',
         '<strong>Plazo del bloqueo</strong>: perpetuo, sin fecha de desbloqueo ni calendario de vesting, verificable de forma transparente en la cadena.',
         '<strong>Bloqueo de los titulares</strong>: 323.519 alpha bloqueados antes del compromiso del equipo y otros 291.974 alpha bloqueados desde entonces.',
-        '<strong>Total bloqueado</strong>: 1.165.493 alpha, aproximadamente 3,04 millones de dólares estadounidenses y el 27,1 % del suministro circulante.',
+        '<strong>Total bloqueado</strong>: 1.165.493 alpha, aproximadamente US$3,04 millones y el 27,1 % del suministro circulante.',
         '<strong>Posición</strong>: segunda de 128 subredes por total de alpha bloqueado en convicción en Bittensor.',
     ],
     body: [
-        'El equipo directivo de UR (SN25) ha bloqueado 550.000 alpha mediante el mecanismo de convicción de Bittensor, aproximadamente 1,44 millones de dólares estadounidenses al precio al contado del 9 de septiembre de 2026, en estado de bloqueo perpetuo. Los titulares externos ya habían bloqueado 323.519 alpha en respaldo de UR (SN25) antes del compromiso del equipo, aproximadamente 844.000 dólares estadounidenses y el 7,5 % del suministro circulante. Desde entonces, los titulares externos han bloqueado otros 291.974 alpha. En conjunto, el total asciende ahora a 1.165.493 alpha, alrededor de 3,04 millones de dólares estadounidenses y el 27,1 % de todo el alpha de SN25 en circulación, el segundo mayor total de alpha bloqueado en respaldo de cualquier subred de Bittensor.',
+        'El equipo directivo de UR (SN25) ha bloqueado 550.000 alpha mediante el mecanismo de convicción de Bittensor, aproximadamente US$1,44 millones al precio al contado del 9 de septiembre de 2026, en estado de bloqueo perpetuo. Los titulares externos ya habían bloqueado 323.519 alpha en respaldo de UR (SN25) antes del compromiso del equipo, aproximadamente US$844.000 y el 7,5 % del suministro circulante. Desde entonces, los titulares externos han bloqueado otros 291.974 alpha. En conjunto, el total asciende ahora a 1.165.493 alpha, alrededor de US$3,04 millones y el 27,1 % de todo el alpha de SN25 en circulación, el segundo mayor total de alpha bloqueado en respaldo de cualquier subred de Bittensor.',
         'El equipo directivo ha fijado el bloqueo como perpetuo para demostrar su convicción. La posición solo gana valor si la red crece y el alpha se revaloriza. Es la misma condición para cada titular y validador de SN25. Los incentivos del equipo están alineados con los de todos los demás que tienen alpha de la subred y trabajan en ella, porque la única forma de que esta posición gane es que gane la red.',
     ],
     brien: {

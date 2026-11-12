@@ -7,7 +7,10 @@
 //
 // Each file holds, for every one of the snapshot's 249 codes:
 //   name     the name a list shows: CLDR's (Intl.DisplayNames, this node's
-//            ICU); in English the API's name (react/src/data/ctf-epoch.json)
+//            ICU), or the site's own where it departs from CLDR (REGION_NAMES
+//            in react/src/i18n/format.js: 香港, 澳门 and 台湾 in Chinese,
+//            Rumania and Arabia Saudita in Spanish); in English the API's
+//            name (react/src/data/ctf-epoch.json)
 //   short    the name a title or the breadcrumb uses when the sentence's is
 //            too long: CLDR's short style, or a shorter name written by hand
 //   in       "in <country>" as the language says it inside a sentence
@@ -27,6 +30,8 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import { REGION_NAMES, displayRegion } from '../react/src/i18n/format.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SNAPSHOT = path.join(ROOT, 'react/src/data/ctf-epoch.json');
@@ -59,13 +64,12 @@ const DRAFT_IN = { ru: (n) => `в ${n}`, ar: (n) => `في ${n}`, zh: (n) => `在
 
 /** A translation: CLDR's names and order, and the hand-written forms kept from `previous`. */
 function translated(lang, countries, previous) {
-    const long = new Intl.DisplayNames([lang], { type: 'region' });
     const shortStyle = new Intl.DisplayNames([lang], { type: 'region', style: 'short' });
     const out = { order: '', name: {}, short: {}, in: {}, inShort: {} };
     for (const { code } of countries) {
-        const name = long.of(code.toUpperCase());
+        const name = displayRegion(code, lang);
         out.name[code] = name;
-        out.short[code] = previous?.short?.[code] ?? shortStyle.of(code.toUpperCase());
+        out.short[code] = previous?.short?.[code] ?? REGION_NAMES[lang]?.[code.toUpperCase()] ?? shortStyle.of(code.toUpperCase());
         out.in[code] = previous?.in?.[code] ?? DRAFT_IN[lang](name);
         out.inShort[code] = previous?.inShort?.[code] ?? DRAFT_IN[lang](out.short[code]);
     }
@@ -79,7 +83,7 @@ function translated(lang, countries, previous) {
 
 const HEADER = {
     en: '// The capture the flag pages\' country names in English, from the snapshot (react/src/data/ctf-epoch.json).',
-    other: (lang) => `// The capture the flag pages' country names in ${new Intl.DisplayNames(['en'], { type: 'language' }).of(lang)}: \`name\` and \`order\` from CLDR ${process.versions.cldr}, \`short\`, \`in\` and \`inShort\` by hand.`,
+    other: (lang) => `// The capture the flag pages' country names in ${new Intl.DisplayNames(['en'], { type: 'language' }).of(lang)}: \`name\` and \`order\` from CLDR ${process.versions.cldr}${REGION_NAMES[lang] ? ` (the site's own ${Object.keys(REGION_NAMES[lang]).map((code) => code.toLowerCase()).join(', ')}: REGION_NAMES in react/src/i18n/format.js)` : ''}, \`short\`, \`in\` and \`inShort\` by hand.`,
 };
 
 function source(lang, names) {

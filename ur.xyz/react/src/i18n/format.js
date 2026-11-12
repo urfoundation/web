@@ -71,11 +71,27 @@ export function interpolate(template, values = {}) {
 }
 
 /**
+ * The places the site names otherwise than CLDR does, by page language and
+ * code (the owner's style decisions of 2026-11-12):
+ *   zh  Hong Kong, Macao and Taiwan are 香港, 澳门 and 台湾, the English site's
+ *       short names, in every form: never CLDR's 中国香港特别行政区 or
+ *       中国澳门特别行政区, and never a 中国… prefix;
+ *   es  the Latin American name where CLDR's Spanish is Spain's (Rumania,
+ *       Arabia Saudita), as every Spanish page is neutral Latin American.
+ */
+export const REGION_NAMES = Object.freeze({
+    zh: Object.freeze({ HK: '香港', MO: '澳门', TW: '台湾' }),
+    es: Object.freeze({ RO: 'Rumania', SA: 'Arabia Saudita' }),
+});
+
+/**
  * A country or territory's name in the page's language, from its ISO 3166-1
- * alpha-2 code: displayRegion('ke', 'de') → "Kenia". ICU versions differ
- * between node and browsers, so compute names at build time and pass them to
- * an island rather than calling this in a hydrating render.
+ * alpha-2 code: displayRegion('ke', 'de') → "Kenia" (REGION_NAMES where the
+ * site departs from CLDR). ICU versions differ between node and browsers, so
+ * compute names at build time and pass them to an island rather than calling
+ * this in a hydrating render.
  */
 export function displayRegion(code, lang) {
-    return cached(Intl.DisplayNames, lang, { type: 'region' }).of(String(code).toUpperCase());
+    const upper = String(code).toUpperCase();
+    return REGION_NAMES[lang]?.[upper] ?? cached(Intl.DisplayNames, lang, { type: 'region' }).of(upper);
 }

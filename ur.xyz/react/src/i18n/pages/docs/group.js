@@ -13,13 +13,14 @@
 export default {
     paths: ['/docs', '/docs/*', '/docs/miner/*', '/docs/support/*', '/terms', '/privacy', '/vdp'],
     localized: true,
-    // Left in English on purpose on the translated pages: Bittensor's terms and
-    // units that every language keeps in Latin script (the translators' glossary;
-    // Spanish keeps pool and litepaper as well), names, the title of the English
-    // whitepaper a link names, the two prompts the miner prints in English (each
-    // followed by its translation), and a code block's language label.
+    // Left in English on purpose on the translated pages: Bittensor's terms that
+    // every language keeps in Latin script (the translators' glossary; Spanish keeps
+    // pool and litepaper as well), names, the title of the English whitepaper a link
+    // names, the two prompts the miner prints in English (each followed by its
+    // translation), and a code block's language label. Units of measure (rao) need
+    // no entry: tests/localized-english-text.mjs reads them as no prose.
     allowEnglish: [
-        'hotkey', 'coldkey', 'alpha', 'rao', 'metagraph', 'momentum', 'relayer', 'pool', 'litepaper',
+        'hotkey', 'coldkey', 'alpha', 'metagraph', 'momentum', 'relayer', 'pool', 'litepaper',
         'Bittensor SN25 (netuid 25)', 'Bittensor SN25, netuid 25', 'whitepaper',
         "This device isn't signed in yet", 'This is the first start on this device',
         'powershell',

@@ -152,6 +152,8 @@ export default {
         loadFinalShort: '4.7–7.3× vs Aug 24',
         loadFinal: '4.7–7.3× faster than Aug 24, low confidence',
         none: 'No measurement yet',
+        // the latest page-load reading under the value: its label and its entry's date
+        loadSub: '{label}, {date}',
         bulkFrom: 'from about {from}, {x}',
         otherReadings: { one: '{count} other reading', other: '{count} other readings' },
         phone: 'phone',

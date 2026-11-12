@@ -40,10 +40,57 @@ function formatFigure(token, lang) {
 
 /** A string's English-written figures in `lang`'s number format; <code> spans and tags stay as they are. */
 export function localizeFigures(text, lang) {
+    if (lang === 'ar') return orientArrows(text);
     if (ENGLISH_STYLE.has(lang)) return text;
     return String(text).split(/(<code>[\s\S]*?<\/code>|<[^>]+>)/).map((part) => (part.startsWith('<')
         ? part
         : part.replace(EN_FIGURE, (token) => formatFigure(token, lang)))).join('');
+}
+
+// ── right to left ─────────────────────────────────────────────────────────────
+// In an Arabic sentence the bidi algorithm lays "3,967.8→745.0" out right to
+// left, so the arrow points from the new value back to the old one. A chain of
+// figures joined by arrows is isolated left to right (U+2066 … U+2069, the
+// figures read as the English writes them); an arrow that still sits against
+// Arabic text runs right to left with it and is written «←», which points the
+// way an Arabic reader reads. An arrow between Latin words (ACK→NoAck) stays.
+export const LRI = '⁦';
+export const PDI = '⁩';
+const CHAIN_NUMBER = '[≈~]?[−+]?\\d[\\d.,/–]*[×%]?';
+const ARROW_CHAIN = new RegExp(`(?<![\\w.,/])${CHAIN_NUMBER}(?:\\s?→\\s?${CHAIN_NUMBER})+`, 'g');
+const LATIN = /[A-Za-z]/;
+const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
+
+/** The direction of the nearest letter from `i` going `step` (−1 or 1), past tags, {placeholders} and isolates: 'L', 'R' or null. */
+function nearestStrong(s, i, step) {
+    const skip = step < 0 ? { '>': '<', '}': '{', [PDI]: LRI } : { '<': '>', '{': '}', [LRI]: PDI };
+    for (let j = i; j >= 0 && j < s.length; j += step) {
+        const c = s[j];
+        if (skip[c]) {
+            j = step < 0 ? s.lastIndexOf(skip[c], j - 1) : s.indexOf(skip[c], j + 1);
+            if (j < 0) return null;
+            continue;
+        }
+        if (LATIN.test(c)) return 'L';
+        if (ARABIC.test(c)) return 'R';
+    }
+    return null;
+}
+
+function orientArrows(text) {
+    const s = String(text).split(/(<code>[\s\S]*?<\/code>|<[^>]+>)/).map((part) => (part.startsWith('<')
+        ? part
+        : part.replace(ARROW_CHAIN, (chain) => `${LRI}${chain}${PDI}`))).join('');
+    let out = '';
+    let isolated = 0;
+    for (let i = 0; i < s.length; i += 1) {
+        const c = s[i];
+        if (c === LRI) isolated += 1;
+        if (c === PDI) isolated -= 1;
+        if (c === '→' && !isolated && (nearestStrong(s, i - 1, -1) === 'R' || nearestStrong(s, i + 1, 1) === 'R')) out += '←';
+        else out += c;
+    }
+    return out;
 }
 
 // the separators each language writes: [group, decimal]

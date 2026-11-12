@@ -20,7 +20,15 @@ export const TERM_PATTERNS_BY_LANG = {
         'g-race-mode': /(?<![\p{L}\p{N}])режим\p{L}* race(?![\p{L}\p{N}])/iu,
         'g-websocket-masking': /(?<![\p{L}\p{N}])маскировани\p{L}*(?: WebSocket)?/iu,
     },
-    ar: {},
+    // Arabic attaches prepositions and the article to a word (لضبط، بوضع), so a term is found inside one
+    ar: {
+        'g-ack-compression': /ضغط ACK/u,
+        'g-ios-profile': /(?:ملفات? تعريف|بديلة? لـ ?) ?iOS/u,
+        'g-model-mbps': /Mbps في النموذج/u,
+        'g-pacing': /ضبط ال?إيقاع/u,
+        'g-race-mode': /وضع race/u,
+        'g-websocket-masking': /(?:ال)?تقنيع(?: WebSocket)?/u,
+    },
     zh: {
         'g-ack-compression': /ACK ?压缩/u,
         'g-ios-profile': /iOS ?(?:替代)?配置/u,

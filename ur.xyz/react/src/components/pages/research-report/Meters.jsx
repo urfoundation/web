@@ -324,7 +324,7 @@ function MeterSet({ mode, index, lang, follow = false }) {
                             </p>
                             {m.key === 'load' && (
                                 <p className={`rr-meter-sub${mode === 'rail' ? ' is-one' : ''}`}>
-                                    <span>{L ? `${labelOf(t, L)}, ${t.entries[ENTRIES[L.i].id].date}` : tm.none}</span>
+                                    <span>{L ? interpolate(tm.loadSub, { label: labelOf(t, L), date: t.entries[ENTRIES[L.i].id].date }) : tm.none}</span>
                                     {/* the rail says it in the meter's name row, to keep its height */}
                                     {mode !== 'rail' && <span className={`rr-meter-badge${state.load.final ? ' is-on' : ''}`}>{tm.loadFinal}</span>}
                                 </p>

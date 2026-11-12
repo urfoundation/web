@@ -46,7 +46,7 @@ export default {
                 other: '储备余额 · 最近 {count} 天',
             },
         },
-        projectedTo: '→ {date} 前达到 {amount}',
+        projectedTo: '→ {date}前达到 {amount}',
         windowChange: {
             other: '最近 {count} 天变化 {change}',
         },
@@ -137,10 +137,10 @@ export default {
             burned: '所有者指定，已销毁',
             noteLive: '储备获得 momentum 之外的部分：1 − momentum。',
             noteOnChain: 'momentum 现已在链上：每天 {momentum} α 付给提供者。储备获得其余部分，即 1 − momentum（每天 {reserve} α），在其 hotkey 获得支付后到账。',
-            notePreLaunch: '自 {date} 起，momentum 付给提供者（每天 {momentum} α），储备获得其余部分，即 1 − momentum（每天 {reserve} α）。在此之前，链会销毁所有者指定的份额。',
+            notePreLaunch: '自 {date}起，momentum 付给提供者（每天 {momentum} α），储备获得其余部分，即 1 − momentum（每天 {reserve} α）。在此之前，链会销毁所有者指定的份额。',
         },
         planned: {
-            title: '自 {date} 起的矿工分配',
+            title: '自 {date}起的矿工分配',
             momentum: 'Momentum，给提供者',
             reserve: '储备，1 − momentum',
             note: '链上响应后即显示实时分配。',

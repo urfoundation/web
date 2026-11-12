@@ -16,11 +16,11 @@ export default {
 
     custody: {
         heading: '托管',
-        threshold: '3 选 2',
-        accountLabel: '储备账户 · {threshold} 多签',
+        threshold: '2/3',
+        accountLabel: '储备账户 · 多签（{threshold}）',
         onChain: '已上链',
         awaitingFunds: '等待资金',
-        modeNote: '储备账户是一个原生的 3 选 2 多签账户。它只为注册自己的接收方而签名，并用自身余额支付它们在 SN25 的注册销毁费用。',
+        modeNote: '储备账户是一个原生多签（2/3）账户。它只为注册自己的接收方而签名，并用自身余额支付它们在 SN25 的注册销毁费用。',
         holds: '在区块 {block}，它持有 {tao} TAO 可用余额。',
         recipients: '接收方 hotkey',
         notRegistered: '尚未注册',
@@ -49,7 +49,7 @@ export default {
         aria: '方法说明',
         mechanism: {
             label: '机制。',
-            body: 'SN25 每天发行 {emission} α：{ownerShare} 归子网所有者，其余由验证者和矿工平分，因此矿工分配为每天 {minerAllocation} α。自 {date} 起，momentum，即现在用于驱动网络的份额，作为奖励付给提供者。储备的接收方 hotkey 获得其余部分，即矿工发行 × (1 − momentum)，因此储备的份额并不固定，会随 momentum 的增长而下降。在链上显示的 momentum 至少达到 {min} 之前，页面将 momentum 保持在启动值，之后跟随链上的值。',
+            body: 'SN25 每天发行 {emission} α：{ownerShare} 归子网所有者，其余由验证者和矿工平分，因此矿工分配为每天 {minerAllocation} α。自 {date}起，momentum，即现在用于驱动网络的份额，作为奖励付给提供者。储备的接收方 hotkey 获得其余部分，即矿工发行 × (1 − momentum)，因此储备的份额并不固定，会随 momentum 的增长而下降。在链上显示的 momentum 至少达到 {min} 之前，页面将 momentum 保持在启动值，之后跟随链上的值。',
         },
         beforeLaunch: {
             label: '启动前。',
@@ -72,7 +72,7 @@ export default {
         valuation: {
             label: '估值。',
             tao: 'TAO 数字只是即时参考价，并非可实现的价值：α 按 {price} TAO 计，即该区块 SN25 资金池中投入的 TAO 与 α 之比。',
-            usd: 'USD 数字为 α 乘以 α 的实时价格，{price}，来自{source}，{time}：同样只是即时参考价。',
+            usd: 'USD 数字为 α 乘以 α 的实时价格（{price}，来源：{source}，{time}）：同样只是即时参考价。',
             noPrice: '尚未读取到任何 α 价格，因此不显示 USD 数字。',
             inAlpha: '显示单位为 α 时，不显示 USD 数字。',
         },

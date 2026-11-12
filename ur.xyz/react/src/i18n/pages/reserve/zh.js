@@ -70,7 +70,7 @@ export default {
             operators: '网络运营商的统计数据源',
             gecko: 'CoinGecko 的 GeckoTerminal 资金池数据源',
         },
-        note: '按 α 实时价格折算的 USD：每 α {price}，来自{source}，{time}。这只是即时参考价，并非可实现的价值。',
+        note: '按 α 实时价格折算的 USD：每 α {price}（来源：{source}，{time}）。这只是即时参考价，并非可实现的价值。',
         unavailable: '无法获取 α 价格：在价格数据源响应之前，数字以 α 显示。',
     },
 

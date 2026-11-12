@@ -57,7 +57,13 @@ const DAY = '2026-12-04';
 
 const CATEGORIES = new Set(['zero', 'one', 'two', 'few', 'many', 'other']);
 const isPlural = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v) && 'other' in v && Object.keys(v).every((k) => CATEGORIES.has(k));
-const placeholders = (s) => [...s.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)].map((m) => m[1]).sort();
+// A country's forms are one placeholder to a translation, which takes the form its grammar needs
+// ({in} where English writes "in {the}"); so are a card's {where} and {whereIn}, and a date's
+// month as a name or a number ({month}, {monthShort}, {mon}).
+const ALIKE = { name: 'country', the: 'country', The: 'country', short: 'country', in: 'country', In: 'country', inShort: 'country', where: 'where', whereIn: 'where', month: 'month', monthShort: 'month', mon: 'month' };
+// the plural categories that are one number in a language (Russian's "one" is 1, 21, 31…; Chinese has only "other")
+const EXACT = { de: ['one'], es: ['one'], ar: ['zero', 'one', 'two'] };
+const placeholders = (s) => [...new Set([...s.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)].map((m) => ALIKE[m[1]] || m[1]))].sort();
 const tags = (s) => [...s.matchAll(/<(\/?)([a-z][a-z0-9]*)>/g)].map((m) => `${m[1]}${m[2]}`).sort();
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -88,8 +94,8 @@ function shapeProblems(lang, en, tr, at = '') {
             const has = placeholders(form);
             for (const name of has) if (!english.has(name)) out.push(`${at}.${category}: placeholder {${name}} the English has not`);
             for (const name of english) {
-                // a form may leave out the count where its category is the single number 1 ("one at most")
-                if (!has.includes(name) && !(name === 'count' && category === 'one' && lang !== 'ru')) out.push(`${at}.${category}: no {${name}}`);
+                // a form may leave out the count where its category is a single number ("one at most", Arabic's dual)
+                if (!has.includes(name) && !(name === 'count' && (EXACT[lang] || []).includes(category))) out.push(`${at}.${category}: no {${name}}`);
             }
             if (!same(tags(form), tagSet)) out.push(`${at}.${category}: tags ${tags(form).join(',')} for ${tagSet.join(',')}`);
         }

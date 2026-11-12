@@ -6,4 +6,6 @@
 export default {
     paths: ['/dashboard'],
     localized: false,
+    // the org filter's buttons: the GitHub organizations' names, the same in every language
+    allowEnglish: ['urnetwork', 'urfoundation'],
 };

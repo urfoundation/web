@@ -7,7 +7,8 @@
 // (react/src/components/pages/Dashboard.jsx), rendered on the server here and
 // hydrated on load. It is standalone (this shell, not the site's Base layout),
 // so it writes its own head: language and direction, title, description,
-// canonical and social cards. react/src/components/pages/dashboard/loader.js
+// canonical, language alternates and social cards, as Base.astro writes them
+// for the site's other pages. react/src/components/pages/dashboard/loader.js
 // builds the data in the visitor's browser from grafana.bringyour.com (public
 // dashboard + stats.json) and Bittensor mainnet (the public RPC, as /reserve
 // reads it), on top of /dashboard/history.json, the daily history
@@ -16,6 +17,8 @@
 // (react/src/i18n/pages/dashboard/).
 import DashboardPage from '@react/components/pages/Dashboard.jsx';
 import { loadPageCopy } from '@react/i18n/page-copy.js';
+import { LANG_CODES } from '../../lib/i18n.js';
+import { alternatesFor, storedLanguageRedirectScript } from '../../lib/route-localization.js';
 
 interface Props {
     lang?: string;
@@ -23,9 +26,14 @@ interface Props {
 
 const { lang = 'en' } = Astro.props;
 const { meta } = (await loadPageCopy('dashboard'))(lang);
-const url = lang === 'en' ? 'https://ur.xyz/dashboard' : `https://ur.xyz/${lang}/dashboard`;
-// as Base.astro names them; the English page has never declared its own
-const OG_LOCALES: Record<string, string> = { ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_ES' };
+const SITE_ORIGIN = 'https://ur.xyz';
+const url = lang === 'en' ? `${SITE_ORIGIN}/dashboard` : `${SITE_ORIGIN}/${lang}/dashboard`;
+// every language's page and x-default (English), once the dashboard group is
+// localized; none while it is English-only
+const alternates = alternatesFor('/dashboard').map(({ hreflang, path }) => ({ hreflang, href: new URL(path, SITE_ORIGIN).href }));
+const localized = alternates.length > 0;
+// as Base.astro names them
+const OG_LOCALES: Record<string, string> = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_ES' };
 ---
 <!doctype html>
 <html lang={lang} dir={lang === 'ar' ? 'rtl' : undefined}>
@@ -36,7 +44,7 @@ const OG_LOCALES: Record<string, string> = { ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_C
 <meta name="description" content={meta.description}>
 <meta name="robots" content="max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <link rel="canonical" href={url}>
-{/* hreflang: added by the lead after the infra merge */}
+{alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href}>)}
 <meta name="theme-color" content="#101010">
 <meta property="og:site_name" content="UR">
 <meta property="og:title" content={meta.title}>
@@ -47,13 +55,16 @@ const OG_LOCALES: Record<string, string> = { ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_C
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content={meta.title}>
-{OG_LOCALES[lang] && <meta property="og:locale" content={OG_LOCALES[lang]}>}
+{localized && <meta property="og:locale" content={OG_LOCALES[lang]}>}
+{localized && LANG_CODES.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={OG_LOCALES[l]}>)}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@urnetwork">
 <meta name="twitter:title" content={meta.title}>
 <meta name="twitter:description" content={meta.description}>
 <meta name="twitter:image" content="https://ur.xyz/og.png">
 <link rel="preconnect" href="https://grafana.bringyour.com" crossorigin>
+{/* a visitor who chose another language reads the page in it (Base.astro) */}
+{localized && <script is:inline set:html={storedLanguageRedirectScript()} />}
 </head>
 <body class="is-loading">
 <DashboardPage lang={lang} client:load />

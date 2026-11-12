@@ -49,8 +49,10 @@ export default {
     // (unit dashboard/script, chart.nowOnline and chart.nowLast24)
     periods: "{d1} and {d3} end at the last full hour, in hourly and 6-hour steps. {d7}, {d30} and {d90} use full UTC days and end at the last full day. Each change compares with the period of the same length just before it. Figures marked Now are live and don't follow the period. Times are in local time.",
 
-    // the Sources section: what each source gives (beside its name: grafana.bringyour.com, Bittensor mainnet)
+    // the Sources section: what each source gives (beside its name: grafana.bringyour.com, or chainName)
     sources: {
+        // the source's name, in the list beside grafana.bringyour.com
+        chainName: 'Bittensor mainnet',
         grafana: "Network and provider figures, from BringYour's monitoring, with 90 days of history",
         chain: "Payout epochs, the reserve and its hotkeys, read through Bittensor's public nodes",
         // {time} is when the page read them, e.g. "Thu 12 Nov, 14:05 local time" (unit dashboard/script, time.local)

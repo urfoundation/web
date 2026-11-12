@@ -149,12 +149,15 @@ test('rows place close marks apart', () => {
     assert.deepEqual(rows([0, 3, 20, 5], 8), [0, 1, 0, 2]);
 });
 
-test('the page is served at /research/<slug>, English-only, under the research section', () => {
+test('the page is served at /research/<slug> and at /<lang>/research/<slug>, under the research section', () => {
     assert.deepEqual(RESEARCH_REPORT_SLUGS, [data.slug]);
     assert.deepEqual(parseRoute(`/research/${data.slug}`), { name: 'research-report', slug: data.slug });
     assert.deepEqual(parseRoute(`/de/research/${data.slug}`), { name: 'research-report', slug: data.slug });
     assert.deepEqual(parseRoute('/research/not-a-report'), { name: 'home', slug: null });
-    assert.equal(buildPath({ name: 'research-report', slug: data.slug }, 'de'), `/research/${data.slug}`);
-    assert.equal(isTranslatedRoute({ name: 'research-report' }), false);
+    assert.equal(buildPath({ name: 'research-report', slug: data.slug }, 'en'), `/research/${data.slug}`);
+    for (const lang of ['ru', 'ar', 'zh', 'de', 'es']) {
+        assert.equal(buildPath({ name: 'research-report', slug: data.slug }, lang), `/${lang}/research/${data.slug}`);
+    }
+    assert.equal(isTranslatedRoute({ name: 'research-report', slug: data.slug }), true);
     assert.equal(movedMeters(data.entries[5], data.meters).length, 3);
 });

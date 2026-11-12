@@ -1,4 +1,4 @@
-// The capture the flag pages' country names in Russian: `name` and `order` from CLDR 48.0, `short`, `in` and `inShort` by hand.
+// The capture the flag pages' country names in Russian: `name` and `order` from CLDR 48.0 (the site's own hk, mo: REGION_NAMES in react/src/i18n/format.js), `short`, `in` and `inShort` by hand.
 // Written by scripts/ctf-names.mjs, which keeps the hand-written forms; see it for what each holds.
 export default {
     order: "au at az ax al dz as ai ao ad aq ag ar am aw af bs bd bb bh by bz be bj bm bg bo bq ba bw br io bn bf bi bt vu va gb hu ve vg vi um tl vn ga ht gy gm gh gp gt gn gw de gg gi hn hk gd gl gr ge gu dk je dj dm do eg zm eh zw il in id jo iq ir ie is es it ye cv kz kh cm ca qa ke cy kg ki cn kp cc co km cg cd cr ci cu kw cw la lv ls lr lb ly lt li lu mu mr mg yt mo mw my ml mv mt ma mq mh mx mz md mc mn ms mm na nr np ne ng nl ni nu nz nc no bv im nf cx sh ky ck pn hm ae om pk pw ps pa pg py pe pl pt pr kr re ru rw ro sv ws sm st sa mk mp sc bl mf pm sn vc kn lc rs sg sx sy sk si us sb so sd sr sl tj th tw tz tc tg tk to tt tv tn tm tr ug uz ua wf uy fo fm fj ph fi fk fr gf pf tf hr cf td me cz cl ch se sj lk ec gq er sz ee et gs za ss jm jp",
@@ -97,7 +97,7 @@ export default {
         gu: "Гуам",
         gw: "Гвинея-Бисау",
         gy: "Гайана",
-        hk: "Гонконг (САР)",
+        hk: "Гонконг",
         hm: "о-ва Херд и Макдональд",
         hn: "Гондурас",
         hr: "Хорватия",
@@ -150,7 +150,7 @@ export default {
         ml: "Мали",
         mm: "Мьянма (Бирма)",
         mn: "Монголия",
-        mo: "Макао (САР)",
+        mo: "Макао",
         mp: "Северные Марианские о-ва",
         mq: "Мартиника",
         mr: "Мавритания",

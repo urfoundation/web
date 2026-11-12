@@ -18,7 +18,10 @@
 // - Names: names/<lang>.js is what scripts/ctf-names.mjs writes (CLDR's names
 //   and A–Z, node's ICU permitting), complete, and each form a plain phrase;
 //   where the site departs from CLDR (format.js REGION_NAMES: 香港, 澳门 and
-//   台湾 in Chinese, Rumania and Arabia Saudita in Spanish), every form says so.
+//   台湾 in Chinese, Гонконг and Макао in Russian, Hongkong and Macau in
+//   German, Latin American CLDR's names in Spanish), every form says so, or is
+//   a shorter name of its own ("Georgia del Sur") that keeps nothing of
+//   CLDR's.
 //
 // Usage (from react/): node --test src/i18n/pages/ctf/ctf-copy.test.mjs
 import assert from 'node:assert/strict';
@@ -268,15 +271,34 @@ test('the countries\' names are CLDR\'s, complete, in each language\'s A–Z, wi
 
 test('where the site names a place otherwise than CLDR, every form says the site\'s name', () => {
     // Chinese: Hong Kong, Macao and Taiwan as the English site names them (香港, 澳门, 台湾), never CLDR's 特别行政区
-    // forms or a 中国… prefix; Spanish: the Latin American name (format.js REGION_NAMES)
+    // forms or a 中国… prefix; Russian and German: Hong Kong and Macao by their short names, as the English site
+    // (Гонконг, Макао; Hongkong, Macau), never the SAR forms; Spanish: the Latin American name (es-419). The short
+    // forms say the site's name too, unless the short name is a shorter one of their own that keeps nothing of
+    // CLDR's (Spanish short.gs, "Georgia del Sur"). format.js REGION_NAMES
     for (const [lang, own] of Object.entries(REGION_NAMES)) {
         for (const [CODE, name] of Object.entries(own)) {
             const code = CODE.toLowerCase();
+            const cldr = new Intl.DisplayNames([lang], { type: 'region' }).of(CODE);
             assert.equal(NAMES[lang].name[code], name, `${lang} name.${code}`);
-            assert.equal(NAMES[lang].short[code], name, `${lang} short.${code}`);
-            for (const key of ['in', 'inShort']) assert.ok(NAMES[lang][key][code].includes(name), `${lang} ${key}.${code}: ${NAMES[lang][key][code]}`);
+            assert.ok(NAMES[lang].in[code].includes(name), `${lang} in.${code}: ${NAMES[lang].in[code]}`);
+            for (const key of ['short', 'inShort']) {
+                const form = NAMES[lang][key][code];
+                assert.ok(form.includes(name) || (cldr !== name && !form.includes(cldr)), `${lang} ${key}.${code}: ${form}`);
+            }
         }
     }
+    // the names the site replaced appear in no form
+    const REPLACED = {
+        ru: /\(САР\)/u,
+        de: /Sonderverwaltungsregion/u,
+        es: /Côte d’Ivoire|Timor-Leste|Islas Aland|Sandwich|Rumanía|Arabia Saudí(?!\p{L})/u,
+    };
+    for (const [lang, re] of Object.entries(REPLACED)) {
+        for (const key of ['name', 'short', 'in', 'inShort']) {
+            for (const [code, v] of Object.entries(NAMES[lang][key])) assert.doesNotMatch(v, re, `${lang} ${key}.${code}: ${v}`);
+        }
+    }
+    assert.equal(NAMES.es.name.cg, 'República del Congo');
     for (const key of ['name', 'short', 'in', 'inShort']) {
         for (const [code, v] of Object.entries(NAMES.zh[key])) assert.doesNotMatch(v, /特别行政区|中国(?:香港|澳门|台湾)/, `zh ${key}.${code}: ${v}`);
     }

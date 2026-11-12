@@ -1,7 +1,7 @@
 // Spanish: the investors group's shared copy (see en.js).
 export default {
     categories: {
-        managementUpdate: 'Comunicado de la dirección',
+        managementUpdate: 'Novedades de la dirección',
         networkUpdate: 'Novedades de la red',
         investorMaterials: 'Materiales para inversores',
     },
@@ -26,7 +26,7 @@ export default {
             cta: 'Leer la carta',
             readTime: '6 min de lectura',
             metaTitle: 'Nuestra carta a Bittensor | UR',
-            metaDescription: 'Jack y Brien sobre el lanzamiento de UR (SN25), la expansión de una red global de operadores residenciales y la construcción conjunta de un internet libre y abierto.',
+            metaDescription: 'Carta de Jack y Brien sobre el lanzamiento de UR (SN25), la expansión de una red global de operadores residenciales y la construcción conjunta de un internet libre y abierto.',
         },
         'conviction-lock': {
             title: 'El equipo de UR bloquea 550.000 alpha a perpetuidad',
@@ -44,7 +44,7 @@ export default {
             cta: 'Leer la actualización',
             readTime: '6 min de lectura',
             metaTitle: 'Carta de septiembre a los titulares de tokens | UR',
-            metaDescription: 'Brien y Jack: preparativos de la red principal de UR, la próxima fase de SN25, el Proyecto Meridian y la misión de hacer de la privacidad una propiedad esperada de internet.',
+            metaDescription: 'Brien y Jack: preparativos para la red principal de UR, la próxima fase de SN25, el Proyecto Meridian y la misión de hacer de la privacidad una propiedad esperada de internet.',
         },
         'funding-network-capacity': {
             title: 'El ecosistema de operadores de UR',

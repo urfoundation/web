@@ -52,6 +52,7 @@ import {
  */
 export default function Board({ m = CTF }) {
     const rootRef = useRef(null);
+    const running = useRef(0);
     const now = useNow();
     const mounted = useMounted();
     const tips = useTips();
@@ -81,9 +82,17 @@ export default function Board({ m = CTF }) {
             mutate();
             return;
         }
+        // the parts keep their names until the last of overlapping transitions ends
+        running.current += 1;
         page.classList.add('ctf-vt');
         const t = document.startViewTransition(() => flushSync(mutate));
-        t.finished.finally(() => page.classList.remove('ctf-vt'));
+        // a transition skipped by the next one (a quick second tap) rejects `ready`;
+        // the change itself has still been made
+        t.ready.catch(() => {});
+        t.finished.catch(() => {}).finally(() => {
+            running.current -= 1;
+            if (!running.current) page.classList.remove('ctf-vt');
+        });
     }, []);
 
     const onFocus = useCallback((arg) => transition(() => {

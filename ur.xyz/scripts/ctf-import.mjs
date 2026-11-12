@@ -62,9 +62,9 @@
 //
 // Usage (from ur.xyz):
 //   node scripts/ctf-import.mjs                          read each listed operator's GET <api_url>/sn/ctf
-//   node scripts/ctf-import.mjs --from <domain>=<answer.json> ...   saved answers instead (one per
-//        operator; a bare <answer.json> when the list has one operator); a listed operator without
-//        one is left out
+//   node scripts/ctf-import.mjs --from <domain>=<answer.json> [--from …]   saved answers instead, one
+//        --from per operator (a bare <answer.json> when the list has one operator); a listed operator
+//        without one is left out
 //   node scripts/ctf-import.mjs --prelaunch --names <server>/model/iso_country_names.go [--now <iso>]
 //   ... --operators <operators.yml>                      another operator list (default operators/operators.yml)
 //   ... --check                                          exit 1 if the files are not what the import writes
@@ -73,6 +73,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseYaml } from '../react/src/lib/yaml.js';
+import { epochAt, epochEndBlock, epochStartBlock } from '../react/src/lib/epoch.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const SNAPSHOT_FILE = path.join(ROOT, 'react/src/data/ctf-epoch.json');
@@ -86,6 +87,10 @@ const OPERATORS_SCHEMA = 'urnetwork-operators-v1';
 export const SCHEMA = 'ur.xyz/ctf-epoch/v1';
 export const AGGREGATE_SCHEMA = 'ur.xyz/ctf-epoch/v2';
 const FETCH_TIMEOUT_MS = 30_000;
+// an answer is about 200 KB; refuse one far larger rather than read it whole
+const ANSWER_MAX_BYTES = 8 * 1024 * 1024;
+// a reason recorded for an operator left out: one line, at most this long
+const REASON_MAX = 300;
 
 export const COUNTRY_COUNT = 249;
 export const SLOTS_PER_ROLE = 5;
@@ -138,7 +143,7 @@ export function parseOperatorList(text) {
         const domain = o?.domain;
         const api = o?.api_url;
         if (typeof domain !== 'string' || !/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(domain)) throw new Error(`operator ${i + 1}: domain ${JSON.stringify(domain)}`);
-        if (typeof api !== 'string' || !/^https:\/\/[^/?#@\s]+(\/[^?#\s]*)?$/.test(api)) throw new Error(`${domain}: api_url ${JSON.stringify(api)}`);
+        if (typeof api !== 'string' || !/^https:\/\/[a-z0-9.-]+(:\d+)?(\/[A-Za-z0-9._~/-]*)?$/i.test(api)) throw new Error(`${domain}: api_url ${JSON.stringify(api)}`);
         if (seen.has(domain)) throw new Error(`${domain} is listed twice`);
         seen.add(domain);
         return { domain, api_url: api.replace(/\/+$/, '') };
@@ -277,6 +282,7 @@ export function apiProblems(api) {
             if (le.amounts.slot?.rao !== Math.floor(le.amounts.fresh?.rao / TOTAL_SLOTS)) bad('last_epoch: slot is not floor(fresh / 2490)');
             if (le.slots.total !== TOTAL_SLOTS || le.slots.won + le.slots.open !== TOTAL_SLOTS) bad('last_epoch.slots do not add up to 2,490');
             if (!['pending', 'finalized'].includes(le.root.status)) bad(`last_epoch.root.status ${le.root.status}`);
+            if (!le.drawn && le.slots.won !== 0) bad('last_epoch: slots won without a draw');
             if (ce && le.epoch >= ce.epoch) bad('last_epoch is not before current_epoch');
         }
     }
@@ -432,9 +438,20 @@ const latest = (values) => (values.some((v) => v === null || v === undefined) ? 
  */
 export function aggregate(results, history = null) {
     const states = results.map((r) => {
-        if (!r.snapshot) return { op: r.op, reason: r.reason || 'not read' };
-        const problems = snapshotProblems(r.snapshot);
-        return problems.length ? { op: r.op, no: r.snapshot.operator?.no ?? null, reason: `its snapshot breaks the pages' invariants: ${problems.slice(0, 3).join('; ')}` } : r;
+        if (!r.snapshot) return { op: r.op, reason: reasonOf(r.reason || 'not read') };
+        const s = r.snapshot;
+        const left = (reason) => ({ op: r.op, no: s.operator?.no ?? null, reason: reasonOf(reason) });
+        const problems = snapshotProblems(s);
+        if (problems.length) return left(`its snapshot breaks the pages' invariants: ${problems.slice(0, 3).join('; ')}`);
+        // the protocol's schedule (lib/epoch.js): an epoch's blocks are fixed, and an answer's epoch is
+        // the one its time falls in, give or take the epoch an import straddles
+        const e = s.current_epoch.epoch;
+        const at = epochAt(Date.parse(s.as_of));
+        if (s.current_epoch.start_block !== epochStartBlock(e) || s.current_epoch.end_block !== epochEndBlock(e) - 1) {
+            return left(`its epoch ${e} runs from block ${s.current_epoch.start_block} to ${s.current_epoch.end_block}, not ${epochStartBlock(e)} to ${epochEndBlock(e) - 1}`);
+        }
+        if (!at || Math.abs(at.number - e) > 1) return left(`its epoch ${e} is not the epoch of its time, ${s.as_of} (epoch ${at ? at.number : 'none'})`);
+        return r;
     });
     const read = states.filter((r) => r.snapshot);
     if (!read.length) throw new Error(`no operator could be included:\n  ${states.map((r) => `${r.op.domain}: ${r.reason}`).join('\n  ')}`);
@@ -458,6 +475,14 @@ export function aggregate(results, history = null) {
         }
         if (s.countries.map((c) => c.code).join(' ') !== codes) return left('its country list is not the others\'');
         return r;
+    });
+    // one pool counted once: a later operator answering for a pool already included is left out
+    const pools = new Map();
+    placed.forEach((r, i) => {
+        if (!r.snapshot) return;
+        const pool = r.snapshot.pool.pool_id;
+        if (pools.has(pool)) placed[i] = { op: r.op, no: r.snapshot.operator.no, reason: `it answers for the same pool as ${pools.get(pool)} (pool ${pool})` };
+        else pools.set(pool, r.op.domain);
     });
     const snaps = placed.filter((r) => r.snapshot).map((r) => r.snapshot);
     const one = snaps.length === 1;
@@ -660,6 +685,12 @@ export function serialize(snapshot) {
     return `${head},\n  "countries": [\n${countries.map((c) => `    ${JSON.stringify(c)}`).join(',\n')}\n  ]\n}\n`;
 }
 
+/** A reason as the aggregate records it: one line, cut short. */
+const reasonOf = (text) => {
+    const line = String(text).replace(/[\u0000-\u001f\u007f]+/g, ' ').trim();
+    return line.length > REASON_MAX ? `${line.slice(0, REASON_MAX - 1)}…` : line;
+};
+
 /** An operator's snapshot file: react/src/data/ctf-operators/<domain>.json. */
 export const operatorFile = (domain) => path.join(OPERATOR_DIR, `${domain}.json`);
 
@@ -667,46 +698,44 @@ export const operatorFile = (domain) => path.join(OPERATOR_DIR, `${domain}.json`
 async function fetchAnswer(op) {
     const url = `${op.api_url}/sn/ctf`;
     let res;
+    let text;
     try {
-        res = await fetch(url, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+        // no redirect: an operator's API answers at the address the list gives
+        res = await fetch(url, { headers: { accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        if (Number(res.headers.get('content-length')) > ANSWER_MAX_BYTES) throw new Error('the answer is too large');
+        text = await res.text();
     } catch (e) {
-        throw new Error(`GET ${url}: ${e.cause?.code || e.name}: ${e.cause?.message || e.message}`);
+        const kind = e.cause?.code || (e.name !== 'Error' ? e.name : '');
+        throw new Error(`GET ${url}: ${kind ? `${kind}: ` : ''}${e.cause?.message || e.message}`);
     }
-    if (!res.ok) throw new Error(`GET ${url}: ${res.status} ${res.statusText}`);
+    if (text.length > ANSWER_MAX_BYTES) throw new Error(`GET ${url}: the answer is too large`);
     try {
-        return await res.json();
+        return JSON.parse(text);
     } catch {
         throw new Error(`GET ${url}: the answer is not JSON`);
     }
 }
 
-/** The import's results, one per listed operator: { op, snapshot } or { op, reason }. */
+/** The import's results, one per listed operator in the list's order: { op, snapshot } or { op, reason }. */
 async function readOperators(list, { from, history }) {
-    const results = [];
-    for (const op of list) {
+    return Promise.all(list.map(async (op) => {
         try {
             let api;
             if (from) {
                 const file = from.get(op.domain);
-                if (!file) {
-                    results.push({ op, reason: 'no saved answer was given for it (--from)' });
-                    continue;
-                }
+                if (!file) return { op, reason: 'no saved answer was given for it (--from)' };
                 api = readJson(file);
             } else {
                 api = await fetchAnswer(op);
             }
             const problems = apiProblems(api);
-            if (problems.length) {
-                results.push({ op, reason: `its answer is not a valid GET /sn/ctf: ${problems.slice(0, 3).join('; ')}${problems.length > 3 ? ` (and ${problems.length - 3} more)` : ''}` });
-                continue;
-            }
-            results.push({ op, snapshot: normalize(api, presenceFrom(history, dayOf(api.as_of)), op) });
+            if (problems.length) return { op, reason: `its answer is not a valid GET /sn/ctf: ${problems.slice(0, 3).join('; ')}${problems.length > 3 ? ` (and ${problems.length - 3} more)` : ''}` };
+            return { op, snapshot: normalize(api, presenceFrom(history, dayOf(api.as_of)), op) };
         } catch (e) {
-            results.push({ op, reason: e.message });
+            return { op, reason: e.message };
         }
-    }
-    return results;
+    }));
 }
 
 async function main() {
@@ -734,9 +763,13 @@ async function main() {
                 if (a !== '--from') return;
                 const value = args[i + 1] || '';
                 const eq = value.indexOf('=');
-                if (eq > 0) from.set(value.slice(0, eq), value.slice(eq + 1));
-                else if (list.length === 1) from.set(list[0].domain, value);
+                let domain;
+                let file;
+                if (eq > 0) [domain, file] = [value.slice(0, eq), value.slice(eq + 1)];
+                else if (list.length === 1) [domain, file] = [list[0].domain, value];
                 else throw new Error(`--from ${value}: name its operator, --from <domain>=<answer.json>, since the list has ${list.length}`);
+                if (from.has(domain)) throw new Error(`--from ${domain}: given twice`);
+                from.set(domain, file);
             });
             for (const domain of from.keys()) if (!list.some((op) => op.domain === domain)) throw new Error(`--from ${domain}: not in the operator list`);
         }
@@ -748,7 +781,7 @@ async function main() {
     if (problems.length) throw new Error(`the aggregate breaks the pages' invariants:\n  ${problems.join('\n  ')}`);
     // what the import writes: the aggregate, and each included operator's snapshot (no other file in its folder)
     const files = new Map([[SNAPSHOT_FILE, serialize(snapshot)], ...[...own].map(([domain, s]) => [operatorFile(domain), serialize(s)])]);
-    const stale = existsSync(OPERATOR_DIR) ? readdirSync(OPERATOR_DIR).map((f) => path.join(OPERATOR_DIR, f)).filter((f) => !files.has(f)) : [];
+    const stale = existsSync(OPERATOR_DIR) ? readdirSync(OPERATOR_DIR).filter((f) => f.endsWith('.json')).map((f) => path.join(OPERATOR_DIR, f)).filter((f) => !files.has(f)) : [];
     const rel = (file) => path.relative(ROOT, file);
     for (const o of snapshot.operators) {
         if (o.status === 'left_out') console.error(`ctf-import: ${o.domain} is left out of the figures: ${o.reason}`);

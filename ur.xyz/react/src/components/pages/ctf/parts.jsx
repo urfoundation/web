@@ -376,7 +376,10 @@ export function CountryCard({ m, c, label, hubLink = false, tips, picker }) {
                         {['p', 'x'].map((role) => (
                             <div className="ctf-role" key={role}>
                                 <span className="ctf-label">{role === 'p' ? all.live.providers : all.live.extenders}</span>
-                                <Pips won={c[role].won} role={role} slots={c[role].won === null ? m.roleSlots : c[role].slots} big />
+                                {/* a role's slots as pips, five at each operator; past two operators' ten, as a count */}
+                                {(c[role].won === null ? m.roleSlots : c[role].slots) <= 10
+                                    ? <Pips won={c[role].won} role={role} slots={c[role].won === null ? m.roleSlots : c[role].slots} big />
+                                    : <span className="ctf-mono ctf-role-count" aria-hidden="true">{`${c[role].won ?? 0}/${c[role].won === null ? m.roleSlots : c[role].slots}`}</span>}
                                 <span className="ctf-mono ctf-role-txt">
                                     {roleLine(m, c, role)}{c[role].held && <>{all.gap}<ChanceTip m={m} c={c} role={role} tips={tips} /></>}
                                     {m.multi && m.drawn && <span className="ctf-role-ops">{opsLine(m, c[role])}</span>}

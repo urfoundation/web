@@ -56,8 +56,6 @@ export const FLAGS_LICENSE = '/ctf/flags/LICENSE.txt';
 // them in the page's language
 export const START_URL = '/docs/miner';
 export const EXTENDER_URL = '/docs/miner/extender';
-/** A call to action ('start', 'p' or 'x'): its link. Its words are the copy's `cta`. */
-export const ctaHref = (cta) => (cta === 'x' ? EXTENDER_URL : START_URL);
 export const flagSrc = (code) => `/ctf/flags/${code}.svg`;
 export const countryPath = (code) => `${HUB_PATH}/${code}`;
 
@@ -528,7 +526,7 @@ export function slotFigure(m) {
  * The next step in a country with an open slot (a "So close" ribbon or an
  * "Open" chip, design.html): what the near misses were, what to run, what a
  * newcomer takes this epoch, and the call to action ('start', 'p' or 'x';
- * its words are the copy's `cta`, its link ctaHref).
+ * its words are the copy's `cta`, its link ctf/links.js ctaLink).
  */
 export function nextStep(m, c) {
     const t = T(m).next;

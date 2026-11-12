@@ -203,6 +203,7 @@ test('the import refuses an answer that breaks operator.yml\'s arithmetic', () =
         ['a slot that is not fresh / 2490', (a) => { a.last_epoch.amounts.slot = amount(SLOT + 1); }],
         ['an uninhabited territory marked inhabited', (a) => { a.countries.find((c) => c.code === 'aq').inhabited = true; }],
         ['a pool that is not its operator\'s', (a) => { a.pool.pool_id += 1; }],
+        ['winners without a draw', (a) => { a.last_epoch.drawn = false; }],
     ];
     for (const [what, mutate] of broken) {
         const answer = drawnAnswer();
@@ -296,7 +297,7 @@ test('with one operator the aggregate is that operator\'s figures, and it keeps 
             assert.equal(snapshot.operator.domain, o.domain);
             return { op: { domain: o.domain, api_url: o.api_url }, snapshot };
         });
-        const left = SNAPSHOT.operators.filter((o) => o.status === 'left_out').map((o) => ({ op: { domain: o.domain, api_url: o.api_url }, reason: o.reason }));
+        const left = SNAPSHOT.operators.filter((o) => o.status === 'left_out').map((o) => ({ op: { domain: o.domain, api_url: o.api_url }, reason: o.reason, no: o.no }));
         const all = aggregate([...kept, ...left].sort((a, b) => SNAPSHOT.operators.findIndex((o) => o.domain === a.op.domain) - SNAPSHOT.operators.findIndex((o) => o.domain === b.op.domain)), null);
         const strip = (s) => ({ ...s, countries: s.countries.map(({ online, seen_days, last_seen, peak, ...c }) => c), presence: null });
         assert.deepEqual(strip(all), strip(SNAPSHOT), 'the committed aggregate is its operators\' snapshots added up');
@@ -380,9 +381,26 @@ test('an operator that cannot be read, or is not at the others\' epoch, is left 
     assert.match(behind.operators[1].reason, /no committed root yet/);
     // an operator whose answer is an epoch old
     const old = drawnAnswer({ no: 2 });
-    old.current_epoch = { ...old.current_epoch, epoch: 8 };
+    old.current_epoch = { ...old.current_epoch, epoch: 8, start_block: 9_600_028, end_block: 9_650_427 };
     old.last_epoch = { ...old.last_epoch, epoch: 7 };
     assert.match(aggregate([drawn, { op: OP2, snapshot: normalize(old, null, OP2) }], null).operators[1].reason, /from epoch 8, the others' from epoch 9/);
+    // an answer off the protocol's schedule: an epoch far from its time, or blocks that are not the epoch's
+    const far = drawnAnswer({ no: 2 });
+    far.current_epoch = { ...far.current_epoch, epoch: 900, start_block: 9_247_228 + 899 * 50_400, end_block: 9_247_228 + 900 * 50_400 - 1 };
+    const farOut = aggregate([drawn, { op: OP2, snapshot: normalize(far, null, OP2) }], null);
+    assert.match(farOut.operators[1].reason, /^its epoch 900 is not the epoch of its time/);
+    assert.equal(farOut.current_epoch.epoch, 9, 'one operator off the schedule does not move the epoch');
+    const skewed = drawnAnswer({ no: 2 });
+    skewed.current_epoch = { ...skewed.current_epoch, start_block: 1 };
+    assert.match(aggregate([drawn, { op: OP2, snapshot: normalize(skewed, null, OP2) }], null).operators[1].reason, /^its epoch 9 runs from block 1 /);
+    // one pool counted once: a second domain answering for the same pool is left out
+    const twin = aggregate([drawn, { op: OP2, snapshot: normalize(drawnAnswer(), null, OP2) }], null);
+    assert.deepEqual(twin.operators.map((o) => o.status), ['included', 'left_out']);
+    assert.match(twin.operators[1].reason, /same pool as bringyour\.com \(pool 4294967297\)/);
+    assert.equal(twin.last_epoch.carried, drawn.snapshot.last_epoch.carried);
+    // a reason is one line, cut short
+    const long = aggregate([drawn, { op: OP2, reason: `GET x: ${'y'.repeat(400)}\nsecond line` }], null).operators[1].reason;
+    assert.ok(long.length <= 300 && !long.includes('\n'), long);
     // a snapshot that breaks the pages' invariants (a draw pending after a drawn epoch)
     const late = drawnAnswer({ no: 2 });
     late.pending_draw = { epoch: 8, census_hash: null, census_block: null, round: null };
@@ -470,7 +488,7 @@ test('after a draw, an open role wins by default and a fully captured one shows 
 
 test('titles fit 60 graphemes and descriptions 175 characters, and none repeats, in every phase', () => {
     assert.ok(graphemes(HUB_TITLE) <= 60, HUB_TITLE);
-    for (const [phase, m] of Object.entries(MODELS)) {
+    for (const [phase, m] of Object.entries({ ...MODELS, ...Object.fromEntries(Object.entries(TWO_MODELS).map(([k, v]) => [`two ${k}`, v])) })) {
         const titles = new Set([HUB_TITLE]);
         const descriptions = new Set([hubDescription(m)]);
         assert.ok(hubDescription(m).length <= 175, `${phase}: ${hubDescription(m)}`);

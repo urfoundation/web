@@ -181,7 +181,7 @@ export default {
         // <list> links the operator list (ur.xyz/operators.yml)
         operator: "Capture the flag is part of the SN25 protocol: every network operator runs a capture the flag pool beside its provider pool, with its own draw in every country, and this page combines every operator in <list>the operator list</list>. Its rules are public: the method in <method>CAPTURETHEFLAG.md</method>, and the code in <source>the subnet's repository</source>.",
         // an operator of the list whose data the import could not read; {names}: their domains; {count}: how many
-        leftOut: { one: ' Left out of these figures: {names}, whose data could not be read when this page was built.', other: ' Left out of these figures: {names}, whose data could not be read when this page was built.' },
+        leftOut: { one: ' Left out of these figures: {names}, whose data could not be read, or was not current, when this page was built.', other: ' Left out of these figures: {names}, whose data could not be read, or was not current, when this page was built.' },
         data: "Country pages are built from each epoch's public data.",
         dataPresence: " Providers online are the network dashboard's count at the end of {day}.",
         flags: 'Flags: flag-icons, <lic>MIT licence</lic>.',
@@ -562,7 +562,7 @@ export default {
         // {count}: the providers online
         providers: { one: '{count} provider', other: '{count} providers' },
         drawQ: 'How are winners chosen, and can I check?',
-        drawA: "When the epoch ends, the operator commits the list of eligible miners in {the} on chain, and a drand round published after it draws up to five winners per role. With five entries or fewer, everyone wins. Miners in one /29 or /48 share a single entry. Each draw's census and round are public.",
+        drawA: "When the epoch ends, each network operator commits the list of its eligible miners in {the} on chain, and a drand round published after it draws up to five winners per role from that list. With five entries or fewer, everyone wins. Miners in one /29 or /48 share a single entry. Each draw's census and round are public.",
         paidQ: 'How do I get paid?',
         paidA: "Winnings go to the payout wallet your miner or app already uses, in your operator's capture the flag pool, and you claim them with your pool earnings. Local law in {the} applies to what you earn and how you cash it out.{note}",
         // after two line breaks; {text} is the note itself, written by a person in this language

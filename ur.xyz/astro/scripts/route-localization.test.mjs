@@ -129,11 +129,9 @@ test('every English page belongs to one page group, and each group names its pag
 });
 
 // A localized group, as a page agent's group.js turns it on: its pages, and a
-// family of them one segment under a prefix, gain their /<lang>/ twins. The
-// fixture turns every real group off first, whatever its group.js says now,
-// so the groups the page agents localize do not change what it expects.
+// family of them one segment under a prefix, gain their /<lang>/ twins.
 const localized = createRouteLocalization({
-    ...Object.fromEntries(Object.entries(PAGE_GROUPS).map(([id, group]) => [id, { ...group, localized: false }])),
+    ...PAGE_GROUPS,
     about: { ...PAGE_GROUPS.about, localized: true },
     ctf: { ...PAGE_GROUPS.ctf, localized: true },
     'not-found': { ...PAGE_GROUPS['not-found'], localized: true },

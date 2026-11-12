@@ -1,22 +1,21 @@
 import { useEffect } from 'react';
-import data from '../../../data/research-report-2026-q3.json';
-import { termId } from './model';
 import { hide, isShownFor, show } from './tooltip';
-
-const DEFINITIONS = new Map(data.glossary.map(([term, def]) => [termId(term), { term, def }]));
+import { pageCopy } from './copy';
 
 /**
  * The glossary terms in the report's text are links to their definitions at
  * the foot of the page, which work without script. This adds the definition
  * beside the term on hover and keyboard focus, and on a touch screen a first
  * tap shows it (with a link to the glossary) instead of jumping away.
- * It renders nothing itself.
+ * It renders nothing itself. The definitions are the page copy's `terms`, by
+ * the term's anchor id, in the page's language.
  */
-export default function TermTips() {
+export default function TermTips({ lang = 'en' }) {
     useEffect(() => {
+        const copy = pageCopy(lang);
         const content = (a) => {
-            const d = DEFINITIONS.get(a.dataset.term);
-            return d ? [[d.term, d.def], { href: `#${a.dataset.term}`, label: 'In the glossary' }] : null;
+            const d = copy.terms[a.dataset.term];
+            return d ? [[d.term, d.def], { href: `#${a.dataset.term}`, label: copy.termTip }] : null;
         };
         const over = (e) => {
             const a = e.target.closest?.('a.rr-term');
@@ -54,6 +53,6 @@ export default function TermTips() {
             document.removeEventListener('focusout', blur);
             document.removeEventListener('click', click);
         };
-    }, []);
+    }, [lang]);
     return null;
 }

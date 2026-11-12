@@ -1,9 +1,29 @@
 {
   "about": "The day each page of the ur.xyz page group research-methodology (react/src/i18n/pages/research-methodology/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
+    "/ar/research/methodology": {
+      "fingerprint": "b7e66f299fcc8f15",
+      "lastmod": "2026-11-12"
+    },
+    "/de/research/methodology": {
+      "fingerprint": "25b46ec0e9d9bf2b",
+      "lastmod": "2026-11-12"
+    },
+    "/es/research/methodology": {
+      "fingerprint": "cf306bf8ee5b4955",
+      "lastmod": "2026-11-12"
+    },
     "/research/methodology": {
       "fingerprint": "2659f507139d5868",
       "lastmod": "2026-10-30"
+    },
+    "/ru/research/methodology": {
+      "fingerprint": "3feedf9bcc7cf63a",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/research/methodology": {
+      "fingerprint": "71caf5419b97da8d",
+      "lastmod": "2026-11-12"
     }
   }
 }

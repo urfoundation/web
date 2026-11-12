@@ -1,6 +1,6 @@
 ---
 title: "كيف تحذف حسابك في URnetwork — وثائق UR"
-description: "احذف حسابك في URnetwork من التطبيق: افتح Account ← Settings، واضغط Delete Account ثم أكّد. تُحذف شبكتك وبياناتها نهائيًا."
+description: "احذف حسابك في URnetwork من التطبيق: افتح Account → Settings، واضغط Delete Account ثم أكّد. تُحذف شبكتك وبياناتها نهائيًا."
 ---
 # كيف تحذف حسابك
 

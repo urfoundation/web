@@ -10,6 +10,8 @@
 }
 
 .capacity-letter-diagram figcaption { margin-top: 8px; font-size: 0.8rem; text-align: right; }
+/* right to left, the link sits at the other end (the Arabic translation) */
+[dir="rtl"] .capacity-letter-diagram figcaption { text-align: left; }
 
 @media (max-width: 760px) {
     .announcement-paper--capacity p,

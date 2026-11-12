@@ -450,10 +450,11 @@
       "date": "2026-11-27T18:25:00Z",
       "status": "scheduled",
       "title": "Extender pool for intra-platform and intra-network traffic, from epoch 8",
-      "detail": "From block 9,600,028, the first of epoch 8, the part of each contract's traffic that no provider earns counts for extenders instead. That covers traffic between a client and its network operator's platform, and traffic between devices of one network. Each operator's pool spreads it evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, up to the epoch's eligible provider usage, so extenders earn at most half of a pool. An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11. Approved by the subnet owner on November 10, it takes effect once the signed amendment entry is published before epoch 8 starts.",
+      "detail": "From block 9,600,028, the first of epoch 8, the part of each contract's traffic that no provider earns counts for extenders instead. That covers traffic between a client and its network operator's platform, and traffic between devices of one network: a provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one, and the share goes to the extender pool, while the contract's other hops keep theirs. Only traffic that a data balance funded counts, never the network operator's own measurement and test traffic, and same-network credit earned before epoch 8 is kept. Each operator's pool spreads it evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, up to the epoch's eligible provider usage, so extenders earn at most half of a pool; with no eligible extender, it is dropped. An extender is eligible when, at the end of the epoch, it is active with at least one address that passes the operator's five-minute challenge, has a payout wallet, is not bound to a top-level miner's fleet and is not on one of the operator's own networks, and records that share a provider client, an IPv4 address or an IPv6 /64 count once. An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11. From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed /29 or /48 prefix hash and never by address, and their shares, and the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it. Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid. Approved by the subnet owner on November 10, it takes effect once the signed amendment entry is published before epoch 8 starts.",
       "sources": [
         { "label": "The amendment, WHITEPAPER.md §8.6", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md" },
-        { "label": "Signed amendment entry", "kind": "doc", "ref": "" },
+        { "label": "Signed amendment entry", "kind": "doc", "ref": "https://ur.xyz/amendments.yml" },
+        { "label": "The amendments file in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/amendments.yml" },
         { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
       ]
     },
@@ -467,7 +468,7 @@
       "sources": [
         { "label": "The design, CAPTURETHEFLAG.md", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/CAPTURETHEFLAG.md" },
         { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-capture-the-flag.md" },
-        { "label": "Signed amendment entry", "kind": "doc", "ref": "" },
+        { "label": "Signed amendment entry", "kind": "doc", "ref": "https://ur.xyz/amendments.yml" },
         { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
       ]
     },

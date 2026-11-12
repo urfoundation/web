@@ -10,44 +10,44 @@ export default {
         },
         'v1-contracts-deployed': {
             title: 'Verträge der Version 1 bereitgestellt',
-            detail: 'Acht Bereitstellungsschritte auf der EVM von Bittensor, in den Blöcken 9,239,983 bis 9,240,067. Der Koordinator, um 18:08 UTC erstellt, startet Epoche 0.',
+            detail: 'Acht Bereitstellungsschritte auf der EVM von Bittensor, in den Blöcken 9.239.983 bis 9.240.067. Der Koordinator, um 18:08 UTC erstellt, startet Epoche 0.',
             sources: [
                 'Koordinator',
                 'Koordinator-Implementierung',
                 'Abrechnungstresor',
                 'Reserve-Senke',
                 'Validator-Nachweise',
-                'Reserve-Senke erstellt, Block 9,239,983',
-                'Abrechnungstresor erstellt, Block 9,239,994',
-                'Koordinator-Implementierung erstellt, Block 9,240,004',
-                'Treuhand registriert, Block 9,240,015',
-                'Koordinator erstellt, Epoche 0 beginnt, Block 9,240,028',
-                'Reserve-Senke mit dem Koordinator verknüpft, Block 9,240,039',
-                'Tresor mit dem Koordinator verknüpft, Block 9,240,049',
-                'Validator-Nachweise erstellt, Block 9,240,067',
+                'Reserve-Senke erstellt, Block 9.239.983',
+                'Abrechnungstresor erstellt, Block 9.239.994',
+                'Koordinator-Implementierung erstellt, Block 9.240.004',
+                'Treuhand registriert, Block 9.240.015',
+                'Koordinator erstellt, Epoche 0 beginnt, Block 9.240.028',
+                'Reserve-Senke mit dem Koordinator verknüpft, Block 9.240.039',
+                'Tresor mit dem Koordinator verknüpft, Block 9.240.049',
+                'Validator-Nachweise erstellt, Block 9.240.067',
             ],
         },
         'network-operator-registered': {
             title: 'Netzbetreiber 1 registriert',
             detail: 'Der Governance-Safe registriert den UR-Betreiber, Netzbetreiber 1, und seinen Pool, SN25 UID 169.',
             sources: [
-                'Registrierung über den Governance-Safe, Block 9,240,168',
+                'Registrierung über den Governance-Safe, Block 9.240.168',
                 'Governance-Safe',
-                'Governance-Safe erstellt, Block 9,229,341',
+                'Governance-Safe erstellt, Block 9.229.341',
             ],
         },
         'v1-validator-activated': {
             title: 'Validator der Version 1 aktiviert',
             detail: 'Der einzige Validator von SN25, UID 1, veröffentlicht seine Aktivierung für Epoche 1 on-chain.',
             sources: [
-                'Aktivierung, Block 9,240,402',
+                'Aktivierung, Block 9.240.402',
             ],
         },
         'weekly-epochs-scheduled': {
             title: 'Wöchentliche Epochen festgelegt',
-            detail: 'Der Governance-Safe legt ab Epoche 1 Epochen von 7 Tagen mit 50,400 Blöcken fest.',
+            detail: 'Der Governance-Safe legt ab Epoche 1 Epochen von 7 Tagen mit 50.400 Blöcken fest.',
             sources: [
-                'Epochenplan über den Governance-Safe, Block 9,240,407',
+                'Epochenplan über den Governance-Safe, Block 9.240.407',
                 'Governance-Safe',
             ],
         },
@@ -63,9 +63,9 @@ export default {
         },
         'epoch-1-begins': {
             title: 'Epoche 1 beginnt: die erste Auszahlungsepoche',
-            detail: 'Die erste wöchentliche Auszahlungsepoche, für die der Validator der Version 1 aktiviert wurde, beginnt mit Block 9,247,228.',
+            detail: 'Die erste wöchentliche Auszahlungsepoche, für die der Validator der Version 1 aktiviert wurde, beginnt mit Block 9.247.228.',
             sources: [
-                'Erster Block von Epoche 1, 9,247,228',
+                'Erster Block von Epoche 1, 9.247.228',
             ],
         },
         'last-usdc-payout-batch': {
@@ -98,21 +98,21 @@ export default {
         },
         'epoch-1-closes': {
             title: 'Epoche 1 schließt mit Version 1',
-            detail: 'Epoche 1 wurde in Block 9,297,631 abgeschlossen, innerhalb ihres Abschlussfensters von 120 Blöcken, und der Abrechnungstresor nahm ihre 3,482.26 α auf. Epoche 1 hatte keine auszahlbare Arbeit, daher wurde bis Block 9,298,828 kein Auszahlungs-Root festgeschrieben, und ihre Finanzierung wurde übertragen (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Epoche 1 wurde in Block 9.297.631 abgeschlossen, innerhalb ihres Abschlussfensters von 120 Blöcken, und der Abrechnungstresor nahm ihre 3.482,26 α auf. Epoche 1 hatte keine auszahlbare Arbeit, daher wurde bis Block 9.298.828 kein Auszahlungs-Root festgeschrieben, und ihre Finanzierung wurde übertragen (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
-                'Abschluss von Epoche 1, Block 9,297,631',
+                'Abschluss von Epoche 1, Block 9.297.631',
             ],
         },
         'first-v1-claims': {
             title: 'Epoche 1 ohne Auszahlungs-Root finalisiert',
-            detail: 'Epoche 1 hatte keinen Auszahlungs-Root und daher keine Claims unter Version 1. Ihre 3,482.26 α wurden nach der Missed-Commit-Regel des Protokolls übertragen und sind mit der Finanzierung von Epoche 3 zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Epoche 1 hatte keinen Auszahlungs-Root und daher keine Claims unter Version 1. Ihre 3.482,26 α wurden nach der Missed-Commit-Regel des Protokolls übertragen und sind mit der Finanzierung von Epoche 3 zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
-                'Epoche 1 finalisiert, Block 9,312,031',
+                'Epoche 1 finalisiert, Block 9.312.031',
             ],
         },
         'v2-pool-registration-window': {
             title: 'Settlement v2 für Epoche 3 nicht registriert',
-            detail: 'Im Fenster, den Blöcken 9,333,628 bis 9,340,828, wurde kein v2-Pool registriert, daher bleibt Epoche 3 bei Version 1. Eine Registrierung kann keine Epoche aktivieren, die bereits begonnen hat.',
+            detail: 'Im Fenster, den Blöcken 9.333.628 bis 9.340.828, wurde kein v2-Pool registriert, daher bleibt Epoche 3 bei Version 1. Eine Registrierung kann keine Epoche aktivieren, die bereits begonnen hat.',
             sources: [],
         },
         'v2-validator-starts': {
@@ -122,18 +122,18 @@ export default {
         },
         'v2-contracts-deployed': {
             title: 'Verträge von Settlement v2 bereitgestellt',
-            detail: 'Sechs Bereitstellungsschritte auf der EVM von Bittensor, in den Blöcken 9,344,278 bis 9,344,859, brachten vault2, das die Mittel hält, STSettlement2 und einen Claim-Batcher neben den unveränderten Verträgen der Version 1 on-chain. Ihre Bereitstellung aktiviert Settlement v2 nicht: Der v2-Pool muss außerdem registriert werden.',
+            detail: 'Sechs Bereitstellungsschritte auf der EVM von Bittensor, in den Blöcken 9.344.278 bis 9.344.859, brachten vault2, das die Mittel hält, STSettlement2 und einen Claim-Batcher neben den unveränderten Verträgen der Version 1 on-chain. Ihre Bereitstellung aktiviert Settlement v2 nicht: Der v2-Pool muss außerdem registriert werden.',
             sources: [
                 'vault2',
                 'STSettlement2',
                 'Erste Implementierung von STSettlement2',
                 'Claim-Batcher',
-                'vault2 erstellt, Block 9,344,278',
-                'Treuhand registriert, Block 9,344,278',
-                'Implementierung von STSettlement2 erstellt, Block 9,344,354',
-                'STSettlement2 erstellt, Block 9,344,841',
-                'vault2 mit STSettlement2 verknüpft, Block 9,344,851',
-                'Claim-Batcher erstellt, Block 9,344,859',
+                'vault2 erstellt, Block 9.344.278',
+                'Treuhand registriert, Block 9.344.278',
+                'Implementierung von STSettlement2 erstellt, Block 9.344.354',
+                'STSettlement2 erstellt, Block 9.344.841',
+                'vault2 mit STSettlement2 verknüpft, Block 9.344.851',
+                'Claim-Batcher erstellt, Block 9.344.859',
             ],
         },
         'validator-adopts-v2-settings': {
@@ -143,10 +143,10 @@ export default {
         },
         'epoch-3-begins-on-v1': {
             title: 'Epoche 3 beginnt mit Version 1',
-            detail: 'Epoche 3 beginnt mit Block 9,348,028 ohne registrierten v2-Pool, daher rechnet Version 1 sie ab. Epoche 2 wurde nicht in ihrem Abschlussfenster von 120 Blöcken abgeschlossen, daher wurde ihre Emission auf den Abschluss von Epoche 3 verschoben.',
+            detail: 'Epoche 3 beginnt mit Block 9.348.028 ohne registrierten v2-Pool, daher rechnet Version 1 sie ab. Epoche 2 wurde nicht in ihrem Abschlussfenster von 120 Blöcken abgeschlossen, daher wurde ihre Emission auf den Abschluss von Epoche 3 verschoben.',
             sources: [
-                'Erster Block von Epoche 3, 9,348,028',
-                'Emission von Epoche 2 verschoben, Block 9,348,551',
+                'Erster Block von Epoche 3, 9.348.028',
+                'Emission von Epoche 2 verschoben, Block 9.348.551',
             ],
         },
         'operator-services-updated': {
@@ -163,7 +163,7 @@ export default {
             title: 'Pool von Settlement v2 registriert',
             detail: 'Der Governance-Safe registrierte den Pool von Netzbetreiber 1 am 29. Oktober um 03:11 UTC im v2-Tresor, bevor Epoche 4 begann, mit Epoche 4 als seiner ersten v2-Epoche. Das war die Aktivierung von Settlement v2.',
             sources: [
-                'Registrierung über den Governance-Safe, Block 9,386,659',
+                'Registrierung über den Governance-Safe, Block 9.386.659',
             ],
         },
         'operator-switches-to-v2-contracts': {
@@ -173,23 +173,23 @@ export default {
         },
         'last-v1-claims': {
             title: 'Epoche 2 ohne Auszahlungs-Root finalisiert',
-            detail: 'Epoche 2 wurde nicht in ihrem Abschlussfenster abgeschlossen, daher blieb ihre Emission im Pool und wurde beim Abschluss von Epoche 3 aufgenommen: Die 4,132.72 α von Epoche 3 decken etwa zwei Wochen ab. Ohne Finanzierung und ohne Auszahlungs-Root hatte Epoche 2 keine Claims unter Version 1.',
+            detail: 'Epoche 2 wurde nicht in ihrem Abschlussfenster abgeschlossen, daher blieb ihre Emission im Pool und wurde beim Abschluss von Epoche 3 aufgenommen: Die 4.132,72 α von Epoche 3 decken etwa zwei Wochen ab. Ohne Finanzierung und ohne Auszahlungs-Root hatte Epoche 2 keine Claims unter Version 1.',
             sources: [
-                'Epoche 2 finalisiert, Block 9,362,431',
+                'Epoche 2 finalisiert, Block 9.362.431',
             ],
         },
         'settlement-v2-active': {
             title: 'Settlement v2 aktiv: Epoche 4 beginnt',
-            detail: 'Ab Block 9,398,428 zahlt Settlement v2 Epoche 4 und jede Epoche danach. Epoche 3 wurde mit Version 1 ohne Auszahlungs-Root abgeschlossen; ihre Finanzierung ist zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Ab Block 9.398.428 zahlt Settlement v2 Epoche 4 und jede Epoche danach. Epoche 3 wurde mit Version 1 ohne Auszahlungs-Root abgeschlossen; ihre Finanzierung ist zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
-                'Erster Block von Epoche 4, 9,398,428',
+                'Erster Block von Epoche 4, 9.398.428',
             ],
         },
         'last-v1-claims-epoch-3': {
             title: 'Epoche 3 ohne Auszahlungs-Root finalisiert',
-            detail: 'Der Auszahlungs-Root von Epoche 3 wurde nicht in seinem Fenster festgeschrieben, daher hatte sie keine Claims unter Version 1. Ihre 4,132.72 α wurden zusammen mit den 3,482.26 α von Epoche 1 übertragen, und beide sind zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Der Auszahlungs-Root von Epoche 3 wurde nicht in seinem Fenster festgeschrieben, daher hatte sie keine Claims unter Version 1. Ihre 4.132,72 α wurden zusammen mit den 3.482,26 α von Epoche 1 übertragen, und beide sind zurückgewonnen (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
-                'Epoche 3 finalisiert, Block 9,412,831',
+                'Epoche 3 finalisiert, Block 9.412.831',
             ],
         },
         'settlement-v2-timelock': {
@@ -203,7 +203,7 @@ export default {
         },
         'first-v2-close-and-commit': {
             title: 'Erster Abschluss und erstes Festschreiben unter Settlement v2',
-            detail: 'Epoche 4 endete mit Block 9,448,828. Ihr v2-Ledger-Root wurde in Block 9,449,034 festgeschrieben und vom Validator in Block 9,449,041 freigegeben.',
+            detail: 'Epoche 4 endete mit Block 9.448.828. Ihr v2-Ledger-Root wurde in Block 9.449.034 festgeschrieben und vom Validator in Block 9.449.041 freigegeben.',
             sources: [
                 'Erster v2-Ledger-Root',
                 'Freigabe durch den Validator',
@@ -211,26 +211,26 @@ export default {
         },
         'epoch-3-recovery-root': {
             title: 'Recovery-Root schickt die Finanzierung der Epochen 1 und 3 in den v2-Tresor',
-            detail: 'Ein einziger Root der Version 1 zahlt den gesamten Übertrag, 3,482.26 α aus Epoche 1 und 4,132.72 α aus Epoche 3, an den v2-Tresor. Er kann nach seiner 48-stündigen Anfechtungsfrist in den Tresor eingelöst werden, ab etwa dem 8. November, 18:25 UTC.',
+            detail: 'Ein einziger Root der Version 1 zahlt den gesamten Übertrag, 3.482,26 α aus Epoche 1 und 4.132,72 α aus Epoche 3, an den v2-Tresor. Er kann nach seiner 48-stündigen Anfechtungsfrist in den Tresor eingelöst werden, ab etwa dem 8. November, 18:25 UTC.',
             sources: [
                 'Recovery-Root',
             ],
         },
         'first-v2-claim': {
             title: 'Erste Claims unter Settlement v2',
-            detail: 'Der Root von Epoche 4, der erste v2-Root, wurde in Block 9,463,438 finalisiert, 14,404 Blöcke nach seinem Festschreiben, und die ersten Claims folgten in Block 9,463,447.',
+            detail: 'Der Root von Epoche 4, der erste v2-Root, wurde in Block 9.463.438 finalisiert, 14.404 Blöcke nach seinem Festschreiben, und die ersten Claims folgten in Block 9.463.447.',
             sources: [
-                'Erster v2-Root finalisiert, Block 9,463,438',
-                'Erste v2-Claims, Block 9,463,447',
+                'Erster v2-Root finalisiert, Block 9.463.438',
+                'Erste v2-Claims, Block 9.463.447',
             ],
         },
         'epoch-3-recovery-scheduled': {
             title: 'Zurückgewonnene Mittel nicht für Epoche 5 eingeplant',
             detail: 'Die Recovery erreichte den v2-Tresor am 8. November um 18:30 UTC. Ihre Aufnahme in die Auszahlung von Epoche 5 hätte bis etwa zum 10. November, 18:25 UTC, über den 72-Stunden-Timelock eingeplant werden müssen, um vor dem Abschluss von Epoche 5 wirksam zu werden. Sie wurde nicht eingeplant, daher werden die zurückgewonnenen Mittel nicht mit Epoche 5 ausgezahlt (siehe die Mitteilung zu Epoche 3 oben). Der Eintrag der Recovery im v2-Abrechnungsvertrag wurde am 6. November eingeplant und kann seit dem 9. November, 21:19 UTC, wirksam werden.',
             sources: [
-                'Recovery-Root finalisiert, Block 9,463,231',
-                'Recovery in den v2-Tresor eingelöst, Block 9,463,236',
-                'Recovery in die Treuhand des v2-Tresors übernommen, Block 9,463,240',
+                'Recovery-Root finalisiert, Block 9.463.231',
+                'Recovery in den v2-Tresor eingelöst, Block 9.463.236',
+                'Recovery in die Treuhand des v2-Tresors übernommen, Block 9.463.240',
                 'Eintrag der Recovery eingeplant',
             ],
         },
@@ -263,29 +263,29 @@ export default {
         },
         'epoch-5-claims-with-recovery': {
             title: 'Claims für Epoche 5',
-            detail: 'Epoche 5 endet mit Block 9,499,228, und die Claims folgen nach ihrer Anfechtungsfrist von 14,400 Blöcken. Die zurückgewonnene Finanzierung der Epochen 1 und 3 ist nicht Teil der Auszahlung von Epoche 5: Ihre Aufnahme wurde nicht rechtzeitig eingeplant (siehe die Mitteilung zu Epoche 3 oben).',
+            detail: 'Epoche 5 endet mit Block 9.499.228, und die Claims folgen nach ihrer Anfechtungsfrist von 14.400 Blöcken. Die zurückgewonnene Finanzierung der Epochen 1 und 3 ist nicht Teil der Auszahlung von Epoche 5: Ihre Aufnahme wurde nicht rechtzeitig eingeplant (siehe die Mitteilung zu Epoche 3 oben).',
             sources: [
                 'Ledger-Root von Epoche 5',
             ],
         },
         'capture-the-flag-presence-sampling': {
             title: 'Capture the Flag: Präsenzmessung spätestens zum Ende von Epoche 6',
-            detail: 'Bevor Epoche 6 mit Block 9,549,628 endet, beginnen die Server des Netzbetreibers, jeden Provider und Extender jede Viertelstunde zu erfassen: ob er online ist und die Prüfungen des Betreibers besteht, und in welchem Land er ist. Epoche 7 läuft dann vollständig als Schattenepoche: Nach ihrem Ende erstellt der Betreiber seine Teilnehmerliste, die Auslosung und die Auszahlungen aus den echten Messungen, ohne sie festzuschreiben, und veröffentlicht einen unsignierten Bericht, auf dem die Prüfungen des Validators laufen. Capture the Flag startet nur dann mit Epoche 8, wenn die Messung beim Start von Epoche 8 läuft.',
+            detail: 'Bevor Epoche 6 mit Block 9.549.628 endet, beginnen die Server des Netzbetreibers, jeden Provider und Extender jede Viertelstunde zu erfassen: ob er online ist und die Prüfungen des Betreibers besteht, und in welchem Land er ist. Epoche 7 läuft dann vollständig als Schattenepoche: Nach ihrem Ende erstellt der Betreiber seine Teilnehmerliste, die Zufallsauswahl und die Auszahlungen aus den echten Messungen, ohne sie festzuschreiben, und veröffentlicht einen unsignierten Bericht, auf dem die Prüfungen des Validators laufen. Capture the Flag startet nur dann mit Epoche 8, wenn die Messung beim Start von Epoche 8 läuft.',
             sources: [],
         },
         'demand-deposits-priced': {
             title: 'Signierter Preis geht live: Nachfrage-Einlagen ab Epoche 7',
-            detail: 'Ab Block 9,549,628 zahlt der Netzbetreiber 0.010437 α pro GiB und 0.005218 α pro aktivem Nutzer von Epoche 6 ein, begrenzt auf 3,000 α pro Epoche, wie vom Subnet-Eigentümer in price.yml signiert (veröffentlicht am 3. November). Validatoren prüfen die Einlage jeder Epoche bei jedem Steuerungsdurchlauf anhand dieses Preises, mit dem Validator-Release, das vor Epoche 7 erscheint. Solange die Einlage nicht dem entspricht, was die Nutzung der vorigen Epoche schuldet, erhält der Pool des Betreibers kein Gewicht.',
+            detail: 'Ab Block 9.549.628 zahlt der Netzbetreiber 0,010437 α pro GiB und 0,005218 α pro aktivem Nutzer von Epoche 6 ein, begrenzt auf 3.000 α pro Epoche, wie vom Subnet-Eigentümer in price.yml signiert (veröffentlicht am 3. November). Validatoren prüfen die Einlage jeder Epoche bei jedem Steuerungsdurchlauf anhand dieses Preises, mit dem Validator-Release, das vor Epoche 7 erscheint. Solange die Einlage nicht dem entspricht, was die Nutzung der vorigen Epoche schuldet, erhält der Pool des Betreibers kein Gewicht.',
             sources: [
                 'price.yml',
                 'Der signierte Preis im sn-Repo',
-                'Erster Block von Epoche 7, 9,549,628',
+                'Erster Block von Epoche 7, 9.549.628',
                 'Erste bepreiste Einlage',
             ],
         },
         'capture-the-flag-pool-registration': {
             title: 'Pool für Capture the Flag über den 72-Stunden-Timelock registriert',
-            detail: 'Bis etwa zum 22. November plant der Governance-Safe über den öffentlichen 72-Stunden-Timelock eine Operation ein: Sie aktualisiert STSettlement2 und registriert den Pool für Capture the Flag von Netzbetreiber 1, Pool 4,294,967,297, ab Epoche 8. Um den 25. November, zwei Tage vor Epoche 8, kann sie jeder ausführen, sobald ihre 72 Stunden vergangen sind. Der Pool belegt dann eine SN25-UID, früh genug, um Gewicht zu verdienen, bevor seine Immunität endet, unter einem Hotkey, der erst bei der Ausführung abgeleitet wird, sodass er während der 72-stündigen Wartezeit nicht öffentlich ist; eine fehlgeschlagene Ausführung läuft in einem späteren Block erneut, und wenn sie nicht vor dem Start von Epoche 8 laufen kann, startet Capture the Flag mit Epoche 9. Der Übertrags-Vertrag, der die Töpfe jeder Epoche in den Pool zurückführt, wird danach erstellt, und vault2, das die Mittel hält, ändert sich nicht. Um vor dem Start von Epoche 8 ausgeführt zu werden, muss die Operation bis etwa zum 24. November, 18:25 UTC, eingeplant sein.',
+            detail: 'Bis etwa zum 22. November plant der Governance-Safe über den öffentlichen 72-Stunden-Timelock eine Operation ein: Sie aktualisiert STSettlement2 und registriert den Pool für Capture the Flag von Netzbetreiber 1, Pool 4.294.967.297, ab Epoche 8. Um den 25. November, zwei Tage vor Epoche 8, kann sie jeder ausführen, sobald ihre 72 Stunden vergangen sind. Der Pool belegt dann eine SN25-UID, früh genug, um Gewicht zu verdienen, bevor seine Immunität endet, unter einem Hotkey, der erst bei der Ausführung abgeleitet wird, sodass er während der 72-stündigen Wartezeit nicht öffentlich ist; eine fehlgeschlagene Ausführung läuft in einem späteren Block erneut, und wenn sie nicht vor dem Start von Epoche 8 laufen kann, startet Capture the Flag mit Epoche 9. Der Übertrags-Vertrag, der die Töpfe jeder Epoche in den Pool zurückführt, wird danach erstellt, und vault2, das die Mittel hält, ändert sich nicht. Um vor dem Start von Epoche 8 ausgeführt zu werden, muss die Operation bis etwa zum 24. November, 18:25 UTC, eingeplant sein.',
             sources: [
                 'Timelock',
                 'STSettlement2',
@@ -296,27 +296,27 @@ export default {
         },
         'extender-pool-epoch-8': {
             title: 'Extender-Pool für Verkehr innerhalb der Plattform und innerhalb eines Netzwerks, ab Epoche 8',
-            detail: 'Ab Block 9,600,028, dem ersten von Epoche 8, zählt der Teil des Verkehrs jedes Vertrags, den kein Provider verdient, stattdessen für Extender. Das umfasst Verkehr zwischen einem Client und der Plattform des Netzbetreibers sowie Verkehr zwischen Geräten eines Netzwerks: Einem Provider, Zwischenknoten oder Extender im Netzwerk des Geräts, das einen Vertrag eröffnet hat, wird sein Anteil an diesem Vertrag nicht mehr angerechnet, im kostenlosen wie im bezahlten Tarif, und der Anteil geht an den Extender-Pool, während die anderen Hops des Vertrags ihre Anteile behalten. Es zählt nur Verkehr, den ein Datenguthaben finanziert hat, nie der eigene Mess- und Testverkehr des Netzbetreibers, und Gutschriften für Verkehr innerhalb desselben Netzwerks, die vor Epoche 8 erworben wurden, bleiben erhalten. Der Pool des Betreibers verteilt ihn gleichmäßig auf jeden /29-Adressblock (IPv4) oder /48-Adressblock (IPv6), der einen berechtigten Extender enthält, dann gleichmäßig auf die Extender darin, bis zur berechtigten Provider-Nutzung der Epoche, sodass Extender höchstens die Hälfte eines Pools verdienen; ohne berechtigten Extender wird er verworfen. Ein Extender ist berechtigt, wenn er am Ende der Epoche aktiv ist und mindestens eine Adresse hat, die die Fünf-Minuten-Prüfung des Betreibers besteht, wenn er eine Auszahlungs-Wallet hat, nicht an die Flotte eines Top-Level-Miners gebunden ist und sich nicht in einem der eigenen Netzwerke des Betreibers befindet, und Einträge, die einen Provider-Client, eine IPv4-Adresse oder ein IPv6-/64 teilen, zählen nur einmal. Ein Extender, über den ein Vertrag läuft, behält seinen eigenen Anteil daran als einer der Hops des Vertrags, wie der Subnet-Eigentümer am 11. November entschieden hat. Ab Epoche 8 nennt der Ledger-Header jeder Epoche die Bytes des Pools, die Bestandsliste der Extender des Betreibers, nach einem mit Schlüssel gebildeten Hash des /29- oder /48-Präfixes und nie nach Adresse, und ihre Anteile, und die Nutzungsaufstellung der Epoche, Version 2, ergänzt die beiden Teile des Pools, sein Gewicht nach der Deckelung sowie die Verträge und zahlenden Netzwerke dahinter. Die Epochen 6 und 7 laufen zuerst im Schattenbetrieb: Nach jeder veröffentlicht der Betreiber einen unsignierten Bericht darüber, was der Pool ausgezahlt hätte, auf dem die Prüfungen des Validators laufen und aus dem nie etwas ausgezahlt wird. Am 10. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
+            detail: 'Ab Block 9.600.028, dem ersten von Epoche 8, zählt der Teil des Verkehrs jedes Vertrags, den kein Provider verdient, stattdessen für Extender. Das umfasst Verkehr zwischen einem Client und der Plattform des Netzbetreibers sowie Verkehr zwischen Geräten eines Netzwerks: Einem Provider, Zwischenknoten oder Extender im Netzwerk des Geräts, das einen Vertrag eröffnet hat, wird sein Anteil an diesem Vertrag nicht mehr angerechnet, im kostenlosen wie im bezahlten Tarif, und der Anteil geht an den Extender-Pool, während die anderen Hops des Vertrags ihre Anteile behalten. Es zählt nur Verkehr, den ein Datenguthaben finanziert hat, nie der eigene Mess- und Testverkehr des Netzbetreibers, und Gutschriften für Verkehr innerhalb desselben Netzwerks, die vor Epoche 8 erworben wurden, bleiben erhalten. Der Pool des Betreibers verteilt ihn gleichmäßig auf jeden /29-Adressblock (IPv4) oder /48-Adressblock (IPv6), der einen berechtigten Extender enthält, dann gleichmäßig auf die Extender darin, bis zur berechtigten Provider-Nutzung der Epoche, sodass Extender höchstens die Hälfte eines Pools verdienen; ohne berechtigten Extender wird er verworfen. Ein Extender ist berechtigt, wenn er am Ende der Epoche aktiv ist und mindestens eine Adresse hat, die die Fünf-Minuten-Prüfung des Betreibers besteht, wenn er eine Auszahlungs-Wallet hat, nicht an die Flotte eines Top-Level-Miners gebunden ist und sich nicht in einem der eigenen Netzwerke des Betreibers befindet, und Einträge, die einen Provider-Client, eine IPv4-Adresse oder ein IPv6-/64 teilen, zählen nur einmal. Ein Extender, über den ein Vertrag läuft, behält seinen eigenen Anteil daran als einer der Hops des Vertrags, wie der Subnet-Eigentümer am 11. November entschieden hat. Ab Epoche 8 nennt der Ledger-Header jeder Epoche die Bytes des Pools, die Bestandsliste der Extender des Betreibers, nach einem mit Schlüssel gebildeten Hash des /29- oder /48-Präfixes und nie nach Adresse, und ihre Anteile, und die Nutzungsaufstellung der Epoche, Version 2, ergänzt die beiden Teile des Pools, sein Gewicht nach der Deckelung sowie die Verträge und zahlenden Netzwerke dahinter. Die Epochen 6 und 7 laufen zuerst im Schattenbetrieb: Nach jeder veröffentlicht der Betreiber einen unsignierten Bericht darüber, was der Pool ausgezahlt hätte, auf dem die Prüfungen des Validators laufen und aus dem nie etwas ausgezahlt wird. Am 10. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
             sources: [
                 'Das Amendment, WHITEPAPER.md §8.6',
                 'Signierter Amendment-Eintrag',
                 'Die Amendment-Datei im sn-Repo',
-                'Erster Block von Epoche 8, 9,600,028',
+                'Erster Block von Epoche 8, 9.600.028',
             ],
         },
         'capture-the-flag-epoch-8': {
             title: 'Capture the Flag ab Epoche 8: zehn Slots in jedem Land',
-            detail: 'Ab Block 9,600,028, dem ersten von Epoche 8, hat jeder Netzbetreiber neben seinem Provider-Pool einen zweiten Pool, Capture the Flag, der für die Präsenz in einem Land zahlt. Jedes der 249 Länder nach ISO 3166-1 hat pro Epoche fünf Provider-Slots und fünf Extender-Slots, jeder so viel wert wie die neue Finanzierung des Pools für die Epoche, geteilt durch 2,490. Ein Provider oder Extender nimmt an der Auslosung seines Landes teil, wenn er mindestens die Hälfte der Epoche lang online war, dabei die Prüfungen des Betreibers bestand und sich in diesem Land befand, und an ihrem Ende aktiv ist. Der Betreiber schreibt die Teilnehmerliste on-chain fest, und eine danach veröffentlichte drand-Runde lost bis zu fünf Gewinner pro Land und Rolle aus. Ein Slot ohne Gewinner wird in den Topf seines Landes übertragen, und jeder Gewinner erhält seinen eigenen Slot und ein Fünftel dieses Topfes. Der Provider-Pool erhält 9/10 des Anteils der Provider statt des gesamten Anteils, 1,076.26 α statt 1,195.84 α im Maßstab von Epoche 4, und 4/10, sobald Top-Level-Flotten gewichtet werden. Der Validator von UR, der die Stake-Mehrheit hält, gewichtet den Pool ab dem ersten Tempo von Epoche 8. Am 11. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
+            detail: 'Ab Block 9.600.028, dem ersten von Epoche 8, hat jeder Netzbetreiber neben seinem Provider-Pool einen zweiten Pool, Capture the Flag, der für die Präsenz in einem Land zahlt. Jedes der 249 Länder nach ISO 3166-1 hat pro Epoche fünf Provider-Slots und fünf Extender-Slots, jeder so viel wert wie die neue Finanzierung des Pools für die Epoche, geteilt durch 2.490. Ein Provider oder Extender nimmt an der Zufallsauswahl seines Landes teil, wenn er mindestens die Hälfte der Epoche lang online war, dabei die Prüfungen des Betreibers bestand und sich in diesem Land befand, und an ihrem Ende aktiv ist. Der Betreiber schreibt die Teilnehmerliste on-chain fest, und eine danach veröffentlichte drand-Runde wählt bis zu fünf Gewinner pro Land und Rolle zufällig aus. Ein Slot ohne Gewinner wird in den Topf seines Landes übertragen, und jeder Gewinner erhält seinen eigenen Slot und ein Fünftel dieses Topfes. Der Provider-Pool erhält 9/10 des Anteils der Provider statt des gesamten Anteils, 1.076,26 α statt 1.195,84 α im Maßstab von Epoche 4, und 4/10, sobald Top-Level-Flotten gewichtet werden. Der Validator von UR, der die Stake-Mehrheit hält, gewichtet den Pool ab dem ersten Tempo von Epoche 8. Am 11. November vom Subnet-Eigentümer freigegeben, tritt dies in Kraft, sobald der signierte Amendment-Eintrag vor dem Start von Epoche 8 veröffentlicht ist.',
             sources: [
                 'Das Design, CAPTURETHEFLAG.md',
                 'Die vollständige Mitteilung im sn-Repo',
                 'Signierter Amendment-Eintrag',
-                'Erster Block von Epoche 8, 9,600,028',
+                'Erster Block von Epoche 8, 9.600.028',
             ],
         },
         'capture-the-flag-first-draw': {
-            title: 'Auslosung und Root von Capture the Flag für Epoche 8',
-            detail: 'Epoche 8 endet mit Block 9,650,428. Der Netzbetreiber schreibt seine Teilnehmerliste bis Block 9,651,028 fest, eine mindestens eine Minute später veröffentlichte drand-Runde lost die Gewinner aus, und der Root von Capture the Flag wird zusammen mit dem des Provider-Pools bis Block 9,651,628 festgeschrieben. Ist die Auslosung bis dahin nicht fertig, schreibt der Betreiber für Epoche 8 keine Liste fest: Jeder Slot wird in den Topf seines Landes übertragen, und die ersten Gewinner werden in Epoche 9 ausgelost.',
+            title: 'Zufallsauswahl und Root von Capture the Flag für Epoche 8',
+            detail: 'Epoche 8 endet mit Block 9.650.428. Der Netzbetreiber schreibt seine Teilnehmerliste bis Block 9.651.028 fest, eine mindestens eine Minute später veröffentlichte drand-Runde wählt die Gewinner zufällig aus, und der Root von Capture the Flag wird zusammen mit dem des Provider-Pools bis Block 9.651.628 festgeschrieben. Ist die Zufallsauswahl bis dahin nicht fertig, schreibt der Betreiber für Epoche 8 keine Liste fest: Jeder Slot wird in den Topf seines Landes übertragen, und die ersten Gewinner werden in Epoche 9 zufällig ausgewählt.',
             sources: [
                 'Teilnehmerliste von Epoche 8 festgeschrieben',
                 'Root von Capture the Flag für Epoche 8',
@@ -324,7 +324,7 @@ export default {
         },
         'capture-the-flag-first-claims': {
             title: 'Erste Claims von Capture the Flag',
-            detail: 'Die Claims von Capture the Flag für Epoche 8 öffnen, sobald der Validator ihren Root freigegeben hat und die Anfechtungsfrist von 14,400 Blöcken vergangen ist, etwa zur selben Zeit wie die Pool-Claims von Epoche 8. Das Validator-Release, das Roots von Capture the Flag prüft und freigibt, ist bis etwa zum 1. Dezember fällig, und die Freigabe bis zum Ende von Epoche 9, etwa am 11. Dezember, 18:25 UTC. Gewinner erhalten ihre Auszahlung auf die Auszahlungs-Wallet, die der Provider-Pool bereits nutzt, und lösen im selben Einlöse-Ablauf ein. Bis zu den App-Releases, die Capture the Flag beim Namen nennen, zeigt eine App ein Konto von Capture the Flag als „Pool 4294967297“ an und löst es wie jeden Pool ein.',
+            detail: 'Die Claims von Capture the Flag für Epoche 8 öffnen, sobald der Validator ihren Root freigegeben hat und die Anfechtungsfrist von 14.400 Blöcken vergangen ist, etwa zur selben Zeit wie die Pool-Claims von Epoche 8. Das Validator-Release, das Roots von Capture the Flag prüft und freigibt, ist bis etwa zum 1. Dezember fällig, und die Freigabe bis zum Ende von Epoche 9, etwa am 11. Dezember, 18:25 UTC. Gewinner erhalten ihre Auszahlung auf die Auszahlungs-Wallet, die der Provider-Pool bereits nutzt, und lösen im selben Einlöse-Ablauf ein. Bis zu den App-Releases, die Capture the Flag beim Namen nennen, zeigt eine App ein Konto von Capture the Flag als „Pool 4294967297“ an und löst es wie jeden Pool ein.',
             sources: [
                 'Erste Claims von Capture the Flag',
             ],

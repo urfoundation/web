@@ -1,7 +1,7 @@
-// The capture the flag pages' country names in German: `name` and `order` from CLDR 48.0, `short`, `in` and `inShort` by hand.
+// The capture the flag pages' country names in German: `name` and `order` from CLDR 48.0 (the site's own hk, mo: REGION_NAMES in react/src/i18n/format.js), `short`, `in` and `inShort` by hand.
 // Written by scripts/ctf-names.mjs, which keeps the hand-written forms; see it for what each holds.
 export default {
-    order: "af eg ax al dz as vi um ad ao ai aq ag gq ar am aw az et au bs bh bd bb by be bz bj bm bt bo ba bw bv br vg io bn bg bf bi cv cl cn ck cr ci cw dk de dm do dj ec sv er ee sz fk fo fj fi fr gf pf tf ga gm ge gh gi gd gr gl gp gu gt gg gn gw gy ht hm hn in id iq ir ie is im il it jm jp ye je jo ky kh cm ca bq kz qa ke kg ki cc co km cg cd hr cu kw la ls lv lb lr ly li lt lu mg mw my mv ml mt ma mh mq mr mu yt mx fm mc mn me ms mz mm na nr np nc nz ni nl ne ng nu kp mp mk nf no om at pk ps pw pa pg py pe ph pn pl pt pr md re rw ro ru sb zm ws sm st sa se ch sn rs sc sl zw sg sx sk si so hk mo es sj lk bl sh kn lc mf pm vc za sd gs kr ss sr sy tj tw tz th tl tg tk to tt td cz tn tr tm tc tv ug ua hu uy uz vu va ve ae us gb vn wf cx eh cf cy",
+    order: "af eg ax al dz as vi um ad ao ai aq ag gq ar am aw az et au bs bh bd bb by be bz bj bm bt bo ba bw bv br vg io bn bg bf bi cv cl cn ck cr ci cw dk de dm do dj ec sv er ee sz fk fo fj fi fr gf pf tf ga gm ge gh gi gd gr gl gp gu gt gg gn gw gy ht hm hn hk in id iq ir ie is im il it jm jp ye je jo ky kh cm ca bq kz qa ke kg ki cc co km cg cd hr cu kw la ls lv lb lr ly li lt lu mo mg mw my mv ml mt ma mh mq mr mu yt mx fm mc mn me ms mz mm na nr np nc nz ni nl ne ng nu kp mp mk nf no om at pk ps pw pa pg py pe ph pn pl pt pr md re rw ro ru sb zm ws sm st sa se ch sn rs sc sl zw sg sx sk si so es sj lk bl sh kn lc mf pm vc za sd gs kr ss sr sy tj tw tz th tl tg tk to tt td cz tn tr tm tc tv ug ua hu uy uz vu va ve ae us gb vn wf cx eh cf cy",
     name: {
         ad: "Andorra",
         ae: "Vereinigte Arabische Emirate",
@@ -97,7 +97,7 @@ export default {
         gu: "Guam",
         gw: "Guinea-Bissau",
         gy: "Guyana",
-        hk: "Sonderverwaltungsregion Hongkong",
+        hk: "Hongkong",
         hm: "Heard und McDonaldinseln",
         hn: "Honduras",
         hr: "Kroatien",
@@ -150,7 +150,7 @@ export default {
         ml: "Mali",
         mm: "Myanmar",
         mn: "Mongolei",
-        mo: "Sonderverwaltungsregion Macau",
+        mo: "Macau",
         mp: "Nördliche Marianen",
         mq: "Martinique",
         mr: "Mauretanien",

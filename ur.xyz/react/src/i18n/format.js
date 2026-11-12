@@ -94,12 +94,28 @@ export function interpolate(template, values = {}) {
  *   zh  Hong Kong, Macao and Taiwan are 香港, 澳门 and 台湾, the English site's
  *       short names, in every form: never CLDR's 中国香港特别行政区 or
  *       中国澳门特别行政区, and never a 中国… prefix;
- *   es  the Latin American name where CLDR's Spanish is Spain's (Rumania,
- *       Arabia Saudita), as every Spanish page is neutral Latin American.
+ *   ru  Hong Kong and Macao are Гонконг and Макао, and
+ *   de  Hongkong and Macau, the short names, as the English site's: never
+ *       CLDR's Гонконг (САР) or Sonderverwaltungsregion Hongkong;
+ *   es  the Latin American name where CLDR's Spanish is Spain's, as Latin
+ *       American CLDR (es-419) writes it (Rumania, Arabia Saudita, Costa de
+ *       Marfil, Timor Oriental, Islas Åland, República del Congo, Islas
+ *       Georgia del Sur y Sándwich del Sur), as every Spanish page is neutral
+ *       Latin American.
  */
 export const REGION_NAMES = Object.freeze({
     zh: Object.freeze({ HK: '香港', MO: '澳门', TW: '台湾' }),
-    es: Object.freeze({ RO: 'Rumania', SA: 'Arabia Saudita' }),
+    ru: Object.freeze({ HK: 'Гонконг', MO: 'Макао' }),
+    de: Object.freeze({ HK: 'Hongkong', MO: 'Macau' }),
+    es: Object.freeze({
+        RO: 'Rumania',
+        SA: 'Arabia Saudita',
+        CI: 'Costa de Marfil',
+        TL: 'Timor Oriental',
+        AX: 'Islas Åland',
+        CG: 'República del Congo',
+        GS: 'Islas Georgia del Sur y Sándwich del Sur',
+    }),
 });
 
 /**

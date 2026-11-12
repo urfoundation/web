@@ -78,7 +78,7 @@ export default {
         providers: "提供者",
         providersByCountry: "各国提供者",
         details: "详情",
-        allCountries: "所有国家",
+        allCountries: "所有国家或地区",
         becomeProvider: "成为提供者",
         payouts: "支付",
         earned: "提供者所得",
@@ -106,7 +106,7 @@ export default {
         online: "在线",
         allTimeChip: "历史累计",
         networkIsAccount: "一个网络就是一个账户。一个账户可以连接多台设备。",
-        searchCountry: "搜索国家",
+        searchCountry: "搜索国家或地区",
     },
     expand: {
         users: "放大每日用户图表",
@@ -122,7 +122,7 @@ export default {
         other: "更多统计：设备、连接、扩展器 →",
     },
     globeAria: "提供者所在国家的地球仪。拖动可旋转，点击国家可查看其数据。",
-    mapAria: "各国提供者地图。所有国家都列在下方表格中。",
+    mapAria: "各国提供者地图。所有国家和地区都列在下方表格中。",
     network: {
         showTable: "以表格显示",
         styleAria: "图表样式",

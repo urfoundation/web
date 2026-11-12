@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { LOCALIZED_BASE_PATHS } from '../../astro/src/lib/route-localization.js';
+import { hasLocalizedVersion } from '../../astro/src/lib/route-localization.js';
 
 /**
  * Tiny client-side router for ur.xyz.
@@ -12,11 +12,12 @@ import { LOCALIZED_BASE_PATHS } from '../../astro/src/lib/route-localization.js'
  * prefix used by the i18n layer is stripped before route detection so
  * a Chinese visitor at `/zh/providers` still resolves correctly.
  *
- * Only the home page and the sections are translated (the same list the
- * static build publishes hreflang for, LOCALIZED_BASE_PATHS). Every other
- * route is English-only: buildPath never gives it a language prefix, and a
- * prefixed URL still resolves to it (/de/about is /about, as /de/docs is
- * /docs), which is where the static host redirects those URLs.
+ * A route is translated when the static build publishes its /<lang>/ pages
+ * (astro/src/lib/route-localization.js: the home page, the sections and the
+ * localized page groups). Every other route is English-only: buildPath never
+ * gives it a language prefix, and a prefixed URL still resolves to it
+ * (/de/about is /about while the about group is English-only), which is where
+ * the static host redirects those URLs.
  *
  * State is just `window.location.pathname`. We push it with
  * pushState/popstate so back/forward work, and re-emit a popstate
@@ -43,35 +44,35 @@ export function splitPath(pathname) {
 export const SECTION_ROUTES = ['operators', 'miners', 'validators', 'research'];
 
 /**
- * Legal documents — top-level paths, linked from the footer only. English
- * only by design: a translated contract would be a different contract.
+ * Legal documents — top-level paths, linked from the footer only. Pages of
+ * the docs group (react/src/i18n/pages/docs/group.js), English-only until that
+ * group is localized.
  */
 export const LEGAL_ROUTES = ['terms', 'privacy', 'vdp'];
 
 /**
- * The English-only pages (components/pages): each routes 1:1 to its path,
- * and the Investor Centre's documents live under /investors/<slug>. They
- * have no translations, so they exist at the bare path only. /reserve is the
- * Network Capacity Reserve dashboard and /mainnet the SN25 mainnet launch
- * timeline, both linked from the footer. /dashboard is the live stats page, standalone
- * and unlinked until launch. /ctf is capture the flag, with a page per country
- * at /ctf/<cc> (the route's slug, a lowercase ISO 3166-1 alpha-2 code).
+ * The page groups' pages (components/pages): each routes 1:1 to its path,
+ * and the Investor Centre's documents live under /investors/<slug>. Each is
+ * English-only, at its bare path, until its group (react/src/i18n/pages/) is
+ * localized. /reserve is the Network Capacity Reserve dashboard and /mainnet
+ * the SN25 mainnet launch timeline, both linked from the footer. /dashboard is
+ * the live stats page, standalone. /ctf is capture the flag, with a page per
+ * country at /ctf/<cc> (the route's slug, a lowercase ISO 3166-1 alpha-2 code).
  */
 export const PAGE_ROUTES = ['about', 'investors', 'build', 'reserve', 'mainnet', 'dashboard', 'ctf'];
 
 /**
- * The research reports: English-only documents under the translated research
- * section, each at /research/<slug> (the route name is 'research-report'), as
- * the Investor Centre's documents are under /investors. The slug is the
- * report's data file's (data/research-report-*.json, checked by
+ * The research reports: documents under the research section, each at
+ * /research/<slug> (the route name is 'research-report'), as the Investor
+ * Centre's documents are under /investors. The slug is the report's data
+ * file's (data/research-report-*.json, checked by
  * tests/research-report.test.mjs).
  */
 export const RESEARCH_REPORT_SLUGS = ['2026-q3-report'];
 
 /**
  * The research methodology (/research/methodology): how the research works,
- * English-only like the reports, under the translated research section. Its
- * route name is 'research-methodology'.
+ * under the research section. Its route name is 'research-methodology'.
  */
 export const RESEARCH_METHODOLOGY_PATH = '/research/methodology';
 
@@ -79,12 +80,27 @@ const SECTION_SET = new Set(SECTION_ROUTES);
 const LEGAL_SET = new Set(LEGAL_ROUTES);
 const PAGE_SET = new Set(PAGE_ROUTES);
 const REPORT_SET = new Set(RESEARCH_REPORT_SLUGS);
-// route names with translated pages: '/' is home, '/miners' is miners, …
-const TRANSLATED_SET = new Set(LOCALIZED_BASE_PATHS.map(path => (path === '/' ? 'home' : path.slice(1))));
+
+/** A route's English URL: its path without a language prefix. */
+function englishPath(route) {
+    if (!route || route.name === 'home') return '/';
+    if (SECTION_SET.has(route.name)) return `/${route.name}`;
+    if (route.name === 'research-report') return `/research/${route.slug}`;
+    if (route.name === 'research-methodology') return RESEARCH_METHODOLOGY_PATH;
+    if (route.name === 'docs') {
+        return route.slug ? `/docs/${route.slug}` : '/docs';
+    }
+    if (route.name === 'price') return '/price';
+    if (LEGAL_SET.has(route.name)) return `/${route.name}`;
+    if (PAGE_SET.has(route.name)) {
+        return route.slug ? `/${route.name}/${route.slug}` : `/${route.name}`;
+    }
+    return '/';
+}
 
 /** Whether a route has translated pages (a `/<lang>/…` URL of its own). */
 export function isTranslatedRoute(route) {
-    return TRANSLATED_SET.has(route?.name || 'home');
+    return hasLocalizedVersion(englishPath(route));
 }
 
 export function parseRoute(pathname) {
@@ -118,25 +134,15 @@ export function parseRoute(pathname) {
 
 /**
  * Build a URL for a given route under a given language. English lives
- * at the bare path; a translated route (home, the sections) carries the
- * `/<lang>` prefix of any other language. An English-only route is always
- * its bare path: a prefixed link to it would only bounce through a redirect.
+ * at the bare path; a translated route (home, the sections, a localized
+ * page group's pages) carries the `/<lang>` prefix of any other language. An
+ * English-only route is always its bare path: a prefixed link to it would
+ * only bounce through a redirect.
  */
 export function buildPath(route, lang) {
-    const prefix = lang && lang !== 'en' && isTranslatedRoute(route) ? `/${lang}` : '';
-    if (!route || route.name === 'home') return prefix || '/';
-    if (SECTION_SET.has(route.name)) return `${prefix}/${route.name}`;
-    if (route.name === 'research-report') return `/research/${route.slug}`;
-    if (route.name === 'research-methodology') return RESEARCH_METHODOLOGY_PATH;
-    if (route.name === 'docs') {
-        return route.slug ? `/docs/${route.slug}` : '/docs';
-    }
-    if (route.name === 'price') return '/price';
-    if (LEGAL_SET.has(route.name)) return `/${route.name}`;
-    if (PAGE_SET.has(route.name)) {
-        return route.slug ? `/${route.name}/${route.slug}` : `/${route.name}`;
-    }
-    return prefix || '/';
+    const path = englishPath(route);
+    if (!lang || lang === 'en' || !hasLocalizedVersion(path)) return path;
+    return path === '/' ? `/${lang}` : `/${lang}${path}`;
 }
 
 export function useRoute() {

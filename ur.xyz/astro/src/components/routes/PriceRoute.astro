@@ -1,0 +1,77 @@
+---
+// /price, the published price sheet, in any site language: pages/price.astro
+// and its translations (pages/[lang]/price.astro) render this. The SPA has had
+// this route all along (App.jsx SectionPage → PriceSection); the role guides
+// (/docs/miner, /docs/validator, /docs/operator) link it for the
+// initial-period rate. The body's words are the site dictionary's `price`
+// section, the head's the `price` copy unit; the sheet is price/price.yml,
+// never translated.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import PriceIsland from '../../islands/PriceIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import { getDict } from '../../lib/i18n.js';
+import { parsePriceSheet } from '@react/lib/price.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+import { sentenceClamp } from '../../lib/meta.js';
+// the canonical tracked copy of the sheet (scripts/sync-price.mjs publishes
+// it to /price.yml as well); the island refreshes from /price.yml in the browser
+import priceSheetText from '../../../../price/price.yml?raw';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const { meta } = (await loadPageCopy('price'))(lang);
+const sheet = parsePriceSheet(priceSheetText);
+const description = sentenceClamp(t.price.intro);
+const pageUrl = lang === 'en' ? 'https://ur.xyz/price' : `https://ur.xyz/${lang}/price`;
+
+const jsonLd = [{
+    '@type': 'Dataset',
+    name: meta.datasetName,
+    description,
+    url: pageUrl,
+    ...(lang === 'en' ? {} : { inLanguage: lang }),
+    license: 'https://ur.xyz/terms',
+    creator: { '@id': 'https://ur.xyz/#org' },
+    distribution: [
+        { '@type': 'DataDownload', contentUrl: 'https://ur.xyz/price.yml', encodingFormat: 'application/yaml' },
+        { '@type': 'DataDownload', contentUrl: 'https://ur.xyz/price.rss', encodingFormat: 'application/rss+xml' },
+    ],
+}];
+---
+<Base
+    title={meta.title}
+    description={description}
+    breadcrumbName={t.price.eyebrow}
+    lang={lang}
+    jsonLd={jsonLd}
+    alternate={{ href: '/price.yml', type: 'application/yaml' }}
+>
+    <!-- RSS autodiscovery: browsers and feed readers pick /price.rss up
+         straight from this page. -->
+    <link
+        slot="head"
+        rel="alternate"
+        type="application/rss+xml"
+        title={meta.feedTitle}
+        href="/price.rss"
+    />
+
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="price" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            <PriceIsland lang={lang} initialSheet={sheet} client:load />
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

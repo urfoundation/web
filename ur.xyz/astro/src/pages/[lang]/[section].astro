@@ -64,8 +64,8 @@ const jsonLd = section === 'research'
                 {section === 'research' && <ResearchCompetition client:load copy={t.research.competition} lang={lang} initialPhase={competitionPhase(Date.now())} />}
                 {section === 'miners' && <MinerGlobeIntro client:load alt={sectionData.globeAlt} labels={sectionData.globeLabels} />}
                 <p>{sectionData.intro}</p>
-                {section === 'research' && <ResearchReportCard t={t} />}
-                {section === 'research' && <ResearchMethodologyCard t={t} />}
+                {section === 'research' && <ResearchReportCard t={t} lang={lang} />}
+                {section === 'research' && <ResearchMethodologyCard t={t} lang={lang} />}
                 {section === 'miners' && <p>{sectionData.both}</p>}
                 {section === 'miners' && <p>{sectionData.goal}</p>}
                 {showDiagram && section === 'operators' && (
@@ -76,8 +76,8 @@ const jsonLd = section === 'research'
                 {showDiagram && section !== 'operators' && <NetworkDiagram client:visible={{rootMargin: "200px"}} active={section} lang={lang} ctaLabel={sectionData.cta} copy={diagramCopy(t)} />}
                 {section === 'research'
                     ? <ResearchAreas t={t} />
-                    : <CardGrid items={items} />}
-                {section === 'research' && <ResearchNotes t={t} />}
+                    : <CardGrid items={items} lang={lang} />}
+                {section === 'research' && <ResearchNotes t={t} lang={lang} />}
                 {section === 'operators' && <OperatorsDirectoryIsland lang={lang} client:visible />}
                 {section === 'miners' && <MinerSim client:visible caption={sectionData.simCaption} />}
                 {section === 'validators' && <ValidatorSim client:visible caption={sectionData.simCaption} />}

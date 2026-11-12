@@ -21,7 +21,15 @@ export default {
         browseDocs:   'تصفّح الوثائق',
         search:       'بحث',
         ctaAria:    'تكلفة الاستخدام — سعر الشبكة الحالي',
-        denomAria:  'عملة عرض السعر'
+        denomAria:  'عملة عرض السعر',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'من نحن',
+        build:       'التطوير',
+        investors:   'المستثمرون',
+        dashboard:   'لوحة البيانات',
+        liveDashboard: 'لوحة البيانات المباشرة',
+        ctf:         'الاستيلاء على العلم'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'شبكة UR الفرعية على Telegram',
         socialDiscord:  'Discord الخاص بـ URnetwork',
         socialGithub:   'شبكة UR الفرعية على GitHub',
-        productsAria:   'منتجات URnetwork على ur.io'
+        productsAria:   'منتجات URnetwork على ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'ابنِ على UR',
+        reserve:       'الاحتياطي',
+        mainnet:       'الشبكة الرئيسية',
+        investorCentre:  'مركز المستثمرين'
     },
 
     disclaimer: {
@@ -261,14 +274,17 @@ operators: {
             date: '24 أغسطس – 24 أكتوبر 2026',
             title: 'تقرير الأبحاث، أغسطس–أكتوبر 2026',
             body: 'تهدف الأبحاث إلى منح الجميع أفضل تشفير وأفضل سرعة في الاستخدام اليومي، بما يجعل الإنترنت لديك أفضل. يعرض التقرير على خط زمني واحد 39 تغييرًا مُقاسًا نحو هذا الهدف، ومدى ما بلغه كل نوع من التحسينات، وكيف أُجريت الأبحاث.',
-            cta: 'اقرأ التقرير (بالإنجليزية)'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'اقرأ التقرير',
+            ctaEnglish: 'اقرأ التقرير (بالإنجليزية)'
         },
         methodology: {
             tag: 'المنهجية',
             topic: 'ثلاث حلقات بحثية',
             title: 'حلقات بحثية تُحسّن نفسها',
             body: 'كيف يُحسّن المختبر والمسابقة المفتوحة والعُقد الميدانية التطوعية الشبكة، ويُحسّن كلٌّ منها طريقة قياس الجولة التالية. تتشارك الثلاث انضباطًا واحدًا: خط أساس مُجمَّد، وضوضاء مُقاسة، وكل محاولة مُسجَّلة.',
-            cta: 'اقرأ المنهجية (بالإنجليزية)',
+            cta: 'اقرأ المنهجية',
+            ctaEnglish: 'اقرأ المنهجية (بالإنجليزية)',
             loops: [
                 { name: 'المختبر', detail: 'PERFVAR · كل تغيير' },
                 { name: 'المسابقة', detail: 'Apex SN1 · أسبوعيًا' },

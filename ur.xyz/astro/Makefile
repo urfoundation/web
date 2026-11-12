@@ -93,6 +93,10 @@ gates: install-playwright-browser
 	node --test ../react/tests/code-marks.test.mjs
 	node --test ../react/tests/docs-search.test.mjs
 	node --test ../react/tests/docs-chapters.test.mjs
+	node --test ../react/tests/page-copy.test.mjs
+	node --test ../react/tests/localized-english-text.test.mjs
+	# each page group's own tests (react/src/i18n/README.md), found by name
+	node --test "../react/src/i18n/pages/**/*.test.mjs"
 	node --test ../scripts/agent-assets.test.mjs
 	node --test ../react/tests/price.test.mjs
 	node --test ../scripts/price-gate.test.mjs
@@ -102,6 +106,9 @@ gates: install-playwright-browser
 	node ../react/tests/visual-parity.mjs
 	node ../react/tests/network-privacy.mjs
 	node ../react/tests/static-affordances.mjs
+	# the site's nginx server block over the build, in Chromium: no redirect
+	# loop, on real and missing pages, with any language stored (needs nginx)
+	node ../react/tests/redirect-loops.mjs build/$(UR_ENV_DIR)
 	node scripts/link-audit.mjs build/$(UR_ENV_DIR)
 	node scripts/seo-audit.mjs build/$(UR_ENV_DIR)
 	node scripts/page-dates.mjs build/$(UR_ENV_DIR) --check

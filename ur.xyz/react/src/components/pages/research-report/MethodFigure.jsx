@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { SCENES } from './scenes';
 import { useReducedMotion } from './active';
+import { pageCopy } from './copy';
 
 /**
  * One method's animation (scenes.jsx). The static page and reduced motion show
@@ -9,10 +10,14 @@ import { useReducedMotion } from './active';
  * so it carries a Pause button (WCAG 2.2.2); under reduced motion the button
  * reads Play and the animation starts only when asked. The step line under it
  * names the current phase; the figure's label describes the whole for screen
- * readers, so the step line is hidden from them.
+ * readers, so the step line is hidden from them. The words drawn in the scene
+ * and its steps are the page copy's `scenes`, in the page's language.
  */
-export default function MethodFigure({ sceneKey, label, caption }) {
+export default function MethodFigure({ sceneKey, label, caption, lang = 'en' }) {
     const scene = SCENES[sceneKey];
+    const copy = pageCopy(lang);
+    const words = copy.scenes[sceneKey];
+    const f = copy.figure;
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
     const reduced = useReducedMotion();
     const [t, setT] = useState(scene.key);
@@ -51,21 +56,21 @@ export default function MethodFigure({ sceneKey, label, caption }) {
     }, [paused, visible, scene.duration]);
 
     let n = 0;
-    scene.steps.forEach(([at], j) => { if (t >= at) n = j; });
+    scene.steps.forEach((at, j) => { if (t >= at) n = j; });
 
     return (
         <figure className="rr-fig">
             <div className="rr-fig-frame" ref={frame}>
                 <svg className="rr-scene" viewBox="0 0 360 200" role="img" aria-label={label}>
-                    {scene.render(t, uid)}
+                    {scene.render(t, uid, words)}
                 </svg>
                 <div className="rr-fig-bar">
-                    <span className="rr-fig-step" aria-hidden="true"><b>{n + 1}/{scene.steps.length}</b>{scene.steps[n][1]}</span>
-                    <button type="button" className="rr-fig-toggle" aria-label={`${paused ? 'Play' : 'Pause'} the animation`} onClick={() => setPaused((p) => !p)}>
+                    <span className="rr-fig-step" aria-hidden="true"><b>{n + 1}/{scene.steps.length}</b>{words.steps[n]}</span>
+                    <button type="button" className="rr-fig-toggle" aria-label={paused ? f.playAria : f.pauseAria} onClick={() => setPaused((p) => !p)}>
                         {paused
                             ? <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1 L9 5 L2 9 Z" fill="currentColor" /></svg>
                             : <svg viewBox="0 0 10 10" aria-hidden="true"><rect x="1.5" y="1" width="2.4" height="8" rx="0.6" fill="currentColor" /><rect x="6.1" y="1" width="2.4" height="8" rx="0.6" fill="currentColor" /></svg>}
-                        <span>{paused ? 'Play' : 'Pause'}</span>
+                        <span>{paused ? f.play : f.pause}</span>
                     </button>
                 </div>
             </div>

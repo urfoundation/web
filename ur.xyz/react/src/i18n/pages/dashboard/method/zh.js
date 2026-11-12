@@ -1,0 +1,38 @@
+// /dashboard's How we count tab in Simplified Chinese: the translation of en.js beside it (same keys).
+export default {
+    headings: {
+        usersPerEpoch: "每周期用户",
+        networksAndSignups: "网络与注册",
+        hourlyDataCarried: "每小时承载数据量",
+        countriesAndCities: "国家与城市",
+        change: "变化",
+        payoutEpochs: "支付周期",
+        operatorDeposits: "运营商存款",
+        periods: "时段",
+        sources: "数据来源",
+    },
+    defs: {
+        dataCarried: "网络为其用户传输的数据，按运营商的监测统计。大数字为过去 24 小时。其下显示所选时段的总量和日均值。以 Gb/秒为单位的平均值将其均匀分摊到整个时段。",
+        dailyUsers: "在 24 小时窗口内传输过数据的账户。托管代理及其背后的客户端计为一个账户。大数字为过去 24 小时，在页面打开时读取。所选时段的平均值显示在其下方，并在图表中以虚线表示。",
+        usersPerEpoch: "在一个周期（SN25 为期 7 天的支付周期）内传输过数据的账户，无论活跃多少天都只计一次。",
+        networksAndSignups: "一个网络就是一个账户。一个账户可以连接多台设备。注册数为该时段内新建的网络。",
+        whenTrafficFlows: "所选时段的平均一天，按本地时间逐小时显示。逐小时的分布形态取自吞吐量，并经过缩放，使 24 小时相加等于平均一天的承载数据量。",
+        hourlyDataCarried: "在“{d1}”和“{d3}”视图中，过去 24 小时及其之前的 48 小时都是实测总量。每小时按该小时吞吐量的比例分得其总量中的份额。",
+        runningTotal: "承载数据量从我们的统计保存的第一天起逐日累加。",
+        providersOnline: "共享连接的设备。大数字为当前在线数。其下显示所选时段的平均值和最高点，平均值也在图表中以虚线表示。",
+        countriesAndCities: "显示的是提供者所在的位置，绝不是用户所在的位置。位置按国家显示，不会单独显示任何提供者。",
+        change: "当前数值与时段开始时数值的对比。如果我们的统计无法追溯那么久，则不显示变化。",
+        payoutEpochs: "SN25 每 7 天（50,400 个区块）结算一次支付。每周期的用户和承载数据量使用相同的边界。",
+        earned: "提供者在已结束的周期和仍在进行的当前周期中，从子网的矿工发行获得的 Alpha。在确认已支付之前显示为待支付；提供者自行领取。支付时间表见 {link}。周期 0 和 1 为测试期，当时提供者仍以 USDC 获得报酬。",
+        operatorDeposits: "网络运营商为其使用的流量向 SN25 支付的 Alpha。",
+        reserve: "由多签（2/3）持有的钱包，通过其拥有的两个 hotkey 接收 SN25 提供者发行的一部分，并为网络容量提供资金。",
+        throughput: "每秒通过网络传输的数据，按路由中的每一跳计数，因此高于承载数据量。",
+    },
+    periods: "“{d1}”和“{d3}”截止于最近一个完整小时，分别以 1 小时和 6 小时为步长。“{d7}”、“{d30}”和“{d90}”使用完整的 UTC 日，截止于最近一个完整日。每个变化都与其之前相同长度的时段比较。标为“当前”的数字为实时数据，不随时段变化。时间均为本地时间。",
+    sources: {
+        chainName: "Bittensor 主网",
+        grafana: "网络与提供者数据，来自 BringYour 的监测，包含 90 天历史",
+        chain: "支付周期、储备及其 hotkey，通过 Bittensor 的公共节点读取",
+        note: "每次打开页面时都会从这些来源读取数据（上次读取：{time}）。网站会保存每天总量的副本，因此图表可以追溯到比 Grafana 的 90 天更早的时间。",
+    },
+};

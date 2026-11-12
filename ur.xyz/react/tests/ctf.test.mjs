@@ -12,7 +12,11 @@
 // 100% at five entries or fewer; no "wins by default" and no chance without a
 // draw last epoch) and for what the seo-audit and search need: titles of at
 // most 60 graphemes and descriptions of at most 175 characters, all unique,
-// and a static render that is the same for the same data.
+// and a static render that is the same for the same data. Which country pages
+// are indexed (src/components/pages/ctf/indexing.js) is checked on pages in
+// miniature: a page that reads like another but for the country's name, with
+// no local note, is noindex, both as the build decides it and as the seo-audit
+// checks the built pages.
 //
 // Usage: node --test tests/ctf.test.mjs   (no network)
 import assert from 'node:assert/strict';
@@ -48,10 +52,15 @@ import {
     roleLine,
     staticSeed,
     uninhabitedSentence,
+    localModel,
     winEstimate,
 } from '../src/components/pages/ctf/model.js';
+import { PLACEHOLDER_CODE, countryIndexing, countryIndexingProblems, ownContent, placeholderModel } from '../src/components/pages/ctf/indexing.js';
 import { CTF_LOCAL_NOTES } from '../src/data/ctf-local-notes.js';
-import { ctfOgImage } from '../src/components/pages/ctf/og.js';
+import { ctfCardAlt, ctfOgImage } from '../src/components/pages/ctf/og.js';
+import { ctfNames, formats } from '../src/components/pages/ctf/i18n.js';
+import { ctaLink, pagePath } from '../src/components/pages/ctf/links.js';
+import group from '../src/i18n/pages/ctf/group.js';
 import { buildPath, parseRoute } from '../src/router.js';
 import { SLOT, SNAPSHOT, amount, drawnAnswer, firstAnswer } from './ctf-fixtures.mjs';
 
@@ -59,6 +68,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const graphemes = (s) => [...new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(s)].length;
 const DAY = '2026-12-04';
+const LANGS = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
 
 // every phase the pages render: the committed snapshot and the import of each kind of answer
 const PHASES = {
@@ -269,6 +279,11 @@ test('local notes, when written, are dated and reviewed for one of the 249', () 
         assert.ok(codes.has(code), code);
         assert.match(note.reviewed, /^\d{4}-\d{2}-\d{2}$/, code);
         assert.ok(typeof note.text === 'string' && note.text.length > 40, code);
+        // its translations, under the site languages' codes
+        for (const [key, value] of Object.entries(note)) {
+            if (key === 'reviewed' || key === 'text') continue;
+            assert.ok(LANGS.includes(key) && key !== 'en' && typeof value === 'string' && value.length > 40, `${code}.${key}`);
+        }
     }
 });
 
@@ -369,10 +384,12 @@ test('the routes: /ctf and a page per country', () => {
     assert.deepEqual(parseRoute('/ctf'), { name: 'ctf', slug: null });
     assert.deepEqual(parseRoute('/ctf/ke'), { name: 'ctf', slug: 'ke' });
     assert.deepEqual(parseRoute('/de/ctf/ke'), { name: 'ctf', slug: 'ke' });
-    assert.equal(buildPath({ name: 'ctf', slug: 'ke' }, 'de'), '/ctf/ke');
+    // the translations are routes of their own once the group is localized (react/src/i18n/pages/ctf/group.js)
+    assert.equal(buildPath({ name: 'ctf', slug: 'ke' }, 'de'), group.localized ? '/de/ctf/ke' : '/ctf/ke');
     assert.equal(buildPath({ name: 'ctf', slug: null }, 'en'), '/ctf');
-    const pages = fs.readdirSync(path.join(ROOT, 'astro/src/pages/ctf'));
-    assert.deepEqual(pages, ['[cc].astro']);
+    assert.deepEqual(fs.readdirSync(path.join(ROOT, 'astro/src/pages/ctf')), ['[cc].astro']);
+    assert.deepEqual(fs.readdirSync(path.join(ROOT, 'astro/src/pages/[lang]/ctf')), ['[cc].astro']);
+    assert.ok(fs.existsSync(path.join(ROOT, 'astro/src/pages/[lang]/ctf.astro')));
 });
 
 test('every country has its flag, with flag-icons\' licence, and the snapshot its social card', () => {
@@ -382,8 +399,238 @@ test('every country has its flag, with flag-icons\' licence, and the snapshot it
         assert.equal(files.size, 250, `${dir}: 249 flags and the licence`);
         assert.match(fs.readFileSync(path.join(ROOT, dir, 'LICENSE.txt'), 'utf8'), /flag-icons 7\.6\.0[\s\S]*The MIT License/);
     }
-    const card = ctfOgImage(MODELS.committed);
+    // a card per language, the English one named as it always was
+    const cards = LANGS.map((lang) => path.basename(ctfOgImage(localModel(MODELS.committed, lang))));
+    assert.equal(new Set(cards).size, LANGS.length, 'each language has a card of its own');
     for (const dir of ['react/public', 'astro/public']) {
-        assert.deepEqual(fs.readdirSync(path.join(ROOT, dir, 'ctf/og')), [path.basename(card)], `${dir}${card}: run node scripts/generate-og.mjs --ctf`);
+        assert.deepEqual(fs.readdirSync(path.join(ROOT, dir, 'ctf/og')).sort(), [...cards].sort(), `${dir}/ctf/og: run node scripts/generate-og.mjs --ctf`);
     }
+    for (const lang of LANGS) {
+        const alt = ctfCardAlt(localModel(MODELS.committed, lang));
+        assert.ok(alt.includes(String(MODELS.committed.firstEpoch)) && !/\{[A-Za-z]/.test(alt), `${lang}: ${alt}`);
+    }
+});
+
+
+test('the pages in another language: its names, its A–Z, its figures, the same data', () => {
+    const m = MODELS.drawn;
+    for (const lang of LANGS.slice(1)) {
+        const lm = localModel(m, lang);
+        const names = ctfNames(lang);
+        assert.equal(localModel(m, lang), lm, 'one model per language');
+        assert.equal(lm.lang, lang);
+        assert.deepEqual(lm.az.map((c) => c.code), names.order.split(' '), `${lang}: the A–Z is the names file's`);
+        for (const c of lm.countries) {
+            const en = m.byCode.get(c.code);
+            assert.equal(c.name, names.name[c.code]);
+            assert.equal(c.in, names.in[c.code]);
+            // the figures are the English model's
+            assert.deepEqual([c.p, c.x, c.pots, c.avail, c.online, c.big, c.hot, c.flagHeld], [en.p, en.x, en.pots, en.avail, en.online, en.big, en.hot, en.flagHeld], `${lang} ${c.code}`);
+        }
+        // the search and the picker know the language's names and the English ones
+        const ke = lm.byCode.get('ke');
+        assert.deepEqual(gridCountries(lm, { q: ke.name }).map((c) => c.code).includes('ke'), true, `${lang}: ${ke.name}`);
+        assert.equal(findCountry(lm, ke.name)?.code, 'ke', `${lang}: ${ke.name}`);
+        assert.equal(findCountry(lm, 'Kenya')?.code, 'ke', `${lang}: the English name`);
+        assert.equal(findCountry(lm, 'KE')?.code, 'ke');
+        // the same countries in every grid, in the language's A–Z among pots within 0.1 α
+        const buckets = (rows) => rows.map((c) => Math.round(c.pots / 1e8));
+        assert.deepEqual(buckets(gridCountries(lm, { sort: 'pot' })), buckets(gridCountries(m, { sort: 'pot' })));
+        assert.deepEqual(easyWins(lm, 7).map((c) => c.code).sort(), easyWins(m, 7).map((c) => c.code).sort());
+    }
+    assert.equal(localModel(m, 'en'), m, 'English is the model itself');
+    // Arabic's vowel marks and hamza seats fold away in the search
+    const ar = localModel(m, 'ar');
+    assert.equal(findCountry(ar, 'عمان')?.code, 'om', 'عُمان without its damma');
+    assert.equal(findCountry(ar, 'المانيا')?.code, 'de', 'ألمانيا without its hamza');
+});
+
+test('figures and days in each language\'s format, rounded as in English', () => {
+    const cases = {
+        en: ['12.97', '1,234', '2.6%', '83%', 'Nov 27, 18:25 UTC', 'November 27, 2026', '16d 03h'],
+        ru: ['12,97', '1\u00a0234', '2,6\u00a0%', '83\u00a0%', '27 нояб., 18:25 UTC', '27 ноября 2026 года', '16 д 03 ч'],
+        de: ['12,97', '1.234', '2,6\u00a0%', '83\u00a0%', '27. Nov., 18:25 UTC', '27. November 2026', '16 T 03 h'],
+        es: ['12,97', '1234', '2,6\u00a0%', '83\u00a0%', '27 nov, 18:25 UTC', '27 de noviembre de 2026', '16 d 03 h'],
+        zh: ['12.97', '1,234', '2.6%', '83%', '11月27日 18:25 UTC', '2026年11月27日', '16天03小时'],
+    };
+    for (const [lang, want] of Object.entries(cases)) {
+        const f = formats(lang);
+        const got = [f.alpha(12_970_000_000), f.int(1234), f.pct(chanceOf(189)), f.pct(chanceOf(5)), f.utcTime('2026-11-27T18:25:24Z'), f.utcDay('2026-11-27T18:25:24Z'), f.countdown(16 * 86_400_000 + 3 * 3_600_000 + 120_000)];
+        assert.deepEqual(got, want, lang);
+    }
+    // Arabic keeps Western digits
+    const ar = formats('ar');
+    assert.match(ar.alpha(12_970_000_000), /^12\.97$/);
+    assert.match(ar.pct(chanceOf(5)), /^83\u200e?%\u200e?$/);
+    // the chance rounds the same digits in every language
+    for (const units of [5, 9, 99, 188, 30630]) {
+        const digits = (s) => s.replace(/[^\d]/g, '');
+        const en = digits(formats('en').pct(chanceOf(units)));
+        for (const lang of ['ru', 'ar', 'zh', 'de', 'es']) assert.equal(digits(formats(lang).pct(chanceOf(units))), en, `${lang} ${units}`);
+    }
+});
+
+test('a page links to the pages in its language where they are translated', () => {
+    assert.equal(pagePath('en', '/ctf/ke'), '/ctf/ke');
+    assert.equal(pagePath('ru', '/ctf/ke'), group.localized ? '/ru/ctf/ke' : '/ctf/ke');
+    assert.equal(pagePath('ar', '/ctf'), group.localized ? '/ar/ctf' : '/ctf');
+    assert.equal(ctaLink('de', 'start'), 'https://ur.io');
+    assert.match(ctaLink('de', 'x'), /^(\/de)?\/docs\/miner\/extender$/);
+    assert.equal(ctaLink('en', 'x'), '/docs/miner/extender');
+});
+
+// A country page's <main> in miniature, as CtfCountry.jsx renders one from a model: its names in the trail, the
+// heading, the card and the questions, escaped as React escapes them; what it says of its own country (the
+// territory sentence, its dashboard count and its pots, as the page prints them); a line of the copy (`copy`); its
+// local note if it has one; the day it last changed; and its other big pots and neighbours, which are about other
+// countries, with a section inside a section. React's marker between two texts is in it unless `markers` is false.
+// `drop` leaves its figures out in the languages it names. The decision renders the page of the placeholder code in
+// the placeholder model (ctf/indexing.js), so `render` reads the country from `model`, as the component does.
+const esc = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+function countryMain(m, code, { copy = '', day = DAY, markers = true, drop = [] } = {}) {
+    const c = m.byCode.get(code);
+    const f = formats(m.lang);
+    const { prev, next } = neighbours(m, code);
+    const figures = drop.includes(m.lang) ? '' : [
+        c.online === null ? '' : `${f.int(c.online)} providers online.`,
+        `Pots: ${f.alpha(c.p.pot)} α and ${f.alpha(c.x.pot)} α.`,
+    ].join(' ');
+    const said = [uninhabitedSentence(c, m.lang), figures, copy].filter(Boolean).join(' ');
+    const note = c.note ? `<br/><br/>Local note, reviewed <time dateTime="${c.note.reviewed}">${c.note.reviewed}</time>: ${esc(c.note[m.lang] || c.note.text)}` : '';
+    return [
+        '<div class="ctf-page"><div class="ctf-shell"><header class="ctf-hdr">',
+        `<nav class="ctf-crumbs" aria-label="Breadcrumb"><a href="/ctf">Capture the flag</a><span aria-hidden="true">›</span><span aria-current="page">${esc(c.short)}</span></nav>`,
+        `<h1>Earn crypto in ${esc(c.the)} with your internet connection</h1>`,
+        `<p class="ctf-intro">${esc(c.The)} has five provider slots and five extender slots each epoch${markers ? '<!-- -->' : ''}. ${esc(said)}</p></header>`,
+        `<section class="ctf-mine"><h2 id="ctf-mine-h" class="ctf-me-name">${esc(c.name)}</h2><img src="/ctf/flags/${c.code}.svg" alt=""/><a class="ctf-btn ctf-btn-p" href="https://ur.io">Start mining in ${esc(c.the)}</a></section>`,
+        `<section class="ctf-sec ctf-feat-sec" data-ctf-elsewhere=""><h2>Other big pots this epoch</h2><div class="ctf-feat"><article><section><h3><a href="/ctf/${next.code}">${esc(next.name)}</a></h3></section><b>${esc(next.name)} in pots</b></article></div></section>`,
+        `<nav class="ctf-sec ctf-around" aria-label="More countries" data-ctf-elsewhere=""><a href="/ctf/${prev.code}" rel="prev">${esc(prev.name)}</a><a href="/ctf">All 249 countries</a><a href="/ctf/${next.code}" rel="next">${esc(next.name)}</a></nav>`,
+        `<section id="faq"><details open=""><summary>How do I get paid?</summary><p>Local law in ${esc(c.the)} applies.${note}`,
+        `</p></details></section><footer class="ctf-foot"><p>Updated <time dateTime="${day}">${day}</time>.</p></footer></div></div>`,
+    ].join('');
+}
+const renderWith = (options = {}) => ({ code, model }) => countryMain(model, code, options);
+// a model with some countries' data or notes changed, as a snapshot or a note file would change them
+function withCountries(m, changes) {
+    const countries = m.countries.map((c) => (changes[c.code] ? { ...c, ...changes[c.code] } : c));
+    const byCode = new Map(countries.map((c) => [c.code, c]));
+    return { ...m, countries, byCode, az: m.az.map((c) => byCode.get(c.code)) };
+}
+const pots = (p, x = 0) => ({ p: { ...MODELS.first.byCode.get('ke').p, pot: p }, x: { ...MODELS.first.byCode.get('ke').x, pot: x } });
+
+test('the decision reads a page with its country as a placeholder, leaving out other countries and the days it states', () => {
+    // countries whose figures are the same (before the first draw, with no dashboard counts)
+    const m = MODELS.first;
+    const own = (code, options = {}) => ownContent(countryMain(placeholderModel(m, code), PLACEHOLDER_CODE, options));
+    const ke = own('ke');
+    // its neighbours, its other big pots and the day it last changed are no content of its own
+    assert.equal(own('li', { day: '2026-12-04' }), ke, 'Liechtenstein\'s page reads like Kenya\'s but for the name');
+    assert.equal(own('ke', { markers: false }), ke, 'React\'s markers between texts are nothing, so every render reads alike');
+    for (const elsewhere of [...Object.values(neighbours(m, 'ke')).map((c) => c.name), 'Other big pots', 'All 249 countries', DAY, 'Kenya']) {
+        assert.ok(!ke.includes(elsewhere), elsewhere);
+    }
+    assert.match(ke, /^Capture the flag › ⟨country⟩ Earn crypto in ⟨country⟩ with your internet connection ⟨country⟩ has five provider slots and five extender slots each epoch\. /);
+    // every form of a name, whatever its length or escaping, is the one placeholder
+    for (const code of ['cd', 'ci', 'us', 'bs']) assert.equal(own(code), ke, code);
+    // the placeholder model is the model but for the one country, which keeps its data
+    const pm = placeholderModel(m, 'ke');
+    assert.equal(pm.byCode.get('ke'), undefined);
+    assert.equal(pm.byCode.get(PLACEHOLDER_CODE).p, m.byCode.get('ke').p);
+    assert.equal(pm.byCode.get('li'), m.byCode.get('li'));
+    assert.equal(pm.countries.length, 249);
+    // in a translation, its forms in that language too ("в Кении", "na Науру")
+    const ru = localModel(m, 'ru');
+    assert.equal(ownContent(countryMain(placeholderModel(ru, 'ke'), PLACEHOLDER_CODE)), ownContent(countryMain(placeholderModel(ru, 'nr'), PLACEHOLDER_CODE)));
+});
+
+test('the build indexes a country page unless it reads like another but for the name', () => {
+    const m = withCountries(MODELS.first, { us: { online: 30000 }, de: { online: 400 }, fr: { online: 400 } });
+    const { decided, byLang, disagreements } = countryIndexing(m, renderWith(), ['en']);
+    assert.deepEqual(disagreements, []);
+    assert.deepEqual([...decided.keys()], m.countries.map((c) => c.code), 'every country, in the model\'s order');
+    assert.deepEqual(decided.get('us'), { noindex: false, alike: [] }, 'a page of its own');
+    assert.deepEqual(decided.get('de'), { noindex: true, alike: ['fr'] }, 'two pages with the same figures');
+    assert.equal(decided.get('ke').noindex, true);
+    assert.equal(decided.get('ke').alike.length, 249 - 7 - 3 - 1, 'the inhabited countries with nothing of their own');
+    assert.deepEqual(decided.get('aq').alike, ['bv', 'gs', 'hm', 'io', 'tf', 'um'], 'the territories without people read alike');
+    assert.deepEqual(byLang.get('en').groups.map((g) => g.length).sort((a, b) => a - b), [2, 7, 249 - 7 - 3]);
+    // nothing of its own anywhere: every page reads like another
+    assert.ok([...countryIndexing(MODELS.first, renderWith(), ['en']).decided.values()].every((d) => d.noindex));
+});
+
+test('a word of the copy that is a country\'s code reads the same on every page (review finding 4a)', () => {
+    // Anguilla (AI) and Italy (IT) with the same figures, under copy that says "AI" and "IT": masking a page's own
+    // code in its text made each read apart from the other, so both were indexed
+    const m = withCountries(MODELS.first, { ai: { online: 5 }, it: { online: 5 }, no: { online: 9 }, pm: { online: 9 } });
+    const copy = 'AI agents and IT teams can use it too. NO, PM and US are words here.';
+    const { decided } = countryIndexing(m, renderWith({ copy }), ['en']);
+    assert.deepEqual(decided.get('ai'), { noindex: true, alike: ['it'] });
+    assert.deepEqual(decided.get('it'), { noindex: true, alike: ['ai'] });
+    assert.deepEqual(decided.get('no'), { noindex: true, alike: ['pm'] });
+    // the copy's words stay as they are, on every page
+    const own = ownContent(countryMain(placeholderModel(m, 'ai'), PLACEHOLDER_CODE, { copy }));
+    assert.ok(own.includes('AI agents and IT teams can use it too. NO, PM and US are words here.'), own);
+});
+
+test('a local note sets its page apart by what it says, never by the name in it (review finding 4b)', () => {
+    const note = (text, extra = {}) => ({ reviewed: '2026-12-01', text, ...extra });
+    // a note of its own: indexable, and the others read alike as before
+    const own = countryIndexing(withCountries(MODELS.first, { ke: { note: note('Winnings can be cashed out to M-Pesa through an exchange that lists alpha.') } }), renderWith(), ['en']).decided;
+    assert.deepEqual(own.get('ke'), { noindex: false, alike: [] });
+    assert.equal(own.get('li').noindex, true);
+    // two notes that differ by the name alone, in English and in German: both noindex, each like the other
+    const alike = withCountries(MODELS.first, {
+        ke: { note: note('Winnings can be cashed out in Kenya through an exchange that lists alpha.', { de: 'In Kenia lassen sich Gewinne über eine Börse auszahlen, die Alpha listet.' }) },
+        li: { note: note('Winnings can be cashed out in Liechtenstein through an exchange that lists alpha.', { de: 'In Liechtenstein lassen sich Gewinne über eine Börse auszahlen, die Alpha listet.' }) },
+    });
+    const both = countryIndexing(alike, renderWith(), ['en', 'de']);
+    assert.deepEqual(both.disagreements, []);
+    assert.deepEqual(both.decided.get('ke'), { noindex: true, alike: ['li'] });
+    assert.deepEqual(both.byLang.get('de').decided.get('li'), { noindex: true, alike: ['ke'] });
+    // the note's words, each name of its country (its "in <country>" forms first) the placeholder, are what the decision reads
+    const read = (lm, code, key) => placeholderModel(lm, code).byCode.get(PLACEHOLDER_CODE).note[key];
+    assert.equal(read(alike, 'ke', 'text'), 'Winnings can be cashed out ⟨country⟩ through an exchange that lists alpha.');
+    assert.equal(read(alike, 'li', 'text'), read(alike, 'ke', 'text'));
+    assert.equal(read(localModel(alike, 'de'), 'ke', 'de'), '⟨country⟩ lassen sich Gewinne über eine Börse auszahlen, die Alpha listet.');
+    assert.equal(read(localModel(alike, 'de'), 'li', 'de'), read(localModel(alike, 'de'), 'ke', 'de'));
+});
+
+test('every language noindexes the same country pages', () => {
+    const m = withCountries(MODELS.first, { us: { online: 30000 }, de: { online: 400 }, fr: { online: 400 } });
+    const all = countryIndexing(m, renderWith(), LANGS);
+    assert.deepEqual(all.disagreements, []);
+    for (const lang of LANGS) {
+        assert.deepEqual([...all.byLang.get(lang).decided].filter(([, d]) => d.noindex).map(([code]) => code), [...all.decided].filter(([, d]) => d.noindex).map(([code]) => code), lang);
+    }
+    // a translation that leaves out the figures reads alike where the English does not: the languages disagree
+    const dropped = countryIndexing(m, renderWith({ drop: ['de'] }), LANGS);
+    assert.equal(dropped.disagreements.length, 1);
+    assert.match(dropped.disagreements[0], /^de would noindex \/de\/ctf\/us, unlike en$/);
+});
+
+test('the seo-audit holds the built pages to the decision, and reads the figures as the pages print them (review finding 3)', () => {
+    const m = withCountries(MODELS.first, { us: { online: 30000 }, de: { online: 400 }, fr: { online: 400 } });
+    const decision = countryIndexing(m, renderWith(), ['en', 'ru']);
+    const built = (changed = {}) => ['en', 'ru'].flatMap((lang) => m.countries.map((c) => ({ lang, code: c.code, noindex: decision.decided.get(c.code).noindex, ...changed[`${lang} ${c.code}`] })));
+    assert.deepEqual(countryIndexingProblems(m, decision, built()), []);
+    // a page indexed against the decision, in any language, and one noindexed
+    assert.deepEqual(countryIndexingProblems(m, decision, built({ 'ru ke': { noindex: false }, 'en us': { noindex: true } })), [
+        '/ctf/us: noindex, though it reads like no other country page',
+        '/ru/ctf/ke: indexable, though it reads like /ru/ctf/ad, /ru/ctf/ae, /ru/ctf/af and 235 more but for the country\'s name, so it must be noindex',
+    ]);
+    assert.deepEqual(countryIndexingProblems(m, decision, [...built(), { lang: 'en', code: 'xk', noindex: false }]).slice(-1), ['/ctf/xk: no such country in the snapshot']);
+    // pots a page prints alike are alike: 0.001 α and 0.004 α are both "0.00", so two pages reading alike are fine
+    const close = withCountries(MODELS.first, { ke: { online: 7, ...pots(1_000_000) }, li: { online: 7, ...pots(4_000_000) } });
+    const closeDecision = countryIndexing(close, renderWith(), ['en']);
+    assert.deepEqual(closeDecision.decided.get('ke'), { noindex: true, alike: ['li'] });
+    assert.deepEqual(countryIndexingProblems(close, closeDecision, close.countries.map((c) => ({ lang: 'en', code: c.code, noindex: closeDecision.decided.get(c.code).noindex }))), []);
+    // pots that print apart set the pages apart
+    const apart = countryIndexing(withCountries(MODELS.first, { ke: { online: 7, ...pots(1_000_000) }, li: { online: 7, ...pots(10_000_000) } }), renderWith(), ['en']);
+    assert.equal(apart.decided.get('ke').noindex, false);
+    // a page that leaves out its own figures: pages whose pots print apart read alike
+    const hidden = withCountries(MODELS.first, { ke: { online: 7, ...pots(1e9) }, li: { online: 7, ...pots(2e9) } });
+    const hiddenDecision = countryIndexing(hidden, renderWith({ drop: ['en'] }), ['en']);
+    const problems = countryIndexingProblems(hidden, hiddenDecision, hidden.countries.map((c) => ({ lang: 'en', code: c.code, noindex: hiddenDecision.decided.get(c.code).noindex })));
+    assert.equal(problems.length, 1);
+    assert.match(problems[0], /^\/ctf\/ad, \/ctf\/ae, \/ctf\/af and \d+ more: read the same but for the country's name, though the figures they print differ \(a page leaves out its own figures\)$/);
 });

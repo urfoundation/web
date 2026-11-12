@@ -21,7 +21,15 @@ export default {
         browseDocs:   'Документация',
         search:       'Поиск',
         ctaAria:    'Стоимость — текущая цена сети',
-        denomAria:  'Валюта отображения цены'
+        denomAria:  'Валюта отображения цены',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'О проекте',
+        build:       'Разработка',
+        investors:   'Инвесторам',
+        dashboard:   'Дашборд',
+        liveDashboard: 'Дашборд онлайн',
+        ctf:         'Захват флага'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'Подсеть UR в Telegram',
         socialDiscord:  'Discord URnetwork',
         socialGithub:   'Подсеть UR на GitHub',
-        productsAria:   'Продукты URnetwork на ur.io'
+        productsAria:   'Продукты URnetwork на ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'Создавайте на UR',
+        reserve:       'Резерв',
+        mainnet:       'Основная сеть',
+        investorCentre:  'Центр для инвесторов'
     },
 
     disclaimer: {
@@ -261,14 +274,17 @@ operators: {
             date: '24 августа – 24 октября 2026 г.',
             title: 'Исследовательский отчёт за август–октябрь 2026 года',
             body: 'Цель исследований — дать каждому лучшее шифрование и лучшую скорость в повседневном использовании, которые делают ваш интернет лучше. Отчёт показывает на одной временной шкале 39 измеренных изменений на этом пути, насколько далеко продвинулся каждый вид улучшений и как проводились исследования.',
-            cta: 'Читать отчёт (на английском)'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'Читать отчёт',
+            ctaEnglish: 'Читать отчёт (на английском)'
         },
         methodology: {
             tag: 'Методология',
             topic: 'Три исследовательских цикла',
             title: 'Самосовершенствующиеся исследовательские циклы',
             body: 'Как лаборатория, открытый конкурс и волонтёрские полевые узлы улучшают сеть, а заодно и то, как измеряется следующий раунд. У всех трёх одна дисциплина: зафиксированная базовая линия, измеренный шум и каждая попытка в журнале.',
-            cta: 'Читать методологию (на английском)',
+            cta: 'Читать методологию',
+            ctaEnglish: 'Читать методологию (на английском)',
             loops: [
                 { name: 'Лаборатория', detail: 'PERFVAR · каждое изменение' },
                 { name: 'Конкурс', detail: 'Apex SN1 · еженедельно' },

@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { CTF } from './data';
 import {
-    alpha,
-    dayName,
     easyWins,
     gridCountries,
+    localModel,
     neutralCountry,
     showsFor,
     sortsFor,
     staticSeed,
 } from './model';
+import { ctfCopy, formats } from './i18n';
+import { BOLD, rich } from './rich';
 import {
     CountryCard,
     CountryPicker,
@@ -28,18 +29,19 @@ import {
 } from './parts';
 
 /**
- * Board — the hub's island (ur.xyz/ctf): the live bar with its stats filters,
- * the visitor's country, Easy wins and the grid of the 249 countries, from
- * design.html.
+ * Board — the hub's island (ur.xyz/ctf, and /<lang>/ctf in `lang`): the live
+ * bar with its stats filters, the visitor's country, Easy wins and the grid
+ * of the 249 countries, from design.html.
  *
  *  - The stats filters (Flags held; not fully captured, providers or
  *    extenders) show only their countries, directly under the bar: the other
  *    sections animate out and the matching cells move up (a view transition),
  *    and tapping the filter again, or "Show all 249", reverses it. ?focus=held,
  *    np or nx opens the hub filtered (a country page's live bar links there).
- *  - The grid sorts A–Z (the default), by biggest pot or by easiest wins, shows
- *    all, the big pots or the flags held, and finds a country by name or code.
- *    Before the first draw it sorts by the providers online instead.
+ *  - The grid sorts A–Z (the default, in the language's A–Z), by biggest pot
+ *    or by easiest wins, shows all, the big pots or the flags held, and finds
+ *    a country by name (in the language or English) or code. Before the first
+ *    draw it sorts by the providers online instead.
  *  - Easy wins is drawn again on each visit and with Shuffle; the static page's
  *    draw is the epoch's, so a build of the same data renders the same page.
  *  - The card starts on the biggest open pot (or no country before a draw) and
@@ -50,7 +52,11 @@ import {
  * everything that depends on the visitor (the clock, the country, the draw)
  * comes after.
  */
-export default function Board({ m = CTF }) {
+export default function Board({ lang = 'en', m: model = CTF }) {
+    const m = useMemo(() => localModel(model, lang), [model, lang]);
+    const all = ctfCopy(m.lang);
+    const t = all.board;
+    const f = formats(m.lang);
     const [rootRef, transition] = useViewTransition();
     const now = useNow();
     const mounted = useMounted();
@@ -93,17 +99,17 @@ export default function Board({ m = CTF }) {
     const viewer = picked || here;
     const card = viewer ? m.byCode.get(viewer) : neutralCountry(m);
     const cardLabel = viewer
-        ? (picked ? 'Your choice' : 'Your country · from your connection')
-        : card ? 'Biggest open pot this epoch' : 'Ten slots in every country';
+        ? (picked ? all.card.choice : all.card.here)
+        : card ? all.card.biggest : all.card.ten;
 
     const sorts = sortsFor(m);
     const shows = showsFor(m);
-    const focusTitle = { held: `${m.totals.flagsHeld} flags held`, np: `${m.totals.openP} countries with providers not fully captured`, nx: `${m.totals.openX} countries with extenders not fully captured` }[focus];
-    const focusNote = {
-        held: 'Every provider slot and every extender slot was won last epoch. A newcomer needs the draw, and each cell shows the chance to win.',
-        np: 'At least one provider slot went unclaimed last epoch. A new provider who stays online there for half the epoch wins by default. Biggest pots first, provider and extender together, and A–Z among pots within 0.1 α.',
-        nx: 'At least one extender slot went unclaimed last epoch. A new extender who stays online there for half the epoch wins by default. Biggest pots first, provider and extender together, and A–Z among pots within 0.1 α.',
-    }[focus];
+    const focusTitle = {
+        held: () => f.count(t.focusHeld, m.totals.flagsHeld),
+        np: () => f.count(t.focusP, m.totals.openP),
+        nx: () => f.count(t.focusX, m.totals.openX),
+    }[focus]?.();
+    const focusNote = { held: t.noteHeld, np: t.noteP, nx: t.noteX }[focus];
 
     return (
         <div className="ctf-board" ref={rootRef}>
@@ -124,7 +130,7 @@ export default function Board({ m = CTF }) {
                 <EasyWinsSection
                     m={m}
                     picks={picks}
-                    title="Big pots waiting this epoch"
+                    title={all.easy.title}
                     mounted={mounted}
                     tips={tips}
                     expanded={featExpanded}
@@ -136,21 +142,21 @@ export default function Board({ m = CTF }) {
             <section className={cx('ctf-gsec', focus && 'ctf-focused')} aria-labelledby="ctf-grid-h">
                 {!focus && (
                     <div className="ctf-ghead">
-                        <div className="ctf-sec-title"><div className="ctf-label">Every flag</div><h2 id="ctf-grid-h" className="ctf-h2">All 249 countries</h2></div>
+                        <div className="ctf-sec-title"><div className="ctf-label">{t.everyFlag}</div><h2 id="ctf-grid-h" className="ctf-h2">{t.all}</h2></div>
                         <div className="ctf-controls">
                             <div className="ctf-segs">
-                                <div className="ctf-seg" role="group" aria-label="Sort">
+                                <div className="ctf-seg" role="group" aria-label={t.sortAria}>
                                     {sorts.map(([key, label]) => <button key={key} type="button" aria-pressed={sort === key} disabled={!mounted} onClick={() => setSort(key)}>{label}</button>)}
                                 </div>
                                 {shows.length > 0 && (
-                                    <div className="ctf-seg" role="group" aria-label="Show">
+                                    <div className="ctf-seg" role="group" aria-label={t.showAria}>
                                         {shows.map(([key, label]) => <button key={key} type="button" aria-pressed={show === key} disabled={!mounted} onClick={() => setShow(key)}>{label}</button>)}
                                     </div>
                                 )}
                             </div>
                             <div className="ctf-find">
-                                <label htmlFor="ctf-q" className="ctf-label">Find</label>
-                                <input id="ctf-q" className="ctf-field ctf-search" type="search" placeholder="Country or code" disabled={!mounted} value={q} onChange={(event) => setQ(event.target.value)} />
+                                <label htmlFor="ctf-q" className="ctf-label">{t.find}</label>
+                                <input id="ctf-q" className="ctf-field ctf-search" type="search" placeholder={t.findPlaceholder} disabled={!mounted} value={q} onChange={(event) => setQ(event.target.value)} />
                             </div>
                         </div>
                         <Legend m={m} tips={tips} shown={cells.length} />
@@ -159,20 +165,20 @@ export default function Board({ m = CTF }) {
                 {focus && (
                     <div className="ctf-fbar">
                         <div className="ctf-sec-title">
-                            <div className="ctf-label ctf-label-acc">From the stats above</div>
+                            <div className="ctf-label ctf-label-acc">{t.from}</div>
                             <h2 id="ctf-grid-h" className="ctf-fbar-h">{focusTitle}</h2>
                             <p className="ctf-sub">{focusNote}</p>
                         </div>
-                        <button type="button" className="ctf-btn ctf-btn-s" onClick={() => onFocus(null)}>Show all 249</button>
+                        <button type="button" className="ctf-btn ctf-btn-s" onClick={() => onFocus(null)}>{t.showAll}</button>
                     </div>
                 )}
                 <div className={cx('ctf-grid', focus === 'np' && 'ctf-focus-p', focus === 'nx' && 'ctf-focus-x')}>
                     {cells.map((c, i) => {
-                        const t = cellTips(tips, c.code);
-                        return <GridCell key={c.code} m={m} c={c} i={i} mounted={mounted} tipApi={tips.api} tipHover={t.hover} tipFocus={t.focus} tipPin={t.pin} expanded={expanded === c.code} onExpand={onExpand} />;
+                        const ct = cellTips(tips, c.code);
+                        return <GridCell key={c.code} m={m} c={c} i={i} mounted={mounted} tipApi={tips.api} tipHover={ct.hover} tipFocus={ct.focus} tipPin={ct.pin} expanded={expanded === c.code} onExpand={onExpand} />;
                     })}
                 </div>
-                {cells.length === 0 && <p className="ctf-empty">No country matches “{q}”.</p>}
+                {cells.length === 0 && <p className="ctf-empty">{rich(t.empty, { q })}</p>}
             </section>
         </div>
     );
@@ -180,50 +186,55 @@ export default function Board({ m = CTF }) {
 
 /** The grid's key, as the data allows: the draw's marks after a draw, the slots and providers online before. */
 function Legend({ m, tips, shown }) {
+    const all = ctfCopy(m.lang);
+    const t = all.legend;
+    const f = formats(m.lang);
+    const shownLine = (node) => rich(f.form(node, shown), { count: f.int(shown) });
     if (!m.potsKnown) {
         return (
             <div className="ctf-legend">
-                <span className="ctf-li"><i className="ctf-pip" />a slot: five for providers (P) and five for extenders (E) in each country</span>
-                {m.presence && <span className="ctf-li">providers online: the network dashboard's count at the end of {dayName(m.presence.day)}, and the days of the last {m.presence.days} with any</span>}
-                <span className="ctf-shown">{shown} shown</span>
+                <span className="ctf-li"><i className="ctf-pip" />{t.slot}</span>
+                {m.presence && <span className="ctf-li">{rich(f.form(t.online, m.presence.days), { day: f.dayName(m.presence.day), count: f.int(m.presence.days) })}</span>}
+                <span className="ctf-shown">{shownLine(t.shown)}</span>
             </div>
         );
     }
     if (!m.drawn) {
         return (
             <div className="ctf-legend">
-                <span className="ctf-li">P providers, E extenders: each role's pot. Epoch {m.last.epoch} had no draw, so every slot carried.</span>
-                <span className="ctf-li"><span className="ctf-ribbon ctf-r-open">Big pot</span>{alpha(m.threshold)} α or more waiting</span>
-                <span className="ctf-shown">{shown} shown</span>
+                <span className="ctf-li">{rich(t.undrawn, { epoch: m.last.epoch })}</span>
+                <span className="ctf-li"><span className="ctf-ribbon ctf-r-open">{t.bigPot}</span>{rich(t.waiting, { amount: f.alpha(m.threshold) })}</span>
+                <span className="ctf-shown">{shownLine(t.shown)}</span>
             </div>
         );
     }
+    const cell = all.cell;
     return (
         <div className="ctf-legend">
-            <span className="ctf-li ctf-mob-only"><i className="ctf-m ctf-m-open">P</i><i className="ctf-m ctf-m-held">E</i>open slot, or fully captured · tap a country for its details</span>
-            <span className="ctf-li"><i className="ctf-pip ctf-p" />provider won</span>
-            <span className="ctf-li"><i className="ctf-pip ctf-x" />extender won</span>
-            <span className="ctf-li"><i className="ctf-pip" />slot open</span>
+            <span className="ctf-li ctf-mob-only"><i className="ctf-m ctf-m-open">{cell.letterP}</i><i className="ctf-m ctf-m-held">{cell.letterX}</i>{t.mobile}</span>
+            <span className="ctf-li"><i className="ctf-pip ctf-p" />{t.pWon}</span>
+            <span className="ctf-li"><i className="ctf-pip ctf-x" />{t.xWon}</span>
+            <span className="ctf-li"><i className="ctf-pip" />{t.slotOpen}</span>
             <span className="ctf-li">
-                <Tip tip={tipOf(tips, 'legend-open')} pop cls="ctf-chance ctf-win" text="Open" label="Not fully captured"
-                    body={<>A slot went unclaimed last epoch. A new provider or extender who stays online there for half the epoch <b>wins by default</b> and takes a fifth of the pot each epoch. Hover any Open chip for its role and amount.</>}
-                    cta="Start mining" />
-                {' '}not fully captured, a newcomer wins by default
+                <Tip m={m} tip={tipOf(tips, 'legend-open')} pop cls="ctf-chance ctf-win" text={cell.open} label={t.openLabel}
+                    body={rich(t.openBody, {}, BOLD)}
+                    cta="start" />
+                {all.gap}{t.openTail}
             </span>
             <span className="ctf-li">
-                <Tip tip={tipOf(tips, 'legend-chance')} pop cls="ctf-chance ctf-ex" text="2.0%" label="Chance to win"
-                    body={<>Where all five of a role's slots were won, this is the estimated probability that you win that role's <b>epoch reward</b> if you launch a provider or an extender in the country and keep it online for half the epoch.</>}
-                    after="Entries are last epoch's eligible units in the role, plus you." cta="Start mining" />
-                {' '}chance to win where all five slots were won
+                <Tip m={m} tip={tipOf(tips, 'legend-chance')} pop cls="ctf-chance ctf-ex" text={f.pct(0.02)} label={t.chanceLabel}
+                    body={rich(t.chanceBody, {}, BOLD)}
+                    after={t.chanceAfter} cta="start" />
+                {all.gap}{t.chanceTail}
             </span>
             <span className="ctf-li">
-                <Tip tip={tipOf(tips, 'legend-near')} pop cls="ctf-ribbon ctf-r-hot" text="So close" label="Next step"
-                    body={<>Miners were in these countries but left before half the epoch. Run a provider or an extender there for half an epoch and you take <b>a fifth of the pot</b> each epoch you stay.</>}
-                    cta="Start mining" />
-                {' '}a big pot, and miners there fell short last epoch
+                <Tip m={m} tip={tipOf(tips, 'legend-near')} pop cls="ctf-ribbon ctf-r-hot" text={cell.soClose} label={all.next.label}
+                    body={rich(t.nearBody, {}, BOLD)}
+                    cta="start" />
+                {all.gap}{t.nearTail}
             </span>
-            <span className="ctf-li"><span className="ctf-ribbon ctf-r-open">Big pot</span>{alpha(m.threshold)} α or more waiting</span>
-            <span className="ctf-shown">{shown} shown · P providers, E extenders: last epoch's winners and each open role's pot</span>
+            <span className="ctf-li"><span className="ctf-ribbon ctf-r-open">{t.bigPot}</span>{rich(t.waiting, { amount: f.alpha(m.threshold) })}</span>
+            <span className="ctf-shown">{shownLine(t.shownDrawn)}</span>
         </div>
     );
 }

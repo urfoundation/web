@@ -5,14 +5,20 @@
  * no browser APIs, so the static render, the SPA and the node test
  * (tests/mainnet-timeline.test.mjs) share them. Dates are read and written in
  * UTC, so the visitor's time zone changes nothing on the page.
+ *
+ * Every word they write is the page's copy (i18n/pages/mainnet/<lang>.js):
+ * a function that writes takes that copy as `t`, and the page's language as
+ * `lang` where a count picks a plural form, and writes English without them.
  */
 
 import { SECONDS_PER_BLOCK } from '../../../data/mainnet.js';
+import EN from '../../../i18n/pages/mainnet/en.js';
+import { formatNumber, interpolate, plural } from '../../../i18n/format.js';
 
 // A milestone's status: done; in progress; scheduled, fixed by the chain, a
 // contract or a decision; or planned, intended but not final. Scheduled and
 // planned milestones are still ahead, and may move.
-export const STATUS_LABEL = Object.freeze({ done: 'Done', in_progress: 'In progress', scheduled: 'Scheduled', planned: 'Planned' });
+export const STATUS_LABEL = Object.freeze({ ...EN.labels.status });
 const AHEAD = new Set(['scheduled', 'planned']);
 
 /**
@@ -27,7 +33,7 @@ export function isApproximate(event, when = parseWhen(event?.date)) {
     return Boolean(when?.start.hasTime) && AHEAD.has(event?.status);
 }
 
-export const SETTLEMENT_LABEL = Object.freeze({ v1: 'Version 1', v2: 'Settlement v2' });
+export const SETTLEMENT_LABEL = Object.freeze({ ...EN.labels.settlement });
 export const SOURCE_KINDS = Object.freeze(['evm_tx', 'substrate_extrinsic', 'evm_address', 'evm_block', 'substrate_block', 'doc']);
 // the kinds that are transactions: the page folds more than a few of them away
 export const TRANSACTION_KINDS = Object.freeze(['evm_tx', 'substrate_extrinsic']);
@@ -47,6 +53,7 @@ export const REF_FORMATS = Object.freeze({
 });
 
 // the placeholders each explorer template carries, and the words of its link
+// (labels.view: View transaction, View contract, View block)
 export const EXPLORER_PLACEHOLDERS = Object.freeze({
     evm_tx: ['{hash}'],
     substrate_extrinsic: ['{block}', '{index}'],
@@ -54,12 +61,12 @@ export const EXPLORER_PLACEHOLDERS = Object.freeze({
     evm_block: ['{number}'],
     substrate_block: ['{number}'],
 });
-const ACTIONS = Object.freeze({
-    evm_tx: 'View transaction',
-    substrate_extrinsic: 'View transaction',
-    evm_address: 'View contract',
-    evm_block: 'View block',
-    substrate_block: 'View block',
+const VIEW = Object.freeze({
+    evm_tx: 'transaction',
+    substrate_extrinsic: 'transaction',
+    evm_address: 'contract',
+    evm_block: 'block',
+    substrate_block: 'block',
 });
 
 // The values a ref fills its template with. An extrinsic's id is built from
@@ -84,7 +91,7 @@ function fills(kind, ref) {
  * "View contract" (`value` is its address, which the page shows beside the
  * label) and a block as "View block"; a doc links its own URL under its label.
  */
-export function sourceLink(source, explorers) {
+export function sourceLink(source, explorers, t = EN) {
     const kind = source?.kind;
     const ref = typeof source?.ref === 'string' ? source.ref.trim() : '';
     if (!ref || !REF_FORMATS[kind]?.test(ref)) return null;
@@ -95,7 +102,7 @@ export function sourceLink(source, explorers) {
     const values = fills(kind, ref);
     if (!values) return null;
     const href = placeholders.reduce((url, p) => url.split(p).join(values[p]), template);
-    return { href, text: ACTIONS[kind], value: kind === 'evm_address' ? ref : null };
+    return { href, text: t.labels.view[VIEW[kind]], value: kind === 'evm_address' ? ref : null };
 }
 
 /**
@@ -104,8 +111,8 @@ export function sourceLink(source, explorers) {
  * than `fold` transactions, they go to `folded` instead (a closed list), so a
  * deployment's run of transactions does not bury its contracts.
  */
-export function sourceRows(sources, explorers, { fold = 3 } = {}) {
-    const linked = (sources || []).map((source) => ({ source, link: sourceLink(source, explorers) })).filter(({ link }) => link);
+export function sourceRows(sources, explorers, { fold = 3, t = EN } = {}) {
+    const linked = (sources || []).map((source) => ({ source, link: sourceLink(source, explorers, t) })).filter(({ link }) => link);
     const transactions = linked.filter(({ source }) => TRANSACTION_KINDS.includes(source.kind));
     if (transactions.length <= fold) return { rows: linked, folded: [] };
     return { rows: linked.filter((s) => !transactions.includes(s)), folded: transactions };
@@ -115,6 +122,23 @@ export function sourceRows(sources, explorers, { fold = 3 } = {}) {
 export function shortHex(value) {
     const text = String(value || '');
     return text.length > 14 ? `${text.slice(0, 6)}…${text.slice(-4)}` : text;
+}
+
+/**
+ * A template's runs, for React to render in place: 'Epoch {number}' with
+ * { number: 4 } is ['Epoch ', 4]. Each value goes in as given (a number, a
+ * string, an element), so a sentence keeps its words and its values in the
+ * language's own order. An unknown placeholder stays as written; an empty run
+ * is left out.
+ */
+export function runs(template, values = {}) {
+    return String(template)
+        .split(/(\{[A-Za-z][A-Za-z0-9_]*\})/)
+        .filter((part) => part !== '')
+        .map((part) => {
+            const name = /^\{([A-Za-z][A-Za-z0-9_]*)\}$/.exec(part)?.[1];
+            return name && Object.hasOwn(values, name) ? values[name] : part;
+        });
 }
 
 // ── dates ────────────────────────────────────────────────────────────────────
@@ -153,14 +177,18 @@ export function parseWhen(value) {
     return { start, end };
 }
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-export const MONTHS = Object.freeze(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
+// the short month names of English (dates.months)
+export const MONTHS = Object.freeze([...EN.dates.months]);
 const DAY_MS = 86400000;
 const pad = (n) => String(n).padStart(2, '0');
-const dayOf = (ms) => {
+
+/** A day as the timeline writes it (dates.day): Thu Oct 8, чт, 8 окт., 10月8日周四. */
+export function dayOf(ms, t = EN) {
     const d = new Date(ms);
-    return `${WEEKDAYS[d.getUTCDay()]} ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
-};
+    const { dates } = t;
+    return interpolate(dates.day, { weekday: dates.weekdays[d.getUTCDay()], month: dates.months[d.getUTCMonth()], date: d.getUTCDate() });
+}
+
 const clockOf = (ms) => {
     const d = new Date(ms);
     return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
@@ -169,7 +197,9 @@ const clockOf = (ms) => {
 /**
  * A date as the page writes it, in runs: { text } and { text, dateTime }, the
  * latter a <time>. `approxStart` / `approxEnd` mark a time ≈: a planned
- * milestone's, or an epoch boundary projected from its block number.
+ * milestone's, or an epoch boundary projected from its block number. `t` is
+ * the page's copy (its days, and the arrow that points on); times are UTC in
+ * every language.
  *
  *   Thu Oct 8 · 18:36 UTC                            a time
  *   Thu Oct 8 · 17:59–18:16 UTC                      an interval within a day
@@ -177,21 +207,21 @@ const clockOf = (ms) => {
  *   Sun Oct 11,  Sun Oct 18 – Mon Oct 19             days
  *   ≈ Sat Oct 17                                     an approximate day
  */
-export function whenParts({ start, end }, { approxStart = false, approxEnd = approxStart } = {}) {
+export function whenParts({ start, end }, { approxStart = false, approxEnd = approxStart, t = EN } = {}) {
     const mark = (on) => (on ? '≈' : '');
     if (!start.hasTime) {
-        const first = { text: dayOf(start.ms), dateTime: start.iso };
-        const days = end ? [first, { text: ' – ' }, { text: dayOf(end.ms), dateTime: end.iso }] : [first];
+        const first = { text: dayOf(start.ms, t), dateTime: start.iso };
+        const days = end ? [first, { text: ' – ' }, { text: dayOf(end.ms, t), dateTime: end.iso }] : [first];
         return approxStart ? [{ text: '≈ ' }, ...days] : days;
     }
-    const first = { text: `${dayOf(start.ms)} · ${mark(approxStart)}${clockOf(start.ms)}`, dateTime: start.iso };
+    const first = { text: `${dayOf(start.ms, t)} · ${mark(approxStart)}${clockOf(start.ms)}`, dateTime: start.iso };
     if (!end) return [first, { text: ' UTC' }];
     if (Math.floor(start.ms / DAY_MS) === Math.floor(end.ms / DAY_MS)) {
         // one ≈ covers a range within the day, as in ≈15:48–16:08
         const second = { text: `${approxStart ? '' : mark(approxEnd)}${clockOf(end.ms)}`, dateTime: end.iso };
         return [first, { text: '–' }, second, { text: ' UTC' }];
     }
-    return [first, { text: ' → ' }, { text: `${dayOf(end.ms)} · ${mark(approxEnd)}${clockOf(end.ms)}`, dateTime: end.iso }, { text: ' UTC' }];
+    return [first, { text: ` ${t.labels.arrow} ` }, { text: `${dayOf(end.ms, t)} · ${mark(approxEnd)}${clockOf(end.ms)}`, dateTime: end.iso }, { text: ' UTC' }];
 }
 
 /** The same date as plain text. */
@@ -201,18 +231,36 @@ export const whenText = (when, options) => whenParts(when, options).map((part) =
 
 export const thousands = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+/**
+ * The languages whose /mainnet figures are written as Intl writes them for the
+ * page, as their other pages write figures: Spanish (9.247.228, 1076,26), the
+ * owner's style decision of 2026-11-12, so /mainnet and /ctf read alike. Every
+ * other language keeps the English digits and separators (9,247,228).
+ */
+export const INTL_FIGURES = Object.freeze(['es']);
+
+/** A whole number as the page writes it: 9,247,228, or Intl's 9.247.228 in a language of INTL_FIGURES. */
+export const figure = (n, lang = 'en') => (INTL_FIGURES.includes(lang) ? formatNumber(Math.round(n), lang) : thousands(n));
+
 /** An epoch's start and end, as a milestone date (date-times). */
 export const epochWhen = (epoch) => parseWhen(`${epoch.start.time}/${epoch.end.time}`);
 
 /** The days an epoch runs, without times (the page's epoch list). */
 export const epochDays = (epoch) => parseWhen(`${epoch.start.time.slice(0, 10)}/${epoch.end.time.slice(0, 10)}`);
 
-/** "Blocks 9,247,228 → 9,297,628 · 50,400 blocks, 7 days" */
-export function epochBlocks(epoch) {
+/**
+ * "Blocks 9,247,228 → 9,297,628 · 50,400 blocks, 7 days". The figures keep
+ * their English digits and separators, but in a language of INTL_FIGURES
+ * (Spanish: "Bloques 9.247.228 → 9.297.628 · 50.400 bloques, 7 días"); the
+ * words and their plural forms are the language's (labels.epochBlocks, blocks,
+ * days, aboutDays).
+ */
+export function epochBlocks(epoch, { lang = 'en', t = EN } = {}) {
     const blocks = epoch.end.block - epoch.start.block;
     const days = (blocks * SECONDS_PER_BLOCK) / 86400;
-    const length = Number.isInteger(days) ? `${days} ${days === 1 ? 'day' : 'days'}` : `about ${Math.round(days)} days`;
-    return `Blocks ${thousands(epoch.start.block)} → ${thousands(epoch.end.block)} · ${thousands(blocks)} blocks, ${length}`;
+    const counted = (forms, n) => interpolate(plural(lang, n, forms), { count: figure(n, lang) });
+    const length = Number.isInteger(days) ? counted(t.labels.days, days) : counted(t.labels.aboutDays, Math.round(days));
+    return interpolate(t.labels.epochBlocks, { start: figure(epoch.start.block, lang), end: figure(epoch.end.block, lang), blocks: counted(t.labels.blocks, blocks), length });
 }
 
 /**
@@ -222,19 +270,20 @@ export function epochBlocks(epoch) {
  * a time counts from the start of its day (a daytime step on the day an epoch
  * turns belongs to the epoch that is ending). Returns the groups in order,
  * { id, title, epoch, summary, events: [{ ...event, when }] }, each keeping
- * the order the data lists its milestones in. A milestone whose date cannot be
- * read is left out; the test fails on it.
+ * the order the data lists its milestones in; `t` names them (labels.epoch,
+ * labels.afterEpoch, and labels.beforeLaunch where `before` has no title). A
+ * milestone whose date cannot be read is left out; the test fails on it.
  */
-export function groupByEpoch(events, epochs, { before = {}, after = {} } = {}) {
+export function groupByEpoch(events, epochs, { before = {}, after = {}, t = EN } = {}) {
     const bounds = epochs.map((epoch) => ({ epoch, startMs: Date.parse(epoch.start.time), endMs: Date.parse(epoch.end.time) }));
     const last = epochs[epochs.length - 1];
     const groupOf = (ms) => {
         if (!bounds.length || ms < bounds[0].startMs) {
-            return { id: 'before-launch', title: before.title || 'Before launch', epoch: null, summary: before.summary || null };
+            return { id: 'before-launch', title: before.title || t.labels.beforeLaunch, epoch: null, summary: before.summary || null };
         }
         const hit = bounds.find((b) => ms >= b.startMs && ms < b.endMs);
-        if (hit) return { id: `epoch-${hit.epoch.number}`, title: `Epoch ${hit.epoch.number}`, epoch: hit.epoch, summary: hit.epoch.summary };
-        return { id: `after-epoch-${last.number}`, title: `After epoch ${last.number}`, epoch: null, summary: after.summary || null };
+        if (hit) return { id: `epoch-${hit.epoch.number}`, title: interpolate(t.labels.epoch, { number: hit.epoch.number }), epoch: hit.epoch, summary: hit.epoch.summary };
+        return { id: `after-epoch-${last.number}`, title: after.title || interpolate(t.labels.afterEpoch, { number: last.number }), epoch: null, summary: after.summary || null };
     };
     const groups = new Map();
     for (const event of events) {

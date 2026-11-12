@@ -1,9 +1,13 @@
 ---
-import { NON_EN_LANGS } from '../../../lib/i18n.js';
+// The docs landing's translation, /<lang>/docs (pages/docs/index.astro), built
+// in every language once the docs page group is localized.
+import DocsIndexPage from '../../../components/routes/DocsIndexPage.astro';
+import { localizedStaticPaths } from '../../../lib/route-localization.js';
 
 export function getStaticPaths() {
-    return NON_EN_LANGS.map(lang => ({ params: { lang } }));
+    return localizedStaticPaths('docs');
 }
 
-return Astro.redirect('/docs', 301);
+const { lang } = Astro.params;
 ---
+<DocsIndexPage lang={lang} />

@@ -1,0 +1,219 @@
+---
+// One Investor Centre page in one language: its head (title, description,
+// structured data) and the site shell around the React page
+// (react/src/components/pages/Investors.jsx), shared by the English pages
+// (src/pages/investors.astro, src/pages/investors/<slug>.astro) and their
+// translations (src/pages/[lang]/investors…). `slug` names the document
+// (null for the Investor Centre itself).
+//
+// English renders what the pages rendered before they were translated. A
+// translation is the same page in its language: its title and description
+// come from the group's copy (react/src/i18n/pages/investors/), its structured
+// data names its language and the English work it translates, and its
+// documents say the English is authoritative (the PDFs stay the English
+// documents as published).
+//
+// Hydration follows the page: the Investor Centre (its archive's search and
+// type filter), the deck (navigation, keyboard, fullscreen) and the Bittensor
+// letter (its network-stack exhibit scales and opens in a dialog) hydrate; the
+// announcements and the other letters are static.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import FooterStatic from '../FooterStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import InvestorsPage from '@react/components/pages/Investors.jsx';
+import { getDict } from '../../lib/i18n.js';
+import { hasLocalizedVersion, localizedPathFor } from '../../lib/route-localization.js';
+import { investorCentre } from '@react/data/investors.js';
+import { contributors } from '@react/data/contributors.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+import { documentKey } from '@react/components/pages/investors/keys.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+    slug?: string | null;
+}
+
+const { lang = 'en', slug = null } = Astro.props;
+const english = lang === 'en';
+const t = await getDict(lang);
+const group = (await loadPageCopy('investors'))(lang);
+
+const SITE = 'https://ur.xyz';
+// a page of the group in this language; another page in this language when it has one
+const local = (path: string) => (english ? path : `/${lang}${path}`);
+const linked = (path: string) => (hasLocalizedVersion(path) ? localizedPathFor(path, lang) : path);
+const ORG = { '@id': 'https://ur.xyz/#org' };
+
+// What a translation adds to the English work's node: its language and the
+// work it translates.
+const translated = (node: object, englishId: string) => (english
+    ? node
+    : { ...node, inLanguage: lang, translationOfWork: { '@id': englishId } });
+// the PDF is the English document as published, whatever the page's language
+const pdfEncoding = (pdfHref: string) => ({
+    '@type': 'MediaObject',
+    encodingFormat: 'application/pdf',
+    contentUrl: `${SITE}${pdfHref}`,
+    ...(english ? {} : { inLanguage: 'en' }),
+});
+
+// A signed letter's authors: the people, tied to the site's Organization node
+// and to their profiles.
+const person = (name: string) => {
+    const profile = contributors.find((c) => c.name === name)?.href;
+    return {
+        '@type': 'Person',
+        name,
+        url: 'https://ur.xyz/about',
+        ...(profile ? { sameAs: [profile] } : {}),
+        affiliation: ORG,
+    };
+};
+
+let head: {
+    title: string;
+    description: string;
+    jsonLd: object[];
+    ogType?: string;
+    article?: { publishedTime?: string; author?: string };
+    ogImage?: string;
+};
+let hydrate = false;
+// The page component's language, passed only when it is not English (its
+// default), so an English island's serialized props stay what they were.
+const pageLang = english ? {} : { lang };
+
+if (!slug) {
+    // The Investor Centre: a collection of the documents it lists.
+    const centre = (await loadPageCopy('investors/centre'))(lang);
+    const { featured, updates, materials } = investorCentre;
+    const centreDocs = [featured, ...updates, ...materials].filter(
+        (d, i, arr) => d && arr.findIndex((x) => x.href === d.href) === i,
+    );
+    const centreUrl = `${SITE}${local('/investors')}`;
+    head = {
+        title: centre.meta.title,
+        description: centre.meta.description,
+        jsonLd: [translated({
+            '@type': 'CollectionPage',
+            '@id': `${centreUrl}#centre`,
+            name: english ? 'Investor Centre' : centre.title,
+            url: centreUrl,
+            inLanguage: lang,
+            isPartOf: { '@id': 'https://ur.xyz/#website' },
+            mainEntity: {
+                '@type': 'ItemList',
+                numberOfItems: centreDocs.length,
+                itemListElement: centreDocs.map((d, i) => ({
+                    '@type': 'ListItem',
+                    position: i + 1,
+                    name: group.docs[documentKey(d.href)].title,
+                    url: `${SITE}${linked(d.href)}`,
+                })),
+            },
+        }, `${SITE}/investors#centre`)],
+    };
+    hydrate = true;
+} else if (slug === 'deck') {
+    // The deck is a published work: dated, by the site's publisher, viewable as
+    // slides here and downloadable as the PDF. PresentationDigitalDocument is
+    // the schema.org CreativeWork for a slide deck.
+    const { deck } = investorCentre;
+    const copy = group.docs.deck;
+    const deckUrl = `${SITE}${local(deck.href)}`;
+    head = {
+        title: copy.metaTitle,
+        description: copy.metaDescription,
+        jsonLd: [translated({
+            '@type': 'PresentationDigitalDocument',
+            '@id': `${deckUrl}#deck`,
+            name: copy.title,
+            headline: copy.title,
+            description: copy.metaDescription,
+            datePublished: deck.dateIso,
+            inLanguage: lang,
+            url: deckUrl,
+            mainEntityOfPage: deckUrl,
+            author: ORG,
+            publisher: ORG,
+            image: {
+                '@type': 'ImageObject',
+                url: `${SITE}${deck.slideBase}/01.${deck.slideExt}`,
+                width: deck.slideWidth,
+                height: deck.slideHeight,
+            },
+            encoding: pdfEncoding(deck.pdfHref),
+        }, `${SITE}${deck.href}#deck`)],
+    };
+    hydrate = true;
+} else {
+    // A letter or an announcement: dated, authored and downloadable, so an
+    // Article rather than a generic web page (SEO3 G5).
+    const ARTICLES = {
+        'conviction-lock': { doc: investorCentre.convictionAnnouncement, author: 'org' },
+        'apex-competition': { doc: investorCentre.apexAnnouncement, author: 'org' },
+        'funding-network-capacity': { doc: investorCentre.capacityLetter, author: 'org-unnamed' },
+        'letter-to-tokenholders-september-2026': { doc: investorCentre.tokenholderLetter, authors: ['Brien Colwell', 'Jack Ai-Leung'] },
+        // signed by Jack Ai-Leung for the UR team
+        'our-letter-to-bittensor': { doc: investorCentre.letter, authors: ['Jack Ai-Leung'], image: '/investors/og-letter.png' },
+    } as const;
+    const entry = ARTICLES[slug as keyof typeof ARTICLES];
+    if (!entry) throw new Error(`InvestorsRoute: no Investor Centre document "${slug}"`);
+    const { doc } = entry;
+    const copy = group.docs[documentKey(doc.href)];
+    const pageUrl = `${SITE}${local(doc.href)}`;
+    const people = 'authors' in entry ? entry.authors : null;
+    const author = people ? (people.length === 1 ? person(people[0]) : people.map(person)) : ORG;
+    const dated = doc.dateIso ? { datePublished: doc.dateIso } : {};
+    head = {
+        title: copy.metaTitle,
+        description: copy.metaDescription,
+        ogType: 'article',
+        article: {
+            ...(doc.dateIso ? { publishedTime: doc.dateIso } : {}),
+            ...(entry.author === 'org' ? { author: 'UR Foundation' } : {}),
+            ...(people ? { author: people.join(' and ') } : {}),
+        },
+        ...('image' in entry ? { ogImage: entry.image } : {}),
+        jsonLd: [translated({
+            '@type': 'Article',
+            '@id': `${pageUrl}#article`,
+            headline: copy.headline || copy.title,
+            description: copy.metaDescription,
+            ...dated,
+            author,
+            publisher: ORG,
+            mainEntityOfPage: pageUrl,
+            url: pageUrl,
+            image: `${SITE}${'image' in entry ? entry.image : '/og.png'}`,
+            ...(doc.pdfHref ? { encoding: pdfEncoding(doc.pdfHref) } : {}),
+        }, `${SITE}${doc.href}#article`)],
+    };
+    hydrate = slug === 'our-letter-to-bittensor';
+}
+---
+<Base
+    title={head.title}
+    description={head.description}
+    lang={lang}
+    ogType={head.ogType}
+    article={head.article}
+    ogImage={head.ogImage}
+    jsonLd={head.jsonLd}
+>
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="investors" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            {hydrate
+                ? <InvestorsPage route={{ name: 'investors', slug }} {...pageLang} client:load />
+                : <InvestorsPage route={{ name: 'investors', slug }} {...pageLang} />}
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

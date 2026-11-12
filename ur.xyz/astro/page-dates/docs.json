@@ -1,0 +1,389 @@
+{
+  "about": "The day each page of the ur.xyz page group docs (react/src/i18n/pages/docs/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
+  "pages": {
+    "/ar/docs": {
+      "fingerprint": "2ba217a26e9f8877",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/litepaper": {
+      "fingerprint": "4eebee9df54616fe",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner": {
+      "fingerprint": "e5c92bfa56ba2ad3",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/advanced": {
+      "fingerprint": "7d9a309d179aee71",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/extender": {
+      "fingerprint": "afeee33de2ec6bea",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/install": {
+      "fingerprint": "de5bf789f840a383",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/reference": {
+      "fingerprint": "6852633ed4fc29d9",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/rewards": {
+      "fingerprint": "36de38acf73088fa",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/run": {
+      "fingerprint": "13fac483cd7ef8a7",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/troubleshooting": {
+      "fingerprint": "6b4a782f07bacfc8",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/miner/updates": {
+      "fingerprint": "4b5b3af48d9efb41",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/operator": {
+      "fingerprint": "49094832acf29ee9",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/docs/validator": {
+      "fingerprint": "b1508c8dd4ccaff3",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/privacy": {
+      "fingerprint": "be3651217b58bd6a",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/terms": {
+      "fingerprint": "ce9ad2278312579e",
+      "lastmod": "2026-11-12"
+    },
+    "/ar/vdp": {
+      "fingerprint": "73dad45b8af2e52c",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs": {
+      "fingerprint": "4a07fa0016ed2957",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/litepaper": {
+      "fingerprint": "67a74b241ca876c0",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner": {
+      "fingerprint": "9d2caaa2cfd3de04",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/advanced": {
+      "fingerprint": "d08de120524d8fbf",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/extender": {
+      "fingerprint": "afbed17874b1e4d7",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/install": {
+      "fingerprint": "d9a7ed689395f06c",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/reference": {
+      "fingerprint": "96b4179d80679f65",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/rewards": {
+      "fingerprint": "6891c67d269dd25b",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/run": {
+      "fingerprint": "38af6ac9800c13dc",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/troubleshooting": {
+      "fingerprint": "63aded27aa4fc26a",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/miner/updates": {
+      "fingerprint": "b900094ab24fb8a2",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/operator": {
+      "fingerprint": "32bb6bc93e5fbc95",
+      "lastmod": "2026-11-12"
+    },
+    "/de/docs/validator": {
+      "fingerprint": "d65a6e4daf60b05d",
+      "lastmod": "2026-11-12"
+    },
+    "/de/privacy": {
+      "fingerprint": "b329e8741478d041",
+      "lastmod": "2026-11-12"
+    },
+    "/de/terms": {
+      "fingerprint": "c99180cdb7441be8",
+      "lastmod": "2026-11-12"
+    },
+    "/de/vdp": {
+      "fingerprint": "12bc80e9afd6f253",
+      "lastmod": "2026-11-12"
+    },
+    "/docs": {
+      "fingerprint": "a3d7bdb86b8ded9a",
+      "lastmod": "2026-11-12"
+    },
+    "/docs/litepaper": {
+      "fingerprint": "6f93e7c8693999ba",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner": {
+      "fingerprint": "9e66ea4068fca886",
+      "lastmod": "2026-11-12"
+    },
+    "/docs/miner/advanced": {
+      "fingerprint": "5915e3107382c2c6",
+      "lastmod": "2026-10-22"
+    },
+    "/docs/miner/extender": {
+      "fingerprint": "d208ac65be8504e7",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/install": {
+      "fingerprint": "adfcfcf4bb98af5e",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/reference": {
+      "fingerprint": "ebc58c128914af33",
+      "lastmod": "2026-10-22"
+    },
+    "/docs/miner/rewards": {
+      "fingerprint": "a80cef42fcdff894",
+      "lastmod": "2026-10-22"
+    },
+    "/docs/miner/run": {
+      "fingerprint": "4e57ccc199e1f0cc",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/troubleshooting": {
+      "fingerprint": "721a54b1eae13b70",
+      "lastmod": "2026-11-11"
+    },
+    "/docs/miner/updates": {
+      "fingerprint": "7ff3e36f70b5498e",
+      "lastmod": "2026-11-12"
+    },
+    "/docs/operator": {
+      "fingerprint": "04eb81f9993dee65",
+      "lastmod": "2026-11-12"
+    },
+    "/docs/validator": {
+      "fingerprint": "379ef84ea8d1a11b",
+      "lastmod": "2026-10-07"
+    },
+    "/es/docs": {
+      "fingerprint": "6f4a8126fd0325d4",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/litepaper": {
+      "fingerprint": "6d65babfa3537760",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner": {
+      "fingerprint": "1c168e8e2f135c8e",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/advanced": {
+      "fingerprint": "24a9fc1e15428de0",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/extender": {
+      "fingerprint": "5f69dbddf59feaf7",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/install": {
+      "fingerprint": "67ad79f8538ad11c",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/reference": {
+      "fingerprint": "ecbc2cfa7e818087",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/rewards": {
+      "fingerprint": "c1e60e8356b6b0e4",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/run": {
+      "fingerprint": "acabf616ef2db0be",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/troubleshooting": {
+      "fingerprint": "2d094c0db1f49c2a",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/miner/updates": {
+      "fingerprint": "651075a365750443",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/operator": {
+      "fingerprint": "f47998009f8aa2b4",
+      "lastmod": "2026-11-12"
+    },
+    "/es/docs/validator": {
+      "fingerprint": "8f7a314c4f1dc135",
+      "lastmod": "2026-11-12"
+    },
+    "/es/privacy": {
+      "fingerprint": "a99c9a78c1a2c873",
+      "lastmod": "2026-11-12"
+    },
+    "/es/terms": {
+      "fingerprint": "2bcdec39bd92cb19",
+      "lastmod": "2026-11-12"
+    },
+    "/es/vdp": {
+      "fingerprint": "1e9524053065f431",
+      "lastmod": "2026-11-12"
+    },
+    "/privacy": {
+      "fingerprint": "a14ca6884f5119cc",
+      "lastmod": "2026-09-25"
+    },
+    "/ru/docs": {
+      "fingerprint": "8260151ab5667b4b",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/litepaper": {
+      "fingerprint": "99adbbfca0118a36",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner": {
+      "fingerprint": "74d6519725be9349",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/advanced": {
+      "fingerprint": "e7d81da915695850",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/extender": {
+      "fingerprint": "74a50593733da30d",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/install": {
+      "fingerprint": "8583ecd4f2aacc87",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/reference": {
+      "fingerprint": "ad676c0133338f06",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/rewards": {
+      "fingerprint": "7d6f91f344136b78",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/run": {
+      "fingerprint": "995938b490df626a",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/troubleshooting": {
+      "fingerprint": "00a97c7dbd52b5f6",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/miner/updates": {
+      "fingerprint": "450d145ed5553b35",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/operator": {
+      "fingerprint": "dd75e204a08d25f4",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/docs/validator": {
+      "fingerprint": "b66d742eef9494b8",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/privacy": {
+      "fingerprint": "50e3088de9fcd75d",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/terms": {
+      "fingerprint": "ce8c7d4f2c92f12d",
+      "lastmod": "2026-11-12"
+    },
+    "/ru/vdp": {
+      "fingerprint": "110b6e21e4c7725b",
+      "lastmod": "2026-11-12"
+    },
+    "/terms": {
+      "fingerprint": "5c68c785434f7066",
+      "lastmod": "2026-11-12"
+    },
+    "/vdp": {
+      "fingerprint": "c5ed84b60e9ab960",
+      "lastmod": "2026-08-14"
+    },
+    "/zh/docs": {
+      "fingerprint": "738d48ecbc0dc806",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/litepaper": {
+      "fingerprint": "9d591679501e6d76",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner": {
+      "fingerprint": "7a9e560a33b447dd",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/advanced": {
+      "fingerprint": "f079402c444fc83e",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/extender": {
+      "fingerprint": "3c72342a0c08cf80",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/install": {
+      "fingerprint": "998a0230d8a98692",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/reference": {
+      "fingerprint": "f4a800ab45836c9c",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/rewards": {
+      "fingerprint": "4f41397a24971d6d",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/run": {
+      "fingerprint": "6d14c91cd44af2ba",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/troubleshooting": {
+      "fingerprint": "a58a10809a8b7b8d",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/miner/updates": {
+      "fingerprint": "ef9087333ea69d0b",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/operator": {
+      "fingerprint": "c6682bce17a4316c",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/docs/validator": {
+      "fingerprint": "d6bc24c800a73c16",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/privacy": {
+      "fingerprint": "49e6e8a13dcdcfb4",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/terms": {
+      "fingerprint": "8cee7702fdb26376",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/vdp": {
+      "fingerprint": "60df8d0b3b65c156",
+      "lastmod": "2026-11-12"
+    }
+  }
+}

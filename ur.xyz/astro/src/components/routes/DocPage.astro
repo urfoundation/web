@@ -1,0 +1,136 @@
+---
+/**
+ * A document's page, /docs/<slug> and its translations /<lang>/docs/<slug>
+ * (pages/docs/[...slug].astro and pages/[lang]/docs/[...slug].astro). The
+ * English page renders the document from docs/; a translated page renders
+ * its translation (react/src/lib/docs-i18n.js) in the same chrome, with the
+ * English headings' ids, its links to translated pages in its language, and
+ * the docs copy (react/src/i18n/pages/docs/) in place of the English words.
+ * The markdown twin, /docs-md/<slug>.md, is English and alternates the
+ * English page only.
+ */
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { publicDir } from 'astro:config/server';
+import { imageMetadata } from 'astro/assets/utils';
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import DocsShell from '../DocsShell.astro';
+import FooterStatic from '../FooterStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import { Markdown } from '@react/lib/markdown.jsx';
+import { DOC_PUBLISHED, UNLISTED_DOC_SLUGS, docImages } from '@react/lib/docs-shared.js';
+import { docIn, docsCopy, localizedHref } from '@react/lib/docs-i18n.js';
+import { interpolate } from '@react/i18n/format.js';
+import { getDict } from '../../lib/i18n.js';
+import { docDescription } from '../../lib/meta.js';
+import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    slug: string;
+    lang?: string;
+}
+
+const { slug, lang = 'en' } = Astro.props;
+const english = lang === 'en';
+const doc = docIn(slug, lang);
+const t = await getDict(lang);
+const words = docsCopy(lang);
+const { title, meta, path, content } = doc;
+const pagePath = english ? `/docs/${slug}` : `/${lang}/docs/${slug}`;
+const url = `https://ur.xyz${pagePath}`;
+// whole-sentence and markdown-free (the raw slice leaked "> " and cut
+// mid-word); a revision line is not what the document is about, so
+// it never opens the description ("Last modified: May 8, 2025 …")
+const description = meta.description || docDescription(
+    content.replace(/^\s*\**\s*Last (?:modified|revised|updated)\b[^\n]*$/gim, ''),
+    title,
+);
+// a document with code in it paints with the code face (Explorer.css)
+const hasCode = content.includes('`');
+const imageSrcs = docImages(content, `/docs/${path}`);
+// An unlisted document (docs-shared.js) is published for the links that lead
+// to it, the app-store listings, but it is not this site's content: the
+// account-deletion walkthrough belongs to ur.io's apps. It is noindex, so it
+// is out of the sitemap and the page-dates record too, in every language.
+const noindex = UNLISTED_DOC_SLUGS.has(slug);
+
+// Each image's intrinsic size, read from the file the build serves (the asset
+// generator mirrors the docs' images into public/docs/), so the <img> carries
+// width and height and the page reserves its box before the image loads.
+const images = {};
+for (const src of imageSrcs) {
+    const file = fileURLToPath(new URL(src.slice(1), publicDir));
+    if (!existsSync(file)) continue;
+    const { width, height } = await imageMetadata(readFileSync(file), src);
+    images[src] = { width, height };
+}
+
+const jsonLd = [{
+    '@type': 'TechArticle',
+    '@id': `${url}#article`,
+    headline: title,
+    description,
+    url,
+    mainEntityOfPage: url,
+    publisher: { '@id': 'https://ur.xyz/#org' },
+    author: { '@id': 'https://ur.xyz/#org' },
+    inLanguage: lang,
+    // the page's card, the social image Base.astro gives it
+    image: { '@type': 'ImageObject', url: 'https://ur.xyz/og.png', width: 1200, height: 630 },
+    // the day it was first published at this URL (docs-shared.js DOC_PUBLISHED,
+    // or its front matter's `published`)
+    ...((meta.published || DOC_PUBLISHED[slug]) ? { datePublished: meta.published || DOC_PUBLISHED[slug] } : {}),
+    // the day the page's content last changed, from the same record as the
+    // sitemap's <lastmod>: the build fills it in once the page is fingerprinted
+    dateModified: LASTMOD_TOKEN,
+    // the English document is the markdown twin's; a translation names the work it translates
+    ...(english
+        ? {
+            encoding: {
+                '@type': 'MediaObject',
+                encodingFormat: 'text/markdown',
+                contentUrl: `https://ur.xyz/docs-md/${slug}.md`,
+            },
+        }
+        : { translationOfWork: { '@id': `https://ur.xyz/docs/${slug}#article` } }),
+}];
+---
+<Base
+    title={meta.title || interpolate(words.page.title, { title })}
+    breadcrumbName={title}
+    description={description}
+    lang={lang}
+    jsonLd={jsonLd}
+    alternate={english ? { href: `/docs-md/${slug}.md`, type: 'text/markdown' } : null}
+    noindex={noindex}
+>
+    {/* fetched with the page, not after its stylesheet: the guides are mostly code.
+        A document without code never paints with it, so it is not preloaded there. */}
+    {hasCode && <link slot="head" rel="preload" href="/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin />}
+    {/* Static HTML: the document, the sidebar and the footer need no script. The
+        nav hydrates when the browser is idle; in the docs chrome only the search
+        box does (DocsShell.astro). */}
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="docs" lang={lang} client:idle={{ timeout: 1000 }} />
+        <DocsShell activeSlug={slug} lang={lang}>
+            <article>
+                <header class="explorer-page-header">
+                    <span class="explorer-page-eyebrow">{words.page.eyebrow}</span>
+                    <h1 class="explorer-page-title">{title}</h1>
+                    {/* the day the content last changed (the sitemap's lastmod), not where the file sits in the repository */}
+                    <p class="explorer-page-meta">{words.page.updated} <time datetime={LASTMOD_TOKEN}>{LASTMOD_TOKEN}</time></p>
+                </header>
+                {/* the header's h1 is the document's title: drop the markdown's own
+                    "# Title" and nest the remaining headings beneath it */}
+                {english
+                    ? <Markdown source={content} baseHref={`/docs/${path}`} dropTitle headingBase={1} images={images} />
+                    : <Markdown source={content} baseHref={`/docs/${path}`} dropTitle headingBase={1} images={images} headingIds={doc.headingIds} hrefFor={(href) => localizedHref(href, lang)} labels={words.code} />}
+            </article>
+        </DocsShell>
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

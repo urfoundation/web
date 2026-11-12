@@ -21,7 +21,15 @@ export default {
         browseDocs:   'Explorar documentación',
         search:       'Buscar',
         ctaAria:    'Costo de uso — el precio actual de la red',
-        denomAria:  'Moneda del precio'
+        denomAria:  'Moneda del precio',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'Acerca de',
+        build:       'Construir',
+        investors:   'Inversores',
+        dashboard:   'Panel',
+        liveDashboard: 'Panel en vivo',
+        ctf:         'Captura la bandera'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'Subred UR en Telegram',
         socialDiscord:  'Discord de URnetwork',
         socialGithub:   'Subred UR en GitHub',
-        productsAria:   'Productos de URnetwork en ur.io'
+        productsAria:   'Productos de URnetwork en ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'Construye sobre UR',
+        reserve:       'Reserva',
+        mainnet:       'Red principal',
+        investorCentre:  'Centro para inversores'
     },
 
     disclaimer: {
@@ -221,7 +234,7 @@ operators: {
         goal:    'El objetivo es una red sombra dual: por cada subred pública IPv4 e IPv6 existe también una contraparte privada y anónima. UR está construyendo esa red privada anónima.',
         globeAlt: 'Un globo de mineros: los proveedores como puntos, los extensores como anillos, cada uno del color de su país.',
         globeLabels: { provider: 'proveedor', extender: 'extensor', miner: 'minero' },
-        simCaption: 'Los mineros compiten por la mayor cantidad de IPs únicas disponibles de forma fiable en la red. Los mejores mineros ascienden a su propio slot de UID.',
+        simCaption: 'Los mineros compiten por la mayor cantidad de IPs únicas disponibles de forma confiable en la red. Los mejores mineros ascienden a su propio slot de UID.',
         cta: 'Conviértete en minero',
         metaTitle: 'Mineros: lleva tráfico cifrado y gana emisiones de SN25 — UR',
         metaDescription: 'Los mineros de UR mantienen enrutables subredes IPv4 /29 e IPv6 /48 para tráfico cifrado en Bittensor SN25 y ganan emisiones por el tráfico que transportan y su cobertura.',
@@ -238,7 +251,7 @@ operators: {
         eyebrow: 'Validadores',
         title:   'Los validadores que miden la red.',
         intro:   'Los validadores son independientes. Cada uno hace staking de su propio UR y ejecuta el protocolo de verificación de enrutamiento, recorriendo continuamente cadenas de mineros asignadas por los operadores para probar el tránsito en tiempo real y medir qué mineros son los eslabones más débiles. Esa medición es la señal central por la que paga la red, y los validadores ganan dividendos nativos por producirla con precisión.',
-        simCaption: 'Los validadores sondean la superficie de IPs disponible y clasifican a los mineros por fiabilidad.',
+        simCaption: 'Los validadores sondean la superficie de IPs disponible y clasifican a los mineros por confiabilidad.',
         cta: 'Conviértete en validador',
         metaTitle: 'Validadores: mide la red UR y gana dividendos de SN25 — UR',
         metaDescription: 'Los validadores de UR hacen staking de su UR, recorren cadenas de mineros para probar el tránsito y ganan dividendos de Bittensor por puntuar con precisión.',
@@ -262,14 +275,17 @@ operators: {
             date: '24 de agosto – 24 de octubre de 2026',
             title: 'Informe de investigación de agosto–octubre de 2026',
             body: 'La investigación busca dar a todos el mejor cifrado y la mejor velocidad para el uso diario, que hacen que tu internet sea mejor. El informe reúne en una línea de tiempo 39 cambios medidos en ese camino, hasta dónde llegó cada tipo de mejora y cómo se hizo la investigación.',
-            cta: 'Leer el informe (en inglés)'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'Leer el informe',
+            ctaEnglish: 'Leer el informe (en inglés)'
         },
         methodology: {
             tag: 'Metodología',
             topic: 'Tres ciclos de investigación',
             title: 'Ciclos de investigación que se mejoran a sí mismos',
             body: 'Cómo el laboratorio, la competencia abierta y los nodos de campo voluntarios mejoran cada uno la red y, a la vez, la forma de medir la siguiente ronda. Los tres comparten una disciplina: una línea base congelada, el ruido medido y cada intento en el registro.',
-            cta: 'Leer la metodología (en inglés)',
+            cta: 'Leer la metodología',
+            ctaEnglish: 'Leer la metodología (en inglés)',
             loops: [
                 { name: 'Laboratorio', detail: 'PERFVAR · cada cambio' },
                 { name: 'Competencia', detail: 'Apex SN1 · semanal' },
@@ -298,12 +314,12 @@ operators: {
               ],
               directions: 'Los extensores pueden añadirse a una lista de subvenciones del protocolo que reparte una parte de los incentivos entre los extensores participantes; los detalles de incorporación se publicarán cuando la lista abra. Cada minero ya asume el rol de extensor junto al de salida. Las preguntas abiertas son cómo medir el alcance de un extensor donde más importa sin exponer a sus usuarios, y cómo deberían rotar las capas exteriores los nombres de host y los certificados a medida que el bloqueo se adapta.' },
             { tag: 'UR-FP2', title: 'Emparejamiento cliente-minero',
-              body: 'Algoritmo de muestreo que carga una muestra aleatoria 10× de mineros potenciales y los mezcla proporcionalmente a fiabilidad × puntuación del cliente. La resistencia Sybil se garantiza por la restricción de que la fiabilidad suma como máximo 1 por subred IP.',
-              approach: 'El sistema de emparejamiento carga desde memoria una muestra aleatoria de mineros candidatos, unas diez veces el número que necesita, y la mezcla en proporción a fiabilidad × puntuación del cliente para producir los finalistas. Su protección contra el aliasing de mineros (ataques Sybil) es un tope por subred IP: las puntuaciones de fiabilidad de todos los mineros de una subred suman como máximo 1, así que dividir una conexión en muchas identidades no aumenta su cuota de emparejamientos. El punto de entrada es FindProviders2.',
+              body: 'Algoritmo de muestreo que carga una muestra aleatoria 10× de mineros potenciales y los mezcla proporcionalmente a confiabilidad × puntuación del cliente. La resistencia Sybil se garantiza por la restricción de que la confiabilidad suma como máximo 1 por subred IP.',
+              approach: 'El sistema de emparejamiento carga desde memoria una muestra aleatoria de mineros candidatos, unas diez veces el número que necesita, y la mezcla en proporción a confiabilidad × puntuación del cliente para producir los finalistas. Su protección contra el aliasing de mineros (ataques Sybil) es un tope por subred IP: las puntuaciones de confiabilidad de todos los mineros de una subred suman como máximo 1, así que dividir una conexión en muchas identidades no aumenta su cuota de emparejamientos. El punto de entrada es FindProviders2.',
               links: [
                   { href: 'https://github.com/urnetwork/server/blob/main/model/network_client_location_model.go', label: 'network_client_location_model.go' }
               ],
-              directions: 'Distinguir al emparejar los saltos con IP y puerto públicos de los que no los tienen, para equilibrar explícitamente velocidad y calidad de conexión en lugar de solo a través de la fiabilidad. Los pesos de fiabilidad y de puntuación del cliente y el tamaño de la muestra son las entradas naturales que un operador experimental puede variar frente a las exportaciones de bloque anonimizadas descritas abajo, manteniendo fijo el tope por subred como cota Sybil.' },
+              directions: 'Distinguir al emparejar los saltos con IP y puerto públicos de los que no los tienen, para equilibrar explícitamente velocidad y calidad de conexión en lugar de solo a través de la confiabilidad. Los pesos de confiabilidad y de puntuación del cliente y el tamaño de la muestra son las entradas naturales que un operador experimental puede variar frente a las exportaciones de bloque anonimizadas descritas abajo, manteniendo fijo el tope por subred como cota Sybil.' },
             { tag: 'UR-MULTI', title: 'Multi cliente',
               body: 'Algoritmo heurístico de barrido que gestiona una ventana de mineros. Fija el tráfico en el mejor nivel disponible basándose en umbrales de transferencia en lugar de análisis de protocolo.',
               approach: 'Un barrido heurístico gestiona una ventana de mineros y fija el tráfico en los mineros del nivel más alto disponible. Las decisiones se toman sobre umbrales de transferencia, cuánto ha movido realmente un minero, y no inspeccionando el protocolo dentro del túnel, así que el enrutador nunca necesita mirar el tráfico de aplicación. La ventana es lo que permite a un cliente mantener varios mineros en juego a la vez y mover el tráfico entre ellos a medida que cambia su transferencia medida.',
@@ -312,28 +328,28 @@ operators: {
               ],
               directions: 'Los umbrales y los límites de nivel hoy se fijan a mano. Preguntas abiertas para un operador experimental: si deberían derivarse de distribuciones de transferencia medidas, y si la ventana debería incorporar también las estadísticas de disponibilidad y latencia por minero que ahora producen los validadores (ver Verificación de enrutamiento), para que un cliente evite un eslabón débil antes de pagarlo con su propio tráfico.' },
             { tag: 'UR-TRANSFER', title: 'Transferencia',
-              body: 'Ventana de entrega fiable ajustada para entornos de alta latencia. Las retransmisiones del protocolo están desactivadas ya que la ventana proporciona entrega fiable. Distribuye el tráfico entre transportes según el rendimiento clasificado.',
-              approach: 'Una ventana de transferencia fiable está ajustada para entornos de alta latencia. Como la propia ventana proporciona entrega fiable, las retransmisiones del protocolo hacia la capa de transferencia están desactivadas: un flujo TCP que viaja por el túnel no se retransmite encima. El tráfico se distribuye entre los transportes disponibles según su rendimiento clasificado y su disponibilidad, de modo que un transporte lento o fallido pierde cuota en lugar de detener el flujo.',
+              body: 'Ventana de entrega confiable ajustada para entornos de alta latencia. Las retransmisiones del protocolo están desactivadas ya que la ventana proporciona entrega confiable. Distribuye el tráfico entre transportes según el rendimiento clasificado.',
+              approach: 'Una ventana de transferencia confiable está ajustada para entornos de alta latencia. Como la propia ventana proporciona entrega confiable, las retransmisiones del protocolo hacia la capa de transferencia están desactivadas: un flujo TCP que viaja por el túnel no se retransmite encima. El tráfico se distribuye entre los transportes disponibles según su rendimiento clasificado y su disponibilidad, de modo que un transporte lento o fallido pierde cuota en lugar de detener el flujo.',
               links: [
                   { href: 'https://github.com/urnetwork/connect/blob/main/transfer.go', label: 'transfer.go' }
               ],
               directions: 'Preguntas abiertas: cómo debería dimensionarse la ventana a lo largo del abanico de latencias reales en lugar de para un único perfil fijo, cómo reclasificar los transportes cuando su rendimiento cambia a mitad del flujo, y cómo debería cooperar la capa de transferencia con las actualizaciones de flujo planificadas para el transporte (ver Rendimiento) cuando un salto es punto a punto y el siguiente no.' },
             { tag: 'UR-IP', title: 'Salida IP',
-              body: 'Implementación de pila IP con consumo mínimo de memoria. Asume comunicación fiable entre pares a través de la capa de transferencia, por lo que las retransmisiones se optimizan en consecuencia.',
-              approach: 'La pila IP está diseñada para funcionar con memoria mínima, de modo que un minero pueda servir como salida en un teléfono o en un dispositivo pequeño. Asume comunicación fiable con el par a través de la capa de transferencia, lo que permite optimizar y eliminar su propio manejo de retransmisiones en lugar de duplicarlo. La capa de seguridad (ver Seguridad) está en la misma ruta, así que cada paquete se comprueba antes de salir del minero.',
+              body: 'Implementación de pila IP con consumo mínimo de memoria. Asume comunicación confiable entre pares a través de la capa de transferencia, por lo que las retransmisiones se optimizan en consecuencia.',
+              approach: 'La pila IP está diseñada para funcionar con memoria mínima, de modo que un minero pueda servir como salida en un teléfono o en un dispositivo pequeño. Asume comunicación confiable con el par a través de la capa de transferencia, lo que permite optimizar y eliminar su propio manejo de retransmisiones en lugar de duplicarlo. La capa de seguridad (ver Seguridad) está en la misma ruta, así que cada paquete se comprueba antes de salir del minero.',
               links: [
                   { href: 'https://github.com/urnetwork/connect/blob/main/ip.go', label: 'ip.go' }
               ],
-              directions: 'Preguntas abiertas: cuánto más puede reducirse la huella de memoria en los dispositivos más pequeños, y cómo conserva sus garantías la pila de salida cuando se relajan las suposiciones de fiabilidad de la capa de transferencia para las actualizaciones de flujo punto a punto planificadas para el transporte. Como con el transporte, los cambios se prueban en un operador experimental antes de convertirse en predeterminados.' },
+              directions: 'Preguntas abiertas: cuánto más puede reducirse la huella de memoria en los dispositivos más pequeños, y cómo conserva sus garantías la pila de salida cuando se relajan las suposiciones de confiabilidad de la capa de transferencia para las actualizaciones de flujo punto a punto planificadas para el transporte. Como con el transporte, los cambios se prueban en un operador experimental antes de convertirse en predeterminados.' },
             { tag: 'UR-PSUB2', title: 'Asignación de recompensas',
               body: 'Los validadores independientes puntúan cada pool de operador según la demanda y la calidad medida; el Yuma Consensus de Bittensor convierte esas puntuaciones en emisión. Dentro de un pool, la liquidación v2 reparte cada ciclo únicamente según el uso verificado en cuentas acumulativas que nunca caducan: el operador registra una raíz Merkle, el validador la audita, y cada minero reclama directamente del contrato de liquidación.',
-              approach: 'Las recompensas son la emisión de la subred UR en SN25. Los mineros de cada operador forman un pool con un UID de minero. En cada tempo, los validadores independientes puntúan cada pool según uso implícito × calidad medida (el uso auditado del operador valorado a la tasa del nivel de convicción cero y recortado igual que su depósito con tope, multiplicado por la calidad de los mineros del pool según los recorridos propios del validador, acotada a [0,75; 1]) bajo commit-reveal, y el Yuma Consensus convierte la mediana en emisión. Antes de la liquidación v2, el operador clasifica a sus mineros por uso × fiabilidad, registra una raíz de pagos Merkle en cada época, y cada minero reclama su parte directamente del contrato de liquidación antes de que caduque. Desde la época de cambio de la liquidación v2, la parte de cada época sigue únicamente el uso verificado y se acumula en una cuenta por wallet de pago que nunca caduca; una raíz solo paga después de que el validador la apruebe y transcurra una ventana de impugnación de 14.400 bloques, y una sola reclamación cobra todo lo acumulado. Las principales flotas por amplitud de IPs enrutables tienen sus propios UIDs y reciben pago nativo. Los proveedores reciben la parte de momentum de la asignación de los mineros, un 10 % en el lanzamiento, que θ reparte entre las flotas principales y los pools; la Network Capacity Reserve recibe el resto. Mientras el precio publicado sea 0, no se recogen depósitos y cada pool lleva la misma demanda implícita, así que solo la calidad medida dirige el canal de pools.',
+              approach: 'Las recompensas son la emisión de la subred UR en SN25. Los mineros de cada operador forman un pool con un UID de minero. En cada tempo, los validadores independientes puntúan cada pool según uso implícito × calidad medida (el uso auditado del operador valorado a la tasa del nivel de convicción cero y recortado igual que su depósito con tope, multiplicado por la calidad de los mineros del pool según los recorridos propios del validador, acotada a [0,75; 1]) bajo commit-reveal, y el Yuma Consensus convierte la mediana en emisión. Antes de la liquidación v2, el operador clasifica a sus mineros por uso × confiabilidad, registra una raíz de pagos Merkle en cada época, y cada minero reclama su parte directamente del contrato de liquidación antes de que caduque. Desde la época de cambio de la liquidación v2, la parte de cada época sigue únicamente el uso verificado y se acumula en una cuenta por wallet de pago que nunca caduca; una raíz solo paga después de que el validador la apruebe y transcurra una ventana de impugnación de 14.400 bloques, y una sola reclamación cobra todo lo acumulado. Las principales flotas por amplitud de IPs enrutables tienen sus propios UIDs y reciben pago nativo. Los proveedores reciben la parte de momentum de la asignación de los mineros, un 10 % en el lanzamiento, que θ reparte entre las flotas principales y los pools; la Network Capacity Reserve recibe el resto. Mientras el precio publicado sea 0, no se recogen depósitos y cada pool lleva la misma demanda implícita, así que solo la calidad medida dirige el canal de pools.',
               links: [
                   { href: 'https://github.com/urnetwork/server/blob/main/model/account_payment_model_plan.go', label: 'account_payment_model_plan.go' },
                   { href: 'https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md', label: 'WHITEPAPER.md §7–§10' },
                   { href: 'https://github.com/urfoundation/sn/tree/main/validator', label: 'sn/validator' }
               ],
-              directions: 'θ es un parámetro de gobernanza publicado: empezar cargado hacia la cola (θ ≈ 0,3), instrumentar el pago realizado por nivel y ampliarlo a medida que maduren el conjunto de mineros de nivel superior y el consenso de calidad de los validadores independientes, con la restricción de que el minero de nivel superior peor pagado siga ganando al menos lo que el minero de pool mejor pagado. La oscilación que la calidad ejerce sobre el peso del pool está acotada en el arranque y se amplía gradualmente. Una prima de esfuerzo para validadores está diseñada pero aparcada, para construirse solo si la red en vivo muestra que la cobertura independiente la necesita. Descentralizar el conjunto de validadores más allá de la mayoría del propietario es un paso de gobernanza posterior y deliberado.' },
+              directions: 'θ es un parámetro de gobernanza publicado: empezar cargado hacia la cola (θ ≈ 0,3), instrumentar el pago realizado por nivel y ampliarlo a medida que maduren el conjunto de mineros de nivel superior y el consenso de calidad de los validadores independientes, con la restricción de que el minero de nivel superior peor pagado siga ganando al menos lo que el minero de pool mejor pagado. La oscilación que la calidad ejerce sobre el peso del pool está acotada en el arranque y se amplía gradualmente. Una prima de esfuerzo para validadores está diseñada pero en pausa, para construirse solo si la red en vivo muestra que la cobertura independiente la necesita. Descentralizar el conjunto de validadores más allá de la mayoría del propietario es un paso de gobernanza posterior y deliberado.' },
             { tag: 'UR-CONTRACT', title: 'Permiso',
               body: 'La transferencia entre partes requiere un contrato encriptado con saldo en custodia y un conjunto de permisos. Ambas partes deben cerrar con recuentos de bytes confirmados; los desacuerdos activan un proceso de resolución forzada.',
               approach: 'La transferencia entre un iniciador y un acompañante requiere un contrato encriptado con la clave secreta del cliente de destino. El contrato mantiene un saldo de transferencia fijo en custodia y define los permisos entre ambas partes. El acompañante puede crear contratos emparejados para el tráfico de retorno, y las rutas multi-salto envían eventos de apertura y cierre de flujo a los intermediarios. Tras el uso, ambas partes cierran el contrato con un recuento de bytes confirmado. Si alguna parte no cierra, o los totales no coinciden, la resolución del contrato determina el resultado; si alguna parte denuncia abuso, se bloquea la transferencia futura entre esas partes.',
@@ -356,7 +372,7 @@ operators: {
                   { href: 'https://github.com/urfoundation/sn/tree/main/validator', label: 'sn/validator' },
                   { href: 'https://github.com/urfoundation/sn/blob/main/VALIDATOR.md', label: 'VALIDATOR.md' }
               ],
-              directions: 'Un recorrido completado prueba tránsito secuencial en vivo hacia un destino conocido, no el reenvío honesto del tráfico de usuario, y el autobeneficio por salto solo está acotado estadísticamente, por una población de validadores independientes. La hoja de ruta hacia una medición apta para pagos: prueba de enrutamiento mediante atestación de vecinos, diversidad de destinos para que un minero no pueda optimizar la única ruta medida, resistencia Sybil de los validadores mediante stake, y un modelo de riesgo jerárquico para la atribución. Hasta entonces, las estadísticas son monitorización de disponibilidad y latencia y puntuación provisional.' }
+              directions: 'Un recorrido completado prueba tránsito secuencial en vivo hacia un destino conocido, no el reenvío honesto del tráfico de usuario, y el autobeneficio por salto solo está acotado estadísticamente, por una población de validadores independientes. La hoja de ruta hacia una medición apta para pagos: prueba de enrutamiento mediante atestación de vecinos, diversidad de destinos para que un minero no pueda optimizar la única ruta medida, resistencia Sybil de los validadores mediante stake, y un modelo de riesgo jerárquico para la atribución. Hasta entonces, las estadísticas son monitoreo de disponibilidad y latencia y puntuación provisional.' }
         ],
         competition: {
             title: 'Competencia de algoritmos de latencia simulada',

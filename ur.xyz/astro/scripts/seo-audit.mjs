@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { DOC_ORDER, DOC_PAGE_PATHS, UNLISTED_DOC_SLUGS, slugFor, splitFrontMatter } from "../../react/src/lib/docs-shared.js";
 import { contentDay, investorLetterMetadata } from "./pdf-freshness.mjs";
 import { reserve } from "../../react/src/data/reserve.js";
+import { LOCALIZED_GROUPS, NON_EN_SITE_LANG_CODES, NOT_FOUND_PATH, PAGE_GROUPS, SITE_LANG_CODES, basePathFor, groupForPath, hasLocalizedVersion, langForPath } from "../src/lib/route-localization.js";
 
 const DIST = path.resolve(process.argv[2] || "dist");
 if (!existsSync(DIST)) {
@@ -115,6 +116,7 @@ for (const f of htmlFiles) {
     attr((head.match(/<meta name="description"[^>]*>/) || [])[0] || "", "content"),
   );
   const lang = attr((html.match(/<html[^>]*>/) || [])[0] || "", "lang") || "";
+  const dir = attr((html.match(/<html[^>]*>/) || [])[0] || "", "dir") || "";
   const hreflangs = new Map(
     [...head.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [m[1], m[2]]),
   );
@@ -150,7 +152,7 @@ for (const f of htmlFiles) {
     }
   }
 
-  pages.set(urlPath, { f, urlPath, canonical, noindex, robotsContents, redirectStub, title, description, lang, hreflangs, ogImage, videoObjects, html });
+  pages.set(urlPath, { f, urlPath, canonical, noindex, robotsContents, redirectStub, title, description, lang, dir, hreflangs, ogImage, videoObjects, html });
 }
 
 // ── robots directives ──
@@ -243,10 +245,25 @@ for (const key of ["title", "description"]) {
 }
 
 // ── hreflang truthfulness: self-reference + reciprocity + served targets ──
+// A cluster is its (language, URL) pairs: every member lists the same pairs,
+// so each language names the same page from every member, and x-default is
+// the English page (the site's default: route-localization.js alternatesFor).
+const clusterPairs = (hreflangs) => [...hreflangs].map(([lang, u]) => `${lang} ${u}`).sort();
+// the pairs one cluster has and the other lacks, each way: "" when they agree
+const pairsDiffer = (a, b, there) => {
+  const [x, y] = [clusterPairs(a), clusterPairs(b)];
+  const only = (from, to) => from.filter((pair) => !to.includes(pair));
+  const list = (pairs) => pairs.slice(0, 3).join(", ") + (pairs.length > 3 ? ", …" : "");
+  const [here, away] = [only(x, y), only(y, x)];
+  return [here.length ? `only here: ${list(here)}` : "", away.length ? `only on ${there}: ${list(away)}` : ""].filter(Boolean).join("; ");
+};
 for (const p of canonicalSelf) {
   if (!p.hreflangs.size) continue;
   const self = [...p.hreflangs.values()].some((u) => toPath(u) === (p.urlPath === "/" ? "/" : p.urlPath));
   if (!self) err(`${p.urlPath}: hreflang cluster omits the page itself`);
+  if ((p.hreflangs.has("x-default") || p.hreflangs.has("en")) && p.hreflangs.get("x-default") !== p.hreflangs.get("en")) {
+    err(`${p.urlPath}: hreflang x-default is ${p.hreflangs.get("x-default") || "missing"}, not the en entry ${p.hreflangs.get("en") || "(none)"}`);
+  }
   for (const [lang, u] of p.hreflangs) {
     const target = toPath(u);
     if (target === null || !resolves(target)) {
@@ -255,12 +272,66 @@ for (const p of canonicalSelf) {
     }
     const targetPage = pages.get(target === "/" ? "/" : target);
     if (!targetPage) continue;
-    if (lang === "x-default") continue;
-    const targetSet = new Set([...targetPage.hreflangs.keys()]);
-    const mySet = new Set([...p.hreflangs.keys()]);
-    if (targetSet.size && (targetSet.size !== mySet.size || [...mySet].some((l) => !targetSet.has(l)))) {
-      err(`${p.urlPath}: hreflang set differs from ${target} (${[...mySet]} vs ${[...targetSet]})`);
+    // a cluster is pages that are indexed: a page and its translations are indexed alike
+    const targetSelf = targetPage.canonical && toPath(targetPage.canonical) === target;
+    if (targetPage.noindex || !targetSelf) err(`${p.urlPath}: hreflang ${lang} points at ${target}, which is ${targetPage.noindex ? "noindex" : "not its own canonical"}`);
+    const expected = lang === "x-default" ? "en" : lang;
+    if (targetPage.lang !== expected) err(`${p.urlPath}: hreflang ${lang} points at ${target}, whose <html lang> is "${targetPage.lang}"`);
+    const differ = pairsDiffer(p.hreflangs, targetPage.hreflangs, target);
+    if (differ) err(`${p.urlPath}: hreflang cluster differs from ${target}'s (${differ})`);
+  }
+}
+
+// ── translated pages: every language, or none ──
+// A page group (src/lib/route-localization.js, react/src/i18n/pages/) marked
+// localized publishes each of its English pages in every site language: a
+// /<lang>/ twin for each, a page in its own right (not a redirect stub)
+// wherever the English is one, in its language and direction, and indexed
+// alike. Until a group is localized none of its /<lang>/ pages is built (nginx
+// 301s their URLs to the English page, and serves a built one as it is). Every
+// page states its language's direction (right to left for Arabic).
+{
+  const DIRS = { ar: "rtl" };
+  const twinOf = (lang, urlPath) => `/${lang}${urlPath === "/" ? "" : urlPath}`;
+  const localizedGroups = new Set(LOCALIZED_GROUPS);
+  const twinsBuilt = new Map(LOCALIZED_GROUPS.map((id) => [id, 0]));
+  for (const p of pages.values()) {
+    if (p.redirectStub) continue;
+    const lang = langForPath(p.urlPath);
+    // a left-to-right page may leave dir to its default; a right-to-left one must say so
+    if (SITE_LANG_CODES.includes(p.lang) && (p.dir || "ltr") !== (DIRS[p.lang] || "ltr")) {
+      err(`${p.urlPath}: <html lang="${p.lang}" dir="${p.dir}">, expected dir="${DIRS[p.lang] || "ltr"}"`);
     }
+    // the social card's locale is the page's language (ar_AR, de_DE, …)
+    const ogLocale = attr((p.html.match(/<meta property="og:locale"[^>]*>/) || [])[0] || "", "content");
+    if (ogLocale && SITE_LANG_CODES.includes(p.lang) && ogLocale.split("_")[0] !== p.lang) {
+      err(`${p.urlPath}: og:locale "${ogLocale}" on a page in "${p.lang}"`);
+    }
+    if (lang !== "en") {
+      const base = basePathFor(p.urlPath);
+      const group = groupForPath(p.urlPath);
+      const known = hasLocalizedVersion(base) || (base === NOT_FOUND_PATH && localizedGroups.has("not-found"));
+      if (!known) err(`${p.urlPath}: built in ${lang}, but ${group ? `page group ${group} is not localized (react/src/i18n/pages/${group}/group.js)` : "the page has no translations (src/lib/route-localization.js)"}`);
+      else if (group) twinsBuilt.set(group, (twinsBuilt.get(group) || 0) + 1);
+      continue;
+    }
+    const group = groupForPath(p.urlPath);
+    if (!group || !localizedGroups.has(group)) continue;
+    for (const l of NON_EN_SITE_LANG_CODES) {
+      const twin = pages.get(twinOf(l, p.urlPath));
+      if (!twin) err(`${p.urlPath}: page group ${group} is localized, but /${l}${p.urlPath === "/" ? "" : p.urlPath} is not built`);
+      else if (twin.redirectStub) err(`${twin.urlPath}: a redirect stub, where ${p.urlPath} is a page`);
+      else {
+        if (twin.lang !== l) err(`${twin.urlPath}: <html lang="${twin.lang}">, expected "${l}"`);
+        if (twin.noindex !== p.noindex) err(`${twin.urlPath}: ${twin.noindex ? "noindex" : "indexable"}, but ${p.urlPath} is ${p.noindex ? "noindex" : "indexable"} (a page and its translations are indexed alike)`);
+      }
+    }
+  }
+  for (const [group, built] of twinsBuilt) {
+    if (!built) err(`page group ${group} is localized, but none of its pages is built in another language`);
+  }
+  for (const id of Object.keys(PAGE_GROUPS)) {
+    if (!Array.isArray(PAGE_GROUPS[id].paths) || !PAGE_GROUPS[id].paths.length) err(`page group ${id}: group.js names no paths`);
   }
 }
 
@@ -282,15 +353,14 @@ else {
       const cPath = page.canonical && toPath(page.canonical);
       const selfPath = page.urlPath === "/" ? "/" : page.urlPath;
       if (cPath && cPath !== selfPath) err(`sitemap: ${loc} canonicalizes to ${cPath} — drop it`);
-      // sitemap alternates must equal the head's cluster
-      const links = new Set([...block.matchAll(/hreflang="([^"]+)"/g)].map((m) => m[1]));
-      const headSet = new Set([...page.hreflangs.keys()]);
-      if (links.size || headSet.size) {
-        const diff = [...links].filter((l) => !headSet.has(l)).concat([...headSet].filter((l) => !links.has(l)));
+      // sitemap alternates must equal the head's cluster, language and URL
+      const links = new Map([...block.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [m[1], m[2]]));
+      if (links.size || page.hreflangs.size) {
+        const diff = pairsDiffer(links, page.hreflangs, "the page");
         // a sitemap entry with NO links for a single-language page is fine even
         // though the head self-references en + x-default
-        const singleLang = headSet.size <= 2 && links.size === 0;
-        if (diff.length && !singleLang) err(`sitemap: ${loc} alternates ≠ head (${diff.join(",")})`);
+        const singleLang = page.hreflangs.size <= 2 && links.size === 0;
+        if (diff && !singleLang) err(`sitemap: ${loc} alternates ≠ head (${diff})`);
       }
     }
   }
@@ -316,8 +386,22 @@ for (const p of pages.values()) {
   if (skips.length) err(`${p.urlPath}: heading levels skip (${skips.join(", ")})`);
 }
 
-// an unlisted document's page (docs-shared.js UNLISTED_DOC_SLUGS)
-const unlistedDocPage = (p) => p.startsWith("/docs/") && UNLISTED_DOC_SLUGS.has(p.slice("/docs/".length));
+// The page-specific checks below hold a page's translations to what they hold
+// the English page to: each reads a page by its path without the language
+// prefix (basePathFor), so /de/docs/miner is a docs page as /docs/miner is.
+// The translated pages exist for search too, and a translation can break what
+// its English meets (a title, a stated day, a link).
+
+// an unlisted document's page (docs-shared.js UNLISTED_DOC_SLUGS), in any language
+const unlistedDocPage = (p) => {
+  const base = basePathFor(p);
+  return base.startsWith("/docs/") && UNLISTED_DOC_SLUGS.has(base.slice("/docs/".length));
+};
+// a page and its translations the build has, by its English path
+const inEveryLanguage = (englishPath) =>
+  [englishPath, ...NON_EN_SITE_LANG_CODES.map((l) => `/${l}${englishPath === "/" ? "" : englishPath}`)]
+    .map((u) => pages.get(u))
+    .filter((p) => p && !p.redirectStub);
 
 // ── unlisted documents and document images ──
 // An unlisted document (docs-shared.js) is published for links from outside
@@ -362,14 +446,15 @@ for (const p of pages.values()) {
     spansOf.set(slug, [...spans]);
   }
   const listed = (spans) => `${spans.slice(0, 4).map((s) => `\`${s}\``).join(", ")}${spans.length > 4 ? ", …" : ""}`;
+  // a translated document keeps its code as the English writes it
   for (const [slug, spans] of spansOf) {
-    const p = pages.get(`/docs/${slug}`);
-    if (!p || p.redirectStub) continue;
-    const shown = new Set(
-      [...p.html.matchAll(/<code class="md-icode"[^>]*>([\s\S]*?)<\/code>/g)].map((m) => decodeHtmlEntities(m[1].replace(/<[^>]+>/g, ""))),
-    );
-    const cut = spans.filter((s) => !shown.has(s));
-    if (cut.length) err(`${p.urlPath}: ${cut.length} inline code span(s) shown without all of their text: ${listed(cut)}`);
+    for (const p of inEveryLanguage(`/docs/${slug}`)) {
+      const shown = new Set(
+        [...p.html.matchAll(/<code class="md-icode"[^>]*>([\s\S]*?)<\/code>/g)].map((m) => decodeHtmlEntities(m[1].replace(/<[^>]+>/g, ""))),
+      );
+      const cut = spans.filter((s) => !shown.has(s));
+      if (cut.length) err(`${p.urlPath}: ${cut.length} inline code span(s) shown without all of their text: ${listed(cut)}`);
+    }
   }
   // a query matches where each of its words occurs within a word of the entry (lib/docs-search.js)
   const searchFile = path.join(DIST, "docs-search.json");
@@ -390,7 +475,8 @@ for (const p of pages.values()) {
 for (const p of pages.values()) {
   if (p.redirectStub || p.noindex) continue;
   const body = p.html.slice(p.html.indexOf("<body"));
-  if (p.urlPath.startsWith("/docs/")) {
+  const base = basePathFor(p.urlPath);
+  if (base.startsWith("/docs/")) {
     const meta = (body.match(/<h1\b[^>]*>[\s\S]*?<\/h1>\s*<p class="explorer-page-meta">([\s\S]*?)<\/p>/) || [])[1];
     const modified = (p.html.match(/"dateModified":"([^"]+)"/) || [])[1];
     if (meta === undefined) err(`${p.urlPath}: no line under the document title`);
@@ -400,7 +486,7 @@ for (const p of pages.values()) {
       err(`${p.urlPath}: the line under the title does not give the day the page last changed (${modified})`);
     }
   }
-  if (LEGAL_PAGES.includes(p.urlPath)) {
+  if (LEGAL_PAGES.includes(base)) {
     const heading = decodeHtmlEntities((body.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/) || [])[1]?.replace(/<[^>]+>/g, "") || "").toLowerCase();
     const name = decodeHtmlEntities(p.title).replace(/\s+[—–|-]\s+UR\s*$/u, "").toLowerCase();
     if (!heading.includes(name)) err(`${p.urlPath}: titled "${name}", but its heading names "${heading}"`);
@@ -422,7 +508,14 @@ for (const p of pages.values()) {
     } catch {
       /* reported above */
     }
-    if (p.urlPath.startsWith("/docs/")) {
+    const base = basePathFor(p.urlPath);
+    // a page's own nodes are in its language (the site-wide WebSite lists them all)
+    for (const node of graph) {
+      if (typeof node.inLanguage === "string" && node.inLanguage !== p.lang) {
+        err(`${p.urlPath}: its ${node["@type"]} is inLanguage "${node.inLanguage}", the page "${p.lang}"`);
+      }
+    }
+    if (base.startsWith("/docs/")) {
       const article = graph.find((n) => n["@type"] === "TechArticle");
       if (!article) {
         err(`${p.urlPath}: no TechArticle`);
@@ -438,7 +531,7 @@ for (const p of pages.values()) {
       const imagePath = image ? toPath(image) : null;
       if (!imagePath || !resolves(imagePath)) err(`${p.urlPath}: TechArticle image ${image || "missing"} is not served`);
     }
-    if (/^\/investors\/[^/]+$/.test(p.urlPath) && !graph.some((n) => WORK_TYPES.has(n["@type"]) && DAY.test(n.datePublished || ""))) {
+    if (/^\/investors\/[^/]+$/.test(base) && !graph.some((n) => WORK_TYPES.has(n["@type"]) && DAY.test(n.datePublished || ""))) {
       err(`${p.urlPath}: investor document declares no dated CreativeWork`);
     }
   }
@@ -452,23 +545,25 @@ for (const p of pages.values()) {
 // are read from the chain in the browser: its HTML says so, with the reserve's
 // account and where to check it.
 {
-  const build = pages.get("/build");
-  if (build) {
+  const css = files.filter((f) => f.endsWith(".css")).map((f) => readFileSync(f, "utf8")).join("\n");
+  const englishBriefs = (pages.get("/build")?.html.match(/<section class="brief-panel"[^>]*>/g) || []).map((tag) => attr(tag, "id") || "");
+  for (const build of inEveryLanguage("/build")) {
     const panels = [...build.html.matchAll(/<section class="brief-panel"[^>]*>/g)].map((m) => m[0]);
-    if (!panels.length) err("/build: no opportunity briefs in the page");
+    if (!panels.length) err(`${build.urlPath}: no opportunity briefs in the page`);
     for (const tag of panels) {
       const id = attr(tag, "id") || "";
-      if (!/^brief-[a-z0-9-]+$/.test(id)) err(`/build: brief ${id || "(no id)"} has no #brief-<slug> address`);
-      if (!/\shidden(?:=""|[\s>])/.test(tag)) err(`/build: brief ${id} is not marked hidden in the static page`);
+      if (!/^brief-[a-z0-9-]+$/.test(id)) err(`${build.urlPath}: brief ${id || "(no id)"} has no #brief-<slug> address`);
+      if (!/\shidden(?:=""|[\s>])/.test(tag)) err(`${build.urlPath}: brief ${id} is not marked hidden in the static page`);
     }
-    const css = files.filter((f) => f.endsWith(".css")).map((f) => readFileSync(f, "utf8")).join("\n");
-    if (!/\.brief-panel:target\b/.test(css)) err("/build: no stylesheet rule shows a brief at its address (.brief-panel:target)");
+    // a translation keeps the briefs' addresses, so a #brief-<slug> link works in every language
+    const ids = panels.map((tag) => attr(tag, "id") || "");
+    if (ids.join(" ") !== englishBriefs.join(" ")) err(`${build.urlPath}: its briefs are ${ids.join(", ")}, the English page's ${englishBriefs.join(", ")}`);
+    if (!/\.brief-panel:target\b/.test(css)) err(`${build.urlPath}: no stylesheet rule shows a brief at its address (.brief-panel:target)`);
   }
-  const reservePage = pages.get("/reserve");
-  if (reservePage) {
+  for (const reservePage of inEveryLanguage("/reserve")) {
     const verify = (reservePage.html.match(/<p class="reserve-verify">([\s\S]*?)<\/p>/) || [])[1] || "";
     if (!verify.includes(reserve.address) || !verify.includes(`href="${reserve.explorerUrl}"`)) {
-      err("/reserve: the static page does not say where to verify its figures (the account and its explorer link)");
+      err(`${reservePage.urlPath}: the static page does not say where to verify its figures (the account and its explorer link)`);
     }
   }
 }
@@ -519,7 +614,8 @@ for (const p of pages.values()) {
     for (const island of islands(p.html)) {
       if (island.name === "NavIsland" && island.client === "load") err(`${p.urlPath}: the nav hydrates on load (client:idle keeps it off the critical path)`);
     }
-    if (p.urlPath !== "/docs" && !p.urlPath.startsWith("/docs/")) continue;
+    const docsBase = basePathFor(p.urlPath);
+    if (docsBase !== "/docs" && !docsBase.startsWith("/docs/")) continue;
     const onLoad = islands(p.html).filter((i) => i.client === "load").map((i) => i.name);
     if (onLoad.length) err(`${p.urlPath}: a docs page hydrates ${onLoad.join(", ")} on load`);
     const bytes = scriptBytes(p.html);
@@ -527,72 +623,68 @@ for (const p of pages.values()) {
   }
 }
 
-// ── capture the flag: 249 country pages, each its own ──
-// Every /ctf/<cc> page is indexable (sn design/ctf/SEO.md §2.1), so none may
-// be another with only the country's name swapped: a template that shows no
-// data of its own is a doorway in Google's spam policies. This reads what each
-// page says of its own country: the text of its <main> without the parts about
-// other countries (marked data-ctf-elsewhere: its neighbours in A–Z and its
-// other big pots), with its own names masked. Pages that then read the same
-// must be countries whose data, as the pages state it, is the same: otherwise
-// a page has left out its own figures. Countries whose data is the same read
-// the same and are listed (every page is indexable by the owner's decision;
-// such a page needs data or a local note of its own). Without a draw last
-// epoch no capture the flag page may claim a default win or show a chance to
-// win (the API's draw figures are null). And the pages are exactly the
-// snapshot's 249.
+// ── capture the flag: 249 country pages, indexed only when each is its own ──
+// A /ctf/<cc> page that reads like another country page but for the country's
+// name is a doorway in Google's spam policies, so it is noindex until its data
+// or a local note sets it apart (sn design/ctf/SEO.md §2.1). The build decides
+// it with react/src/components/pages/ctf/indexing.js from every page rendered
+// with its country's names and code as a placeholder, in every language it is
+// built in; this decides again with the same function and the same component
+// (rendered through Vite, ctf-render.mjs), and holds the built pages to it: each
+// page, in every language, is indexed as decided; every language noindexes the
+// same countries; and pages that read alike print the same figures (pots as the
+// page prints them, to 0.01 α), or a page has left out its own. The noindex
+// pages are listed. Each language has the snapshot's 249 country pages beside
+// its hub. Without a draw last epoch no capture the flag page in any language
+// may claim a default win or show a chance to win (the API's draw figures are
+// null).
 {
   const CTF_SNAPSHOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../react/src/data/ctf-epoch.json");
-  const countryPages = [...pages.values()].filter((p) => /^\/ctf\/[a-z]{2}$/.test(p.urlPath) && !p.redirectStub);
-  if (countryPages.length || pages.has("/ctf")) {
-    const snapshot = existsSync(CTF_SNAPSHOT) ? JSON.parse(readFileSync(CTF_SNAPSHOT, "utf8")) : { countries: [] };
-    const byCode = new Map(snapshot.countries.map((c) => [c.code, c]));
-    if (countryPages.length !== snapshot.countries.length) err(`/ctf: ${countryPages.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
-    const mainText = (html, { own = true } = {}) => {
-      let main = ((html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "").replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ");
-      if (own) main = main.replace(/<(nav|section)\b[^>]*\sdata-ctf-elsewhere\b[^>]*>[\s\S]*?<\/\1>/gi, " ");
-      return decodeHtmlEntities(main.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
-    };
-    // the data a country page states (CtfCountry.jsx and ctf/model.js): its dashboard counts, its
-    // territory flag, and after a root its roles' winners, units and pots, its near misses, awards
-    // and epochs without a winner
-    const stated = (c) => JSON.stringify([
-      c.inhabited, c.online, c.seen_days, c.last_seen, c.peak, c.open_epochs, c.near_misses, c.awarded,
-      ...["providers", "extenders"].map((r) => [c[r].won, c[r].units, c[r].pot]),
-    ]);
-    const same = new Map();
-    for (const p of countryPages) {
-      const c = byCode.get(p.urlPath.slice("/ctf/".length));
-      if (!c) {
-        err(`${p.urlPath}: no such country in react/src/data/ctf-epoch.json`);
-        continue;
-      }
-      if (p.noindex) err(`${p.urlPath}: a country page is noindex`);
-      const the = c.sentence_name;
-      const names = [c.name, the, the.charAt(0).toUpperCase() + the.slice(1), the.replace(/^the /, "")].sort((a, b) => b.length - a.length);
-      let text = mainText(p.html);
-      for (const name of names) text = text.split(name).join("\u0000");
-      if (!same.has(text)) same.set(text, []);
-      same.get(text).push({ urlPath: p.urlPath, data: stated(c) });
+  const ctfPagesOf = (lang) => {
+    const prefix = lang === "en" ? "" : `/${lang}`;
+    return [...pages.values()].filter((p) => new RegExp(`^${prefix}/ctf/[a-z]{2}$`).test(p.urlPath) && !p.redirectStub);
+  };
+  const countryPages = ctfPagesOf("en");
+  if ((countryPages.length || pages.has("/ctf")) && !existsSync(CTF_SNAPSHOT)) err("/ctf: react/src/data/ctf-epoch.json is missing");
+  else if (countryPages.length || pages.has("/ctf")) {
+    const snapshot = JSON.parse(readFileSync(CTF_SNAPSHOT, "utf8"));
+    // the languages capture the flag is built in
+    const ctfLangs = ["en", ...NON_EN_SITE_LANG_CODES.filter((lang) => ctfPagesOf(lang).length || pages.has(`/${lang}/ctf`))];
+    for (const lang of ctfLangs) {
+      const built = ctfPagesOf(lang);
+      const hub = lang === "en" ? "/ctf" : `/${lang}/ctf`;
+      if (!pages.has(hub)) err(`${hub}: the hub is missing beside its country pages`);
+      if (built.length !== snapshot.countries.length) err(`${hub}: ${built.length} country pages for the snapshot's ${snapshot.countries.length} countries`);
     }
-    const alike = [];
-    for (const group of same.values()) {
-      if (group.length < 2) continue;
-      if (new Set(group.map((g) => g.data)).size > 1) {
-        err(`${group.map((g) => g.urlPath).join(", ")}: read the same but for the country's name, though their data differs (a page leaves out its own figures)`);
-      } else {
-        alike.push(group.map((g) => g.urlPath.slice("/ctf/".length)));
+    const { ctfRenderer } = await import("./ctf-render.mjs");
+    const renderer = await ctfRenderer();
+    try {
+      const { countryIndexing, countryIndexingProblems } = renderer.indexing;
+      const decision = countryIndexing(renderer.CTF, renderer.render, ctfLangs);
+      const built = ctfLangs.flatMap((lang) => ctfPagesOf(lang).map((p) => ({ lang, code: p.urlPath.slice(-2), noindex: p.noindex })));
+      countryIndexingProblems(renderer.CTF, decision, built).forEach(err);
+      const groups = decision.byLang.get("en").groups;
+      const noindexed = [...decision.decided.values()].filter((d) => d.noindex).length;
+      if (noindexed) {
+        console.log(`seo-audit: note: ${noindexed} country pages are noindex in ${ctfLangs.join(", ")}, each reading like another but for the country's name (${groups.length} group(s)): ${groups.map((g) => g.join(" ")).join(" | ")}`);
       }
-    }
-    if (alike.length) {
-      const pagesAlike = alike.reduce((n, g) => n + g.length, 0);
-      console.log(`seo-audit: note: ${pagesAlike} country pages read like another but for the name, their countries' data being the same (${alike.length} group(s)): ${alike.map((g) => g.join(" ")).join(" | ")}`);
+    } finally {
+      await renderer.close();
     }
     if (!snapshot.last_epoch?.drawn) {
-      for (const p of [...countryPages, pages.get("/ctf")].filter(Boolean)) {
-        const text = mainText(p.html, { own: false });
-        const claim = text.match(/[^.]*\bwins? by default\b[^.]*\.|[^.]*\b\d+(?:\.\d+)?%[^.]*\./);
-        if (claim) err(`${p.urlPath}: without a draw last epoch it says "${claim[0].trim()}"`);
+      const { CHANCE_SHOWN, DEFAULT_WIN } = await import("../../react/src/components/pages/ctf/indexing.js");
+      const mainOf = (html) => (html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/) || [])[1] || "";
+      for (const lang of ctfLangs) {
+        const hub = pages.get(lang === "en" ? "/ctf" : `/${lang}/ctf`);
+        for (const p of [...ctfPagesOf(lang), hub].filter(Boolean)) {
+          const text = decodeHtmlEntities(mainOf(p.html).replace(/<(script|style|template)\b[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+          const sentence = (re) => {
+            const at = text.search(re);
+            return at < 0 ? null : text.slice(Math.max(0, at - 60), at + 80).trim();
+          };
+          const claim = sentence(DEFAULT_WIN[lang]) || sentence(CHANCE_SHOWN);
+          if (claim) err(`${p.urlPath}: without a draw last epoch it says "…${claim}…"`);
+        }
       }
     }
   }

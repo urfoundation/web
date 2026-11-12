@@ -1,7 +1,7 @@
 ---
 import '@react/App.css';
-import { LANG_CODES } from '../lib/i18n.js';
-import { basePathFor, hasLocalizedVersion, publicPathFor, storedLanguageRedirectScript } from '../lib/route-localization.js';
+import { LANG_CODES, LANGS, getDict } from '../lib/i18n.js';
+import { LANG_CHOICE_SCRIPT, alternatesFor, basePathFor, hasLocalizedVersion, localizedPathFor, publicPathFor, storedLanguageRedirectScript } from '../lib/route-localization.js';
 
 interface Props {
     title: string;
@@ -31,7 +31,8 @@ const {
     title,
     description = 'UR: Own your privacy. Own the network.',
     lang = 'en',
-    dir = 'ltr',
+    // the page's direction: right to left for Arabic (lib/i18n.js LANGS)
+    dir = LANGS[lang]?.dir || 'ltr',
     jsonLd = [],
     alternate = null,
     noindex = false,
@@ -58,13 +59,13 @@ const alternateHref = alternate && (alternate.href.startsWith('http') ? alternat
 const OG_LOCALES = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_ES' };
 const ogLocale = OG_LOCALES[lang] || OG_LOCALES.en;
 
-// Language alternates exist only for routes backed by real translated pages.
-// A positive allowlist keeps a newly-added English page from claiming
-// unserved /<lang>/... variants by default.
+// Language alternates exist only for routes backed by real translated pages
+// (lib/route-localization.js): the home page, the sections and the localized
+// page groups. A positive allowlist keeps a newly-added English page from
+// claiming unserved /<lang>/... variants by default.
 const basePath = basePathFor(publicPath);
 const localized = hasLocalizedVersion(basePath);
-const altHref = (l) =>
-    new URL(l === 'en' ? basePath : `/${l}${basePath === '/' ? '' : basePath}`, SITE_ORIGIN).href;
+const alternates = alternatesFor(basePath).map(({ hreflang, path }) => ({ hreflang, href: new URL(path, SITE_ORIGIN).href }));
 
 // Site-wide schema.org graph. The Organization is the site's publisher, UR
 // Foundation, as the footer and the legal pages name it, also known by the
@@ -80,22 +81,25 @@ const X_HANDLE = 'urnetwork';
 
 // Breadcrumbs follow the URL: the home page of the page's language, the
 // section a page sits in (Docs, the Investor Centre, Research, Capture the
-// flag), then the page itself, named without the site suffix (" — UR",
-// " | UR", " — UR Docs").
+// flag: named in the page's language, and linked in it when the section page
+// has translations), then the page itself, named without the site suffix
+// (" — UR", " | UR", " — UR Docs").
 const homeUrl = lang && lang !== 'en' ? new URL(`/${lang}`, SITE_ORIGIN).href : `${SITE_ORIGIN}/`;
+const dict = (await getDict(lang)) || (await getDict('en'));
 const PARENTS = [
-    { prefix: '/docs/', name: 'Docs', path: '/docs' },
-    { prefix: '/investors/', name: 'Investor Centre', path: '/investors' },
-    { prefix: '/research/', name: 'Research', path: '/research' },
-    { prefix: '/ctf/', name: 'Capture the flag', path: '/ctf' },
+    { prefix: '/docs/', name: dict.nav.docs, path: '/docs' },
+    { prefix: '/investors/', name: dict.footer.investorCentre, path: '/investors' },
+    { prefix: '/research/', name: dict.nav.research, path: '/research' },
+    { prefix: '/ctf/', name: dict.nav.ctf, path: '/ctf' },
 ];
 const parent = PARENTS.find((p) => basePath.startsWith(p.prefix));
+const parentPath = parent && (hasLocalizedVersion(parent.path) ? localizedPathFor(parent.path, lang) : parent.path);
 const pageName = breadcrumbName || title.replace(/\s+[—–|-]\s+UR(?:\s+Docs)?\s*$/u, '');
 const trail = basePath === '/' || noindex
     ? []
     : [
         { name: 'UR', item: homeUrl },
-        ...(parent ? [{ name: parent.name, item: new URL(parent.path, SITE_ORIGIN).href }] : []),
+        ...(parent ? [{ name: parent.name, item: new URL(parentPath, SITE_ORIGIN).href }] : []),
         { name: pageName, item: canonical },
     ];
 
@@ -142,10 +146,9 @@ const jsonLdText = JSON.stringify({ '@context': 'https://schema.org', '@graph': 
         page's picture into a result or a Discover card. */}
     {!noindex && <meta name="robots" content="max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
     {!noindex && <link rel="canonical" href={canonical} />}
-    {!noindex && localized && LANG_CODES.map(l => (
-        <link rel="alternate" hreflang={l} href={altHref(l)} />
+    {!noindex && alternates.map(a => (
+        <link rel="alternate" hreflang={a.hreflang} href={a.href} />
     ))}
-    {!noindex && localized && <link rel="alternate" hreflang="x-default" href={altHref('en')} />}
     {alternateHref && <link rel="alternate" type={alternate.type} href={alternateHref} />}
 
     <!-- Open Graph -->
@@ -208,10 +211,10 @@ const jsonLdText = JSON.stringify({ '@context': 'https://schema.org', '@graph': 
     <script type="application/ld+json" set:html={jsonLdText} />
 
     {/* A visitor who chose another language reads the page in it: the script
-        redirects a translated English page to its /<lang>/ twin and does
-        nothing on a page without translations (it was inlined by the home and
-        section pages, which are exactly the translated ones). */}
-    <script is:inline set:html={storedLanguageRedirectScript()} />
+        redirects a translated English page to its /<lang>/ twin. Only a page
+        with translations carries it, never the not-found page, which nginx
+        serves at every missing URL (lib/route-localization.js). */}
+    {localized && <script is:inline set:html={storedLanguageRedirectScript()} />}
 
     <!-- Page-specific head extras. -->
     <slot name="head" />
@@ -239,5 +242,8 @@ const jsonLdText = JSON.stringify({ '@context': 'https://schema.org', '@graph': 
     <div id="root">
         <slot />
     </div>
+    {/* following a link marked data-lang-choice (a translation's link to its
+        English original) stores that language, as the switcher does */}
+    <script is:inline set:html={LANG_CHOICE_SCRIPT} />
 </body>
 </html>

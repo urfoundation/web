@@ -6,12 +6,16 @@
  *
  * The index is /docs-search.json, fetched the first time the box is focused or
  * typed in, so a page that is only read never loads it: the docs pages used to
- * bundle the whole corpus to search it.
+ * bundle the whole corpus to search it. A translated page passes its own
+ * language's index (/docs-search.<lang>.json, its translations' text) and the
+ * box's words from the docs copy (react/src/i18n/pages/docs/).
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { searchDocs } from '@react/lib/docs-search.js';
 
-export default function DocsSearchIsland({ indexUrl = '/docs-search.json' }) {
+const ENGLISH = { placeholder: 'Search docs', label: 'Search docs', results: 'Search results', none: 'No matches.', kind: 'DOC' };
+
+export default function DocsSearchIsland({ indexUrl = '/docs-search.json', labels = ENGLISH }) {
     const [query, setQuery] = useState('');
     const [index, setIndex] = useState(null);
     const loading = useRef(null);
@@ -42,21 +46,21 @@ export default function DocsSearchIsland({ indexUrl = '/docs-search.json' }) {
                 <input
                     type="search"
                     className="explorer-search-input"
-                    placeholder="Search docs"
+                    placeholder={labels.placeholder}
                     value={query}
                     onFocus={load}
                     onChange={(e) => {
                         load();
                         setQuery(e.target.value);
                     }}
-                    aria-label="Search docs"
+                    aria-label={labels.label}
                 />
             </div>
 
             {results && (
-                <div className="explorer-results" role="listbox" aria-label="Search results">
+                <div className="explorer-results" role="listbox" aria-label={labels.results}>
                     {results.length === 0 && (
-                        <div className="explorer-results-empty">No matches.</div>
+                        <div className="explorer-results-empty">{labels.none}</div>
                     )}
                     {results.map((r, i) => (
                         <button
@@ -65,7 +69,7 @@ export default function DocsSearchIsland({ indexUrl = '/docs-search.json' }) {
                             className="explorer-result"
                             onClick={() => window.location.assign(r.href)}
                         >
-                            <span className="explorer-result-kind kind-doc">DOC</span>
+                            <span className="explorer-result-kind kind-doc">{labels.kind}</span>
                             <span className="explorer-result-body">
                                 <span className="explorer-result-title">{r.title}</span>
                                 {r.subtitle && (

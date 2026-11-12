@@ -16,6 +16,13 @@
 //     price feed (lib/usePrice.js): the operators' stats feeds (first-party) or
 //     CoinGecko's GeckoTerminal (*.geckoterminal.com), which /price reads too;
 //     in α, the default, it contacts nothing but the chain.
+//   - on /price: *.geckoterminal.com, CoinGecko's GeckoTerminal, the α price feed
+//     behind the page's live USD equivalents (lib/usePrice.js), which the page
+//     reads on load when the operators' feeds don't answer.
+//   - on /dashboard: *.opentensor.ai, the public Bittensor RPC endpoints, for the
+//     payout epochs, the reserve and its hotkeys, which the page reads from mainnet
+//     in the visitor's browser as /reserve does and names as a source.
+// A route's own hosts hold for it in every language: /ar/price is /price.
 // SSO / WalletConnect / payment SDKs are intentionally NOT allowlisted — they may load
 // only inside their own flows, which this test does not trigger.
 import { chromium } from "playwright-core";
@@ -24,16 +31,20 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { OFFLINE_CHROMIUM_ARGS } from "./offline-chromium.mjs";
+import { localizedSamples } from "./localized-samples.mjs";
+import { basePathFor } from "../../astro/src/lib/route-localization.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REACT_DIR = path.resolve(__dirname, "..");
 const VITE_BIN = path.join(REACT_DIR, "node_modules/vite/bin/vite.js");
 
-const ROUTES = ["/", "/operators", "/miners", "/validators", "/research", "/docs", "/terms", "/privacy", "/vdp", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology"];
+const ROUTES = ["/", "/operators", "/miners", "/validators", "/research", "/docs", "/terms", "/privacy", "/vdp", "/reserve", "/mainnet", "/ctf", "/ctf/ke", "/research/2026-q3-report", "/research/methodology",
+  // a page of each localized page group, in Arabic (localized-samples.mjs)
+  ...localizedSamples(["ar"])];
 
 const ALLOWED = ["ur.xyz", "ur.io", "bringyour.com", "ur.network", "urnetwork.com"];
-// hosts a single route may contact, for the reason stated on that page
-const ALLOWED_ON_ROUTE = { "/reserve": ["opentensor.ai", "geckoterminal.com"] };
+// hosts a single route may contact, for the reason stated on that page (in any of its languages)
+const ALLOWED_ON_ROUTE = { "/reserve": ["opentensor.ai", "geckoterminal.com"], "/price": ["geckoterminal.com"], "/dashboard": ["opentensor.ai"] };
 
 function isLocal(host) {
   return host.startsWith("localhost") || host.startsWith("127.");
@@ -41,7 +52,7 @@ function isLocal(host) {
 
 function isAllowed(host, route) {
   if (isLocal(host)) return true;
-  const allowed = [...ALLOWED, ...(ALLOWED_ON_ROUTE[route] || [])];
+  const allowed = [...ALLOWED, ...(ALLOWED_ON_ROUTE[basePathFor(route)] || [])];
   return allowed.some((d) => host === d || host.endsWith("." + d));
 }
 

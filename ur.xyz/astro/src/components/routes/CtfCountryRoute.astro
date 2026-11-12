@@ -1,0 +1,92 @@
+---
+// /ctf/<cc> in any site language — a country's capture the flag page, one for
+// each of the 249 ISO 3166-1 codes (sn design/ctf/SEO.md §2 and §6). The
+// English pages (pages/ctf/[cc].astro) and their translations
+// (pages/[lang]/ctf/[cc].astro) both render this. Every page carries its own
+// country's data from the epoch's snapshot, never only its name: what is open
+// there and what its pots hold after a draw, before it the providers the
+// network's dashboard counted online there (the seo-audit refuses a page that
+// drops its own figures).
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/CtfCountry.jsx), rendered to static HTML in the
+// page's language: its words the `ctf` copy unit, the country's names (in a
+// list, in a title, "in <country>") the `ctf/names` unit. Its islands are the
+// live bar with the country's card, and the country's other big pots
+// (ctf/CountryIslands.jsx); their first render is this one. The paths are
+// lowercase codes in the clean form publicPathFor publishes (/ctf/ke,
+// /ru/ctf/ke). `noindex` is the build's decision (ctf-paths.js), the same in
+// every language: a page that reads like another but for the country's name
+// is noindex until its data or a local note sets it apart.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import CtfCountryPage from '@react/components/pages/CtfCountry.jsx';
+import { CountryEasyWins, CountryLive } from '@react/components/pages/ctf/CountryIslands.jsx';
+import { CTF } from '@react/components/pages/ctf/data.js';
+import { SITE, apiCountry, countryDescription, countryTitle, localModel } from '@react/components/pages/ctf/model.js';
+import { pagePath } from '@react/components/pages/ctf/links.js';
+import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
+import { getDict } from '../../lib/i18n.js';
+import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+    cc: string;
+    noindex?: boolean;
+}
+
+const { lang = 'en', cc, noindex = false } = Astro.props;
+const t = await getDict(lang);
+const m = localModel(CTF, lang);
+const c = m.byCode.get(cc);
+// the islands' props: English is their default, so the English pages' islands carry only the code, as before
+const islandLang = lang === 'en' ? {} : { lang };
+const title = countryTitle(c, lang);
+const url = `${SITE}${pagePath(lang, `/ctf/${cc}`)}`;
+// "Updated" in the description is the day the page last changed, as on the page
+const description = countryDescription(m, c, LASTMOD_TOKEN);
+// A page about a country (by its ISO 3166-1 code), part of the hub's dataset in
+// the same language; Base.astro adds the BreadcrumbList from breadcrumbName.
+const jsonLd = [{
+    '@type': 'WebPage',
+    '@id': `${url}#page`,
+    url,
+    name: title.replace(/ \| UR$/, ''),
+    description,
+    dateModified: LASTMOD_TOKEN,
+    inLanguage: lang,
+    ...(lang === 'en' ? {} : { translationOfWork: { '@id': `${SITE}/ctf/${cc}#page` } }),
+    about: { '@type': 'Country', name: c.name, identifier: cc.toUpperCase() },
+    isPartOf: { '@id': `${SITE}${pagePath(lang, '/ctf')}#dataset` },
+    publisher: { '@id': `${SITE}/#org` },
+}];
+---
+<Base
+    title={title}
+    description={description}
+    breadcrumbName={c.short}
+    lang={lang}
+    jsonLd={jsonLd}
+    alternate={{ href: apiCountry(cc), type: 'application/json' }}
+    ogImage={ctfOgImage(m)}
+    ogImageAlt={ctfCardAlt(m)}
+    noindex={noindex}
+>
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="ctf" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            <CtfCountryPage code={cc} lang={lang} updated={LASTMOD_TOKEN}>
+                <CountryLive slot="live" code={cc} {...islandLang} client:idle={{ timeout: 1500 }} />
+                <CountryEasyWins slot="easyWins" code={cc} {...islandLang} client:visible={{ rootMargin: '200px' }} />
+            </CtfCountryPage>
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

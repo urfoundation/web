@@ -6,7 +6,8 @@
 // fingerprint, or every build re-dates the page and the gate never passes.
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { pageFacts } from './page-dates.mjs';
+import path from 'node:path';
+import { GROUP_RECORD_DIR, RECORD_FILE, pageFacts, recordFileFor, serializeRecordFiles } from './page-dates.mjs';
 import { LASTMOD_TOKEN } from '../src/lib/lastmod.js';
 
 const page = (updated) => `<!doctype html><html lang="en"><head><title>Fixture guide — UR Docs</title>
@@ -22,4 +23,24 @@ test('a page stating its lastmod fingerprints the same with the token and with t
 
 test('a change to what the page says still changes its fingerprint', () => {
     assert.notEqual(pageFacts(page(LASTMOD_TOKEN)).fingerprint, pageFacts(page(LASTMOD_TOKEN).replace("The fixture's text.", 'Other text.')).fingerprint);
+});
+
+test('a page group\'s pages, in every language, are recorded in the group\'s own file', () => {
+    const group = (name) => path.join(GROUP_RECORD_DIR, `${name}.json`);
+    assert.equal(recordFileFor('/ctf/ke'), group('ctf'));
+    assert.equal(recordFileFor('/de/ctf/ke'), group('ctf'));
+    assert.equal(recordFileFor('/ar/about'), group('about'));
+    assert.equal(recordFileFor('/docs/miner/install'), group('docs'));
+    assert.equal(recordFileFor('/terms'), group('docs'));
+    assert.equal(recordFileFor('/research/methodology'), group('research-methodology'));
+    for (const page of ['/', '/de', '/miners', '/ar/research', '/audits/masa-l2-2025.pdf']) assert.equal(recordFileFor(page), RECORD_FILE, page);
+
+    const entry = { fingerprint: '0123456789abcdef', lastmod: '2026-11-12' };
+    const files = serializeRecordFiles(new Map([['/', entry], ['/ctf/ke', entry], ['/de/ctf/ke', entry], ['/about', entry]]));
+    assert.deepEqual(Object.keys(JSON.parse(files.get(RECORD_FILE)).pages), ['/']);
+    assert.deepEqual(Object.keys(JSON.parse(files.get(group('ctf'))).pages), ['/ctf/ke', '/de/ctf/ke']);
+    assert.deepEqual(Object.keys(JSON.parse(files.get(group('about'))).pages), ['/about']);
+    // a group with no recorded page has no file
+    assert.equal(files.get(group('not-found')), null);
+    assert.equal(files.get(group('mainnet')), null);
 });

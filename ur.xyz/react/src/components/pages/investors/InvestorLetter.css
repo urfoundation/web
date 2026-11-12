@@ -872,7 +872,10 @@
         min-height: 0;
     }
 
+    /* Centred in its column: a full-width arrow turned about its centre
+       carried the glyph half a column away from the gap between the boxes. */
     .letter-flow__arrow {
+        justify-self: center;
         transform: rotate(90deg);
     }
 

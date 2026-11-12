@@ -329,6 +329,9 @@
 [dir="rtl"] .announcement-document-section li { padding-right: 0.4rem; padding-left: 0; }
 [dir="rtl"] .announcement-paper--tokenholders .announcement-signoff p { text-align: right; }
 [dir="rtl"] .announcement-document-section blockquote { padding: 0 22px 0 0; }
+/* Arabic script takes no italic: the quotations and emphasis stand upright */
+[dir="rtl"] .announcement-paper em,
+[dir="rtl"] .announcement-document-section blockquote p { font-style: normal; }
 
 @media (max-width: 760px) {
     [dir="rtl"] .announcement-address { text-align: right; }

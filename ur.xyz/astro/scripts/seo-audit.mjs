@@ -245,10 +245,25 @@ for (const key of ["title", "description"]) {
 }
 
 // ── hreflang truthfulness: self-reference + reciprocity + served targets ──
+// A cluster is its (language, URL) pairs: every member lists the same pairs,
+// so each language names the same page from every member, and x-default is
+// the English page (the site's default: route-localization.js alternatesFor).
+const clusterPairs = (hreflangs) => [...hreflangs].map(([lang, u]) => `${lang} ${u}`).sort();
+// the pairs one cluster has and the other lacks, each way: "" when they agree
+const pairsDiffer = (a, b, there) => {
+  const [x, y] = [clusterPairs(a), clusterPairs(b)];
+  const only = (from, to) => from.filter((pair) => !to.includes(pair));
+  const list = (pairs) => pairs.slice(0, 3).join(", ") + (pairs.length > 3 ? ", …" : "");
+  const [here, away] = [only(x, y), only(y, x)];
+  return [here.length ? `only here: ${list(here)}` : "", away.length ? `only on ${there}: ${list(away)}` : ""].filter(Boolean).join("; ");
+};
 for (const p of canonicalSelf) {
   if (!p.hreflangs.size) continue;
   const self = [...p.hreflangs.values()].some((u) => toPath(u) === (p.urlPath === "/" ? "/" : p.urlPath));
   if (!self) err(`${p.urlPath}: hreflang cluster omits the page itself`);
+  if ((p.hreflangs.has("x-default") || p.hreflangs.has("en")) && p.hreflangs.get("x-default") !== p.hreflangs.get("en")) {
+    err(`${p.urlPath}: hreflang x-default is ${p.hreflangs.get("x-default") || "missing"}, not the en entry ${p.hreflangs.get("en") || "(none)"}`);
+  }
   for (const [lang, u] of p.hreflangs) {
     const target = toPath(u);
     if (target === null || !resolves(target)) {
@@ -260,13 +275,10 @@ for (const p of canonicalSelf) {
     // a cluster is pages that are indexed: a page and its translations are indexed alike
     const targetSelf = targetPage.canonical && toPath(targetPage.canonical) === target;
     if (targetPage.noindex || !targetSelf) err(`${p.urlPath}: hreflang ${lang} points at ${target}, which is ${targetPage.noindex ? "noindex" : "not its own canonical"}`);
-    if (lang === "x-default") continue;
-    if (targetPage.lang !== lang) err(`${p.urlPath}: hreflang ${lang} points at ${target}, whose <html lang> is "${targetPage.lang}"`);
-    const targetSet = new Set([...targetPage.hreflangs.keys()]);
-    const mySet = new Set([...p.hreflangs.keys()]);
-    if (targetSet.size && (targetSet.size !== mySet.size || [...mySet].some((l) => !targetSet.has(l)))) {
-      err(`${p.urlPath}: hreflang set differs from ${target} (${[...mySet]} vs ${[...targetSet]})`);
-    }
+    const expected = lang === "x-default" ? "en" : lang;
+    if (targetPage.lang !== expected) err(`${p.urlPath}: hreflang ${lang} points at ${target}, whose <html lang> is "${targetPage.lang}"`);
+    const differ = pairsDiffer(p.hreflangs, targetPage.hreflangs, target);
+    if (differ) err(`${p.urlPath}: hreflang cluster differs from ${target}'s (${differ})`);
   }
 }
 
@@ -341,15 +353,14 @@ else {
       const cPath = page.canonical && toPath(page.canonical);
       const selfPath = page.urlPath === "/" ? "/" : page.urlPath;
       if (cPath && cPath !== selfPath) err(`sitemap: ${loc} canonicalizes to ${cPath} — drop it`);
-      // sitemap alternates must equal the head's cluster
-      const links = new Set([...block.matchAll(/hreflang="([^"]+)"/g)].map((m) => m[1]));
-      const headSet = new Set([...page.hreflangs.keys()]);
-      if (links.size || headSet.size) {
-        const diff = [...links].filter((l) => !headSet.has(l)).concat([...headSet].filter((l) => !links.has(l)));
+      // sitemap alternates must equal the head's cluster, language and URL
+      const links = new Map([...block.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [m[1], m[2]]));
+      if (links.size || page.hreflangs.size) {
+        const diff = pairsDiffer(links, page.hreflangs, "the page");
         // a sitemap entry with NO links for a single-language page is fine even
         // though the head self-references en + x-default
-        const singleLang = headSet.size <= 2 && links.size === 0;
-        if (diff.length && !singleLang) err(`sitemap: ${loc} alternates ≠ head (${diff.join(",")})`);
+        const singleLang = page.hreflangs.size <= 2 && links.size === 0;
+        if (diff && !singleLang) err(`sitemap: ${loc} alternates ≠ head (${diff})`);
       }
     }
   }

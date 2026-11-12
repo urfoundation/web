@@ -36,13 +36,12 @@ export function docDate(doc, lang, options) {
 
 // A visitor who follows the link to the English original has chosen English,
 // as with the language switcher: record it, or the stored-language redirect
-// would send them straight back to the translation. The static pages that do
-// not hydrate do the same from INVESTOR_LANG_CHOICE_SCRIPT.
+// would send them straight back to the translation. The link's
+// data-lang-choice says so, which every static page records (Base.astro's
+// LANG_CHOICE_SCRIPT); this does it in the SPA.
 function rememberEnglish() {
     try { window.localStorage.setItem(LANG_STORAGE_KEY, 'en'); } catch (e) { /* private mode */ }
 }
-
-export const INVESTOR_LANG_CHOICE_SCRIPT = `document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-lang-choice]');if(!a)return;try{localStorage.setItem(${JSON.stringify(LANG_STORAGE_KEY)},a.getAttribute('data-lang-choice'))}catch(_){}});`;
 
 /**
  * The note a translated page opens with: the English is the authoritative

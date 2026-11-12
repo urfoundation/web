@@ -135,7 +135,7 @@
         <div class="tw" style="max-height:none"><table class="t" id="v-tbl"></table></div><div style="margin-top:12px"><button class="more" id="v-all"></button></div></div>
       <div class="pn s12"><div class="ph"><h2 class="pt">{{titles.becomeProvider}}</h2></div>
         <p class="note" style="margin-top:0;font-size:14px;color:var(--ink);max-width:none">{{providers.becomeText}}</p>
-        <div class="cta"><a href="https://ur.io/install">{{providers.install}}</a><a href="https://ur.xyz/miners">{{providers.rewards}}</a></div></div>
+        <div class="cta"><a href="https://ur.io/install">{{providers.install}}</a><a href="{{=miners}}">{{providers.rewards}}</a></div></div>
     </section>
 
     <!-- ===================== SN25 ===================== -->
@@ -155,7 +155,7 @@
         <div class="tw" style="max-height:none;margin-top:18px"><table class="t" id="cv-tbl"></table></div>
         <p class="note" id="cv-n"></p></div>
 
-      <div class="hd"><h2>{{titles.reserve}}</h2><p>{{subnet.reserveLede|link=<a href="https://ur.xyz/reserve" style="color:var(--ink)">{{subnet.reserveLink}}</a>}}</p></div>
+      <div class="hd"><h2>{{titles.reserve}}</h2><p>{{subnet.reserveLede|link=<a href="{{=reserve}}" style="color:var(--ink)">{{subnet.reserveLink}}</a>}}</p></div>
       <div class="pn s8"><div class="ph"><h2 class="pt">{{titles.reserveBalance}}</h2><div class="tags"><div class="seg" role="group" aria-label="{{subnet.reservePeriodAria}}" id="r-period"><button data-p="7">{{periods.d7}}</button><button data-p="30">{{periods.d30}}</button><button data-p="0">{{periods.all}}</button></div></div></div><span class="dl" id="r-d"></span><div id="r-c" style="margin-top:8px"></div></div>
       <div class="pn s4" style="display:flex;flex-direction:column"><div class="ph"><h2 class="pt">{{titles.reserveShort}}</h2></div>
         <div class="cumhead"><div class="big" id="r-bal"></div><span class="sub">α</span></div>

@@ -27,7 +27,6 @@ import { hasLocalizedVersion, localizedPathFor } from '../../lib/route-localizat
 import { investorCentre } from '@react/data/investors.js';
 import { contributors } from '@react/data/contributors.js';
 import { loadPageCopy } from '@react/i18n/page-copy.js';
-import { INVESTOR_LANG_CHOICE_SCRIPT } from '@react/components/pages/investors/shared.jsx';
 import { documentKey } from '@react/components/pages/investors/keys.js';
 
 import '@react/components/Nav.css';
@@ -217,5 +216,4 @@ if (!slug) {
 
         <FooterStatic t={t} lang={lang} />
     </div>
-    {!english && <script is:inline set:html={INVESTOR_LANG_CHOICE_SCRIPT} />}
 </Base>

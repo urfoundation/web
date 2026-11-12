@@ -14,7 +14,7 @@
   </aside>
 
   <main class="main">
-    <div class="top"><div class="toprow"><h1 id="h1" tabindex="-1">{{heading}}</h1><span class="h1live" id="h1live" hidden><i aria-hidden="true"></i>{{live.sinceOpened|value=<b id="nr-live">{{=zeroGb}}</b>}}</span></div><p id="lede"></p></div>
+    <div class="top"><div class="toprow"><h1 id="h1" tabindex="-1">{{heading}}</h1><span class="h1live" id="h1live" hidden><i aria-hidden="true"></i>{{live.sinceOpened|value=<b id="nr-live" data-parity-ignore>{{=zeroGb}}</b>}}</span></div><p id="lede"></p></div>
 
     <div class="livewrap" id="livewrap" hidden><div class="livebar" id="livebar" aria-label="{{live.stripAria}}">
       <div class="tag"><i></i>{{live.rightNow}}</div>
@@ -22,7 +22,7 @@
       <div class="it"><span>{{live.usersDay}}</span><b id="lv-users"></b></div>
       <div class="it"><span>{{live.dataDay}}</span><b id="lv-data"></b></div>
       <div class="it"><span>{{titles.alphaPrice}}</span><b id="lv-px"></b></div>
-      <div class="it fun"><span>{{live.dataSinceOpened}}</span><b id="live">{{=zeroGb}}</b></div>
+      <div class="it fun"><span>{{live.dataSinceOpened}}</span><b id="live" data-parity-ignore>{{=zeroGb}}</b></div>
     </div></div>
 
     <div class="nowroute" id="nowroute" hidden aria-label="{{live.rightNow}}">

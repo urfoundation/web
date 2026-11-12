@@ -2,6 +2,9 @@
 //
 // Covers Astro-only pages that the React/Astro pixel-parity test cannot compare,
 // and locks down the shared navigation contract at the two responsive boundaries.
+// /dashboard, standalone (no site nav or footer), is checked in every language,
+// tab by tab: Grafana answered by tests/dashboard-fixture.mjs, Bittensor mainnet
+// left unreachable, as on a network that blocks it.
 import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -10,7 +13,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OFFLINE_CHROMIUM_ARGS } from './offline-chromium.mjs';
 import { localizedSamples } from './localized-samples.mjs';
-import { basePathFor, langForPath } from '../../astro/src/lib/route-localization.js';
+import { dashboardGrafana } from './dashboard-fixture.mjs';
+import { loadPageCopy } from '../src/i18n/page-copy.js';
+import { SITE_LANG_CODES, basePathFor, langForPath } from '../../astro/src/lib/route-localization.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ASTRO_DIR = path.resolve(__dirname, '../../astro');
@@ -21,16 +26,14 @@ const ROOT = path.join(ASTRO_DIR, 'build', UR_ENV);
 // code; /docs/miner: a directory tree. Their code wraps and their tables stack,
 // so neither a code block nor a table scrolls sideways at any width.
 // /ctf: the 249-country grid; /ctf/vc and /ctf/gs: the longest country names.
-const ROUTES = ['/build', '/about', '/investors', '/reserve', '/mainnet', '/ctf', '/ctf/ke', '/ctf/vc', '/ctf/gs', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner',
-    // a page of each localized page group, in Arabic and German (localized-samples.mjs), but
-    // /dashboard, which is left out in English too: its figures come live from Grafana (through
-    // /__grafana off ur.xyz) and from Bittensor, and its engine needs both. Grafana could be
-    // answered here (stats.json, and the panel queries, which rebuild the days history.json lacks
-    // and give the countries the engine needs one of), but the engine then stops on the reserve:
-    // components/pages/dashboard/engine.js reads SNAP.RESERVE, EMISSION and ROUTING, which only a
-    // chain read gives (lib/subtensor.js readReserve), and throws when that read failed, in every
-    // language, so the page logs errors offline
-    ...localizedSamples(['ar', 'de']).filter((route) => basePathFor(route) !== '/dashboard')];
+// /dashboard in every language (and so its Arabic and German samples).
+const DASHBOARD = SITE_LANG_CODES.map((lang) => (lang === 'en' ? '/dashboard' : `/${lang}/dashboard`));
+const ROUTES = [...new Set(['/build', '/about', '/investors', '/reserve', '/mainnet', '/ctf', '/ctf/ke', '/ctf/vc', '/ctf/gs', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner',
+    // a page of each localized page group, in Arabic and German (localized-samples.mjs)
+    ...localizedSamples(['ar', 'de']), ...DASHBOARD])];
+const DASHBOARD_TABS = ['overview', 'network', 'providers', 'subnet', 'more', 'method'];
+// the dashboard's note for what it reads from Bittensor mainnet, by language
+const dashboardScript = await loadPageCopy('dashboard/script');
 const PROFILES = [
   { name: 'desktop', width: 1280, height: 900 },
   { name: 'desktop-edge', width: 1080, height: 800 },
@@ -111,19 +114,27 @@ async function visible(locator) {
 async function auditPage(browser, base, route, profile) {
   const page = await browser.newPage({ viewport: { width: profile.width, height: profile.height } });
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  const dashboard = basePathFor(route) === '/dashboard';
   // opentensor.ai: the reserve page reads Bittensor mainnet in the browser, and
   // geckoterminal.com the α price with USD selected; an empty answer keeps this
   // audit independent of the chain (the page then shows its "waiting for the
-  // chain" state, which is the layout under test).
-  await page.route(/bringyour\.com|ur\.network|opentensor\.ai|geckoterminal\.com/, (request) => request.fulfill({ json: {} }).catch(() => request.abort()));
+  // chain" state, which is the layout under test). /dashboard's Grafana, which it
+  // reads through /__grafana off ur.xyz, is the fixture's, and its chain is left
+  // unreachable: the page shows what it reads there as unavailable.
+  await page.route(dashboard ? /bringyour\.com|ur\.network|geckoterminal\.com/ : /bringyour\.com|ur\.network|opentensor\.ai|geckoterminal\.com/, (request) => request.fulfill({ json: {} }).catch(() => request.abort()));
+  if (dashboard) await page.route('**/__grafana/**', dashboardGrafana());
   const errors = [];
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() !== 'error') return;
+    // the browser's own line for each request to the unreachable chain
+    if (dashboard && /^Failed to load resource/.test(message.text()) && /^https:\/\/[^/]*\.opentensor\.ai\//.test(message.location()?.url || '')) return;
+    errors.push(message.text());
   });
   page.on('pageerror', (error) => errors.push(error.message));
 
   const response = await page.goto(base + route, { waitUntil: 'networkidle' });
   assert(response?.status() === 200, `${route} returned ${response?.status() || 'no response'}`);
+  if (dashboard) await page.waitForFunction(() => !document.body.classList.contains('is-loading'), null, { timeout: 30_000 });
 
   const shell = await page.evaluate(() => ({
     h1s: document.querySelectorAll('h1').length,
@@ -139,6 +150,11 @@ async function auditPage(browser, base, route, profile) {
   // checks below; the nav's names and order are English's
   const lang = langForPath(route);
   const pagePath = basePathFor(route);
+  if (dashboard) {
+    await auditDashboard(page, route, lang, profile, errors);
+    await page.close();
+    return;
+  }
   if (lang === 'en') assert(await page.locator('footer a[href="/about"]').count() > 0, `${route} footer has no About link`);
 
   if (pagePath.startsWith('/docs/')) {
@@ -261,6 +277,42 @@ async function auditPage(browser, base, route, profile) {
   }
 
   await page.close();
+}
+
+// /dashboard, standalone: its own nav (the rail), every tab without sideways scroll,
+// Grafana's panels drawn from the fixture, and what it reads from Bittensor mainnet
+// (the reserve, its inflow and the conviction locks) shown as unavailable in the
+// page's language, without a page error
+async function auditDashboard(page, route, lang, profile, errors) {
+  const chainLine = dashboardScript(lang).chainUnavailable;
+  assert(typeof chainLine === 'string' && chainLine.length > 0, `${route}: no chainUnavailable copy`);
+  assert(!(await page.evaluate(() => document.body.classList.contains('is-error'))), `${route} shows its error state with Grafana answering`);
+  assert(await page.locator('.rail .nav button').count() >= 5, `${route} has no section nav`);
+  const unavailable = new Map();
+  for (const tab of DASHBOARD_TABS) {
+    await page.evaluate((t) => { history.pushState(null, '', `#${t}`); dispatchEvent(new PopStateEvent('popstate')); }, tab);
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const state = await page.evaluate((t) => {
+      const section = document.querySelector(`section[data-tab="${t}"]`);
+      return {
+        shown: !!section && !section.hidden && section.getBoundingClientRect().height > 0,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        waiting: section ? section.querySelectorAll('.pn.wait').length : 0,
+        unavailable: section ? [...section.querySelectorAll('.pn.na')].map((pn) => [pn.querySelector('.pt')?.id || pn.querySelector('[id]')?.id || '?', pn.dataset.na]) : [],
+        sna: document.getElementById('s-na')?.hidden === false ? document.getElementById('s-na').textContent : null,
+      };
+    }, tab);
+    assert(state.shown, `${route} #${tab} is not shown at ${profile.width}px`);
+    assert(state.overflow <= 1, `${route} #${tab} overflows horizontally by ${state.overflow}px at ${profile.width}px`);
+    assert(state.waiting === 0, `${route} #${tab} still waits for the unreachable chain`);
+    for (const [id, text] of state.unavailable) unavailable.set(id, text);
+    if (tab === 'overview') assert(state.sna === chainLine, `${route} SN25 card says "${state.sna}" for the unreachable chain`);
+  }
+  // with Grafana answering, only the chain's two panels on the SN25 tab lack their data
+  const ids = [...unavailable.keys()].sort();
+  assert(JSON.stringify(ids) === JSON.stringify(['cv-tot', 'r-bal']), `${route} panels unavailable: ${ids.join(', ') || 'none'}`);
+  for (const [id, text] of unavailable) assert(text === chainLine, `${route} ${id} says "${text}" for the unreachable chain`);
+  assert(errors.length === 0, `${route} logged errors: ${errors.join(' | ')}`);
 }
 
 async function main() {

@@ -17,7 +17,7 @@ export default {
     },
 
     meta: {
-        hubTitle: '赚取加密货币：在 249 个国家共享你的网络 | UR',
+        hubTitle: '赚取加密货币：在 249 个国家和地区共享你的网络 | UR',
         countryTitle: {
             full: '{in}赚取加密货币：开放槽位与奖池 | UR',
             plain: '{in}赚取加密货币 | UR',
@@ -134,7 +134,7 @@ export default {
         firstDraw: '首次抽签',
         slots: '槽位',
         slotsValue: '每国 5 + 5',
-        countries: '国家',
+        countries: '国家和地区',
         countriesValue: '249',
     },
 
@@ -296,7 +296,7 @@ export default {
 
     board: {
         everyFlag: '所有旗帜',
-        all: '全部 249 个国家',
+        all: '全部 249 个国家和地区',
         sortAria: '排序',
         showAria: '显示',
         find: '查找',
@@ -357,7 +357,7 @@ export default {
         asOfClose: '截至周期 {epoch} 结束（{day}）：',
         disclaimer: '奖励以 Bittensor 第 25 号子网的代币 alpha 支付，且无保证。',
         more: '更多国家',
-        all: '全部 249 个国家',
+        all: '全部 249 个国家和地区',
         aroundPots: '奖池共 {amount} α',
         aroundOnline: { other: '{count} 个提供者在线' },
     },
@@ -397,7 +397,7 @@ export default {
     },
 
     og: {
-        title: '赚取加密货币：在 249 个国家共享你的网络',
+        title: '赚取加密货币：在 249 个国家和地区共享你的网络',
         prelaunch: '自周期 {first} 起 · {day}',
         first: '周期 {epoch} · 首次抽签 ≈ {draw}',
         drawing: '周期 {first} 的抽签进行中',
@@ -408,7 +408,7 @@ export default {
 
     dataset: {
         name: 'URnetwork 夺旗：各国奖励槽位与奖池',
-        description: '每个周期（一周），ISO 3166-1 中的 249 个国家在 URnetwork（Bittensor 第 25 号子网）上各有五个提供者槽位和五个扩展器槽位。数据按国家给出上个周期的获胜者和每次抽签的参与者、结转到本周期的各角色奖池，以及在五个槽位都已被赢得的地方新人的获胜概率。金额以子网代币 alpha 计，未扣除参与者的成本。',
+        description: '每个周期（一周），ISO 3166-1 中的 249 个国家和地区在 URnetwork（Bittensor 第 25 号子网）上各有五个提供者槽位和五个扩展器槽位。数据按国家给出上个周期的获胜者和每次抽签的参与者、结转到本周期的各角色奖池，以及在五个槽位都已被赢得的地方新人的获胜概率。金额以子网代币 alpha 计，未扣除参与者的成本。',
         coverage: '全球',
         measured: ['已赢得的提供者槽位', '已赢得的扩展器槽位', '抽签参与者', '提供者奖池（alpha）', '扩展器奖池（alpha）', '获胜概率'],
     },

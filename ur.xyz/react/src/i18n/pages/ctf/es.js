@@ -61,7 +61,7 @@ export default {
     start: {
         note: 'Captura la bandera empieza con la época {first}, en el bloque {block}, hacia las {clock} del {day}.',
         live: 'Captura la bandera está en marcha desde la época {first}.',
-        in: 'Empieza en',
+        in: 'Empieza en aproximadamente',
         days: 'días',
         hours: 'horas',
         minutes: 'minutos',

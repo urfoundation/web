@@ -59,7 +59,7 @@ export default {
     start: {
         note: 'Capture the Flag beginnt mit Epoche {first} bei Block {block}, etwa am {day} um {clock}.',
         live: 'Capture the Flag läuft seit Epoche {first}.',
-        in: 'Start in',
+        in: 'Start in etwa',
         days: 'Tage',
         hours: 'Stunden',
         minutes: 'Minuten',

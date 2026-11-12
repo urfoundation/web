@@ -38,6 +38,7 @@ const DAY = 24 * HOUR;
 // a snapshot before the start, whatever is committed now: the committed one if it is, else the pre-launch state
 const PRELAUNCH = SNAPSHOT.prelaunch ? SNAPSHOT : { ...SNAPSHOT, prelaunch: { start_block: 9_600_028, starts_at: '2026-11-27T18:25:24Z' }, last_epoch: null, pending_draw: null };
 const START = Date.parse(PRELAUNCH.prelaunch.starts_at);
+const graphemes = (s) => [...new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(s)].length;
 
 test('the note is there only before the start, with the snapshot\'s block and time in each language\'s formats', () => {
     for (const lang of LANGS) {
@@ -52,6 +53,8 @@ test('the note is there only before the start, with the snapshot\'s block and ti
             assert.ok(note.note.includes(part), `${lang}: the note names ${part}: ${note.note}`);
         }
         assert.ok(note.live.includes(String(PRELAUNCH.first_epoch)), `${lang}: ${note.live}`);
+        // once live, the sentence of before holds the note's size unseen, so it must be the longer
+        assert.ok(graphemes(note.note) > graphemes(note.live) + 8, `${lang}: the sentence of before the start is the longer: ${note.note} | ${note.live}`);
         assert.equal(note.words.units.length, 4);
         for (const s of [note.note, note.live, note.words.in, note.words.blocks, note.words.go, ...note.words.units]) {
             assert.ok(s && !/\{[A-Za-z]/.test(s), `${lang}: an empty or unfilled string: ${JSON.stringify(s)}`);

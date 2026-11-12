@@ -98,6 +98,7 @@
 .ctf-page .ctf-start-flag b { font: 700 calc(var(--ctf-flag-h) * 0.74)/1 var(--ctf-pixel); color: #101010; transform: translateY(0.06em); }
 /* at the start ten pips burst from the flag, five providers' and five extenders' */
 .ctf-page .ctf-start-burst { position: absolute; inset-inline-start: calc(5px + var(--ctf-flag-w) / 2); bottom: calc(var(--ctf-flag-h) / 2); }
+[dir="rtl"] .ctf-page .ctf-start-burst { transform: scaleX(-1); }
 .ctf-page .ctf-start-burst i { position: absolute; left: -3.5px; top: -3.5px; width: 7px; height: 7px; border-radius: 2px; background: var(--ctf-blue); opacity: 0; animation: ctf-burst 1.3s cubic-bezier(0.15, 0.7, 0.3, 1) 0.4s both; }
 .ctf-page .ctf-start-burst i:nth-child(n + 6) { background: var(--ctf-green); }
 .ctf-page .ctf-start-burst i:nth-child(1) { --x: -46px; --y: -30px; --r: -80deg; }
@@ -140,12 +141,13 @@
 @keyframes ctf-flare { from { box-shadow: 0 0 40px rgba(237, 143, 255, 0.5), inset 0 1px 0 rgba(255, 225, 255, 0.12); } }
 .ctf-page .ctf-start-go { display: inline-flex; align-items: center; justify-content: center; gap: 0.4em; color: var(--ctf-acc); font: 700 calc(var(--ctf-start-digit) * 1.05)/1 var(--ctf-pixel); letter-spacing: 0.06em; text-transform: uppercase; text-shadow: 0 0 22px rgba(237, 143, 255, 0.5); }
 .ctf-page .ctf-start-go i { flex: none; width: 0.3em; height: 0.3em; border-radius: 50%; background: var(--ctf-acc); animation: ctf-pulse 2s infinite; }
-.ctf-page .ctf-start[data-phase="soon"] .ctf-start-go, .ctf-page .ctf-start[data-phase="live"] .ctf-start-count { visibility: hidden; }
+.ctf-page .ctf-start[data-phase="live"] .ctf-start-count { visibility: hidden; }
 .ctf-page .ctf-start[data-phase="live"] .ctf-start-go { animation: ctf-go 0.9s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes ctf-go { from { opacity: 0; transform: scale(0.88); } }
-/* the blocks left, and a bar that fills over the block counting down */
+/* the blocks left, and a bar that fills over the block counting down; the figure keeps a six-figure width (the
+   pixel face's widest, 888,888, is under 8ch), so the row wraps alike before and after it arrives, and as it ticks */
 .ctf-page .ctf-start-blocks { grid-area: blocks; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-.ctf-page .ctf-start-blocks b { font: 700 15px/1 var(--ctf-pixel); color: var(--ctf-ink); white-space: nowrap; }
+.ctf-page .ctf-start-blocks b { display: inline-block; min-width: 8ch; font: 700 15px/1 var(--ctf-pixel); color: var(--ctf-ink); white-space: nowrap; }
 .ctf-page .ctf-start-track { position: relative; width: 64px; height: 3px; border-radius: 2px; background: #2c2830; overflow: hidden; }
 .ctf-page .ctf-start-bar { position: absolute; inset: 0; background: rgba(237, 143, 255, 0.75); transform-origin: left center; animation: ctf-block 12s linear both; }
 [dir="rtl"] .ctf-page .ctf-start-bar { transform-origin: right center; }
@@ -155,7 +157,7 @@
 .ctf-page:lang(ar) .ctf-start-uname, .ctf-page:lang(ar) .ctf-start-go { letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) {
     .ctf-page .ctf-start-car { transition: none; }
-    .ctf-page .ctf-start-flag, .ctf-page .ctf-start-d > span, .ctf-page .ctf-start-sep, .ctf-page .ctf-start[data-last-minute] .ctf-start-num, .ctf-page .ctf-start-go, .ctf-page .ctf-start-go i { animation: none; }
+    .ctf-page .ctf-start-flag, .ctf-page .ctf-start-d > span, .ctf-page .ctf-start-sep, .ctf-page .ctf-start[data-last-minute] .ctf-start-num, .ctf-page .ctf-start[data-phase="live"] .ctf-start-go, .ctf-page .ctf-start-go i { animation: none; }
     .ctf-page .ctf-start-burst, .ctf-page .ctf-start-track { display: none; }
 }
 

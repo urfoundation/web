@@ -24,10 +24,14 @@ import { blockFigure, clockFigure, startClock, timeLeftWords } from './clock.js'
  * For a screen reader the figures are hidden: it reads the sentence and the
  * time left in words ("Starts in about 15 days"), which changes at most once a
  * minute. The static render, and the first render here, show no figures (the
- * clock starts in an effect, so they hydrate exactly), and every part holds
- * its place whatever it shows: nothing under the note moves when the figures
- * arrive or when it turns live. The figures and the flag follow the clock, not
- * an edit, so the visual parity test masks them (data-parity-ignore).
+ * clock starts in an effect, so they hydrate exactly), and nothing of after
+ * the start: what the HTML says before the start, to a reader or to anything
+ * that reads it without styles, is only the start. Every part holds its place
+ * whatever it shows (the blocks left keep a six-figure width), so nothing
+ * under the note moves when the figures arrive or when it turns live: once
+ * live, the sentence of before the start and the countdown stay in place
+ * unseen. The figures and the flag follow the clock, not an edit, so the
+ * visual parity test masks them (data-parity-ignore).
  */
 
 const SECOND = 1000;
@@ -109,11 +113,11 @@ export default function Countdown({ lang = 'en', first, startsAt, note, live: li
                     {live && <span className="ctf-start-burst">{PIPS}</span>}
                 </span>
             </div>
-            {/* both sentences hold the one place, so the note keeps its size when it turns; the one
-                showing is a status, so a screen reader hears the turn */}
+            {/* the sentence is a status, so a screen reader hears the turn; once live, the sentence of
+                before (always the longer) holds its place unseen, so the note keeps its size */}
             <p className="ctf-start-line">
                 <span role="status">{live ? liveNote : note}</span>
-                <span className="ctf-start-ghost" aria-hidden="true">{live ? note : liveNote}</span>
+                {live && <span className="ctf-start-ghost" aria-hidden="true">{note}</span>}
             </p>
             <div className="ctf-start-clock" aria-hidden="true" data-parity-ignore="">
                 <span className="ctf-start-count">
@@ -130,7 +134,7 @@ export default function Countdown({ lang = 'en', first, startsAt, note, live: li
                         ))}
                     </span>
                 </span>
-                <span className="ctf-start-go"><i />{words.go}</span>
+                {live && <span className="ctf-start-go"><i />{words.go}</span>}
             </div>
             <p className="ctf-start-blocks" aria-hidden="true" data-parity-ignore="">
                 <span className="ctf-label">{words.blocks}</span>

@@ -93,8 +93,8 @@ export default {
         note: 'Capture the flag starts with epoch {first}, at block {block}, about {day}, {clock}.',
         // what the note says once the start has passed on the visitor's clock
         live: 'Capture the flag is live from epoch {first}.',
-        // over the countdown's figures, and under each
-        in: 'Starts in',
+        // over the countdown's figures (the start is a projection, so about), and under each
+        in: 'Starts in about',
         days: 'days',
         hours: 'hours',
         minutes: 'minutes',

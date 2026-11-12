@@ -53,7 +53,7 @@ export default {
     start: {
         note: '夺旗将随周期 {first} 于区块 {block} 开始，约在{day} {clock}。',
         live: '夺旗已随周期 {first} 开始。',
-        in: '距开始',
+        in: '距开始约',
         days: '天',
         hours: '小时',
         minutes: '分钟',

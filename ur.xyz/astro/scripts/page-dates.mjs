@@ -178,12 +178,24 @@ const git = (args) =>
         maxBuffer: 64 << 20,
     });
 
+// Each file is asked about once a run: git does not change while a build runs,
+// and the pages that enter the record together share their sources (an epoch's
+// import can bring a hundred capture the flag country pages in at once, when
+// their data sets them apart, ctf/indexing.js), which took git minutes a page.
+const once = (fn) => {
+    const answers = new Map();
+    return (rel) => {
+        if (!answers.has(rel)) answers.set(rel, fn(rel));
+        return answers.get(rel);
+    };
+};
+
 /**
  * The day git last changed a file's bytes, following renames and skipping a
  * commit that only moved it (a pure rename keeps the blob), or null when the
  * file has no history.
  */
-function gitContentDay(rel) {
+const gitContentDay = once((rel) => {
     let log;
     try {
         log = git(['log', '--follow', '--format=%x00%cs', '--raw', '--no-abbrev', '--', rel]);
@@ -199,15 +211,15 @@ function gitContentDay(rel) {
         return day.trim();
     }
     return null;
-}
+});
 
-function hasUncommittedChanges(rel) {
+const hasUncommittedChanges = once((rel) => {
     try {
         return git(['status', '--porcelain', '--', rel]).trim() !== '';
     } catch {
         return false;
     }
-}
+});
 
 let DOC_FILES = null;
 /** docs slug → its markdown file (relative to ur.xyz), the first file per slug wins as in lib/docs.js */

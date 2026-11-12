@@ -2,7 +2,7 @@
 export default {
     meta: {
         title: 'مركز المستثمرين | UR',
-        description: 'تحديثات UR ومواده للمستثمرين وأبحاثه العامة: الرسائل والورقة المختصرة وعمليات التدقيق من جهات خارجية، مع لوحات معلومات حية للشبكة.',
+        description: 'تحديثات UR وموادها للمستثمرين وأبحاثها العامة: الرسائل والورقة المختصرة وعمليات التدقيق من جهات خارجية، مع لوحات معلومات حية للشبكة.',
     },
     eyebrow: 'المستثمرون',
     title: 'مركز المستثمرين',
@@ -24,7 +24,7 @@ export default {
     count: {
         zero: '{count} عنصر',
         one: '{count} عنصر',
-        two: '{count} عنصر',
+        two: 'عنصران ({count})',
         few: '{count} عناصر',
         many: '{count} عنصرًا',
         other: '{count} عنصر',
@@ -40,11 +40,11 @@ export default {
     empty: 'لا توجد مواد للمستثمرين تطابق عوامل التصفية هذه.',
     exploreAria: 'موارد الشبكة والأبحاث',
     exploreHeading: 'استكشف الشبكة',
-    exploreText: 'تابع أداء الشبكة على لوحة معلومات UR، واطّلع على بيانات سوق الشبكة الفرعية عبر TaoMarketCap و taostats.',
+    exploreText: 'تابع أداء الشبكة على لوحة معلومات UR، واطّلع على بيانات سوق الشبكة الفرعية عبر TaoMarketCap وtaostats.',
     dashboard: 'لوحة معلومات UR',
     networkLinksAria: 'مصادر بيانات الشبكة',
     researchHeading: 'ابحث في UR',
-    researchText: 'اسأل ChatGPT أو Claude عن منتجات UR وأبحاثه وتطوير الشبكة الفرعية والتحديثات المنشورة والمواد العامة.',
+    researchText: 'اسأل ChatGPT أو Claude عن منتجات UR وأبحاثها وتطوير الشبكة الفرعية والتحديثات المنشورة والمواد العامة.',
     researchLinksAria: 'ابحث في UR باستخدام الذكاء الاصطناعي',
     metrics: {
         heading: 'المقاييس',

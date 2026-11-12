@@ -32,8 +32,8 @@ const url = lang === 'en' ? `${SITE_ORIGIN}/dashboard` : `${SITE_ORIGIN}/${lang}
 // localized; none while it is English-only
 const alternates = alternatesFor('/dashboard').map(({ hreflang, path }) => ({ hreflang, href: new URL(path, SITE_ORIGIN).href }));
 const localized = alternates.length > 0;
-// as Base.astro names them
-const OG_LOCALES: Record<string, string> = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_ES' };
+// as Base.astro names them (Spanish es_LA: the Spanish pages are neutral Latin American Spanish)
+const OG_LOCALES: Record<string, string> = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR', zh: 'zh_CN', de: 'de_DE', es: 'es_LA' };
 ---
 <!doctype html>
 <html lang={lang} dir={lang === 'ar' ? 'rtl' : undefined}>

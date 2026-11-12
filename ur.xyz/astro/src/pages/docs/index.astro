@@ -6,7 +6,8 @@ import FooterStatic from '../../components/FooterStatic.astro';
 import NavIsland from '../../islands/NavIsland.jsx';
 import en from '@react/i18n/en.js';
 import { docsIndex as listed } from '@react/lib/docs.js';
-import { docPath } from '@react/lib/docs-shared.js';
+import { DOCS_LANDING_NOTICE, docPath } from '@react/lib/docs-shared.js';
+import { Markdown } from '@react/lib/markdown.jsx';
 
 import '@react/components/Nav.css';
 
@@ -52,6 +53,9 @@ const jsonLd = [{
                 <h1 class="explorer-page-title">UR docs</h1>
                 <p class="explorer-page-meta">How to take part in the UR privacy network on Bittensor SN25, one guide per role, and the litepaper that explains the mechanism they take part in. Every document is also served as markdown.</p>
             </header>
+
+            {/* the notice above the guides, if any (docs-shared.js), as the SPA's landing draws it */}
+            {DOCS_LANDING_NOTICE && <Markdown source={DOCS_LANDING_NOTICE} baseHref="/docs/" />}
 
             <div class="md">
                 {listed.map((d) => {

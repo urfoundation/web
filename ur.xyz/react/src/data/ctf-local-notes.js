@@ -3,10 +3,12 @@
  * how to claim and cash out there and what local law says, written by a person
  * and dated with the day they reviewed it. A note shows under "How do I get
  * paid?" on its country's page (/ctf/<cc>); tests/ctf.test.mjs checks each.
- * None is written yet: SEO.md lists the demand markets to write first (India,
- * Indonesia, Nigeria, the Philippines, Pakistan, Vietnam, Bangladesh, Nepal,
- * Kenya, Ghana, Egypt, Brazil, Mexico, Turkey, then the US, the UK, Canada and
- * Germany), each after counsel's review of SEO.md §3.
+ * A page with a note is indexed: one that reads like another country page but
+ * for the name, with no note, is noindex until its data or a note sets it
+ * apart (components/pages/ctf/indexing.js). None is written yet: SEO.md lists
+ * the demand markets to write first (India, Indonesia, Nigeria, the
+ * Philippines, Pakistan, Vietnam, Bangladesh, Nepal, Kenya, Ghana, Egypt,
+ * Brazil, Mexico, Turkey, then the US, the UK, Canada and Germany).
  *
  *   ke: { reviewed: '2026-12-01', text: 'One paragraph, plain words, no fiat projections.' },
  */

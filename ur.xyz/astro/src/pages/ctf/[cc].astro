@@ -1,11 +1,19 @@
 ---
 // /ctf/<cc> — a country's capture the flag page, one for each of the 249
-// ISO 3166-1 codes (sn design/ctf/SEO.md §2 and §6). Every page is
-// indexable and carries its own country's data from the epoch's snapshot,
-// never only its name: what is open there and what its pots hold after a
-// draw, before it the providers the network's dashboard counted online there
-// (the seo-audit refuses a page that drops its own figures, and lists the
-// countries whose data is the same and so read alike).
+// ISO 3166-1 codes (sn design/ctf/SEO.md §2 and §6). Every page carries its
+// own country's data from the epoch's snapshot, never only its name: what is
+// open there and what its pots hold after a draw, before it the providers the
+// network's dashboard counted online there (the seo-audit refuses a page that
+// drops its own figures).
+//
+// A page that says something of its own is indexable. One whose own content
+// reads like another country page's but for the country's name, and which has
+// no local note, is noindex (ctf/indexing.js, SEO.md §2.1): it is still built,
+// linked from the hub and served, but out of the sitemap and the page-dates
+// record. getStaticPaths decides it from this build's snapshot, rendering each
+// country's page body first, so a page is indexable from the first build whose
+// data or local note sets it apart; the seo-audit checks the built pages by the
+// same reading.
 //
 // The page body is the React component the SPA renders for this route
 // (react/src/components/pages/CtfCountry.jsx), rendered to static HTML. Its
@@ -13,6 +21,8 @@
 // big pots (ctf/CountryIslands.jsx); their first render is this one. The
 // paths are lowercase codes in the clean form publicPathFor publishes
 // (/ctf/ke). English-only, like the hub.
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import Base from '../../layouts/Base.astro';
 import DisclaimerStatic from '../../components/DisclaimerStatic.astro';
 import NavIsland from '../../islands/NavIsland.jsx';
@@ -20,6 +30,7 @@ import FooterStatic from '../../components/FooterStatic.astro';
 import CtfCountryPage from '@react/components/pages/CtfCountry.jsx';
 import { CountryEasyWins, CountryLive } from '@react/components/pages/ctf/CountryIslands.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
+import { countryIndexing } from '@react/components/pages/ctf/indexing.js';
 import { SITE, apiCountry, countryDescription, countryTitle } from '@react/components/pages/ctf/model.js';
 import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
 import en from '@react/i18n/en.js';
@@ -28,17 +39,21 @@ import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
 import '@react/components/Nav.css';
 
 export function getStaticPaths() {
-    return CTF.countries.map((c) => ({ params: { cc: c.code } }));
+    // each page's <main> as the template below renders it: without the slots,
+    // CtfCountryPage renders the same islands itself, as their first render
+    const indexing = countryIndexing(CTF, (code) => renderToStaticMarkup(createElement(CtfCountryPage, { code, updated: LASTMOD_TOKEN })));
+    return CTF.countries.map((c) => ({ params: { cc: c.code }, props: { noindex: indexing.get(c.code).noindex } }));
 }
 
 const { cc } = Astro.params;
+const { noindex } = Astro.props;
 const c = CTF.byCode.get(cc);
 const title = countryTitle(c);
 const url = `${SITE}/ctf/${cc}`;
 // "Updated" in the description is the day the page last changed, as on the page
 const description = countryDescription(CTF, c, LASTMOD_TOKEN);
 // A page about a country (by its ISO 3166-1 code), part of the hub's dataset;
-// Base.astro adds the BreadcrumbList from breadcrumbName.
+// Base.astro adds the BreadcrumbList from breadcrumbName (an indexable page's).
 const jsonLd = [{
     '@type': 'WebPage',
     '@id': `${url}#page`,
@@ -61,6 +76,7 @@ const jsonLd = [{
     alternate={{ href: apiCountry(cc), type: 'application/json' }}
     ogImage={ctfOgImage(CTF)}
     ogImageAlt={ctfCardAlt(CTF)}
+    noindex={noindex}
 >
     <div class="app">
         <DisclaimerStatic t={en} />

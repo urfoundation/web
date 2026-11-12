@@ -12,7 +12,7 @@ export default function Research() {
             <ResearchReportCard t={t} lang={code} />
             <ResearchMethodologyCard t={t} lang={code} />
             <ResearchAreas t={t} />
-            <ResearchNotes t={t} />
+            <ResearchNotes t={t} lang={code} />
             <ResearchFoot t={t} />
         </Section>
     );

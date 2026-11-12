@@ -53,7 +53,8 @@ const twin = english ? { href: `/${doc}.md`, type: 'text/markdown' } : null;
 
         <main class="section-page">
             <Section id={doc} eyebrow={t.legal.eyebrow} title={d.title} headingLevel="h1">
-                {!english && <p class="legal-translation-note" role="note">{words.notice} <a href={`/${doc}`} hreflang="en">{words.english}</a></p>}
+                {/* following the English link chooses English: Base.astro records data-lang-choice */}
+                {!english && <p class="legal-translation-note" role="note">{words.notice} <a href={`/${doc}`} hreflang="en" data-lang-choice="en">{words.english}</a></p>}
                 {updated && <p class="legal-updated">{updated}</p>}
                 <div class="legal-doc" set:html={d.html} />
             </Section>

@@ -76,8 +76,8 @@ const jsonLd = section === 'research'
                 {showDiagram && section !== 'operators' && <NetworkDiagram client:visible={{rootMargin: "200px"}} active={section} lang={lang} ctaLabel={sectionData.cta} copy={diagramCopy(t)} />}
                 {section === 'research'
                     ? <ResearchAreas t={t} />
-                    : <CardGrid items={items} />}
-                {section === 'research' && <ResearchNotes t={t} />}
+                    : <CardGrid items={items} lang={lang} />}
+                {section === 'research' && <ResearchNotes t={t} lang={lang} />}
                 {section === 'operators' && <OperatorsDirectoryIsland lang={lang} client:visible />}
                 {section === 'miners' && <MinerSim client:visible caption={sectionData.simCaption} />}
                 {section === 'validators' && <ValidatorSim client:visible caption={sectionData.simCaption} />}

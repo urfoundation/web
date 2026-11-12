@@ -623,8 +623,8 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
 });
 
 test('the extender pool from epoch 8: a notice beside its milestone, with the rule, who counts, what is published and the signed entry', () => {
-    // the sn whitepaper's §8.6, approved on November 10, with Q7 of November 11; the notice's full text is drafted
-    // in the sn repo (mainnet/notices/2026-11-12-extender-pool.md) and waits on its main branch
+    // the sn whitepaper's §8.6, approved on November 10, with Q7 of November 11; the notice's full text is in the
+    // sn repo (mainnet/notices/2026-11-12-extender-pool.md), on its main branch since November 12
     const epoch7 = mainnetEpochs.at(-1);
     const pool = events.find((e) => e.id === 'extender-pool-epoch-8');
     const notice = mainnetNotices.find((n) => n.id === 'notice-extender-pool');
@@ -660,8 +660,8 @@ test('the extender pool from epoch 8: a notice beside its milestone, with the ru
     assert.equal(pool.sources.find((s) => s.label === 'Signed amendment entry').ref, 'https://ur.xyz/amendments.yml');
     assert.match(entry, / Rewards are paid in alpha, whose value changes and can fall\. /);
     assert.match(entry, / claimed with its pool account, in the same claim flow\. There is nothing you need to do\.$/);
-    // until the full text is on sn's main branch, the notice links its milestone on this page (NOTICES, src/data/mainnet.js)
-    assert.deepEqual(notice.link, { label: 'See the milestone', href: `#${pool.id}` });
+    // its full text is on sn's main branch, so the notice links it, as the other notices link theirs (NOTICES, src/data/mainnet.js)
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-pool.md' });
     // plain words and no earnings promises, as for capture the flag
     const avoid = /guarantee|risk-free|\breturns?\b|\byield|\bAPY\b|lottery|jackpot|\bbet\b|invest|passive income|get rich|easy money|financial freedom|quit your job|\bjobs?\b|hiring|salary|wage|\$\s?\d/i;
     for (const words of [`${notice.title} ${notice.paragraphs.join(' ')}`, `${pool.title} ${pool.detail}`]) assert.doesNotMatch(words, avoid);

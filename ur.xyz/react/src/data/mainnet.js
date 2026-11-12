@@ -204,7 +204,7 @@ const NOTICES = [
             "From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed /29 or /48 prefix hash and never by address, and their shares, and the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it. Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid.",
             "The subnet owner signs the amendment entry that starts the pool during epoch 7, beside capture the flag's, and it takes effect once it is published at ur.xyz/amendments.yml before epoch 8 starts. Rewards are paid in alpha, whose value changes and can fall. An extender's share is paid to the payout wallet it already uses and claimed with its pool account, in the same claim flow. There is nothing you need to do.",
         ],
-        link: { label: 'See the milestone', href: '#extender-pool-epoch-8' },
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-pool.md' },
     },
 ];
 

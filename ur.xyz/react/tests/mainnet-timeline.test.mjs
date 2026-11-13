@@ -866,11 +866,14 @@ test('Gamma payments on SN25: done at the block the subnet owner switched them o
     // a fact of the subnet: URnetwork is named only as one place to pay with it, and no operator is "the" one
     assert.match(gamma.detail, / The first is URnetwork's, one place to pay with it: /);
     assert.doesNotMatch(gamma.detail, /the network operator|bringyour/i);
-    // the switch-on links its extrinsic; the ur.io page is linked once it is live
+    // the switch-on links its extrinsic, and ur.io's page on paying with Gamma is linked (it answered 200 at 01:06 UTC on
+    // November 13)
     const [switchOn, page] = gamma.sources;
     assert.deepEqual(switchOn, { label: "Published and switched on by the subnet owner's multisig, extrinsic 9483859-0021", kind: 'substrate_extrinsic', ref: '9483859-21' });
     assert.equal(sourceLink(switchOn, explorers).href, 'https://taostats.io/extrinsic/9483859-0021');
-    assert.deepEqual([page.kind, page.ref], ['doc', '']);
+    assert.deepEqual(page, { label: 'Paying with Gamma, on ur.io', kind: 'doc', ref: 'https://ur.io/gamma' });
+    assert.equal(sourceLink(page, explorers).href, 'https://ur.io/gamma');
+    assert.deepEqual(sourceRows(gamma.sources, explorers).rows.map(({ link }) => link.href), ['https://taostats.io/extrinsic/9483859-0021', 'https://ur.io/gamma']);
     assert.equal(gamma.key, undefined);
 });
 

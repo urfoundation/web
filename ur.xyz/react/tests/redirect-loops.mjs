@@ -35,19 +35,33 @@
 // never does. Each settled page is watched CONFIRM_MS longer, so a slow loop
 // (one a script starts after the page loads) fails too.
 //
+// A loop fails its case at once: more than LOOP_NAVIGATIONS navigations, or
+// more than BOUNCES returns from a page's translation to the page, however
+// slowly they come. A case that only ran out of time (still navigating after
+// BUDGET_MS, or a step before that timing out, in no more navigations than it
+// may take) runs again once the rest are done, alone and with the same
+// budget, and fails only if it fails again: on a busy machine a page can take
+// that long to load. The cases run WORKERS at a time, fewer when the machine
+// is already busy.
+//
 // Needs nginx (brew install nginx; apt-get install nginx-light) and the
 // Chromium of `make install-playwright-browser`.
 //
-// Usage: node tests/redirect-loops.mjs [buildDir] [--conf path/to/nginx.conf.j2]
+// Usage: node tests/redirect-loops.mjs [buildDir] [--conf path/to/nginx.conf.j2] [--overlay dir]
 //   buildDir defaults to ../astro/build/main; the config to web/web's.
+//   --overlay serves a copy of the build with the files of dir laid over it.
+//   tests/fixtures/redirect-loops holds pages that loop on purpose, and the
+//   gate must fail on them:
+//     node tests/redirect-loops.mjs ../astro/build/main --overlay tests/fixtures/redirect-loops
 import { chromium } from 'playwright-core';
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { constants, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+    LANG_REDIRECT_GUARD_MS,
     LANG_STORAGE_KEY,
     NON_EN_SITE_LANG_CODES,
     NOT_FOUND_PATH,
@@ -61,9 +75,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, '../../..');
 
 const argv = process.argv.slice(2);
-const confAt = argv.indexOf('--conf');
-const CONF = path.resolve(confAt >= 0 ? argv[confAt + 1] : path.join(REPO, 'web/nginx/nginx.conf.j2'));
-const BUILD = path.resolve(argv.filter((a, i) => !a.startsWith('--') && argv[i - 1] !== '--conf')[0] || path.join(__dirname, '../../astro/build/main'));
+function option(name) {
+    if (!argv.includes(name)) return null;
+    const value = argv[argv.indexOf(name) + 1];
+    if (!value || value.startsWith('--')) {
+        console.error(`redirect-loops: ${name} needs a path`);
+        process.exit(2);
+    }
+    return path.resolve(value);
+}
+const CONF = option('--conf') || path.join(REPO, 'web/nginx/nginx.conf.j2');
+const OVERLAY = option('--overlay');
+const SOURCE = path.resolve(argv.filter((a, i) => !a.startsWith('--') && !['--conf', '--overlay'].includes(argv[i - 1]))[0] || path.join(__dirname, '../../astro/build/main'));
+// the directory nginx serves: the build, or with --overlay its copy in the work directory
+let BUILD = SOURCE;
 const MIME = path.join(REPO, 'web/nginx/mime.types');
 
 // A page has settled when no navigation follows its last one for this long. The
@@ -72,17 +97,74 @@ const QUIET_MS = 400;
 // how long a settled page is watched for one more navigation
 const CONFIRM_MS = 1500;
 // how long a case may take before it counts as unsettled (a loop is found
-// sooner, by its count of navigations)
+// sooner, by its count of navigations or of bounces)
 const BUDGET_MS = 15000;
 // more navigations than this in one case is a loop
 const LOOP_NAVIGATIONS = 12;
-const WORKERS = Math.max(2, Math.min(10, os.availableParallelism?.() || os.cpus().length));
+// More returns than this from a page's translation to the page, in one case,
+// is a loop. The stored-language redirect's recovery from a cached 301
+// (storedLanguageRedirectScript) takes one: the redirect, the 301 back, then
+// once more at <target>?, an address no cached 301 matches. As the script
+// does, a return counts only within LANG_REDIRECT_GUARD_MS of the redirect:
+// the script by the page's clock, the gate by when it saw the requests, a
+// little later and not always by the same delay, so the gate takes a second
+// less (BOUNCE_WINDOW_MS).
+const BOUNCES = 1;
+const BOUNCE_WINDOW_MS = LANG_REDIRECT_GUARD_MS - 1000;
+// At most this many cases that ran out of time run again in one run: more
+// than that is no busy machine but a fault, and they fail as they are.
+const RETRY_LIMIT = 20;
+// Cases run WORKERS at a time: one per CPU, 2 to 10, and fewer on a machine
+// already busy, where a page can take longer than BUDGET_MS to load. Above a
+// one-minute load average of half the CPUs the count falls with the load, to
+// 2 when the load reaches the CPU count. The load is read as the gate starts,
+// before its own.
+const CPUS = os.availableParallelism?.() || os.cpus().length;
+const LOAD = os.loadavg()[0];
+const WORKERS = Math.max(2, Math.round(Math.min(10, CPUS) * Math.min(1, Math.max(0, 2 * (1 - LOAD / CPUS)))));
 const MISSING = 'no-such-page';
 const VIEWPORT = { width: 1280, height: 900 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const twin = (lang, base) => (lang === 'en' ? base : base === '/' ? `/${lang}` : `/${lang}${base}`);
 const pathOf = (url) => { try { return new URL(url).pathname; } catch { return url; } };
+
+// A path as a page and the language it names: /de/docs/miner/ is /docs/miner
+// in de, /about.html is /about in en.
+const LANG_PREFIX = new RegExp(`^/(${NON_EN_SITE_LANG_CODES.join('|')})(?=/|$)`);
+function pageOf(p) {
+    const bare = p.replace(/\/index\.html$/, '/').replace(/\.html$/, '').replace(/\/+$/, '') || '/';
+    const prefix = LANG_PREFIX.exec(bare);
+    return prefix ? { page: bare.slice(prefix[0].length) || '/', lang: prefix[1] } : { page: bare, lang: 'en' };
+}
+
+// How many times a chain of paths came back from a page's translation to the
+// page after a step from the page to that translation. `times` holds when
+// each step was requested. A case that starts on the translation and is sent
+// to English has not bounced yet. As in the site's script, a return counts
+// only when the page decides within the guard's window of that step
+// (BOUNCE_WINDOW_MS): when its next step is requested, or `now` while none
+// has followed. Later, the script starts afresh, and so does the count.
+function bounces(chain, times, now) {
+    const left = new Map(); // English pages the chain stepped from to a translation, and when
+    let count = 0;
+    for (let i = 1; i < chain.length; i++) {
+        const from = pageOf(chain[i - 1]);
+        const to = pageOf(chain[i]);
+        if (from.page !== to.page || from.lang === to.lang) continue;
+        if (from.lang === 'en') left.set(from.page, times[i]);
+        else if (to.lang === 'en' && left.has(to.page) && (times[i + 1] ?? now) - left.get(to.page) < BOUNCE_WINDOW_MS) count += 1;
+    }
+    return count;
+}
+
+// Whether a case's navigations are a loop already: false, or by which rule
+// and how many navigations or bounces.
+function loops(chain, times, now) {
+    if (chain.length > LOOP_NAVIGATIONS) return { rule: 'navigations', count: chain.length };
+    const count = bounces(chain, times, now);
+    return count > BOUNCES ? { rule: 'bounces', count } : false;
+}
 
 // ── nginx ────────────────────────────────────────────────────────────────────
 
@@ -269,18 +351,25 @@ async function loaded(page) {
 }
 
 // Starts a navigation with `navigate` and waits until the page settles: no
-// main-frame navigation for QUIET_MS, the document parsed. Returns the chain
-// of main-frame requests (each HTTP redirect and each scripted redirect is
-// one), where it ended, its status and its <html lang>, and confirm(), which
-// watches the page CONFIRM_MS longer and marks the outcome unsettled, with the
-// late navigations, if it moved.
-async function settle(page, navigate) {
+// main-frame navigation for QUIET_MS, the page showing the document it last
+// asked for (on a busy machine one can take longer than QUIET_MS to arrive,
+// while the one before it has long been parsed), that document parsed. Stops
+// at once at a loop (`looped`, from loops()). Returns the chain of main-frame
+// requests (each HTTP redirect and each scripted redirect is one), where it
+// ended, its status and its <html lang>, and confirm(), which watches the page
+// CONFIRM_MS longer and marks the outcome unsettled, with the late
+// navigations, if it moved, and looped if they made a loop; an unsettled
+// chain takes in the requests that came after the wait. `stays`: the case
+// may end with no navigation at all.
+async function settle(page, navigate, { stays = false } = {}) {
     const requests = [];
+    const times = []; // when each request was made
     let last = Date.now();
     const onRequest = (request) => {
         if (request.isNavigationRequest() && request.frame() === page.mainFrame()) {
             requests.push(request);
             last = Date.now();
+            times.push(last);
         }
     };
     const onCommit = (frame) => { if (frame === page.mainFrame()) last = Date.now(); };
@@ -290,38 +379,59 @@ async function settle(page, navigate) {
     };
     page.on('request', onRequest);
     page.on('framenavigated', onCommit);
+    const chainOf = () => requests.map((r) => pathOf(r.url()));
+    const loopOf = (chain) => loops(chain, times, Date.now());
+    // the page shows the document of the last navigation (or Chromium's error page for it); with none
+    // made yet, only a case that may stay where it is has arrived
+    const arrived = () => (requests.length
+        ? page.url().startsWith('chrome-error:') || pathOf(page.url()) === pathOf(requests.at(-1).url())
+        : stays);
+    const quiet = () => Date.now() - last >= QUIET_MS && arrived();
     let looped = false;
+    let settled = false;
     try {
         await navigate();
         const start = Date.now();
         last = Math.max(last, start);
         for (;;) {
             await sleep(50);
-            if (requests.length > LOOP_NAVIGATIONS) { looped = true; break; }
+            looped = loopOf(chainOf());
+            if (looped) break;
+            const seen = requests.length;
+            settled = quiet();
             if (Date.now() - start > BUDGET_MS) break;
-            if (Date.now() - last >= QUIET_MS && await loaded(page)) break;
+            // and still so once the document has answered: no navigation began meanwhile
+            if (settled && await loaded(page) && requests.length === seen && quiet()) break;
         }
     } catch (error) {
         detach();
         throw error;
     }
+    const settledAt = requests.length;
+    const chain = chainOf();
     const response = requests.length ? await requests.at(-1).response().catch(() => null) : null;
     const outcome = {
-        settled: !looped && Date.now() - last >= QUIET_MS,
+        settled: !looped && settled,
         looped,
-        redirects: Math.max(0, requests.length - 1),
-        chain: requests.map((r) => pathOf(r.url())),
+        redirects: Math.max(0, chain.length - 1),
+        chain,
         status: response ? response.status() : null,
         path: pathOf(page.url()),
         lang: await page.evaluate(() => document.documentElement.lang).catch(() => null),
     };
-    const settledAt = requests.length;
     outcome.confirm = async () => {
         if (outcome.settled) await sleep(CONFIRM_MS);
         detach();
-        if (requests.length > settledAt) {
+        const chain = chainOf();
+        if (!outcome.settled) {
+            // still navigating when the wait ended: what came since is the same chain
+            outcome.chain = chain;
+            outcome.redirects = Math.max(0, chain.length - 1);
+            outcome.looped ||= loopOf(chain);
+        } else if (chain.length > settledAt) {
             outcome.settled = false;
-            outcome.late = requests.slice(settledAt).map((r) => pathOf(r.url()));
+            outcome.late = chain.slice(settledAt);
+            outcome.looped ||= loopOf(chain);
         }
         return outcome;
     };
@@ -332,10 +442,13 @@ async function settle(page, navigate) {
 // { what, text }, `what` naming the kind of problem for the summary.
 function judge(expect, outcome) {
     const problems = [];
-    const chain = outcome.chain.slice(0, 6).join(' → ') + (outcome.chain.length > 6 ? ' → …' : '');
-    if (outcome.looped) problems.push({ what: 'loops', text: `${outcome.chain.length}+ navigations within seconds: ${chain}` });
+    const steps = (list) => list.slice(0, 6).join(' → ') + (list.length > 6 ? ' → …' : '');
+    const chain = steps(outcome.chain);
+    const all = [...outcome.chain, ...(outcome.late || [])];
+    if (outcome.looped?.rule === 'bounces') problems.push({ what: 'loops', text: `back to the page from its translation ${outcome.looped.count} times, where the recovery from a cached 301 takes ${BOUNCES}: ${steps(all)}` });
+    else if (outcome.looped) problems.push({ what: 'loops', text: `${all.length}+ navigations within seconds: ${steps(all)}` });
     else if (outcome.late) problems.push({ what: 'moves again after settling', text: `${chain}, then ${outcome.late.join(' → ')}` });
-    else if (!outcome.settled) problems.push({ what: 'never settles', text: `still navigating after ${BUDGET_MS / 1000} s: ${chain}` });
+    else if (!outcome.settled) problems.push({ what: 'never settles', text: outcome.chain.length ? `still navigating after ${BUDGET_MS / 1000} s: ${chain}` : `no navigation in ${BUDGET_MS / 1000} s` });
     else if (outcome.redirects > expect.maxRedirects) problems.push({ what: `more than ${expect.maxRedirects} redirect(s)`, text: chain });
     if (!outcome.looped && outcome.settled) {
         if (expect.path && outcome.path !== expect.path) problems.push({ what: 'ends on another page', text: `${chain}, not ${expect.path}` });
@@ -365,7 +478,7 @@ async function chooseLanguage(page, lang) {
         }
         await sleep(200); // the nav hydrates on idle
     }
-    throw new Error('the language switcher did not open');
+    throw Object.assign(new Error('the language switcher did not open in 8 s'), { name: 'TimeoutError' });
 }
 
 // Runs `cases` through `run` with WORKERS at a time.
@@ -497,21 +610,62 @@ function originalCases() {
 
 // ── the run ──────────────────────────────────────────────────────────────────
 
-const results = new Map(); // kind -> { total, failures: [] }
+const results = new Map(); // kind -> { total, failures: [], again: count that ran as expected on their second run }
 function record(c, problems) {
-    if (!results.has(c.kind)) results.set(c.kind, { total: 0, failures: [] });
+    if (!results.has(c.kind)) results.set(c.kind, { total: 0, failures: [], again: 0 });
     const r = results.get(c.kind);
     r.total += 1;
     if (problems.length) r.failures.push({ c, problems });
+    else if (c.first) r.again += 1;
+}
+
+// The cases that only ran out of time, to run again once the rest are done
+// (runAgain); each case run again, with what its first run found; and how
+// many ran out of time past RETRY_LIMIT, and failed as they were.
+let pending = [];
+const retried = [];
+let overLimit = 0;
+
+// A case that could not run: what stopped it, and whether a step of it ran
+// out of time (Playwright's TimeoutError, or the language switcher's wait).
+const failsToRun = (error) => ({ what: 'fails to run', text: error.message.split('\n')[0], timeout: error.name === 'TimeoutError' });
+
+// Records a case, or keeps it for a second run when it only ran out of time:
+// still navigating after BUDGET_MS, or a step timing out before it, with no
+// loop and in no more navigations than the case may take.
+function conclude(c, problems, outcome) {
+    const outOfTime = problems.length === 1 && (problems[0].what === 'never settles' || problems[0].timeout === true)
+        && !outcome?.looped && (outcome?.chain.length ?? 0) <= c.expect.maxRedirects + 1;
+    if (outOfTime && !c.first) pending.push({ c, problems });
+    else record(c, problems);
+}
+
+// Runs the cases kept for a second run, one at a time, each through `run`
+// with the same budget, and waits for each to be recorded. Past RETRY_LIMIT
+// in the run, none of them runs again.
+async function runAgain(run) {
+    const queue = pending;
+    pending = [];
+    if (retried.length + queue.length > RETRY_LIMIT) {
+        overLimit += queue.length;
+        for (const { c, problems } of queue) record(c, problems);
+        return;
+    }
+    for (const { c, problems } of queue) {
+        c.first = problems;
+        retried.push(c);
+        await run(c);
+        await watched();
+    }
 }
 
 // The settled pages being watched for one more navigation (settle's confirm),
-// each recording its case when done.
+// each concluding its case when done.
 let watching = [];
 const watch = (c, outcome, after) => {
     watching.push(outcome.confirm()
-        .then((o) => record(c, judge(c.expect, o)))
-        .catch((error) => record(c, [{ what: 'fails to run', text: error.message.split('\n')[0] }]))
+        .then((o) => conclude(c, judge(c.expect, o), o))
+        .catch((error) => conclude(c, [failsToRun(error)]))
         .finally(after));
 };
 async function watched() {
@@ -531,7 +685,9 @@ async function freshCase(browser, origin, c) {
         let outcome;
         if (c.choose) {
             await page.goto(origin + c.url);
-            outcome = await settle(page, () => chooseLanguage(page, c.choose));
+            // asked for the language the page is already in, the switcher only records the choice
+            const stays = await page.evaluate(() => document.documentElement.lang).catch(() => null) === c.choose;
+            outcome = await settle(page, () => chooseLanguage(page, c.choose), { stays });
         } else if (c.click) {
             await page.goto(origin + c.url);
             outcome = await settle(page, () => page.locator(c.click).first().click({ noWaitAfter: true, timeout: 5000 }));
@@ -541,7 +697,7 @@ async function freshCase(browser, origin, c) {
         }
         watch(c, outcome, close);
     } catch (error) {
-        record(c, [{ what: 'fails to run', text: error.message.split('\n')[0] }]);
+        conclude(c, [failsToRun(error)]);
         await close();
     }
 }
@@ -554,7 +710,7 @@ async function cachedCases(binary, work, sinkPort, list) {
     const origin = `http://127.0.0.1:${port}`;
     const profile = path.join(work, 'profile');
     const real = list.filter((f) => f.real).map((f) => f.real);
-    let bounced = 0;
+    const bounced = new Set(); // the cases the cache sent from /<lang>/<page> back to English
 
     const old = await startNginx(binary, path.join(work, 'nginx-old'), port, oldConfig(port, BUILD));
     try {
@@ -577,28 +733,39 @@ async function cachedCases(binary, work, sinkPort, list) {
     try {
         const context = await chromium.launchPersistentContext(profile, { ...launchOptions(sinkPort), viewport: VIEWPORT });
         try {
+            const first = context.pages()[0] || await context.newPage();
+            // a case in a tab of its own, with its language stored in the profile
+            const run = async (c) => {
+                const page = await context.newPage();
+                try {
+                    const outcome = await settle(page, () => page.goto(origin + c.url, { waitUntil: 'commit', timeout: BUDGET_MS }).catch(() => {}));
+                    // the cache sent the visitor from the page's /<lang>/ URL back to English
+                    if (outcome.chain.some((step, i) => step === twin(c.stored, c.family) && outcome.chain[i + 1] === c.family)) bounced.add(c);
+                    watch(c, outcome, () => page.close().catch(() => {}));
+                } catch (error) {
+                    conclude(c, [failsToRun(error)]);
+                    await page.close().catch(() => {});
+                }
+            };
             for (const lang of NON_EN_SITE_LANG_CODES) {
-                const first = context.pages()[0] || await context.newPage();
                 await storeLanguage(first, origin, lang);
                 // a page's English URL, and its /<lang>/ URL, which the cache
                 // sends to English: both end on the translation, past the cache
                 const cases = real.flatMap((p) => [p, twin(lang, p)].map((url) => (
                     { kind, family: p, url, stored: lang, expect: { maxRedirects: 4, ...landing(p, lang), status: 200 } })));
-                await pool(cases, async (c) => {
-                    const page = await context.newPage();
-                    try {
-                        const outcome = await settle(page, () => page.goto(origin + c.url, { waitUntil: 'commit', timeout: BUDGET_MS }).catch(() => {}));
-                        // the cache sent the visitor from the page's /<lang>/ URL back to English
-                        if (outcome.chain.some((step, i) => step === twin(lang, c.family) && outcome.chain[i + 1] === c.family)) bounced += 1;
-                        watch(c, outcome, () => page.close().catch(() => {}));
-                    } catch (error) {
-                        record(c, [{ what: 'fails to run', text: error.message.split('\n')[0] }]);
-                        await page.close().catch(() => {});
-                    }
-                });
+                await pool(cases, run);
                 // the next language is stored in the same profile
                 await watched();
             }
+            await runAgain(async (c) => {
+                try {
+                    await storeLanguage(first, origin, c.stored);
+                } catch (error) {
+                    conclude(c, [failsToRun(error)]);
+                    return;
+                }
+                await run(c);
+            });
         } finally {
             await context.close().catch(() => {});
         }
@@ -607,13 +774,22 @@ async function cachedCases(binary, work, sinkPort, list) {
     }
     // Without a 301 from the cache, these cases prove nothing: the profile
     // must have kept the old config's.
-    if (!bounced) record({ kind, family: 'the profile' }, [{ what: 'kept no 301 of the old config', text: 'no case went from /<lang>/<page> to the English page' }]);
-    else results.get(kind).note = `the cached 301s sent ${bounced} back to English`;
+    if (!bounced.size) record({ kind, family: 'the profile' }, [{ what: 'kept no 301 of the old config', text: 'no case went from /<lang>/<page> to the English page' }]);
+    else results.get(kind).note = `the cached 301s sent ${bounced.size} back to English`;
 }
 
+// a case, what it did and what it found, for the report
+const describe = (c, text) => [c.family, c.choose ? `chose ${c.choose.toUpperCase()} on ${c.url}`
+    : c.click ? `followed the English link on ${c.url}${c.stored ? ` with ${c.stored} stored` : ''}`
+        : c.url && `${c.url}${c.referer ? ` from ${c.referer}` : ''}${c.stored ? ` with ${c.stored} stored` : ''}`, text].filter(Boolean).join(': ');
+
 async function main() {
-    if (!existsSync(path.join(BUILD, 'index.html'))) {
-        console.error(`redirect-loops: no build at ${BUILD} (make build-main, or pass the build directory)`);
+    if (!existsSync(path.join(SOURCE, 'index.html'))) {
+        console.error(`redirect-loops: no build at ${SOURCE} (make build-main, or pass the build directory)`);
+        process.exit(2);
+    }
+    if (OVERLAY && !existsSync(OVERLAY)) {
+        console.error(`redirect-loops: no overlay at ${OVERLAY}`);
         process.exit(2);
     }
     const binary = nginxBinary();
@@ -623,9 +799,27 @@ async function main() {
     }
     const started = Date.now();
     const work = mkdtempSync(path.join(os.tmpdir(), 'ur-redirect-loops-'));
-    const sink = await startSink();
-    const list = families();
+    const shown = (file) => (file.startsWith(`${REPO}${path.sep}`) ? path.relative(REPO, file) : file);
+    let list;
     try {
+        if (OVERLAY) {
+            BUILD = path.join(work, 'build');
+            cpSync(SOURCE, BUILD, { recursive: true, mode: constants.COPYFILE_FICLONE });
+            cpSync(OVERLAY, BUILD, { recursive: true });
+            // a file laid over the build replaces its precompressed copies too
+            for (const file of readdirSync(OVERLAY, { recursive: true })) {
+                for (const copy of [`${file}.gz`, `${file}.br`]) rmSync(path.join(BUILD, copy), { force: true });
+            }
+        }
+        list = families();
+    } catch (error) {
+        rmSync(work, { recursive: true, force: true });
+        throw error;
+    }
+    console.log(`redirect-loops: ${shown(CONF)} over ${shown(SOURCE)}${OVERLAY ? ` with ${shown(OVERLAY)} laid over it` : ''}, ${list.length} families of pages; ${WORKERS} workers (load average ${LOAD.toFixed(1)} on ${CPUS} CPUs)`);
+    let sink;
+    try {
+        sink = await startSink();
         const port = await freePort();
         const origin = `http://127.0.0.1:${port}`;
         const nginx = await startNginx(binary, path.join(work, 'nginx'), port, urXyzConfig(readFileSync(CONF, 'utf8'), port, BUILD));
@@ -634,6 +828,7 @@ async function main() {
             try {
                 await pool([...storedCases(list), ...switcherCases(list), ...originalCases()], (c) => freshCase(browser, origin, c));
                 await watched();
+                await runAgain((c) => freshCase(browser, origin, c));
             } finally {
                 await browser.close().catch(() => {});
             }
@@ -642,16 +837,15 @@ async function main() {
         }
         await cachedCases(binary, work, sink.port, list);
     } finally {
-        await sink.close();
+        await sink?.close();
         rmSync(work, { recursive: true, force: true });
     }
 
-    const shown = (file) => (file.startsWith(`${REPO}${path.sep}`) ? path.relative(REPO, file) : file);
-    console.log(`redirect-loops: ${shown(CONF)} over ${shown(BUILD)}, ${list.length} families of pages`);
     let failed = 0;
     for (const [kind, r] of results) {
         failed += r.failures.length;
-        console.log(`  ${r.failures.length ? '✗' : '✓'} ${kind}: ${r.total - r.failures.length} of ${r.total} as expected${r.note ? ` (${r.note})` : ''}`);
+        const notes = [r.note, r.again && `${r.again} on a second run`].filter(Boolean);
+        console.log(`  ${r.failures.length ? '✗' : '✓'} ${kind}: ${r.total - r.failures.length} of ${r.total} as expected${notes.length ? ` (${notes.join('; ')})` : ''}`);
         // the failures by what went wrong, with a few examples each
         const byWhat = new Map();
         for (const { c, problems } of r.failures) {
@@ -665,20 +859,26 @@ async function main() {
             console.log(`      ${found.length} ${what}, in ${families.length} famil${families.length === 1 ? 'y' : 'ies'} (${families.slice(0, 8).join(', ')}${families.length > 8 ? ', …' : ''}), e.g.`);
             // an example from each of the first families
             for (const { c, problem } of families.slice(0, 3).map((family) => found.find(({ c: x }) => x.family === family))) {
-                const how = c.choose ? `chose ${c.choose.toUpperCase()} on ${c.url}`
-                    : c.click ? `followed the English link on ${c.url}${c.stored ? ` with ${c.stored} stored` : ''}`
-                        : `${c.url}${c.referer ? ` from ${c.referer}` : ''}${c.stored ? ` with ${c.stored} stored` : ''}`;
-                console.log(`        ${c.family}: ${how}: ${problem.text}`);
+                console.log(`        ${describe(c, problem.text)}${c.first ? ' (its second run)' : ''}`);
             }
         }
     }
+    // the cases that ran again, each with its first run and how the second went
+    const again = retried.filter((c) => !results.get(c.kind).failures.some((f) => f.c === c));
+    if (retried.length) console.log(`  retried ${retried.length} case(s) that only ran out of time, one at a time with the same ${BUDGET_MS / 1000} s: ${again.length} as expected the second time`);
+    else if (!overLimit) console.log('  retried 0 cases: none only ran out of time');
+    for (const c of retried) {
+        const second = results.get(c.kind).failures.find((f) => f.c === c);
+        console.log(`      ${describe(c, c.first[0].text)}; then ${second ? second.problems.map((p) => p.text).join('; ') : 'as expected'}`);
+    }
+    if (overLimit) console.log(`  ${overLimit} case(s) only ran out of time but were not retried, as they would have taken the run past ${RETRY_LIMIT} retries: they fail as they are`);
     const hosts = [...sink.blocked.entries()].sort((a, b) => b[1] - a[1]);
     console.log(`  blocked ${hosts.reduce((n, [, count]) => n + count, 0)} requests off the machine${hosts.length ? ` (${hosts.slice(0, 6).map(([h, n]) => `${h} ${n}`).join(', ')}${hosts.length > 6 ? ', …' : ''})` : ''}; ${Math.round((Date.now() - started) / 1000)} s`);
     if (failed) {
         console.log(`\n✗ redirect-loops: ${failed} case(s) did not settle as expected`);
         process.exit(1);
     }
-    console.log('\n✓ redirect-loops: every page settles');
+    console.log(`\n✓ redirect-loops: every page settles${retried.length ? ` (${retried.length} on a second run)` : ''}`);
 }
 
 main().catch((error) => {

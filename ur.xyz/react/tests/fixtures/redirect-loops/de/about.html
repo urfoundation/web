@@ -1,0 +1,17 @@
+<!doctype html>
+<!--
+  A deliberate loop, for tests/redirect-loops.mjs --overlay tests/fixtures/redirect-loops: laid over a build, the
+  German /about sends the visitor straight back to the English page, with no referrer, as a 301 cached from the
+  config before the pages were translated did. With German stored: /about, /de/about, /about, /de/about?, /about,
+  where the stored-language redirect's guard stops it. That is two returns from the translation where the recovery
+  from a cached 301 takes one, and the gate fails it as a loop.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<title>Über uns</title>
+<script>location.replace('/about');</script>
+</head>
+<body></body>
+</html>

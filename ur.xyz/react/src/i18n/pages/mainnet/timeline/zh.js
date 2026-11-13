@@ -269,6 +269,11 @@ export default {
                 'sn 仓库中的完整通知',
             ],
         },
+        'usdc-payouts-end': {
+            title: 'USDC 提供者支付结束',
+            detail: '旧的 USDC 提供者支付已经结束，此后不会再发送任何 USDC 支付。提供者的报酬通过 SN25 支付。',
+            sources: [],
+        },
         'epoch-5-claims-with-recovery': {
             title: '周期 5 的领取',
             detail: '周期 5 于区块 9,499,228 结束，领取在其 14,400 个区块的质疑期之后开放。恢复的周期 1 和 3 资金不属于周期 5 的支付：将其加入的操作未能及时安排（见页面顶部关于周期 3 的通知）。',

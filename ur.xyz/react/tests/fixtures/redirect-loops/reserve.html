@@ -1,0 +1,14 @@
+<!doctype html>
+<!--
+  A deliberate loop, for tests/redirect-loops.mjs --overlay tests/fixtures/redirect-loops: laid over a build, /price
+  and /reserve send the visitor to each other at once, without end. No page here is the other's translation, so the
+  gate fails it as a loop by its count of navigations.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reserve</title>
+<script>location.replace('/price');</script>
+</head>
+<body></body>
+</html>

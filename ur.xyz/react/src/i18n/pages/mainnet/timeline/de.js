@@ -281,6 +281,13 @@ export default {
                 'Die vollständige Mitteilung im sn-Repo',
             ],
         },
+        'top200-binding-open': {
+            title: 'Die Top-200-Flottenbindung auf SN25 ist geöffnet',
+            detail: 'Ein Netzwerk, das voraussichtlich in den Top 200 von SN25 rangiert, seinen 200 Top-Level-Plätzen, kann sich seinen Platz sichern: einen Hotkey auf SN25 registrieren, von ihm aus das Manifest der Flotte veröffentlichen, das das Commitment-Orakel des Netzbetreibers in den Koordinator auf Chain 964 spiegelt, und jedes Gerät für bis zu 12 Epochen binden, beginnend nach der aktuellen Epoche. Der Validator gewichtet die ausgewählten Flotten der Top 200 nach Score, nicht nach Rang, solange er seine Gewichte steuert, und ein gebundenes Gerät verlässt den Provider-Pool, solange seine Bindung aktiv ist. Für einen Provider, der sich keinen Platz sichert, ändert sich nichts.',
+            sources: [
+                'Die vollständige Mitteilung im sn-Repo',
+            ],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Claims für Epoche 5',
             detail: 'Epoche 5 endet mit Block 9.499.228, und die Claims folgen nach ihrer Anfechtungsfrist von 14.400 Blöcken. Die zurückgewonnene Finanzierung der Epochen 1 und 3 ist nicht Teil der Auszahlung von Epoche 5: Ihre Aufnahme wurde nicht rechtzeitig eingeplant (siehe die Mitteilung zu Epoche 3 oben).',

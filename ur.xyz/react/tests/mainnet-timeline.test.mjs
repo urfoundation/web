@@ -693,10 +693,10 @@ test('providers without UDP or IPv6: a milestone and a notice as the next releas
     assert.match(milestone.detail, / Apps from before these releases keep the old selection\. /);
     // §1 non-goals: SN25 reads no URL outcome (qualityprobe/H3.md, "SN25")
     assert.match(milestone.detail, / SN25 scoring, weights and payouts read none of the quality probe's checks and do not change: pool rewards are still split by completed usage, so these providers earn more only through the traffic they will carry\.$/);
-    // in date order: after the milestones of November 12, before epoch 5's claims
+    // in date order: after the milestones of November 12, and before Top 200 binding, posted later the same day
     const ids = events.map((e) => e.id);
     assert.equal(ids.indexOf(milestone.id), ids.indexOf('usdc-payouts-end') + 1);
-    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('epoch-5-claims-with-recovery'));
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('top200-binding-open'));
 
     const notice = mainnetNotices.find((n) => n.id === 'notice-providers-without-udp-or-ipv6');
     assert.ok(notice, 'the notice is listed');
@@ -724,11 +724,13 @@ test('providers without UDP or IPv6: a milestone and a notice as the next releas
 });
 
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the providers without UDP or IPv6,
-    // of November 13, then the extender pool and the extenders' share, both of November 12, then capture the
-    // flag and Pro data, both of November 11, the later-posted first, then epoch 3's of October 31. The data
-    // lists them in the order they were posted, the other way round, so this order is the sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): Top 200 binding and the providers
+    // without UDP or IPv6, both of November 13, then the extender pool and the extenders' share, both of
+    // November 12, then capture the flag and Pro data, both of November 11, the later-posted first, then epoch 3's
+    // of October 31. The data lists them in the order they were posted, the other way round, so this order is the
+    // sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
+        ['notice-top200-binding-open', 'November 13, 2026'],
         ['notice-providers-without-udp-or-ipv6', 'November 13, 2026'],
         ['notice-extender-pool', 'November 12, 2026'],
         ['notice-extender-relay-share', 'November 12, 2026'],
@@ -756,7 +758,7 @@ test('the notices at the top run newest first, by the day each was posted', () =
         assert.ok(Number.isNaN(noticeDay(posted('x', date))), `"${date}" should not read`);
         assert.throws(() => newestFirst([posted('x', date)]), /is not a day such as "November 11, 2026"/, `"${date}"`);
     }
-    // with six notices at the top, the milestones and the box name the one they point to
+    // with seven notices at the top, the milestones and the box name the one they point to
     const pointers = [...events.map((e) => e.detail), ...mainnetActions.steps.map((s) => s.detail)];
     for (const text of pointers) assert.doesNotMatch(text, /\bthe notice at the top\b/);
     assert.equal(pointers.filter((text) => text.includes('the epoch 3 notice at the top')).length, 7);
@@ -947,4 +949,52 @@ test('USDC provider payouts end: done on November 12, after which no USDC payout
     // it follows the last weekly USDC batch
     const ids = events.map((e) => e.id);
     assert.ok(ids.indexOf('last-usdc-payout-batch') < ids.indexOf(end.id));
+});
+
+test('Top 200 fleet binding is open: a milestone and a notice, with the limits a claim meets and no reward figure', () => {
+    // the open-binding runbook's step 13 flips GET /sn/top to binding_open: true; this note is posted once that
+    // has rolled out and a binding has worked on mainnet, dated the day binding opened
+    const milestone = events.find((e) => e.id === 'top200-binding-open');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'done');
+    assert.equal(milestone.date, '2026-11-13');
+    assert.equal(milestone.key, undefined);
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-top200-binding-open.md';
+    assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
+    assert.equal(milestone.title, 'Top 200 fleet binding is open on SN25');
+    // the three steps, with the coordinator's limits (policy: maximumBindingValidityEpochs 12, a binding's first
+    // epoch after the current one) and the oracle that mirrors a published manifest (sn commitmentoracle)
+    assert.ok(milestone.detail.startsWith("A network projected to rank inside SN25's head of 200 top-level seats can claim its spot: register a hotkey on SN25, publish the fleet's manifest from it, which the network operator's commitment oracle mirrors to the coordinator on chain 964, and bind each device for up to 12 epochs, starting after the current epoch. "));
+    assert.match(milestone.detail, / a bound device leaves the provider pool while its binding is active\. Nothing changes for a provider that doesn't claim\.$/);
+    // in date order: the last milestone of the day it was posted, before epoch 5's claims
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('providers-without-udp-or-ipv6') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('epoch-5-claims-with-recovery'));
+
+    const notice = mainnetNotices.find((n) => n.id === 'notice-top200-binding-open');
+    assert.ok(notice, 'the notice is listed');
+    // posted the day of the milestone, and the full text in the sn repo is named by that day
+    assert.equal(notice.date, 'November 13, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 13));
+    assert.equal(notice.title, 'Top 200 fleet binding is open on SN25. A network in the head can claim its spot.');
+    assert.equal(notice.paragraphs.length, 5);
+    const [open, steps, pay, pool, publish] = notice.paragraphs;
+    assert.match(open, / Claiming is optional, and nothing changes for a provider that doesn't claim\.$/);
+    assert.match(steps, /registering burns TAO from your coldkey, and the burn is not refunded\./);
+    assert.match(steps, / the network operator's commitment oracle mirrors it to the coordinator on chain 964 by itself\. Then bind each device to the fleet, for up to 12 epochs, starting after the current epoch\. /);
+    assert.match(steps, / nothing in a claim asks for a recovery phrase\.$/);
+    // paid by score while the validator steers; the cohort's per-fleet priority is its size over the 200 seats
+    // (server model/verify_cohort_model.go, VerifyCohortPriorityPerFleet: 1,500 / 200)
+    assert.match(pay, /^The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights\. /);
+    assert.match(pay, / at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured\. Rewards are paid in alpha, whose value changes and can fall\.$/);
+    // a device earns in one tier at a time (server controller/st_head_exclusion.go); immunity is 21,600 blocks
+    assert.match(pool, /^A bound device leaves the provider pool: while its binding is active at either boundary of an epoch, it earns no pool share for that epoch, whether or not its fleet earns\. /);
+    assert.match(pool, / so register in the 3 days before the epoch your binding starts\.$/);
+    // the coordinator's commitmentMaxAgeBlocks, and the oracle mirrors only tagged commitments
+    assert.match(publish, /^A commitment older than 100,800 blocks \(14 days\) can't bind new devices, and commitments in the older format are not mirrored, /);
+    assert.match(publish, / and a new chain runtime needs a new document\.$/);
+    // facts of the opening only: no reward figure, no share of emission, no calendar date in the text
+    const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
+    assert.doesNotMatch(words, /\d\s?%|\$\s?\d|\d\s?α|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/);
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });

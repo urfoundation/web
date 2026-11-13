@@ -3,6 +3,17 @@
 // `node tests/i18n-staleness.mjs --unit mainnet/data --accept de <key> ...` from react/.
 export default {
     notices: {
+        'notice-top200-binding-open': {
+            title: 'Die Top-200-Flottenbindung auf SN25 ist geöffnet. Ein Netzwerk in den Top 200 kann sich seinen Platz sichern.',
+            paragraphs: [
+                'Head-Miner können sich jetzt einen Platz in den Top 200 von SN25 sichern, seinen 200 Top-Level-Plätzen. Die Top-200-Seite auf ur.io und die aktuellen Apps sagen nicht mehr, dass das noch nicht möglich ist: Sie fordern ein Netzwerk, das voraussichtlich in den Top 200 rangiert, auf, sich seinen Platz zu sichern. Das ist freiwillig, und für einen Provider, der sich keinen Platz sichert, ändert sich nichts.',
+                'Dafür gibt es drei Schritte. Registriere einen Hotkey auf SN25: Die Registrierung verbrennt TAO von deinem Coldkey, und der Burn wird nicht erstattet. Veröffentliche das Manifest der Flotte von diesem Hotkey aus: Sobald das Commitment final ist, spiegelt das Commitment-Orakel des Netzbetreibers es von selbst in den Koordinator auf Chain 964. Binde dann jedes Gerät an die Flotte, für bis zu 12 Epochen, beginnend nach der aktuellen Epoche. Die Top-200-Seite, die Apps und die Kommandozeilen-Anleitung führen durch jeden Schritt, und kein Schritt fragt nach einer Wiederherstellungsphrase.',
+                'Der SN25-Validator gewichtet die ausgewählten Flotten der Top 200 im Verhältnis zum Score jeder Flotte, nicht zu ihrem Rang, und ein Platz zahlt nur, solange der Validator seine Gewichte steuert. Eine Flotte wird anhand der Geräte bewertet, die der Validator misst, und höchstens 7 Geräte jeder Flotte kommen vor anderen Providern in die gemessene Kohorte. Binde also höchstens 7, es sei denn, die übrigen werden bereits gemessen. Belohnungen werden in Alpha ausgezahlt, dessen Wert sich ändert und fallen kann.',
+                'Ein gebundenes Gerät verlässt den Provider-Pool: Solange seine Bindung an einer der beiden Grenzen einer Epoche aktiv ist, erhält es für diese Epoche keinen Pool-Anteil, unabhängig davon, ob seine Flotte verdient. Eine UID ohne Emission kann ersetzt werden, sobald ihre Immunität endet, etwa 3 Tage nach der Registrierung, und eine Bindung beginnt frühestens mit der nächsten Epoche. Registriere dich also in den 3 Tagen vor der Epoche, in der deine Bindung beginnt.',
+                'Ein Commitment, das älter als 100.800 Blöcke (14 Tage) ist, kann keine neuen Geräte binden, und Commitments im älteren Format werden nicht gespiegelt. Eine Flotte, die in diesem Format oder vor mehr als 14 Tagen veröffentlicht hat, veröffentlicht also erneut. Schreibvorgänge über die Kommandozeile brauchen das Provider-Release mit dem Befehl fleet storage und das geprüfte Laufzeit-Autoritätsdokument für Flotten, das im sn-Repo mit seinem SHA-256 veröffentlicht ist, und eine neue Laufzeit der Chain braucht ein neues Dokument.',
+            ],
+            link: 'Vollständige Mitteilung lesen',
+        },
         'notice-providers-without-udp-or-ipv6': {
             title: 'Provider ohne UDP oder IPv6 werden künftig für den Verkehr angeboten, den sie transportieren. SN25-Belohnungen werden wie bisher gezählt.',
             paragraphs: [

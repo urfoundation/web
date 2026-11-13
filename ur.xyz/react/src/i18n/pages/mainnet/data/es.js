@@ -3,6 +3,17 @@
 // `node tests/i18n-staleness.mjs --unit mainnet/data --accept es <key> ...` from react/.
 export default {
     notices: {
+        'notice-top200-binding-open': {
+            title: 'La vinculación de flotas del Top 200 está abierta en SN25. Una red del Top 200 puede reclamar su puesto.',
+            paragraphs: [
+                'Los mineros principales ya pueden reclamar un puesto en el Top 200 de SN25, sus 200 puestos de nivel superior. La página Top 200 de ur.io y las apps actuales ya no dicen que todavía no se puede reclamar: invitan a reclamar su puesto a una red cuya posición prevista está dentro del Top 200. Reclamar es opcional, y nada cambia para un proveedor que no reclama.',
+                'Reclamar lleva tres pasos. Registra un hotkey en SN25: el registro quema TAO de tu coldkey, y lo quemado no se reembolsa. Publica el manifiesto de la flota desde ese hotkey: cuando el compromiso es definitivo, el oráculo de compromisos del operador de red lo replica por sí solo en el coordinador de la cadena 964. Después vincula cada dispositivo a la flota, por hasta 12 épocas, a partir de una época posterior a la actual. La página Top 200, las apps y la guía de línea de comandos explican cada paso, y ningún paso pide una frase de recuperación.',
+                'El validador de SN25 pondera las flotas seleccionadas del Top 200 en proporción a la puntuación de cada flota, no a su posición, y un puesto solo paga mientras el validador dirige sus pesos. Una flota se puntúa por los dispositivos que mide el validador, y como máximo 7 dispositivos de cada flota pasan por delante de otros proveedores a la cohorte medida, así que vincula como máximo 7, salvo que los demás ya se estén midiendo. Las recompensas se pagan en alfa, cuyo valor cambia y puede bajar.',
+                'Un dispositivo vinculado sale del pool de proveedores: mientras su vinculación está activa en cualquiera de los dos límites de una época, no gana ninguna parte del pool en esa época, gane o no su flota. Un UID sin emisión puede ser reemplazado cuando termina su inmunidad, unos 3 días después de registrarse, y una vinculación empieza como pronto en la siguiente época, así que regístrate en los 3 días anteriores a la época en la que empieza tu vinculación.',
+                'Un compromiso de más de 100.800 bloques (14 días) no puede vincular dispositivos nuevos, y los compromisos en el formato anterior no se replican, así que una flota que publicó en ese formato, o hace más de 14 días, vuelve a publicar. Las escrituras por línea de comandos necesitan la versión del proveedor con el comando fleet storage y el documento de autoridad de runtime de flotas revisado, publicado en el repositorio sn con su SHA-256, y un runtime nuevo de la cadena necesita un documento nuevo.',
+            ],
+            link: 'Leer el aviso completo',
+        },
         'notice-providers-without-udp-or-ipv6': {
             title: 'Los proveedores sin UDP o IPv6 se ofrecerán para el tráfico que transportan. Las recompensas de SN25 se cuentan como antes.',
             paragraphs: [

@@ -3,6 +3,12 @@
 // payment is paid or not paid. Before, a payment neither completed nor
 // canceled read "Pending" with an estimated amount, and the totals counted
 // payments that were never paid.
+//
+// The Data Stats tab (WalletStatsSection) read GET /transfer/stats and showed
+// the never-paid sweeps as "Current Unpaid Data", an "Unpaid Data Transfer
+// History" chart and a "Total Data" that added them in, as if that data were
+// still owed a payout. No USDC payout will be sent, so the tab shows only the
+// data the paid USDC payouts covered, as history.
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
@@ -49,4 +55,11 @@ test("the payout history shows no pending state and no estimate", () => {
 	assert.match(source, /Past USDC Payouts/);
 	assert.match(source, /pastPayoutStatus\(payment\)/);
 	assert.doesNotMatch(source, /Pending|Estimated|estimateFor|settlementFee/);
+});
+
+test("the data tab shows the data paid in USDC as history, and no unpaid data", () => {
+	const source = fs.readFileSync(new URL("../src/components/WalletStatsSection.tsx", import.meta.url), "utf8");
+	assert.match(source, /Data Paid in USDC/);
+	assert.match(source, /USDC payouts ended on November 12, 2026/);
+	assert.doesNotMatch(source, /Unpaid|unpaid_mb|Total Data|data transfer earnings/);
 });

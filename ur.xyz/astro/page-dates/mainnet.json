@@ -2,28 +2,28 @@
   "about": "The day each page of the ur.xyz page group mainnet (react/src/i18n/pages/mainnet/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
     "/ar/mainnet": {
-      "fingerprint": "19de70ce20a029d8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4510c688baf39f87",
+      "lastmod": "2026-11-13"
     },
     "/de/mainnet": {
-      "fingerprint": "de344753c695d7f4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0b74ae366e95b06f",
+      "lastmod": "2026-11-13"
     },
     "/es/mainnet": {
-      "fingerprint": "9942e05b95d04c36",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7acef95c34c4c448",
+      "lastmod": "2026-11-13"
     },
     "/mainnet": {
-      "fingerprint": "be84db2d19d19f7d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3ca528b1cf56f6b4",
+      "lastmod": "2026-11-13"
     },
     "/ru/mainnet": {
-      "fingerprint": "484dfcf5a8a9ef9b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "25aa1fb9aeb5d1a6",
+      "lastmod": "2026-11-13"
     },
     "/zh/mainnet": {
-      "fingerprint": "6b268344d8fc6b6f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f3feb73546870385",
+      "lastmod": "2026-11-13"
     }
   }
 }

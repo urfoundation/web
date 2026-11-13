@@ -274,6 +274,13 @@ export default {
             detail: 'Los pagos heredados en USDC a proveedores han terminado y no se enviarán más pagos en USDC. Las ganancias de los proveedores se pagan a través de SN25.',
             sources: [],
         },
+        'providers-without-udp-or-ipv6': {
+            title: 'Los proveedores sin UDP o IPv6 se ofrecerán para el tráfico que transportan',
+            detail: 'Se está desplegando con la próxima versión del servidor del operador de red y las próximas versiones de las apps: a los clientes se les ofrecerá un proveedor cuyas comprobaciones de la sonda de calidad fallaron solo por HTTP/3 (UDP) para tráfico TCP, y uno cuyas comprobaciones fallaron solo por IPv6 para tráfico IPv4. Hasta entonces, un proveedor así no supera sus comprobaciones, y a los clientes se les ofrece rara vez o nunca, incluso para el tráfico que transporta: el 12 de noviembre, unos 20.700 proveedores no superaron sus comprobaciones solo por sus cargas por HTTP/3. Los clientes nunca enviarán UDP a un proveedor que no lo transporta. Cada app mantendrá algunos de estos proveedores junto a los habituales, los hará competir por las conexiones TCP que pueden transportar y recurrirá a ellos donde una ubicación tenga muy pocos proveedores que transporten UDP. Las apps anteriores a estas versiones mantienen la selección anterior. La puntuación, los pesos y los pagos de SN25 no leen ninguna de las comprobaciones de la sonda de calidad y no cambian: las recompensas del pool se siguen repartiendo según el uso completado, así que estos proveedores ganan más solo gracias al tráfico que transportarán.',
+            sources: [
+                'El aviso completo en el repositorio sn',
+            ],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Reclamaciones de la época 5',
             detail: 'La época 5 termina en el bloque 9.499.228, y las reclamaciones siguen a su período de impugnación de 14.400 bloques. La financiación recuperada de las épocas 1 y 3 no forma parte del pago de la época 5: su incorporación no se programó a tiempo (consulta el aviso de la época 3 arriba).',

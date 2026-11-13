@@ -406,6 +406,16 @@
       "sources": []
     },
     {
+      "id": "providers-without-udp-or-ipv6",
+      "date": "2026-11-13",
+      "status": "in_progress",
+      "title": "Providers without UDP or IPv6 will be offered for the traffic they carry",
+      "detail": "Rolling out with the network operator's next server release and the next app releases: clients will be offered a provider whose quality-probe checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Until then, such a provider fails its checks, and clients are offered it rarely, if at all, even for the traffic it carries: on November 12, about 20,700 providers failed their checks only because of their HTTP/3 loads. Clients will never send UDP to a provider that does not carry it. Each app will keep a few of these providers beside its usual ones and race them for the TCP connections they can carry, and turn to them where a location has too few providers that carry UDP. Apps from before these releases keep the old selection. SN25 scoring, weights and payouts read none of the quality probe's checks and do not change: pool rewards are still split by completed usage, so these providers earn more only through the traffic they will carry.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-providers-without-udp-or-ipv6.md" }
+      ]
+    },
+    {
       "id": "epoch-5-claims-with-recovery",
       "date": "2026-11-15T18:25:00Z/2026-11-15T22:25:00Z",
       "status": "planned",

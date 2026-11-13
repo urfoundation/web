@@ -3,6 +3,17 @@
 // `node tests/i18n-staleness.mjs --unit mainnet/data --accept de <key> ...` from react/.
 export default {
     notices: {
+        'notice-providers-without-udp-or-ipv6': {
+            title: 'Provider ohne UDP oder IPv6 werden künftig für den Verkehr angeboten, den sie transportieren. SN25-Belohnungen werden wie bisher gezählt.',
+            paragraphs: [
+                'Die Qualitätsmessung des Netzbetreibers lädt Testseiten über jeden Provider, per HTTPS (TCP), per HTTP/3 (QUIC, das über UDP läuft), wo eine Seite es anbietet, und per IPv6, wo die Verbindungen eines Providers es belegen. Eine Prüfung besteht nur, wenn jeder Ladevorgang besteht. Ein Provider, der kein UDP transportiert oder dessen IPv6 fehlschlägt, besteht seine Prüfungen also nicht, und Clients wird er selten oder gar nicht angeboten, selbst für den Verkehr, den er transportiert. Am 12. November bestanden etwa 20.700 Provider ihre Prüfungen nur wegen ihrer HTTP/3-Ladevorgänge nicht.',
+                'Eine Änderung, die diese Provider für den Verkehr anbietet, den sie transportieren, wird mit dem nächsten Server-Release des Netzbetreibers und den nächsten App-Releases ausgerollt. Mit beiden wird Clients ein Provider, dessen Prüfungen nur über HTTP/3 (UDP) fehlgeschlagen sind, für TCP-Verkehr angeboten, und einer, dessen Prüfungen nur über IPv6 fehlgeschlagen sind, für IPv4-Verkehr. Clients senden nie UDP an einen Provider, der es nicht transportiert. Jede App hält einige dieser Provider neben ihren üblichen, und sie nehmen am Wettlauf um jede TCP-Verbindung teil, die sie transportieren können. Die Apps greifen außerdem auf sie zurück, wo ein Standort zu wenige Provider hat, die UDP transportieren.',
+                'Nur fehlgeschlagene Prüfungen zählen gegen einen Provider: Einer ohne fehlgeschlagene Prüfung über UDP oder IPv6 wird wie bisher für beides angeboten, und einer, der UDP oder IPv6 zurückgewinnt, wird innerhalb von 8 Stunden wieder dafür angeboten. Die gehosteten Proxys des Netzbetreibers erhalten dieselbe Änderung mit ihrem nächsten Release, und Apps von vor diesen Releases behalten die bisherige Auswahl.',
+                'SN25-Bewertung, Gewichte und Auszahlungen lesen keine der Prüfungen der Qualitätsmessung, und nichts davon ändert sich: Pool-Belohnungen werden weiterhin nach abgeschlossener Nutzung aufgeteilt. Ein Provider, der für den Verkehr angeboten wird, den er transportiert, bedient mehr davon und verdient so allein durch diesen Verkehr mehr.',
+                'Mit denselben Releases zeigt der Status eines Providers in den Apps, wie viele seiner Prüfungen nur über HTTP/3 (UDP) oder nur über IPv6 fehlgeschlagen sind und wofür er angeboten wird. Du musst nichts tun. Ein Provider, der kein UDP transportiert, kann es wieder transportieren, wenn er auf das neueste Release aktualisiert wird, da einige ältere Builds kein UDP weiterleiten, und wenn sein Netzwerk UDP nicht blockiert.',
+            ],
+            link: 'Vollständige Mitteilung lesen',
+        },
         'notice-extender-pool': {
             title: 'Der Extender-Pool startet mit Epoche 8. Bytes, die innerhalb eines Netzwerks bedient werden, zählen für Extender, nicht für Provider.',
             paragraphs: [

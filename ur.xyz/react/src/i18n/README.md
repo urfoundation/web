@@ -172,6 +172,7 @@ language capture the flag's draw as a random selection, never with the words of 
   runs the site's nginx server block over the build and drives Chromium through every page family with each
   language stored, the language switcher on a missing page, a translation's link to its English original and a
   profile with the old config's 301s cached; it needs nginx. A loop fails at once: more than 12 navigations, or a
-  second return from a translation to its page within the script's ten seconds, where the retry past a cached 301
-  takes one. A case that only ran out of time runs again, alone, and fails only if it fails again; on a busy machine
-  the gate runs fewer pages at once (it prints how many, and how many it retried).
+  second return from a translation to its page inside the script's ten-second window (the gate allows itself a second
+  less), where the retry past a cached 301 takes one. A case that only ran out of time runs again, alone, and fails
+  only if it fails again; on a busy machine the gate runs fewer pages at once (it prints how many, and how many it
+  retried).

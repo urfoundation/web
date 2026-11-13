@@ -105,8 +105,12 @@ const LOOP_NAVIGATIONS = 12;
 // is a loop. The stored-language redirect's recovery from a cached 301
 // (storedLanguageRedirectScript) takes one: the redirect, the 301 back, then
 // once more at <target>?, an address no cached 301 matches. As the script
-// does, a return counts only within LANG_REDIRECT_GUARD_MS of the redirect.
+// does, a return counts only within LANG_REDIRECT_GUARD_MS of the redirect:
+// the script by the page's clock, the gate by when it saw the requests, a
+// little later and not always by the same delay, so the gate takes a second
+// less (BOUNCE_WINDOW_MS).
 const BOUNCES = 1;
+const BOUNCE_WINDOW_MS = LANG_REDIRECT_GUARD_MS - 1000;
 // At most this many cases that ran out of time run again in one run: more
 // than that is no busy machine but a fault, and they fail as they are.
 const RETRY_LIMIT = 20;
@@ -138,9 +142,9 @@ function pageOf(p) {
 // page after a step from the page to that translation. `times` holds when
 // each step was requested. A case that starts on the translation and is sent
 // to English has not bounced yet. As in the site's script, a return counts
-// only when the page decides within LANG_REDIRECT_GUARD_MS of that step:
-// when its next step is requested, or `now` while none has followed. Later,
-// the script starts afresh, and so does the count.
+// only when the page decides within the guard's window of that step
+// (BOUNCE_WINDOW_MS): when its next step is requested, or `now` while none
+// has followed. Later, the script starts afresh, and so does the count.
 function bounces(chain, times, now) {
     const left = new Map(); // English pages the chain stepped from to a translation, and when
     let count = 0;
@@ -149,7 +153,7 @@ function bounces(chain, times, now) {
         const to = pageOf(chain[i]);
         if (from.page !== to.page || from.lang === to.lang) continue;
         if (from.lang === 'en') left.set(from.page, times[i]);
-        else if (to.lang === 'en' && left.has(to.page) && (times[i + 1] ?? now) - left.get(to.page) < LANG_REDIRECT_GUARD_MS) count += 1;
+        else if (to.lang === 'en' && left.has(to.page) && (times[i + 1] ?? now) - left.get(to.page) < BOUNCE_WINDOW_MS) count += 1;
     }
     return count;
 }
@@ -355,8 +359,9 @@ async function loaded(page) {
 // ended, its status and its <html lang>, and confirm(), which watches the page
 // CONFIRM_MS longer and marks the outcome unsettled, with the late
 // navigations, if it moved, and looped if they made a loop; an unsettled
-// chain takes in the requests that came after the wait.
-async function settle(page, navigate) {
+// chain takes in the requests that came after the wait. `stays`: the case
+// may end with no navigation at all.
+async function settle(page, navigate, { stays = false } = {}) {
     const requests = [];
     const times = []; // when each request was made
     let last = Date.now();
@@ -376,9 +381,11 @@ async function settle(page, navigate) {
     page.on('framenavigated', onCommit);
     const chainOf = () => requests.map((r) => pathOf(r.url()));
     const loopOf = (chain) => loops(chain, times, Date.now());
-    // a navigation was made, and the page shows its document (or Chromium's error page for it)
-    const arrived = () => requests.length > 0
-        && (page.url().startsWith('chrome-error:') || pathOf(page.url()) === pathOf(requests.at(-1).url()));
+    // the page shows the document of the last navigation (or Chromium's error page for it); with none
+    // made yet, only a case that may stay where it is has arrived
+    const arrived = () => (requests.length
+        ? page.url().startsWith('chrome-error:') || pathOf(page.url()) === pathOf(requests.at(-1).url())
+        : stays);
     const quiet = () => Date.now() - last >= QUIET_MS && arrived();
     let looped = false;
     let settled = false;
@@ -441,7 +448,7 @@ function judge(expect, outcome) {
     if (outcome.looped?.rule === 'bounces') problems.push({ what: 'loops', text: `back to the page from its translation ${outcome.looped.count} times, where the recovery from a cached 301 takes ${BOUNCES}: ${steps(all)}` });
     else if (outcome.looped) problems.push({ what: 'loops', text: `${all.length}+ navigations within seconds: ${steps(all)}` });
     else if (outcome.late) problems.push({ what: 'moves again after settling', text: `${chain}, then ${outcome.late.join(' → ')}` });
-    else if (!outcome.settled) problems.push({ what: 'never settles', text: `still navigating after ${BUDGET_MS / 1000} s: ${chain}` });
+    else if (!outcome.settled) problems.push({ what: 'never settles', text: outcome.chain.length ? `still navigating after ${BUDGET_MS / 1000} s: ${chain}` : `no navigation in ${BUDGET_MS / 1000} s` });
     else if (outcome.redirects > expect.maxRedirects) problems.push({ what: `more than ${expect.maxRedirects} redirect(s)`, text: chain });
     if (!outcome.looped && outcome.settled) {
         if (expect.path && outcome.path !== expect.path) problems.push({ what: 'ends on another page', text: `${chain}, not ${expect.path}` });
@@ -678,7 +685,9 @@ async function freshCase(browser, origin, c) {
         let outcome;
         if (c.choose) {
             await page.goto(origin + c.url);
-            outcome = await settle(page, () => chooseLanguage(page, c.choose));
+            // asked for the language the page is already in, the switcher only records the choice
+            const stays = await page.evaluate(() => document.documentElement.lang).catch(() => null) === c.choose;
+            outcome = await settle(page, () => chooseLanguage(page, c.choose), { stays });
         } else if (c.click) {
             await page.goto(origin + c.url);
             outcome = await settle(page, () => page.locator(c.click).first().click({ noWaitAfter: true, timeout: 5000 }));
@@ -856,9 +865,8 @@ async function main() {
     }
     // the cases that ran again, each with its first run and how the second went
     const again = retried.filter((c) => !results.get(c.kind).failures.some((f) => f.c === c));
-    console.log(retried.length
-        ? `  retried ${retried.length} case(s) that only ran out of time, one at a time with the same ${BUDGET_MS / 1000} s: ${again.length} as expected the second time`
-        : '  retried 0 cases: none only ran out of time');
+    if (retried.length) console.log(`  retried ${retried.length} case(s) that only ran out of time, one at a time with the same ${BUDGET_MS / 1000} s: ${again.length} as expected the second time`);
+    else if (!overLimit) console.log('  retried 0 cases: none only ran out of time');
     for (const c of retried) {
         const second = results.get(c.kind).failures.find((f) => f.c === c);
         console.log(`      ${describe(c, c.first[0].text)}; then ${second ? second.problems.map((p) => p.text).join('; ') : 'as expected'}`);

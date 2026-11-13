@@ -384,7 +384,7 @@
       "detail": "At block 9,483,859, the subnet owner's multisig published the first Gamma service on SN25 and switched on Gamma for SN25, in one call. Gamma, a feature of the Subtensor runtime switched on network-wide on November 9, is a subnet's credit for paying services, valued in US dollars: a buyer mints SN25 gamma, one per dollar, by burning SN25 alpha bought with TAO or taken from stake, and a service published on SN25 spends it on what the buyer orders. Every mint burns SN25 alpha. Gamma cannot be transferred or redeemed, and SN25 gamma pays only for services on SN25. The first is URnetwork's, one place to pay with it: Pro plans and data, by API. Approved by the subnet owner on November 11.",
       "sources": [
         { "label": "Published and switched on by the subnet owner's multisig, extrinsic 9483859-0021", "kind": "substrate_extrinsic", "ref": "9483859-21" },
-        { "label": "Paying with Gamma, on ur.io", "kind": "doc", "ref": "" }
+        { "label": "Paying with Gamma, on ur.io", "kind": "doc", "ref": "https://ur.io/gamma" }
       ]
     },
     {

@@ -677,7 +677,7 @@ const WalletStatsSection: React.FC = () => {
  }`}
           >
             <CreditCard size={16} className="inline mr-2" />
-            Payout Stats
+            Past USDC Payouts
           </button>
         </div>
       </div>

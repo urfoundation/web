@@ -873,3 +873,19 @@ test('Gamma payments on SN25: done at the block the subnet owner switched them o
     assert.deepEqual([page.kind, page.ref], ['doc', '']);
     assert.equal(gamma.key, undefined);
 });
+
+test('USDC provider payouts end: done on November 12, after which no USDC payout is sent', () => {
+    // the owner closed out USDC on November 12: the unsent USDC payouts were closed and the weekly payout run
+    // was turned off; provider earnings are paid through SN25
+    const end = events.find((e) => e.id === 'usdc-payouts-end');
+    assert.equal(end.status, 'done');
+    assert.equal(end.date, '2026-11-12');
+    assert.equal(whenText(parseWhen(end.date), { approxStart: isApproximate(end) }), 'Thu Nov 12');
+    assert.equal(end.title, 'USDC provider payouts end');
+    assert.equal(end.detail, 'Legacy USDC provider payouts have ended, and no further USDC payouts will be sent. Provider earnings are paid through SN25.');
+    assert.deepEqual(end.sources, []);
+    assert.equal(end.key, undefined);
+    // it follows the last weekly USDC batch
+    const ids = events.map((e) => e.id);
+    assert.ok(ids.indexOf('last-usdc-payout-batch') < ids.indexOf(end.id));
+});

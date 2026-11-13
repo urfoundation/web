@@ -269,6 +269,11 @@ export default {
                 'El aviso completo en el repositorio sn',
             ],
         },
+        'usdc-payouts-end': {
+            title: 'Terminan los pagos en USDC a proveedores',
+            detail: 'Los pagos heredados en USDC a proveedores han terminado y no se enviarán más pagos en USDC. Las ganancias de los proveedores se pagan a través de SN25.',
+            sources: [],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Reclamaciones de la época 5',
             detail: 'La época 5 termina en el bloque 9.499.228, y las reclamaciones siguen a su período de impugnación de 14.400 bloques. La financiación recuperada de las épocas 1 y 3 no forma parte del pago de la época 5: su incorporación no se programó a tiempo (consulta el aviso de la época 3 arriba).',

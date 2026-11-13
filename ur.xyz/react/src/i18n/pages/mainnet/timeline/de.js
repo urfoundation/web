@@ -269,6 +269,11 @@ export default {
                 'Die vollständige Mitteilung im sn-Repo',
             ],
         },
+        'usdc-payouts-end': {
+            title: 'USDC-Auszahlungen an Provider enden',
+            detail: 'Die bisherigen Auszahlungen in USDC an Provider sind beendet, und es werden keine weiteren Auszahlungen in USDC gesendet. Provider-Einnahmen werden über SN25 ausgezahlt.',
+            sources: [],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Claims für Epoche 5',
             detail: 'Epoche 5 endet mit Block 9.499.228, und die Claims folgen nach ihrer Anfechtungsfrist von 14.400 Blöcken. Die zurückgewonnene Finanzierung der Epochen 1 und 3 ist nicht Teil der Auszahlung von Epoche 5: Ihre Aufnahme wurde nicht rechtzeitig eingeplant (siehe die Mitteilung zu Epoche 3 oben).',

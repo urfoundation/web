@@ -9,14 +9,18 @@
 //   • the figures: every number of the English (a block, an amount, a time, a
 //     day of the month, a section of a document) appears as the English writes
 //     it, with its digits and separators, Western digits in Arabic too, and in
-//     Spanish as Intl writes it for the page (9.240.028, 1076,26), as /ctf and
-//     its other pages do (timeline.js INTL_FIGURES); every ≈ and UTC; and the
+//     Spanish, German and Russian as Intl writes it for the page (9.240.028,
+//     1076,26; 1.076,26; 1 076,26), as /ctf and their other pages do
+//     (timeline.js INTL_FIGURES); every ≈ and UTC; and the
 //     names that are not translated (SN25, STSettlement2, drand, the
 //     governance Safe, …);
 //   • capture the flag under the apps' name for it in each language, and never
 //     called a lottery or a game of chance: the draw picks slots, in plain
 //     words, without the words of gambling or of earnings promises
-//     (sn design/ctf/SEO.md §2.3).
+//     (sn design/ctf/SEO.md §2.3), and is a public, verifiable random
+//     selection, never named with the words of drawing lots (the owner's
+//     decision of 2026-11-12; each language's word is in its page unit's
+//     header, as on /ctf).
 //
 // Usage: node --test src/i18n/pages/mainnet/mainnet-copy.test.mjs   (from react/; no network)
 import assert from 'node:assert/strict';
@@ -78,8 +82,8 @@ const placeholders = (text) => [...String(text).matchAll(/\{[A-Za-z][A-Za-z0-9_]
 // a figure as the English writes it: 9,240,028, 1,076.26, 18:25, §8.6.7, 2026, 5
 const figures = (text) => [...new Set(String(text).match(/§?\d+(?:[.,:]\d+)*/g) || [])];
 
-// the figure as a translation writes it: as the English does, but in a language of INTL_FIGURES (Spanish), whose
-// numbers are Intl's for the page (9.240.028, 1076,26, 0,1); a section (§8.6.7), a time (18:25) and a whole number
+// the figure as a translation writes it: as the English does, but in a language of INTL_FIGURES (Spanish, German,
+// Russian), whose numbers are Intl's for the page (9.240.028, 1076,26, 0,1); a section (§8.6.7), a time (18:25) and a whole number
 // without separators (2026, 4294967297) read the same in every language
 const written = (figure, lang) => {
     if (!INTL_FIGURES.includes(lang) || !/^(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d+)$/.test(figure)) return figure;
@@ -117,6 +121,15 @@ const PROMISES = {
     es: /garantiz|rentabilidad|inversi|ingreso pasivo|salario|sueldo|hacerse rico|empleo/i,
 };
 const CTF_KEYS = (key) => key.startsWith('notices.notice-capture-the-flag.') || key.startsWith('events.capture-the-flag-');
+// the words of drawing lots, their verbs and kin, in every string: the draw is случайный отбор, الاختيار العشوائي,
+// 随机选取, Zufallsauswahl or selección aleatoria, as on /ctf (pages/ctf/ctf-copy.test.mjs)
+const DRAWING_LOTS = {
+    ru: /жеребь|жреби|розыгр|разыгр/iu,
+    ar: /قرع[ةت]|سحب/u,
+    zh: /抽签|抽取|抽出|抽中|摇号/u,
+    de: /auslos|ausgelost|losentscheid|losverfahren|(?<!\p{L})(?:ziehung|gezogen|lost)(?!\p{L})/iu,
+    es: /sorte(?:o|a|á|ad|ar|e)/iu,
+};
 
 test('the English units load', () => {
     for (const unit of UNITS) assert.ok(english[unit].size > 0, `${unit || 'mainnet'}/en.js`);
@@ -176,15 +189,23 @@ test('the figures and the names are the English\'s own, in Western digits', () =
     }
 });
 
-test('capture the flag keeps the apps\' name, and no translation reads as a lottery, a bet or a promise', () => {
+test('capture the flag keeps the apps\' name, and no translation reads as a lottery, a drawing of lots, a bet or a promise', () => {
     for (const t of translations) {
         for (const { key, text } of pairs(t)) {
             assert.doesNotMatch(text, GAMBLING[t.lang], `${t.name}: ${key}: "${text}"`);
+            assert.doesNotMatch(text, DRAWING_LOTS[t.lang], `${t.name}: ${key}: the draw is a random selection, not a drawing of lots: "${text}"`);
             if (CTF_KEYS(key)) assert.doesNotMatch(text, PROMISES[t.lang], `${t.name}: ${key}: "${text}"`);
         }
         if (t.unit === 'data') {
             const title = t.flat.get('notices.notice-capture-the-flag.title');
             assert.match(title, CTF_NAME[t.lang], `${t.name}: the capture the flag notice's title names it as the apps do: "${title}"`);
+            // epoch 8, the first in which it pays, says so in its row's group
+            assert.match(t.flat.get('epochs.8'), CTF_NAME[t.lang], `${t.name}: epochs.8 names capture the flag as the apps do`);
+        }
+        if (t.unit === '') {
+            // the flag beside an epoch's settlement, and the settlement section's paragraph on it
+            assert.match(t.flat.get('labels.captureTheFlag'), CTF_NAME[t.lang], `${t.name}: labels.captureTheFlag`);
+            assert.match(t.flat.get('settlement.paragraphs.3'), CTF_NAME[t.lang], `${t.name}: settlement.paragraphs.3`);
         }
         if (t.unit === 'timeline') {
             for (const [key, text] of t.flat) {

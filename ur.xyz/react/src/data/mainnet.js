@@ -18,6 +18,9 @@
  * `settlement` is what pays the epoch: 'v1' (version 1) or 'v2' (settlement
  * v2, from epoch 4: epoch 3 began before the v2 pool was registered, so it
  * stayed on version 1, and its funding is recovered: see its notice below).
+ * `captureTheFlag` marks an epoch in which capture the flag pays beside the
+ * provider pool, from epoch 8 (the capture the flag notice below); the page
+ * flags it in the epoch's row and over its milestones.
  *
  * Plain data with no imports: the page, the SPA and the node test
  * (tests/mainnet-timeline.test.mjs) all read it. Its one rule is the order of
@@ -81,12 +84,21 @@ export const mainnetEpochs = [
         start: { block: 9549628, time: '2026-11-20T18:25:00Z', projected: true },
         end: { block: 9600028, time: '2026-11-27T18:25:00Z', projected: true },
     },
+    {
+        number: 8,
+        settlement: 'v2',
+        captureTheFlag: true,
+        summary: 'The first capture the flag epoch: ten slots in every country',
+        start: { block: 9600028, time: '2026-11-27T18:25:00Z', projected: true },
+        end: { block: 9650428, time: '2026-12-04T18:25:00Z', projected: true },
+    },
 ];
 
 // the milestones before the first epoch listed above, and after the last
 // (the page names that group after the last epoch's number). The epochs run to
-// epoch 7, the first with priced demand deposits; the first settlement v2 cycle,
-// which once came after the last epoch, is epoch 5's.
+// epoch 8, the first in which capture the flag pays: its draw and its first
+// claims, after epoch 8 ends, are listed after it. The first settlement v2
+// cycle, which once came after the last epoch, is epoch 5's.
 export const mainnetBeforeEpochs = { title: 'Before launch' };
 export const mainnetAfterEpochs = {};
 
@@ -131,11 +143,13 @@ export const mainnetActions = {
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
 // posted, the later first. So it shows the providers without UDP or IPv6,
-// offered for the traffic they carry, and the extenders' share on the contracts
-// they can relay, both of November 12, then capture the flag from epoch 8 and
-// Pro data on each network's own cycle, both of November 11, then epoch 3's delayed
-// payout and its recovery, with the updates that followed, which the milestones
-// and the box point to as "the epoch 3 notice at the top". Their dates are the
+// offered for the traffic they carry as the next releases roll out, of
+// November 13, then the extender pool from epoch 8 and the extenders' share on
+// the contracts they can relay, both of November 12, then capture the flag from
+// epoch 8 and Pro data on each network's own cycle, both of November 11, then
+// epoch 3's delayed payout and its recovery, with the updates that followed,
+// which the milestones and the box point to as "the epoch 3 notice at the
+// top". Their dates are the
 // epochs' and the milestones' (tests/mainnet-timeline.test.mjs holds them
 // together). `id` is the anchor of the notice's box. `link` opens a notice's
 // full text in the sn repo once that is on sn's main branch, and until then the
@@ -160,7 +174,7 @@ const NOTICES = [
         title: "Pro data moves to each network's own cycle. SN25 rewards are counted as before.",
         paragraphs: [
             "With the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, instead of on the 1st of the month. Each cycle's grant carries that cycle's share of the subscription's revenue, and a payment no longer adds a separate 600 GiB credit.",
-            'SN25 pool rewards are counted as before. The pool is split by completed usage, and subscription payments are not an input to it.',
+            "SN25 pool rewards are counted as before. Each operator's pool is split by completed usage, and subscription payments are not an input to it.",
             "What changes is the subscription revenue counted by the network operator's provider subsidy, which for traffic since the October 6 cutoff pays no USDC and only counts toward the weekly points the network operator awards. The subsidy counts revenue through the balances that fund settled traffic. Before, a paid period's revenue could count twice, in full through its 600 GiB credit and again as a share through the monthly grant, and a long-running Google Play subscription counted only a share spread over the months since it began. From the release, each period's revenue counts once, through its cycle grants.",
             "So the subsidy counts less where revenue counted twice, as in a new subscription's first month, and more for long-running Google Play subscriptions. Its timing follows each network's own cycle rather than the 1st. A payment credited during a running cycle, such as a second subscription, adds its revenue to the cycles after it, and the part that overlaps the running cycle is not counted.",
             "Nothing granted before the release changes. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, when that grant's month ends. Customers pay the same, and there is nothing you need to do.",
@@ -173,7 +187,7 @@ const NOTICES = [
         title: 'Capture the flag starts with epoch 8: ten slots in every country, beside the provider pool.',
         paragraphs: [
             "From epoch 8, which starts at block 9,600,028 around November 27, 18:25 UTC, each network operator gets a second SN25 pool beside its provider pool: capture the flag. The provider pool pays for usage, and capture the flag pays for being present in a country. Each of the 249 ISO 3166-1 countries has ten slots each epoch (one week), five for providers and five for extenders, and every slot is worth the same: the pool's new funding for the epoch divided by 2,490.",
-            "A provider or extender enters its country's draw when it was online, passing the network operator's checks and in that country for at least half of the epoch, and is active at its end. The operator commits the list of entries on chain, and a drand round published after it draws up to five winners per country and role. Miners in one /29 IPv4 or /48 IPv6 block share one entry. With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries.",
+            "A provider or extender enters its country's draw when it was online, passing its network operator's checks and in that country for at least half of the epoch, and is active at its end. Each operator commits its list of entries on chain, and a drand round published after it draws up to five winners per country and role. Miners in one /29 IPv4 or /48 IPv6 block share one entry. With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries.",
             "A slot with no winner carries forward into its country's pot for that role. Each winner takes its own slot and a fifth of that pot, so a miner alone in a country takes a fifth of what is left for each epoch it stays.",
             "From epoch 8 the provider pool gets 9/10 of the providers' share of emission instead of all of it. In epoch 4 that share was 1,195.84 α; at that scale the provider pool would get 1,076.26 α and capture the flag 119.58 α. Once top-level fleets are weighted, the provider pool gets 4/10. These figures are at epoch 4's scale, not a forecast. Rewards are paid in alpha, whose value changes and can fall, and what a miner receives depends on its uptime, on how many others are eligible in its country and on the network's emission.",
             "Winners are paid to the payout wallet the provider pool already uses, so there is nothing new to sign. Epoch 8's capture the flag claims open around December 7, with its pool claims, in the same claim flow. The pool is registered through the 72-hour timelock before epoch 8 starts, and the milestones below give each step. There is nothing you need to do.",
@@ -194,17 +208,30 @@ const NOTICES = [
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md' },
     },
     {
-        id: 'notice-providers-without-udp-or-ipv6',
+        id: 'notice-extender-pool',
         date: 'November 12, 2026',
-        title: 'Providers without UDP or IPv6 are offered for the traffic they carry. SN25 rewards are counted as before.',
+        title: 'The extender pool starts with epoch 8. Bytes served within one network count for extenders, not providers.',
         paragraphs: [
-            "The network operator's quality probe loads test sites through every provider over HTTPS (TCP), over HTTP/3 (QUIC, which runs over UDP) where a site serves it, and over IPv6 where a provider's connections prove it. A check passes only when every load passes. So a provider that carries no UDP, or whose IPv6 fails, failed its checks, and clients were offered it rarely, if at all, even for the traffic it carries. On November 12, about 20,700 providers failed their checks only because of their HTTP/3 loads.",
-            "From the apps' release of November 12, clients are offered a provider whose checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Clients never send UDP to a provider that does not carry it. Each app keeps a few of these providers beside its usual ones, and they join the race for every TCP connection they can carry. The apps also turn to them where a location has too few providers that carry UDP.",
-            "Only failed checks count against a provider: one with no failed check over UDP or IPv6 is offered for both, as before, and one that regains UDP or IPv6 is offered for it again within 8 hours. The network operator's hosted proxies carry the same change, and apps from before the release keep the old selection.",
-            "SN25 scoring, weights and payouts read none of the quality probe's checks, and none of it changes: pool rewards are still split by completed usage. A provider offered for the traffic it carries serves more of it, so it earns more through that traffic alone.",
-            "A provider's status in the apps now says how many of its checks failed only over HTTP/3 (UDP), or only over IPv6, and what it is offered for. There is nothing you need to do. A provider that carries no UDP can carry it again by updating to the latest release, since some older builds do not route UDP, and by checking that its network does not block UDP.",
+            "From epoch 8, which starts at block 9,600,028 around November 27, 18:25 UTC, the part of each contract's usage that no provider earns counts for extenders instead, as the subnet owner approved on November 10. A provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one: the share goes to the extender pool, and the contract's other hops keep theirs. A share held by a platform endpoint the network operator registers, such as sidecar's edges, goes there too; sidecar has not shipped, so until it does, the pool's bytes come from same-network traffic alone. Same-network credit earned before epoch 8 is kept.",
+            "Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it. Each epoch, the pool's bytes are spread evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, and weighted beside the provider rows up to the epoch's eligible provider usage, so extenders take at most half of a pool. With no eligible extender, the bytes are dropped. An extender that carries a contract keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract.",
+            "An extender counts when, at the end of the epoch, it is in the active pool, with at least one address that passes the network operator's five-minute challenge; it has a payout wallet and is not bound to a top-level miner's fleet; and it is not on one of the network operator's own networks. Records that share a provider client, an IPv4 address or an IPv6 /64 count once.",
+            "From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed /29 or /48 prefix hash and never by address, and their shares, and the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it. Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid.",
+            "The subnet owner signs the amendment entry that starts the pool during epoch 7, beside capture the flag's, and it takes effect once it is published at ur.xyz/amendments.yml before epoch 8 starts. Rewards are paid in alpha, whose value changes and can fall. An extender's share is paid to the payout wallet it already uses and claimed with its pool account, in the same claim flow. There is nothing you need to do.",
         ],
-        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-providers-without-udp-or-ipv6.md' },
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-pool.md' },
+    },
+    {
+        id: 'notice-providers-without-udp-or-ipv6',
+        date: 'November 13, 2026',
+        title: 'Providers without UDP or IPv6 will be offered for the traffic they carry. SN25 rewards are counted as before.',
+        paragraphs: [
+            "The network operator's quality probe loads test sites through every provider over HTTPS (TCP), over HTTP/3 (QUIC, which runs over UDP) where a site serves it, and over IPv6 where a provider's connections prove it. A check passes only when every load passes. So a provider that carries no UDP, or whose IPv6 fails, fails its checks, and clients are offered it rarely, if at all, even for the traffic it carries. On November 12, about 20,700 providers failed their checks only because of their HTTP/3 loads.",
+            "A change that offers these providers for the traffic they carry is rolling out with the network operator's next server release and the next app releases. With both, clients are offered a provider whose checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Clients never send UDP to a provider that does not carry it. Each app keeps a few of these providers beside its usual ones, and they join the race for every TCP connection they can carry. The apps also turn to them where a location has too few providers that carry UDP.",
+            "Only failed checks count against a provider: one with no failed check over UDP or IPv6 is offered for both, as before, and one that regains UDP or IPv6 is offered for it again within 8 hours. The network operator's hosted proxies take the same change with their next release, and apps from before these releases keep the old selection.",
+            "SN25 scoring, weights and payouts read none of the quality probe's checks, and none of it changes: pool rewards are still split by completed usage. A provider offered for the traffic it carries serves more of it, so it earns more through that traffic alone.",
+            "With the same releases, a provider's status in the apps says how many of its checks failed only over HTTP/3 (UDP), or only over IPv6, and what it is offered for. There is nothing you need to do. A provider that carries no UDP can carry it again by updating to the latest release, since some older builds do not route UDP, and by checking that its network does not block UDP.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-providers-without-udp-or-ipv6.md' },
     },
 ];
 

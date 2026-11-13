@@ -54,8 +54,8 @@ test('the file has the explorers and the events, and nothing else', () => {
 
 test('every milestone has a unique id, a readable date, a known status, a title and a detail', () => {
     const ids = new Set();
-    // ids the page itself uses: the notices, the sections and the epoch groups
-    const reserved = new Set([...mainnetNotices.map((n) => n.id), 'actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
+    // ids the page itself uses: the notices (with their titles and texts), the sections and the epoch groups
+    const reserved = new Set([...mainnetNotices.flatMap((n) => [n.id, `${n.id}-heading`, `${n.id}-text`]), 'actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
     for (const event of events) {
         const fields = Object.keys(event).filter((key) => key !== 'approximate' && key !== 'key').sort();
         assert.deepEqual(fields, ['date', 'detail', 'id', 'sources', 'status', 'title'], `${event.id}: fields`);
@@ -230,14 +230,14 @@ test('a milestone is grouped by the epoch it ends in, a day counting from its st
         { id: 'f', date: '2026-10-23T18:09:00Z' },
         { id: 'g', date: '2026-10-30T18:25:00Z/2026-10-30T22:25:00Z' },
         { id: 'i', date: '2026-11-06T18:25:00Z/2026-11-06T22:25:00Z' },
-        // after the last epoch listed, epoch 7
-        { id: 'j', date: '2026-11-27T18:25:00Z/2026-11-27T22:25:00Z' },
+        // after the last epoch listed, epoch 8
+        { id: 'j', date: '2026-12-04T18:25:00Z/2026-12-04T22:25:00Z' },
         { id: 'h', date: 'not a date' },
     ];
     const groups = groupByEpoch(fixture, epochs, { before: { title: 'Before launch' }, after: { summary: 'After' } });
     const where = Object.fromEntries(groups.flatMap((g) => g.events.map((e) => [e.id, g.id])));
-    assert.deepEqual(where, { a: 'before-launch', b: 'epoch-0', c: 'epoch-0', d: 'epoch-1', e: 'epoch-2', f: 'epoch-3', g: 'epoch-4', i: 'epoch-5', j: 'after-epoch-7' });
-    assert.deepEqual(groups.map((g) => g.title), ['Before launch', 'Epoch 0', 'Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'After epoch 7']);
+    assert.deepEqual(where, { a: 'before-launch', b: 'epoch-0', c: 'epoch-0', d: 'epoch-1', e: 'epoch-2', f: 'epoch-3', g: 'epoch-4', i: 'epoch-5', j: 'after-epoch-8' });
+    assert.deepEqual(groups.map((g) => g.title), ['Before launch', 'Epoch 0', 'Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'After epoch 8']);
 
     // the real milestones all land in a group, in the order the data lists them
     const real = groupByEpoch(events, epochs);
@@ -435,9 +435,9 @@ test('the first settlement v2 claims: epoch 4\'s root finalized at 19:10 UTC on 
 
 test('the extender amendment: the pool begins epoch 8, and the billing change is live since November 11', () => {
     // approved on November 10 (the sn whitepaper's §8.6): the extender pool starts with epoch 8's first
-    // block, which is the end of epoch 7, the last epoch listed, so the list shows it after epoch 7
+    // block, which is the end of epoch 7, so the list shows it under epoch 8
     const pool = events.find((e) => e.id === 'extender-pool-epoch-8');
-    const epoch7 = mainnetEpochs.at(-1);
+    const epoch7 = mainnetEpochs.find((e) => e.number === 7);
     assert.equal(epoch7.number, 7);
     assert.equal(epoch7.end.block, 9600028);
     assert.equal(pool.status, 'scheduled');
@@ -450,10 +450,27 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     assert.match(pool.detail, /the part of each contract's traffic that no provider earns counts for extenders instead\./);
     assert.match(pool.detail, /An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11\./);
     assert.doesNotMatch(pool.detail, /bytes that no provider carries/);
-    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === pool.id)).id, 'after-epoch-7');
-    // the signed entry and epoch 8's first block do not exist yet: their sources stay empty, so the page hides them
-    assert.deepEqual(pool.sources.filter((s) => s.ref === '').map((s) => s.label), ['Signed amendment entry', "Epoch 8's first block, 9,600,028"]);
-    // not a key milestone: the summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === pool.id)).id, 'epoch-8');
+    // the signed entry is published in amendments.yml, at ur.xyz beside the price sheet and in the sn repo; epoch 8's
+    // first block does not exist yet, so its source stays empty and the page hides it
+    assert.deepEqual(pool.sources.map((s) => [s.label, s.ref]), [
+        ['The amendment, WHITEPAPER.md §8.6', 'https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md'],
+        ['Signed amendment entry', 'https://ur.xyz/amendments.yml'],
+        ['The amendments file in the sn repo', 'https://github.com/urfoundation/sn/blob/main/amendments.yml'],
+        ["Epoch 8's first block, 9,600,028", ''],
+    ]);
+    // the same-network rule (§8.6.2): a hop on the origin's network earns no share from epoch 8, free or paid, and only
+    // its share moves; funded traffic only, never measurement traffic; earlier credit stays
+    assert.match(pool.detail, / a provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one, and the share goes to the extender pool, while the contract's other hops keep theirs\. /);
+    assert.match(pool.detail, / Only traffic that a data balance funded counts, never the network operator's own measurement and test traffic, and same-network credit earned before epoch 8 is kept\. /);
+    // with no eligible extender, Z is dropped (decision 4)
+    assert.match(pool.detail, /so extenders earn at most half of a pool; with no eligible extender, it is dropped\. /);
+    // who counts: E1, E4, E5 and E3
+    assert.match(pool.detail, / An extender is eligible when, at the end of the epoch, it is active with at least one address that passes the operator's five-minute challenge, has a payout wallet, is not bound to a top-level miner's fleet and is not on one of the operator's own networks, and records that share a provider client, an IPv4 address or an IPv6 \/64 count once\. /);
+    // what is published (§8.6.4): the header's component, never an address, statement v2, and the shadow runs of epochs 6 and 7
+    assert.match(pool.detail, / each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(pool.detail, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\. /);
+    // not a key milestone: on the summary, capture the flag marks epoch 8's first block (tests/mainnet-summary.test.mjs)
     assert.equal(pool.key, undefined);
 
     // the billing change (§8.6.7, step 0): done, dated by its deploy on November 11, which reached the network
@@ -532,7 +549,7 @@ test('Pro data on each network\'s own cycle: a milestone and a notice for the su
     assert.equal(notice.paragraphs.length, 5);
     assert.match(what, /^With the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, instead of on the 1st of the month\. /);
     assert.match(what, / a payment no longer adds a separate 600 GiB credit\.$/);
-    assert.equal(sn25, 'SN25 pool rewards are counted as before. The pool is split by completed usage, and subscription payments are not an input to it.');
+    assert.equal(sn25, 'SN25 pool rewards are counted as before. Each operator\'s pool is split by completed usage, and subscription payments are not an input to it.');
     assert.match(subsidy, /^What changes is the subscription revenue counted by the network operator's provider subsidy, which for traffic since the October 6 cutoff pays no USDC and only counts toward the weekly points the network operator awards\. /);
     assert.match(subsidy, / From the release, each period's revenue counts once, through its cycle grants\.$/);
     // for providers: less where revenue counted twice, more for long-running Play, on each network's own cycle;
@@ -561,9 +578,10 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
     assert.equal(share.date, '2026-11-12');
     assert.equal(whenText(parseWhen(share.date), { approxStart: isApproximate(share) }), 'Thu Nov 12');
     assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === share.id)).id, 'epoch-5');
-    // after the Pro data milestone of November 11, before epoch 5's claims
+    // after the milestones of November 11, the last of them Gamma's, before epoch 5's claims
     const ids = events.map((e) => e.id);
-    assert.equal(ids.indexOf(share.id), ids.indexOf('pro-grant-per-cycle') + 1);
+    assert.equal(ids.indexOf(share.id), ids.indexOf('sn25-gamma-payments') + 1);
+    assert.equal(ids.indexOf('sn25-gamma-payments'), ids.indexOf('pro-grant-per-cycle') + 1);
     assert.equal(share.key, undefined);
     // the notice's full text, dated the day of the rollout (sn mainnet/notices, on its main branch)
     const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md';
@@ -605,70 +623,114 @@ test('the extenders\' share on the contracts they can relay: a milestone and a n
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
-test('providers without UDP or IPv6: a milestone and a notice for the apps\' release, with SN25 rewards counted as before', () => {
-    // the network operator's FP2-PROTOCOL.md (server), D11.7: a /mainnet note when the apps that carry the
-    // limited window ship (its §10 step 5). Done, and dated by that release, to the day; the notice is dated
-    // the same day and its full text in the sn repo is named by it
+test('the extender pool from epoch 8: a notice beside its milestone, with the rule, who counts, what is published and the signed entry', () => {
+    // the sn whitepaper's §8.6, approved on November 10, with Q7 of November 11; the notice's full text is in the
+    // sn repo (mainnet/notices/2026-11-12-extender-pool.md), on its main branch since November 12
+    const epoch7 = mainnetEpochs.find((e) => e.number === 7);
+    const pool = events.find((e) => e.id === 'extender-pool-epoch-8');
+    const notice = mainnetNotices.find((n) => n.id === 'notice-extender-pool');
+    assert.ok(notice, 'the notice is listed');
+    assert.equal(notice.date, 'November 12, 2026');
+    assert.equal(notice.title, 'The extender pool starts with epoch 8. Bytes served within one network count for extenders, not providers.');
+    assert.equal(notice.paragraphs.length, 5);
+    const [rule, split, who, published, entry] = notice.paragraphs;
+    // the start, at the milestone's block and projected time
+    assert.equal(pool.date, epoch7.end.time);
+    assert.equal(epoch7.end.time, '2026-11-27T18:25:00Z');
+    assert.ok(rule.startsWith(`From epoch 8, which starts at block ${thousands(epoch7.end.block)} around November 27, 18:25 UTC, the part of each contract's usage that no provider earns counts for extenders instead, `));
+    // the same-network rule: a hop on the origin's network earns no share, free or paid, and only its share moves
+    assert.match(rule, / A provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one: the share goes to the extender pool, and the contract's other hops keep theirs\. /);
+    // platform endpoints are sidecar's edges, which have not shipped, so epoch 8's pool is same-network traffic
+    assert.match(rule, / sidecar has not shipped, so until it does, the pool's bytes come from same-network traffic alone\. /);
+    assert.match(rule, / Same-network credit earned before epoch 8 is kept\.$/);
+    // funded traffic only, never measurement; units, then extenders; the cap; an empty set drops the bytes; Q7
+    assert.match(split, /^Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it\. /);
+    assert.match(split, / spread evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, /);
+    assert.match(split, / so extenders take at most half of a pool\. With no eligible extender, the bytes are dropped\. /);
+    assert.match(split, / keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract\.$/);
+    // who counts: E1, E4, E5, then E3
+    assert.match(who, /^An extender counts when, at the end of the epoch, it is in the active pool, with at least one address that passes the network operator's five-minute challenge; /);
+    assert.match(who, / it has a payout wallet and is not bound to a top-level miner's fleet; and it is not on one of the network operator's own networks\. /);
+    assert.match(who, / Records that share a provider client, an IPv4 address or an IPv6 \/64 count once\.$/);
+    // what is published: the header's component, never an address, statement v2, and the shadow runs
+    assert.match(published, /^From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(published, / the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it\. /);
+    assert.match(published, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\.$/);
+    // the signed entry, beside capture the flag's, where the milestone links it
+    assert.match(entry, /^The subnet owner signs the amendment entry that starts the pool during epoch 7, beside capture the flag's, and it takes effect once it is published at ur\.xyz\/amendments\.yml before epoch 8 starts\. /);
+    assert.equal(pool.sources.find((s) => s.label === 'Signed amendment entry').ref, 'https://ur.xyz/amendments.yml');
+    assert.match(entry, / Rewards are paid in alpha, whose value changes and can fall\. /);
+    assert.match(entry, / claimed with its pool account, in the same claim flow\. There is nothing you need to do\.$/);
+    // its full text is on sn's main branch, so the notice links it, as the other notices link theirs (NOTICES, src/data/mainnet.js)
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-pool.md' });
+    // plain words and no earnings promises, as for capture the flag
+    const avoid = /guarantee|risk-free|\breturns?\b|\byield|\bAPY\b|lottery|jackpot|\bbet\b|invest|passive income|get rich|easy money|financial freedom|quit your job|\bjobs?\b|hiring|salary|wage|\$\s?\d/i;
+    for (const words of [`${notice.title} ${notice.paragraphs.join(' ')}`, `${pool.title} ${pool.detail}`]) assert.doesNotMatch(words, avoid);
+});
+
+test('providers without UDP or IPv6: a milestone and a notice as the next releases roll it out, with SN25 rewards counted as before', () => {
+    // the network operator's FP2-PROTOCOL.md (server), D11.7: a /mainnet note for the change, posted on November 13
+    // (owner, 2026-11-13) while it rolls out: its code is merged, and it takes effect with the network operator's
+    // next server release and the next app releases, so the note says it is rolling out and never that it is live
     const milestone = events.find((e) => e.id === 'providers-without-udp-or-ipv6');
     assert.ok(milestone, 'the milestone is listed');
-    assert.equal(milestone.status, 'done');
+    assert.equal(milestone.status, 'in_progress');
     assert.equal(milestone.approximate, undefined);
-    assert.equal(isApproximate(milestone), false);
-    assert.match(milestone.date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(milestone.date, '2026-11-13');
+    assert.equal(whenText(parseWhen(milestone.date), { approxStart: isApproximate(milestone) }), 'Fri Nov 13');
     assert.equal(milestone.key, undefined);
-    const fullText = `https://github.com/urfoundation/sn/blob/main/mainnet/notices/${milestone.date}-providers-without-udp-or-ipv6.md`;
+    // the full text in the sn repo is named by the day the note was posted
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-providers-without-udp-or-ipv6.md';
     assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
-    assert.equal(milestone.title, 'Providers without UDP or IPv6 are offered for the traffic they carry');
-    // the release is named by the milestone's own day
-    const day = new Date(`${milestone.date}T00:00:00Z`);
-    const releaseDay = `${day.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })} ${day.getUTCDate()}`;
-    assert.ok(milestone.detail.startsWith(`From the apps' release of ${releaseDay}, clients are offered a provider whose quality-probe checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. `));
-    // the providers the hard UDP gate kept out (FP2-PROTOCOL.md §1, measured on Main on November 12)
-    assert.match(milestone.detail, / on November 12, about 20,700 providers failed their checks only because of their HTTP\/3 loads\. /);
+    assert.equal(milestone.title, 'Providers without UDP or IPv6 will be offered for the traffic they carry');
+    assert.ok(milestone.detail.startsWith("Rolling out with the network operator's next server release and the next app releases: clients will be offered a provider whose quality-probe checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. "));
+    // the providers the hard UDP gate keeps out (FP2-PROTOCOL.md §1, measured on Main on November 12)
+    assert.match(milestone.detail, / Until then, such a provider fails its checks, and clients are offered it rarely, if at all, even for the traffic it carries: on November 12, about 20,700 providers failed their checks only because of their HTTP\/3 loads\. /);
     // compatible placement (§7.2), the limited window and its merged races (§7.4-7.5), overflow (§6.3)
-    assert.match(milestone.detail, / Clients never send UDP to a provider that does not carry it\. /);
-    assert.match(milestone.detail, / Each app keeps a few of these providers beside its usual ones and races them for the TCP connections they can carry, and it turns to them where a location has too few providers that carry UDP\. /);
+    assert.match(milestone.detail, / Clients will never send UDP to a provider that does not carry it\. /);
+    assert.match(milestone.detail, / Each app will keep a few of these providers beside its usual ones and race them for the TCP connections they can carry, and turn to them where a location has too few providers that carry UDP\. /);
     // old clients keep the hard gate (§5.4)
-    assert.match(milestone.detail, / Apps from before the release keep the old selection\. /);
+    assert.match(milestone.detail, / Apps from before these releases keep the old selection\. /);
     // §1 non-goals: SN25 reads no URL outcome (qualityprobe/H3.md, "SN25")
-    assert.match(milestone.detail, / SN25 scoring, weights and payouts read none of the quality probe's checks and do not change: pool rewards are still split by completed usage, so these providers earn more only through the traffic they now carry\.$/);
-    // it names the release by its day, not as one still to come, and gives no share or price
-    assert.doesNotMatch(`${milestone.title} ${milestone.detail}`, /\bnext (?:app )?release\b|\d\s?%|\$\s?\d|\bGB\b/i);
-    // in date order, so it follows the milestones of its day
+    assert.match(milestone.detail, / SN25 scoring, weights and payouts read none of the quality probe's checks and do not change: pool rewards are still split by completed usage, so these providers earn more only through the traffic they will carry\.$/);
+    // in date order: after the milestones of November 12, before epoch 5's claims
     const ids = events.map((e) => e.id);
-    const index = ids.indexOf(milestone.id);
-    assert.ok(parseWhen(events[index - 1].date).start.ms <= parseWhen(milestone.date).start.ms);
-    assert.ok(parseWhen(milestone.date).start.ms <= parseWhen(events[index + 1].date).start.ms);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('usdc-payouts-end') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('epoch-5-claims-with-recovery'));
 
     const notice = mainnetNotices.find((n) => n.id === 'notice-providers-without-udp-or-ipv6');
     assert.ok(notice, 'the notice is listed');
-    // dated the day of the release, as the milestone is
-    assert.equal(noticeDay(notice), day.getTime());
-    assert.equal(notice.title, 'Providers without UDP or IPv6 are offered for the traffic they carry. SN25 rewards are counted as before.');
+    // posted the day of the milestone
+    assert.equal(notice.date, 'November 13, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 13));
+    assert.equal(notice.title, 'Providers without UDP or IPv6 will be offered for the traffic they carry. SN25 rewards are counted as before.');
     assert.equal(notice.paragraphs.length, 5);
-    const [before, change, evidence, sn25, status] = notice.paragraphs;
-    assert.match(before, /^The network operator's quality probe loads test sites through every provider over HTTPS \(TCP\), over HTTP\/3 \(QUIC, which runs over UDP\) where a site serves it, and over IPv6 where a provider's connections prove it\. A check passes only when every load passes\. /);
-    assert.match(before, / On November 12, about 20,700 providers failed their checks only because of their HTTP\/3 loads\.$/);
-    assert.ok(change.startsWith(`From the apps' release of ${releaseDay}, clients are offered a provider whose checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Clients never send UDP to a provider that does not carry it. `));
+    const [today, change, evidence, sn25, status] = notice.paragraphs;
+    assert.match(today, /^The network operator's quality probe loads test sites through every provider over HTTPS \(TCP\), over HTTP\/3 \(QUIC, which runs over UDP\) where a site serves it, and over IPv6 where a provider's connections prove it\. A check passes only when every load passes\. /);
+    assert.match(today, / So a provider that carries no UDP, or whose IPv6 fails, fails its checks, and clients are offered it rarely, if at all, even for the traffic it carries\. On November 12, about 20,700 providers failed their checks only because of their HTTP\/3 loads\.$/);
+    assert.ok(change.startsWith("A change that offers these providers for the traffic they carry is rolling out with the network operator's next server release and the next app releases. With both, clients are offered a provider whose checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Clients never send UDP to a provider that does not carry it. "));
     assert.match(change, / Each app keeps a few of these providers beside its usual ones, and they join the race for every TCP connection they can carry\. The apps also turn to them where a location has too few providers that carry UDP\.$/);
     // no negative evidence means capable (D7.4), and labels follow the 8-hour window (§3.5)
     assert.match(evidence, /^Only failed checks count against a provider: one with no failed check over UDP or IPv6 is offered for both, as before, and one that regains UDP or IPv6 is offered for it again within 8 hours\. /);
-    assert.match(evidence, / apps from before the release keep the old selection\.$/);
+    assert.match(evidence, / The network operator's hosted proxies take the same change with their next release, and apps from before these releases keep the old selection\.$/);
     assert.match(sn25, /^SN25 scoring, weights and payouts read none of the quality probe's checks, and none of it changes: pool rewards are still split by completed usage\. /);
-    // the provider status's reason (D11.6, §5.5), and nothing to do
-    assert.match(status, /^A provider's status in the apps now says how many of its checks failed only over HTTP\/3 \(UDP\), or only over IPv6, and what it is offered for\. There is nothing you need to do\. /);
-    assert.doesNotMatch(`${notice.title} ${notice.paragraphs.join(' ')}`, /\bnext (?:app )?release\b|\d\s?%|\$\s?\d|\bGB\b/i);
+    // the provider status's reason (D11.6, §5.5) comes with the same releases, and there is nothing to do
+    assert.match(status, /^With the same releases, a provider's status in the apps says how many of its checks failed only over HTTP\/3 \(UDP\), or only over IPv6, and what it is offered for\. There is nothing you need to do\. /);
+    // rolling out, never live: nothing says it is in effect or names a release day, and no figure of a reward
+    const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
+    assert.doesNotMatch(words, /\blive\b|\bnow (?:offered|in effect|takes? effect)\b|\breleases? of November\b|\bsince November 1[23]\b|\d\s?%|\$\s?\d|\bGB\b|\d\s?α|\balpha\b/i);
     // its full text is in the sn repo, as the milestone's is
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the providers without UDP or
-    // IPv6 and the extenders' share, both of November 12, then capture the flag and Pro data, both of
-    // November 11, the later-posted first, then epoch 3's of October 31. The data lists them in the order
-    // they were posted, the other way round, so this order is the sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the providers without UDP or IPv6,
+    // of November 13, then the extender pool and the extenders' share, both of November 12, then capture the
+    // flag and Pro data, both of November 11, the later-posted first, then epoch 3's of October 31. The data
+    // lists them in the order they were posted, the other way round, so this order is the sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
-        ['notice-providers-without-udp-or-ipv6', 'November 12, 2026'],
+        ['notice-providers-without-udp-or-ipv6', 'November 13, 2026'],
+        ['notice-extender-pool', 'November 12, 2026'],
         ['notice-extender-relay-share', 'November 12, 2026'],
         ['notice-capture-the-flag', 'November 11, 2026'],
         ['notice-pro-grant-cycle', 'November 11, 2026'],
@@ -694,7 +756,7 @@ test('the notices at the top run newest first, by the day each was posted', () =
         assert.ok(Number.isNaN(noticeDay(posted('x', date))), `"${date}" should not read`);
         assert.throws(() => newestFirst([posted('x', date)]), /is not a day such as "November 11, 2026"/, `"${date}"`);
     }
-    // with five notices at the top, the milestones and the box name the one they point to
+    // with six notices at the top, the milestones and the box name the one they point to
     const pointers = [...events.map((e) => e.detail), ...mainnetActions.steps.map((s) => s.detail)];
     for (const text of pointers) assert.doesNotMatch(text, /\bthe notice at the top\b/);
     assert.equal(pointers.filter((text) => text.includes('the epoch 3 notice at the top')).length, 7);
@@ -705,8 +767,7 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     // deployment plan (§11.2). Its times here are the page's projection from block numbers at 12 seconds a
     // block, so epoch 8's first block, the end of epoch 7, is about 18:25 UTC on November 27, as for the
     // extender pool (the design's measured projection puts it about four minutes later)
-    const epoch7 = mainnetEpochs.at(-1);
-    assert.equal(epoch7.number, 7);
+    const epoch7 = mainnetEpochs.find((e) => e.number === 7);
     assert.equal(epoch7.end.time, '2026-11-27T18:25:00Z');
     const blocksPerEpoch = epoch7.end.block - epoch7.start.block;
     const after = (time, blocks) => new Date(Date.parse(time) + blocks * SECONDS_PER_BLOCK * 1000).toISOString().replace('.000Z', 'Z');
@@ -715,14 +776,19 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     const groupOf = (id) => groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === id)).id;
     const shown = (event) => whenText(parseWhen(event.date), { approxStart: isApproximate(event) });
     const ctf = ['capture-the-flag-presence-sampling', 'capture-the-flag-pool-registration', 'capture-the-flag-epoch-8', 'capture-the-flag-first-draw', 'capture-the-flag-first-claims'];
-    // in date order among the other milestones; nothing is done yet; none is a key milestone, since the
-    // summary timeline ends with epoch 7 (tests/mainnet-summary.test.mjs)
+    // in date order among the other milestones; nothing is done yet; the start is the one key milestone,
+    // marked on the summary at epoch 8's first block, the last epoch listed (tests/mainnet-summary.test.mjs)
     assert.deepEqual(ctf.map((id) => ids.indexOf(id)), ctf.map((id) => ids.indexOf(id)).sort((a, b) => a - b));
     for (const id of ctf) {
         assert.ok(byId(id), `${id} is listed`);
         assert.ok(['scheduled', 'planned'].includes(byId(id).status), `${id}: ${byId(id).status}`);
-        assert.equal(byId(id).key, undefined, id);
+        assert.equal(byId(id).key, id === 'capture-the-flag-epoch-8' ? true : undefined, id);
     }
+    // epoch 8, the first in which capture the flag pays, is listed: its row and its milestones carry the flag
+    const epoch8 = mainnetEpochs.at(-1);
+    assert.deepEqual([epoch8.number, epoch8.settlement, epoch8.captureTheFlag], [8, 'v2', true]);
+    assert.deepEqual([epoch8.start, epoch8.end], [epoch7.end, { block: 9650428, time: '2026-12-04T18:25:00Z', projected: true }]);
+    assert.deepEqual(mainnetEpochs.filter((e) => e.captureTheFlag).map((e) => e.number), [8]);
 
     // the sampler runs by the end of epoch 6, the day epoch 7 begins, so that epoch 7 is a full shadow epoch;
     // the start moves to epoch 9 only if it is not running when epoch 8 starts
@@ -758,7 +824,7 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     assert.equal(start.date, byId('extender-pool-epoch-8').date);
     assert.equal(ids.indexOf(start.id), ids.indexOf('extender-pool-epoch-8') + 1);
     assert.equal(shown(start), 'Fri Nov 27 · ≈18:25 UTC');
-    assert.equal(groupOf(start.id), 'after-epoch-7');
+    assert.equal(groupOf(start.id), 'epoch-8');
     assert.ok(start.detail.startsWith(`From block ${thousands(epoch7.end.block)}, the first of epoch 8, `));
     const slots = 249 * (5 + 5);
     assert.ok(start.detail.includes(` Each of the 249 ISO 3166-1 countries has five provider slots and five extender slots each epoch, each worth the pool's new funding for the epoch divided by ${thousands(slots)}. `));
@@ -774,12 +840,13 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     assert.deepEqual([alpha(share), alpha(share * 9 / 10), alpha(share / 10)], ['1,195.84 α', '1,076.26 α', '119.58 α']);
     assert.ok(start.detail.includes(` The provider pool gets 9/10 of the providers' share instead of all of it, ${alpha(share * 9 / 10)} instead of ${alpha(share)} at epoch 4's scale, and 4/10 once top-level fleets are weighted. `));
     assert.match(start.detail, / it takes effect once the signed amendment entry is published before epoch 8 starts\.$/);
-    // the design and the notice's full text are in the sn repo; the entry and the block do not exist yet
+    // the design and the notice's full text are in the sn repo, and the signed entry will be in the published
+    // amendments file, which ur.xyz serves; the block does not exist yet
     const notice = mainnetNotices.find((n) => n.id === 'notice-capture-the-flag');
     assert.deepEqual(start.sources.map((s) => [s.label, s.ref]), [
         ['The design, CAPTURETHEFLAG.md', 'https://github.com/urfoundation/sn/blob/main/CAPTURETHEFLAG.md'],
         ['The full notice in the sn repo', notice.link.href],
-        ['Signed amendment entry', ''],
+        ['Signed amendment entry', 'https://ur.xyz/amendments.yml'],
         [`Epoch 8's first block, ${thousands(epoch7.end.block)}`, ''],
     ]);
 
@@ -789,7 +856,7 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     assert.deepEqual(end8, { block: 9650428, time: '2026-12-04T18:25:00Z' });
     assert.equal(draw.date, `${end8.time}/${after(end8.time, 1200)}`);
     assert.equal(shown(draw), 'Fri Dec 4 · ≈18:25–22:25 UTC');
-    assert.equal(groupOf(draw.id), 'after-epoch-7');
+    assert.equal(groupOf(draw.id), 'after-epoch-8');
     assert.ok(draw.detail.startsWith(`Epoch 8 ends at block ${thousands(end8.block)}. The network operator commits its list of entries by block ${thousands(end8.block + 600)}, `));
     assert.ok(draw.detail.includes(` committed with the provider pool's by block ${thousands(end8.block + 1200)}. `));
     assert.match(draw.detail, / every slot carries forward into its country's pot, and the first winners are drawn in epoch 9\.$/);
@@ -810,7 +877,9 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     const text = notice.paragraphs.join(' ');
     assert.ok(text.startsWith(`From epoch 8, which starts at block ${thousands(epoch7.end.block)} around November 27, 18:25 UTC, `));
     assert.ok(text.includes(` Each of the 249 ISO 3166-1 countries has ten slots each epoch (one week), five for providers and five for extenders, and every slot is worth the same: the pool's new funding for the epoch divided by ${thousands(slots)}. `));
-    assert.match(text, / when it was online, passing the network operator's checks and in that country for at least half of the epoch, and is active at its end\. /);
+    assert.match(text, / when it was online, passing its network operator's checks and in that country for at least half of the epoch, and is active at its end\. /);
+    // every operator draws its own: each commits its list, as each has its pool (the owner's rule: every operator is part of the protocol)
+    assert.match(text, / Each operator commits its list of entries on chain, /);
     // the draw's exact odds (§12.1, item 15)
     assert.match(text, / With five entries or fewer, each wins a slot; with more, each entry's chance is 5 in the number of entries\. /);
     assert.match(text, / Each winner takes its own slot and a fifth of that pot, /);
@@ -833,4 +902,46 @@ test('capture the flag from epoch 8: a notice and its deployment milestones, at 
     for (const words of [`${notice.title} ${text}`, litepaperFlag, ...ctf.map((id) => `${byId(id).title} ${byId(id).detail}`)]) {
         assert.doesNotMatch(words, avoid);
     }
+});
+
+test('Gamma payments on SN25: done at the block the subnet owner switched them on, as a fact of the subnet', () => {
+    // read from the chain (snow's archive, read-only) on November 12: at block 9,483,859, 15:14:12 UTC on November
+    // 11, extrinsic 21, the ur-owner multisig's second approval executed the batch that published SN25's first Gamma
+    // service (ServiceSet: the owner hotkey, the services document, the spender) and switched on SN25's gamma
+    // (SubnetGammaEnabledSet: netuid 25, enabled), the batch mmm BTCPAY.md §18.7 gives. Gamma itself was switched on
+    // network-wide on November 9 (GammaEnabled first true at block 9,471,027)
+    const gamma = events.find((e) => e.id === 'sn25-gamma-payments');
+    assert.equal(gamma.status, 'done');
+    assert.equal(gamma.date, '2026-11-11T15:14:12Z');
+    assert.equal(whenText(parseWhen(gamma.date), { approxStart: isApproximate(gamma) }), 'Wed Nov 11 · 15:14 UTC');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === gamma.id)).id, 'epoch-5');
+    assert.equal(gamma.title, 'Gamma payments available on SN25');
+    assert.ok(gamma.detail.startsWith('At block 9,483,859, the subnet owner\'s multisig published the first Gamma service on SN25 and switched on Gamma for SN25, in one call. '));
+    assert.match(gamma.detail, / switched on network-wide on November 9, /);
+    assert.match(gamma.detail, / Every mint burns SN25 alpha\. /);
+    // a fact of the subnet: URnetwork is named only as one place to pay with it, and no operator is "the" one
+    assert.match(gamma.detail, / The first is URnetwork's, one place to pay with it: /);
+    assert.doesNotMatch(gamma.detail, /the network operator|bringyour/i);
+    // the switch-on links its extrinsic; the ur.io page is linked once it is live
+    const [switchOn, page] = gamma.sources;
+    assert.deepEqual(switchOn, { label: "Published and switched on by the subnet owner's multisig, extrinsic 9483859-0021", kind: 'substrate_extrinsic', ref: '9483859-21' });
+    assert.equal(sourceLink(switchOn, explorers).href, 'https://taostats.io/extrinsic/9483859-0021');
+    assert.deepEqual([page.kind, page.ref], ['doc', '']);
+    assert.equal(gamma.key, undefined);
+});
+
+test('USDC provider payouts end: done on November 12, after which no USDC payout is sent', () => {
+    // the owner closed out USDC on November 12: the unsent USDC payouts were closed and the weekly payout run
+    // was turned off; provider earnings are paid through SN25
+    const end = events.find((e) => e.id === 'usdc-payouts-end');
+    assert.equal(end.status, 'done');
+    assert.equal(end.date, '2026-11-12');
+    assert.equal(whenText(parseWhen(end.date), { approxStart: isApproximate(end) }), 'Thu Nov 12');
+    assert.equal(end.title, 'USDC provider payouts end');
+    assert.equal(end.detail, 'Legacy USDC provider payouts have ended, and no further USDC payouts will be sent. Provider earnings are paid through SN25.');
+    assert.deepEqual(end.sources, []);
+    assert.equal(end.key, undefined);
+    // it follows the last weekly USDC batch
+    const ids = events.map((e) => e.id);
+    assert.ok(ids.indexOf('last-usdc-payout-batch') < ids.indexOf(end.id));
 });

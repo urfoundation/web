@@ -100,7 +100,7 @@ export default function Board({ lang = 'en', m: model = CTF }) {
     const card = viewer ? m.byCode.get(viewer) : neutralCountry(m);
     const cardLabel = viewer
         ? (picked ? all.card.choice : all.card.here)
-        : card ? all.card.biggest : all.card.ten;
+        : card ? all.card.biggest : m.many ? f.count(all.card.tenMany, 2 * m.roleSlots) : all.card.ten;
 
     const sorts = sortsFor(m);
     const shows = showsFor(m);
@@ -109,7 +109,7 @@ export default function Board({ lang = 'en', m: model = CTF }) {
         np: () => f.count(t.focusP, m.totals.openP),
         nx: () => f.count(t.focusX, m.totals.openX),
     }[focus]?.();
-    const focusNote = { held: t.noteHeld, np: t.noteP, nx: t.noteX }[focus];
+    const focusNote = { held: m.multi ? t.noteHeldMany : t.noteHeld, np: t.noteP, nx: t.noteX }[focus];
 
     return (
         <div className="ctf-board" ref={rootRef}>
@@ -172,10 +172,11 @@ export default function Board({ lang = 'en', m: model = CTF }) {
                         <button type="button" className="ctf-btn ctf-btn-s" onClick={() => onFocus(null)}>{t.showAll}</button>
                     </div>
                 )}
-                <div className={cx('ctf-grid', focus === 'np' && 'ctf-focus-p', focus === 'nx' && 'ctf-focus-x')}>
-                    {cells.map((c, i) => {
+                {/* with more than one operator a role has five slots at each, so the grid counts its winners in place of five pips */}
+                <div className={cx('ctf-grid', m.multi && 'ctf-multi', focus === 'np' && 'ctf-focus-p', focus === 'nx' && 'ctf-focus-x')}>
+                    {cells.map((c) => {
                         const ct = cellTips(tips, c.code);
-                        return <GridCell key={c.code} m={m} c={c} i={i} mounted={mounted} tipApi={tips.api} tipHover={ct.hover} tipFocus={ct.focus} tipPin={ct.pin} expanded={expanded === c.code} onExpand={onExpand} />;
+                        return <GridCell key={c.code} m={m} c={c} mounted={mounted} tipApi={tips.api} tipHover={ct.hover} tipFocus={ct.focus} tipPin={ct.pin} expanded={expanded === c.code} onExpand={onExpand} />;
                     })}
                 </div>
                 {cells.length === 0 && <p className="ctf-empty">{rich(t.empty, { q })}</p>}

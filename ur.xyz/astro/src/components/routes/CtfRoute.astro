@@ -20,8 +20,13 @@
 // does. Until capture the flag starts, a note above everything else says when
 // (in the HTML, from the snapshot's prelaunch block) and counts down to it on
 // the visitor's clock (ctf/Countdown.jsx, a small island that brings its words
-// with it and hydrates on load, as the clock is at the top of the page); the
-// build of a snapshot from after the start leaves it out (model.js startNote).
+// with it and hydrates when the browser is idle, within a second, so the page
+// preloads nothing for it); the build of a snapshot from after the start
+// leaves it out (model.js startNote).
+// The snapshot combines every network operator of the operator list
+// (scripts/ctf-import.mjs), so the Dataset's distribution is each operator's
+// GET /sn/ctf, and the page names its JSON as its alternate only while there
+// is one operator to name.
 import Base from '../../layouts/Base.astro';
 import DisclaimerStatic from '../DisclaimerStatic.astro';
 import NavIsland from '../../islands/NavIsland.jsx';
@@ -30,7 +35,7 @@ import CtfPage from '@react/components/pages/Ctf.jsx';
 import Board from '@react/components/pages/ctf/Board.jsx';
 import Countdown from '@react/components/pages/ctf/Countdown.jsx';
 import { CTF } from '@react/components/pages/ctf/data.js';
-import { API_STATE, SITE, hubDescription, hubTitle, localModel, startNote } from '@react/components/pages/ctf/model.js';
+import { SITE, hubDescription, hubTitle, localModel, startNote } from '@react/components/pages/ctf/model.js';
 import { ctfCopy } from '@react/components/pages/ctf/i18n.js';
 import { pagePath } from '@react/components/pages/ctf/links.js';
 import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
@@ -54,8 +59,8 @@ const url = `${SITE}${pagePath(lang, '/ctf')}`;
 const description = hubDescription(m);
 // the note until capture the flag starts: null once the snapshot is from after the start
 const note = startNote(m);
-// The data as a Dataset (Dataset Search), its distribution the JSON API; a
-// translation's is the same data described in its language.
+// The data as a Dataset (Dataset Search), its distribution each operator's
+// JSON API; a translation's is the same data described in its language.
 const jsonLd = [{
     '@type': 'Dataset',
     '@id': `${url}#dataset`,
@@ -71,8 +76,10 @@ const jsonLd = [{
     // from the first epoch's start, on the site's time basis, onwards
     temporalCoverage: `${new Date(epochBounds(CTF.firstEpoch).startMs).toISOString().slice(0, 10)}/..`,
     variableMeasured: copy.dataset.measured,
-    distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: API_STATE }],
+    distribution: m.api.state.map((contentUrl) => ({ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl })),
 }];
+// the visitor's country comes from the first operator's API (the list always names one)
+const hereOrigin = new URL(m.api.here).origin;
 ---
 <Base
     title={hubTitle(lang)}
@@ -80,12 +87,12 @@ const jsonLd = [{
     breadcrumbName={copy.program}
     lang={lang}
     jsonLd={jsonLd}
-    alternate={{ href: API_STATE, type: 'application/json' }}
+    alternate={m.api.state.length === 1 ? { href: m.api.state[0], type: 'application/json' } : null}
     ogImage={ctfOgImage(m)}
     ogImageAlt={ctfCardAlt(m)}
 >
     {/* the board's first chain of requests is the visitor's country */}
-    <link slot="head" rel="preconnect" href="https://api.bringyour.com" crossorigin />
+    <link slot="head" rel="preconnect" href={hereOrigin} crossorigin />
 
     <div class="app">
         <DisclaimerStatic t={t} />
@@ -95,7 +102,7 @@ const jsonLd = [{
             {/* "Updated" states the sitemap's lastmod: the build fills the
                 token in once the page is fingerprinted (src/lib/lastmod.js) */}
             <CtfPage lang={lang} updated={LASTMOD_TOKEN}>
-                {note && <Countdown slot="countdown" {...note} client:load />}
+                {note && <Countdown slot="countdown" {...note} client:idle={{ timeout: 1000 }} />}
                 <Board slot="board" {...islandLang} client:idle={{ timeout: 1500 }} />
             </CtfPage>
         </main>

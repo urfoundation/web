@@ -4,12 +4,14 @@ import { blockFigure, clockFigure, startClock, timeLeftWords } from './clock.js'
 
 /**
  * Countdown — the note at the top of the hub (ur.xyz/ctf, and /<lang>/ctf)
- * until capture the flag starts: when it starts, as a sentence in the static
- * HTML (its epoch, its block and the day and time, about), and a countdown to
- * it on the visitor's clock (ctf/clock.js). Its props are model.js
- * startNote's: its words come with them, so the island loads no copy and
- * stays small. The page renders it only while the snapshot is the prelaunch
- * one.
+ * and of every country page (/ctf/<cc>) until capture the flag starts: when it
+ * starts, as a sentence in the static HTML (its epoch, its block and the day
+ * and time, about), and a countdown to it on the visitor's clock
+ * (ctf/clock.js). Its props are model.js startNote's, the same on every page:
+ * its words come with them, so the island loads no copy and stays small. The
+ * pages render it only while the snapshot is the prelaunch one. A country
+ * page's is `compact`: one band, the flag and the tiles smaller, and no
+ * blocks left (nor the notches on the pole).
  *
  * The countdown, after hydration: a flag climbs its pole over the epochs
  * before the start (it is hoisted to its place as the island starts), the
@@ -90,7 +92,7 @@ function BlockBar({ into }) {
 // the ten pips that burst from the flag at the start: five providers' (blue), five extenders' (green)
 const PIPS = Array.from({ length: 10 }, (_, i) => <i key={i} />);
 
-export default function Countdown({ lang = 'en', first, startsAt, note, live: liveNote, words }) {
+export default function Countdown({ lang = 'en', first, startsAt, note, live: liveNote, words, compact = false }) {
     const start = Date.parse(startsAt);
     const now = useCountdownClock(start);
     const c = now === null ? null : startClock(now, startsAt);
@@ -100,14 +102,14 @@ export default function Countdown({ lang = 'en', first, startsAt, note, live: li
     const left = running ? timeLeftWords(now, startsAt, lang) : null;
     return (
         <div
-            className={cx('ctf-start', c && 'ctf-start-on')}
+            className={cx('ctf-start', compact && 'ctf-start-compact', c && 'ctf-start-on')}
             data-phase={live ? 'live' : 'soon'}
             data-last-minute={running && c.lastMinute ? '' : undefined}
             style={{ '--ctf-hoist': c ? c.hoist : 0 }}
         >
             <div className="ctf-start-pole" aria-hidden="true" data-parity-ignore="">
-                <i className="ctf-start-notch" />
-                <i className="ctf-start-notch" />
+                {!compact && <i className="ctf-start-notch" />}
+                {!compact && <i className="ctf-start-notch" />}
                 <span className="ctf-start-car">
                     <span className="ctf-start-flag"><b>{first}</b></span>
                     {live && <span className="ctf-start-burst">{PIPS}</span>}
@@ -136,11 +138,13 @@ export default function Countdown({ lang = 'en', first, startsAt, note, live: li
                 </span>
                 {live && <span className="ctf-start-go"><i />{words.go}</span>}
             </div>
-            <p className="ctf-start-blocks" aria-hidden="true" data-parity-ignore="">
-                <span className="ctf-label">{words.blocks}</span>
-                <b>≈ {running ? blockFigure(c.blocks, lang) : '–'}</b>
-                <span className="ctf-start-track">{running && <BlockBar key={c.blocks} into={c.intoBlock} />}</span>
-            </p>
+            {!compact && (
+                <p className="ctf-start-blocks" aria-hidden="true" data-parity-ignore="">
+                    <span className="ctf-label">{words.blocks}</span>
+                    <b>≈ {running ? blockFigure(c.blocks, lang) : '–'}</b>
+                    <span className="ctf-start-track">{running && <BlockBar key={c.blocks} into={c.intoBlock} />}</span>
+                </p>
+            )}
             {left && <p className="ctf-sr">{interpolate(words.about, { time: left })}</p>}
         </div>
     );

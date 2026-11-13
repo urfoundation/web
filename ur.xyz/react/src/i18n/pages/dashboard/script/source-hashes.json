@@ -1,6 +1,7 @@
 {
   "about": "sha256 (first 12 hex) of the English each translation was made from, per language and key. Checked by tests/i18n-staleness.mjs; after updating a translation run `node tests/i18n-staleness.mjs --unit dashboard/script --accept <lang> <key> ...` (from react/).",
   "ru": {
+    "chainUnavailable": "ce32dfa71be4",
     "change.none": "5d69f9dac5b0",
     "change.notEnough": "624a1a20789e",
     "change.since": "5d9267d05d52",
@@ -189,6 +190,7 @@
     "vsPeriodAverage.d90": "0ff4a82be44e"
   },
   "ar": {
+    "chainUnavailable": "ce32dfa71be4",
     "change.none": "5d69f9dac5b0",
     "change.notEnough": "624a1a20789e",
     "change.since": "5d9267d05d52",
@@ -377,6 +379,7 @@
     "vsPeriodAverage.d90": "0ff4a82be44e"
   },
   "zh": {
+    "chainUnavailable": "ce32dfa71be4",
     "change.none": "5d69f9dac5b0",
     "change.notEnough": "624a1a20789e",
     "change.since": "5d9267d05d52",
@@ -565,6 +568,7 @@
     "vsPeriodAverage.d90": "0ff4a82be44e"
   },
   "de": {
+    "chainUnavailable": "ce32dfa71be4",
     "change.none": "5d69f9dac5b0",
     "change.notEnough": "624a1a20789e",
     "change.since": "5d9267d05d52",
@@ -753,6 +757,7 @@
     "vsPeriodAverage.d90": "0ff4a82be44e"
   },
   "es": {
+    "chainUnavailable": "ce32dfa71be4",
     "change.none": "5d69f9dac5b0",
     "change.notEnough": "624a1a20789e",
     "change.since": "5d9267d05d52",

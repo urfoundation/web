@@ -4,21 +4,22 @@
 // mainnet red principal; network operator operador de red; subnet owner propietario de la subred; payout root
 // raíz de pagos; commit registrar; challenge period período de impugnación; claims reclamaciones; payout wallet
 // wallet de pago; governance Safe Safe de gobernanza; vault bóveda; capture the flag Captura la bandera (the
-// apps' name, without quotes, as /ctf writes it); draw sorteo (never lotería, rifa or apuesta: it is not a lottery);
+// apps' name, without quotes, as /ctf writes it); draw selección aleatoria, to draw seleccionar al azar (a public,
+// verifiable random selection: never sorteo, a drawing of lots, and never lotería, rifa or apuesta: it is not a lottery);
 // entry participante; pot fondo acumulado (not bote); carry forward se traslada; relay retransmitir; reader
 // addressed as tú. Figures are written as Intl writes Spanish numbers, as on /ctf (9.240.028; 1076,26 α;
 // timeline.js INTL_FIGURES).
 export default {
     meta: {
         title: 'Cronología del lanzamiento de SN25 en la red principal | UR',
-        description: 'Lanzamiento de SN25 en la red principal por época: versión 1 desde el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y primeras reclamaciones el 8 de noviembre.',
+        description: 'Lanzamiento de SN25 en la red principal: versión 1 el 8 de octubre, liquidación v2 desde la época 4 (30 de octubre) y Captura la bandera desde la época 8 (27 de noviembre).',
         breadcrumb: 'Red principal',
     },
 
     intro: {
         eyebrow: 'SN25 · red principal de Bittensor',
         title: 'Cronología del lanzamiento en la red principal',
-        lede: 'La subred de UR, SN25, entró en funcionamiento en la red principal de Bittensor el 8 de octubre de 2026. Esta cronología sigue el lanzamiento por época de pago, desde los contratos de la versión 1 hasta la primera reclamación de la liquidación v2.',
+        lede: 'La subred de UR, SN25, entró en funcionamiento en la red principal de Bittensor el 8 de octubre de 2026. Esta cronología sigue el lanzamiento por época de pago, desde los contratos de la versión 1, pasando por la liquidación v2, hasta Captura la bandera, que empieza con la época 8.',
         note: 'Los hitos marcados como {scheduled} o {planned} aún están por llegar, y sus fechas pueden cambiar. Todas las horas están en UTC, y una hora marcada con ≈ es aproximada: la mayoría se proyectan a partir de números de bloque.',
     },
 
@@ -29,6 +30,7 @@ export default {
             'SN25 paga a los proveedores por época de pago. Son las épocas de liquidación de UR, no el tempo de 72 minutos de la cadena: la época 0 duró un día, y cada época posterior dura 7 días (50.400 bloques).',
             'La versión 1 se lanzó el 8 de octubre y liquida las épocas 1 a 3. Solo paga a los proveedores que el validador ha medido, y esa medición tiene un tope de unos 1500 proveedores por época, así que la mayoría de los mineros no recibe ninguna parte de la versión 1.',
             'La liquidación v2 paga según el uso y elimina ese tope. Estaba previsto que tomara el relevo desde la época 3, pero su pool no se registró antes de que la época 3 comenzara el 23 de octubre, así que la versión 1 liquida también la época 3. Su pool se registró el 29 de octubre, y la liquidación v2 ha pagado cada época desde la época 4, que comenzó hacia las 18:25 UTC del 30 de octubre. La primera época v2 terminó hacia el 6 de noviembre, y sus reclamaciones se abrieron el 8 de noviembre, después de que se registrara su raíz y terminara su período de impugnación.',
+            'Desde la época 8, que comienza hacia las 18:25 UTC del 27 de noviembre, cada operador de red tiene un segundo pool junto a su pool de proveedores: Captura la bandera, que la liquidación v2 paga en el mismo flujo de reclamación. El pool de proveedores paga por el uso, y Captura la bandera paga por estar presente en un país, con diez slots en cada país en cada época.',
         ],
         epochsAria: 'Épocas de pago',
     },
@@ -41,10 +43,12 @@ export default {
     },
 
     noticeDate: 'Aviso · {date}',
+    noticeToggle: { expand: 'Expandir', collapse: 'Contraer' },
 
     labels: {
         status: { done: 'Hecho', in_progress: 'En curso', scheduled: 'Programado', planned: 'Previsto' },
         settlement: { v1: 'Versión 1', v2: 'Liquidación v2' },
+        captureTheFlag: 'Captura la bandera',
         view: { transaction: 'Ver transacción', contract: 'Ver contrato', block: 'Ver bloque' },
         sourceAria: '{action}: {label}',
         sourcesAria: 'Fuentes de {title}',

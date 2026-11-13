@@ -137,7 +137,7 @@ test('the approved English is on the page word for word', async () => {
     const p = en.price;
     assert.equal(p.signedBeforeInitial, "Until epoch {epoch}, the initial period's rate of 0 α stays in force.");
     assert.equal(p.sourcingTitle, 'Sourcing commitment');
-    assert.equal(p.sourcingPays, 'From the first priced epoch, the network operator pays every SN25 demand deposit with alpha bought on the open market with its revenue. It uses no alpha obtained any other way.');
+    assert.equal(p.sourcingPays, 'From the first priced epoch, network operator 1 pays each of its SN25 demand deposits with alpha bought on the open market with its revenue. It uses no alpha obtained any other way.');
     assert.equal(p.sourcingRoute, 'Every purchase is on chain. USDC is swapped for TAO on Solana through Jupiter, bridged to Bittensor over LayerZero, and staked into SN25 alpha by the deposit wallet:');
     assert.equal(p.sourcingUsdcWallet, 'USDC wallet (Solana):');
     assert.equal(p.sourcingDepositWallet, 'Deposit wallet (Bittensor):');

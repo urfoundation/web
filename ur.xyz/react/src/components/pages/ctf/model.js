@@ -19,6 +19,16 @@
  * drand round, as far as they have happened): the draw of the first epoch in
  * `drawing`, and later ones beside `drawn` or `undrawn`.
  *
+ * Operators: capture the flag is part of the SN25 protocol, so every network
+ * operator runs its own pool, with its own draw among its own miners, and the
+ * snapshot combines every operator of the operator list (scripts/ctf-import.mjs).
+ * A country's figures are the operators' sums; a role also keeps each
+ * operator's own draw (`ops`), since a newcomer's chance to win and whether it
+ * wins by default are its operator's. With one operator the model is that
+ * operator's alone, and the pages read as they always did; with more, a
+ * per-operator fact (a draw's odds, an open slot) is listed by operator
+ * (opsList), and the slot counts the copy states are five at each operator.
+ *
  * Languages: buildModel is English (the snapshot's names). localModel(m, lang)
  * is the same model in another language: its countries named in it
  * (react/src/i18n/pages/ctf/names/<lang>.js) and in its A–Z, and `m.lang`, by
@@ -33,20 +43,19 @@ import { CTF_LOCAL_NOTES } from '../../../data/ctf-local-notes.js';
 
 export const SITE = 'https://ur.xyz';
 export const HUB_PATH = '/ctf';
-export const API_ORIGIN = 'https://api.bringyour.com';
-export const API_STATE = `${API_ORIGIN}/sn/ctf`;
-export const API_HERE = `${API_ORIGIN}/sn/ctf/here`;
-export const apiCountry = (code) => `${API_ORIGIN}/sn/ctf/country/${code}`;
+// the operator list the pages combine (sn/operators.yml, as the site publishes it);
+// each operator's API (its api_url) serves /sn/ctf and the routes beside it
+export const OPERATORS_PATH = '/operators.yml';
 export const SOURCE_URL = 'https://github.com/urfoundation/sn';
 export const OPERATOR_YML = `${SOURCE_URL}/blob/main/api/operator.yml`;
 export const METHOD_URL = `${SOURCE_URL}/blob/main/CAPTURETHEFLAG.md`;
 export const FLAGS_LICENSE = '/ctf/flags/LICENSE.txt';
-// where the calls to action go: the free URnetwork app (design.html), and for
-// an extender the miner guide's chapter on running one (its TCP port 443)
-export const START_URL = 'https://ur.io';
+// where the calls to action go: the miner guide, which names the URnetwork
+// apps as an easy alternative for mining from a phone or computer, and for an
+// extender its chapter on running one (its TCP port 443); ctf/links.js gives
+// them in the page's language
+export const START_URL = '/docs/miner';
 export const EXTENDER_URL = '/docs/miner/extender';
-/** A call to action ('start', 'p' or 'x'): its link. Its words are the copy's `cta`. */
-export const ctaHref = (cta) => (cta === 'x' ? EXTENDER_URL : START_URL);
 export const flagSrc = (code) => `/ctf/flags/${code}.svg`;
 export const countryPath = (code) => `${HUB_PATH}/${code}`;
 
@@ -108,18 +117,56 @@ const potBucket = (rao) => Math.round(rao / 1e8);
 export const byPot = (a, b) => (potBucket(b.pots) - potBucket(a.pots)) || byName(a, b);
 export const byOnline = (a, b) => (b.online - a.online) || byName(a, b);
 
-function roleOf(r, slot) {
-    const drawn = r.won !== null;
+/**
+ * When a country's flag starts its wave (a negative CSS animation-delay), so the
+ * flags of the cards and the grid wave out of step, as design.html staggers them:
+ * from the flag's place in the design's sprite, 16 to a row in code order, which
+ * is the snapshot's order (k, its index). The same for a country wherever it is
+ * shown and however the grid is sorted.
+ */
+export const waveDelay = (k) => `-${((((k % 16) * 7) + (Math.floor(k / 16) * 11)) % 23 / 10).toFixed(1)}s`;
+
+/**
+ * A country's role: the operators' sums, and each operator's own draw (`ops`,
+ * in the order of `operators`; one operator's is the role itself). It is open
+ * where any operator that drew left a slot of it unclaimed (a newcomer with
+ * that operator wins by default), and held where every operator that drew
+ * filled all five. `chance` is the best of the operators' draws and `est` what
+ * a newcomer who wins takes at the operator that pays most, an open one first:
+ * with one operator, that operator's own.
+ */
+function roleOf(r, operators, multi) {
+    const ops = (multi ? r.ops : [r]).map((o, i) => {
+        const drawn = o.won !== null;
+        const slot = operators[i] ? operators[i].slot : null;
+        return {
+            operator: operators[i] ? operators[i].domain : null,
+            won: o.won,
+            units: o.units,
+            near: o.near_misses,
+            pot: o.pot,
+            open: drawn && o.won < SLOTS_PER_ROLE,
+            held: drawn && o.won === SLOTS_PER_ROLE,
+            chance: drawn ? chanceOf(o.units) : null,
+            est: slot === null || slot === undefined ? null : winEstimate(slot, o.pot),
+        };
+    });
+    const drew = ops.filter((o) => o.won !== null);
+    const open = ops.filter((o) => o.open);
+    const ests = (open.length ? open : ops).map((o) => o.est).filter((v) => v !== null);
     return {
         won: r.won,
         units: r.units,
         near: r.near_misses,
         pot: r.pot,
         awarded: r.awarded,
-        open: drawn && r.won < SLOTS_PER_ROLE,
-        held: drawn && r.won === SLOTS_PER_ROLE,
-        chance: drawn ? chanceOf(r.units) : null,
-        est: slot === null ? null : winEstimate(slot, r.pot),
+        // the slots drawn last epoch: five at each operator that drew
+        slots: SLOTS_PER_ROLE * drew.length,
+        open: open.length > 0,
+        held: drew.length > 0 && drew.every((o) => o.held),
+        chance: drew.length ? Math.max(...drew.map((o) => o.chance)) : null,
+        est: ests.length ? Math.max(...ests) : null,
+        ops,
     };
 }
 
@@ -128,11 +175,21 @@ export function buildModel(snap) {
     const last = snap.last_epoch;
     const phase = snap.prelaunch ? 'prelaunch' : !last ? (snap.pending_draw ? 'drawing' : 'first') : last.drawn ? 'drawn' : 'undrawn';
     const drawn = phase === 'drawn';
+    // the operators' slot amounts added up: one slot at every operator (one operator: its slot)
     const slot = last ? last.slot : null;
     const threshold = slot === null ? null : BIG_POT_SLOTS * slot;
-    const countries = snap.countries.map((c) => {
-        const p = roleOf(c.providers, slot);
-        const x = roleOf(c.extenders, slot);
+    // the operators of the list, with those whose figures the snapshot adds up; an
+    // operator's own snapshot (ctf-operators/<domain>.json) is that operator alone
+    const listed = snap.operators || (snap.operator ? [{ ...snap.operator, status: 'included', reason: null, drawn: last ? last.drawn : null, slot }] : []);
+    const operators = listed.filter((o) => o.status === 'included');
+    const multi = operators.length > 1;
+    // the operators taking part: those included, or before the start every listed one
+    const taking = operators.length || listed.length || 1;
+    const apis = (operators.length ? operators : listed).map((o) => o.api_url).filter(Boolean);
+    const slots = operators.map((o) => o.slot).filter((v) => v !== null && v !== undefined);
+    const countries = snap.countries.map((c, k) => {
+        const p = roleOf(c.providers, operators, multi);
+        const x = roleOf(c.extenders, operators, multi);
         const pots = p.pot + x.pot;
         const avail = slot === null ? null : pots + 2 * SLOTS_PER_ROLE * slot;
         const big = avail !== null && avail >= threshold;
@@ -151,7 +208,9 @@ export function buildModel(snap) {
             keys: [sortKey, shortKey],
             rank: 0,
             inhabited: c.inhabited,
+            // held at any operator; `flags` counts the operators where it is
             flagHeld: c.flag_held,
+            flags: multi ? p.ops.filter((o, i) => o.held && x.ops[i].held).length : Number(c.flag_held),
             openEpochs: c.open_epochs,
             near: c.near_misses,
             awarded: c.awarded,
@@ -168,6 +227,8 @@ export function buildModel(snap) {
             won: drawn ? p.won + x.won : null,
             // its local note (data/ctf-local-notes.js), shown on its page
             note: CTF_LOCAL_NOTES[c.code] || null,
+            // when its flag starts its wave (waveDelay)
+            wave: waveDelay(k),
         };
     });
     const az = countries.slice().sort(byFolded);
@@ -190,7 +251,24 @@ export function buildModel(snap) {
         pending: snap.pending_draw,
         slot,
         threshold,
-        totals: { flagsHeld: snap.totals.flags_held, openP: nfc ? nfc.providers : null, openX: nfc ? nfc.extenders : null },
+        // the operators whose figures these are, every listed one (those left out with the reason), and more than one
+        operators,
+        listed,
+        leftOut: listed.filter((o) => o.status === 'left_out'),
+        multi,
+        // the slot counts the copy states: more than one operator taking part, and a country's slots of each role
+        many: taking > 1,
+        roleSlots: SLOTS_PER_ROLE * taking,
+        // the operators' last slot amounts, the smallest and the largest
+        slotMin: slots.length ? Math.min(...slots) : null,
+        slotMax: slots.length ? Math.max(...slots) : null,
+        // each operator's routes (sn/api/operator.yml): its state, a country's, and the visitor's country (the first operator's)
+        api: {
+            state: apis.map((url) => `${url}/sn/ctf`),
+            here: apis.length ? `${apis[0]}/sn/ctf/here` : null,
+            country: (code) => (apis.length === 1 ? `${apis[0]}/sn/ctf/country/${code}` : null),
+        },
+        totals: { flagsHeld: snap.totals.flags_held, flagsTotal: COUNTRY_COUNT * (operators.length || 1), openP: nfc ? nfc.providers : null, openX: nfc ? nfc.extenders : null },
         presence: snap.presence,
         countries,
         byCode,
@@ -298,7 +376,7 @@ export function startNote(m) {
 export function hubDescription(m) {
     const t = T(m).meta;
     const f = F(m);
-    const lead = t.hubLead;
+    const lead = m.many ? f.count(t.hubLeadMany, m.roleSlots) : t.hubLead;
     if (m.phase === 'drawn') return f.count(t.hubDrawn, m.totals.openP, { lead, carried: f.alpha(m.last.carried) });
     if (m.phase === 'undrawn') return say(t.hubUndrawn, { lead, epoch: m.last.epoch, carried: f.alpha(m.last.carried) });
     if (m.phase === 'first') return say(t.hubFirst, { lead, epoch: m.epoch, day: f.utcDay(m.drawAt) });
@@ -367,21 +445,23 @@ export function countryDescription(m, c, updated) {
     if (m.phase === 'drawn' || m.phase === 'undrawn') {
         const pots = say(t.pots, { p: f.alpha(c.p.pot), x: f.alpha(c.x.pot) });
         const lead = m.drawn
-            ? say(t.drawnLead, { ...values, po: SLOTS_PER_ROLE - c.p.won, xo: SLOTS_PER_ROLE - c.x.won, pots })
+            ? say(t.drawnLead, { ...values, po: c.p.slots - c.p.won, xo: c.x.slots - c.x.won, pots })
             : say(t.undrawnLead, { ...values, pots });
         // with a slot open a newcomer wins by default; where all ten were won, or without a draw, it enters the draw
         const stay = m.drawn && (c.p.open || c.x.open) ? t.stayWin : t.stayDraw;
         const stamp = say(t.updated, { day: A_DAY });
         forms = [join(m, [lead, stay, stamp]), join(m, [lead, stamp]), lead];
     } else {
-        const start = {
-            prelaunch: () => say(t.startPrelaunch, { ...values, first: m.firstEpoch, day: f.utcDay(m.startsAt) }),
-            first: () => say(t.startFirst, { ...values, epoch: m.epoch, day: f.utcDay(m.drawAt) }),
-            drawing: () => say(t.startDrawing, { ...values, first: m.firstEpoch }),
+        // with more than one operator taking part, the country's slots are five at each
+        const start = (one, many, more) => (m.many ? f.count(many, m.roleSlots, { ...values, ...more }) : say(one, { ...values, ...more }));
+        const begin = {
+            prelaunch: () => start(t.startPrelaunch, t.startPrelaunchMany, { first: m.firstEpoch, day: f.utcDay(m.startsAt) }),
+            first: () => start(t.startFirst, t.startFirstMany, { epoch: m.epoch, day: f.utcDay(m.drawAt) }),
+            drawing: () => start(t.startDrawing, t.startDrawingMany, { first: m.firstEpoch }),
         }[m.phase]();
         const day = m.presence ? f.dayName(m.presence.day) : null;
         const seen = !m.presence || c.online === null ? null : c.online > 0 ? f.count(t.seen, c.online, { day }) : say(t.seenNone, { day });
-        forms = [join(m, [start, seen]), start];
+        forms = [join(m, [begin, seen]), begin];
     }
     return (forms.find((d) => d.length <= DESCRIPTION_MAX) || forms[forms.length - 1]).replace(A_DAY, updated);
 }
@@ -395,9 +475,9 @@ export function countryMessage(m, c) {
     if (m.phase === 'first') return say(t.first, { ...values, epoch: m.epoch, draw: f.utcTime(m.drawAt) });
     if (m.phase === 'drawing') return say(t.drawing, { ...values, first: m.firstEpoch });
     if (m.phase === 'undrawn') return say(t.undrawn, { ...values, epoch: m.last.epoch, p: f.alpha(c.p.pot), x: f.alpha(c.x.pot) });
-    if (!c.p.open && !c.x.open) return say(t.held, { ...values, pp: f.pct(c.p.chance), xp: f.pct(c.x.chance) });
-    const p = c.p.open ? f.count(t.pSlots, SLOTS_PER_ROLE - c.p.won) : null;
-    const x = c.x.open ? f.count(t.xSlots, SLOTS_PER_ROLE - c.x.won) : null;
+    if (!c.p.open && !c.x.open) return say(m.multi ? t.heldMany : t.held, { ...values, pp: chanceText(m, c.p), xp: chanceText(m, c.x) });
+    const p = c.p.open ? f.count(t.pSlots, c.p.slots - c.p.won) : null;
+    const x = c.x.open ? f.count(t.xSlots, c.x.slots - c.x.won) : null;
     return say(p && x ? t.both : p ? t.pOnly : t.xOnly, { ...values, p, x });
 }
 
@@ -406,27 +486,58 @@ export function roleLine(m, c, role) {
     const t = T(m).roleLine;
     const f = F(m);
     const r = c[role];
-    if (m.phase === 'prelaunch') return say(t.prelaunch, { first: m.firstEpoch });
-    if (m.phase === 'first') return say(t.first, { draw: f.utcTime(m.drawAt) });
-    if (m.phase === 'drawing') return say(t.drawing, { first: m.firstEpoch });
+    if (m.phase === 'prelaunch') return f.count(t.prelaunch, m.roleSlots, { first: m.firstEpoch });
+    if (m.phase === 'first') return f.count(t.first, m.roleSlots, { draw: f.utcTime(m.drawAt) });
+    if (m.phase === 'drawing') return f.count(t.drawing, m.roleSlots, { first: m.firstEpoch });
     if (m.phase === 'undrawn') return say(t.undrawn, { pot: f.alpha(r.pot) });
     return r.open
-        ? say(role === 'p' ? t.pOpen : t.xOpen, { won: r.won, pot: f.alpha(r.pot) })
-        : f.count(t.held, r.units);
+        ? say(role === 'p' ? t.pOpen : t.xOpen, { won: r.won, slots: r.slots, pot: f.alpha(r.pot) })
+        : f.count(t.held, r.units, { slots: r.slots });
 }
 
-/** The draw a newcomer to a fully captured role faces. */
+/**
+ * A role's figures at each operator, by its domain (the copy's `ops`): its
+ * chance to win where all five slots were won, what a newcomer takes where one
+ * is open, or that it had no draw. Null with one operator, whose figures are
+ * the role's own.
+ */
+export function opsList(m, r) {
+    if (!m.multi) return null;
+    const t = T(m).ops;
+    const f = F(m);
+    return r.ops.map((o) => {
+        if (o.won === null) return say(t.noDraw, { operator: o.operator });
+        if (o.open) return say(t.open, { operator: o.operator, amount: f.alpha(o.est) });
+        return say(t.chance, { operator: o.operator, pct: f.pct(o.chance) });
+    }).join(t.sep);
+}
+
+/** A role's list by operator on a card or a tip ("By operator: …"); null with one operator. */
+export const opsLine = (m, r) => (m.multi ? say(T(m).ops.label, { list: opsList(m, r) }) : null);
+
+/** A fully captured role's chance to win as a sentence states it: the operator's, or each operator's (opsList). */
+export const chanceText = (m, r) => (m.multi ? opsList(m, r) : F(m).pct(r.chance));
+
+/** The draw a newcomer to a fully captured role faces: its operator's, or with more than one each operator's. */
 export function drawLine(m, r) {
+    if (m.multi) return opsLine(m, r);
     const t = T(m);
     const f = F(m);
     return join(m, [f.count(t.drawFrom, r.units), f.count(t.drawWith, r.units + 1, { slot: f.alpha(m.slot, 3) })]);
+}
+
+/** The slot's amount as the live bar shows it: last epoch's, or the operators' smallest to largest when they differ. */
+export function slotFigure(m) {
+    const f = F(m);
+    if (m.multi && m.slotMin !== m.slotMax) return say(T(m).live.slotRange, { min: f.alpha(m.slotMin, 3), max: f.alpha(m.slotMax, 3) });
+    return f.alpha(m.multi ? m.slotMax : m.slot, 3);
 }
 
 /**
  * The next step in a country with an open slot (a "So close" ribbon or an
  * "Open" chip, design.html): what the near misses were, what to run, what a
  * newcomer takes this epoch, and the call to action ('start', 'p' or 'x';
- * its words are the copy's `cta`, its link ctaHref).
+ * its words are the copy's `cta`, its link ctf/links.js ctaLink).
  */
 export function nextStep(m, c) {
     const t = T(m).next;
@@ -436,10 +547,10 @@ export function nextStep(m, c) {
     const top = Math.max(xTake, pTake);
     const both = Math.min(xTake, pTake) >= Math.max(0.2 * RAO, top / 2);
     const ext = xTake >= pTake;
-    const unclaimed = (SLOTS_PER_ROLE - c.p.won) + (SLOTS_PER_ROLE - c.x.won);
+    const unclaimed = (c.p.slots - c.p.won) + (c.x.slots - c.x.won);
     const values = place(c);
     return {
-        near: c.near > 0 ? f.count(t.left, c.near) : f.count(t.unclaimed, unclaimed),
+        near: c.near > 0 ? f.count(t.left, c.near) : f.count(t.unclaimed, unclaimed, { total: c.p.slots + c.x.slots }),
         act: say(both ? t.both : ext ? t.xOnly : t.pOnly, values),
         take: say(both ? t.takeEach : t.take, { amount: f.alpha(top) }),
         cta: both ? 'start' : ext ? 'x' : 'p',
@@ -453,14 +564,17 @@ export function roleDetail(m, c, role) {
     const r = c[role];
     const P = role === 'p';
     if (!m.drawn) return say(P ? t.pUndrawn : t.xUndrawn, { pot: f.alpha(r.pot) });
-    return r.open
-        ? say(P ? t.pOpen : t.xOpen, { won: r.won, pot: f.alpha(r.pot), est: f.alpha(r.est) })
-        : say(P ? t.pHeld : t.xHeld, {
-            units: f.count(t.units, r.units),
-            pct: f.pct(r.chance),
-            entries: f.count(t.entries, r.units + 1),
-            slot: f.alpha(m.slot, 3),
-        });
+    if (r.open) {
+        const open = say(P ? t.pOpen : t.xOpen, { won: r.won, slots: r.slots, pot: f.alpha(r.pot), est: f.alpha(r.est) });
+        return m.multi ? join(m, [open, opsLine(m, r)]) : open;
+    }
+    if (m.multi) return say(P ? t.pHeldMany : t.xHeldMany, { list: opsList(m, r) });
+    return say(P ? t.pHeld : t.xHeld, {
+        units: f.count(t.units, r.units),
+        pct: f.pct(r.chance),
+        entries: f.count(t.entries, r.units + 1),
+        slot: f.alpha(m.slot, 3),
+    });
 }
 
 /** The country the hub's card shows before it knows the visitor's: the biggest open pot (null before a draw). */

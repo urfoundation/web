@@ -136,9 +136,13 @@ carry that mark), the seo-audit
 (hreflang targets indexable and in their language, sitemap alternates equal to the head's, every localized group
 complete, `dir` per language), `page-dates.mjs --check`, `tests/page-copy.test.mjs`,
 `scripts/route-localization.test.mjs`, and every `pages/<group>/*.test.mjs`, which a group adds without editing the
-Makefile, with `pages/style.test.mjs`: the owner's Chinese and Spanish style rules in every unit and the docs corpus
-(香港, 澳门 and 台湾; 国家和地区 in a count of places; neutral Latin American Spanish in tú; US$ before every dollar
-figure, never a bare $, which `format.js` `formatUsd` also writes for the code's amounts).
+Makefile, with `pages/style.test.mjs`: the owner's style rules in every unit and the docs corpus (香港, 澳门 and 台湾;
+国家和地区 in a count of places and 国家或地区 on a label that names one; neutral Latin American Spanish in tú, places
+named as Latin American CLDR names them and og:locale es_LA; US$ before every dollar figure, never a bare $, which
+`format.js` `formatUsd` also writes for the code's amounts; Hong Kong and Macao by their short names (Гонконг and Макао,
+Hongkong and Macau, هونغ كونغ and ماكاو, Hong Kong and Macao); /mainnet's figures as Intl writes them in German and
+Russian; in Arabic, /dashboard's data carried figure in ت.ب, as its charts' axes write the terabyte; and in every
+language capture the flag's draw as a random selection, never with the words of drawing lots).
 
 ## Good to know
 

@@ -3,6 +3,17 @@
 // `node tests/i18n-staleness.mjs --unit mainnet/data --accept es <key> ...` from react/.
 export default {
     notices: {
+        'notice-providers-without-udp-or-ipv6': {
+            title: 'Los proveedores sin UDP o IPv6 se ofrecerán para el tráfico que transportan. Las recompensas de SN25 se cuentan como antes.',
+            paragraphs: [
+                'La sonda de calidad del operador de red carga sitios de prueba a través de cada proveedor por HTTPS (TCP), por HTTP/3 (QUIC, que funciona sobre UDP) donde un sitio lo ofrece, y por IPv6 donde las conexiones de un proveedor lo demuestran. Una comprobación solo se supera cuando se supera cada carga. Así, un proveedor que no transporta UDP, o cuyo IPv6 falla, no supera sus comprobaciones, y a los clientes se les ofrece rara vez o nunca, incluso para el tráfico que transporta. El 12 de noviembre, unos 20.700 proveedores no superaron sus comprobaciones solo por sus cargas por HTTP/3.',
+                'Un cambio que ofrece estos proveedores para el tráfico que transportan se está desplegando con la próxima versión del servidor del operador de red y las próximas versiones de las apps. Con ambas, a los clientes se les ofrece un proveedor cuyas comprobaciones fallaron solo por HTTP/3 (UDP) para tráfico TCP, y uno cuyas comprobaciones fallaron solo por IPv6 para tráfico IPv4. Los clientes nunca envían UDP a un proveedor que no lo transporta. Cada app mantiene algunos de estos proveedores junto a los habituales, y estos compiten por cada conexión TCP que pueden transportar. Las apps también recurren a ellos donde una ubicación tiene muy pocos proveedores que transporten UDP.',
+                'Solo las comprobaciones fallidas cuentan en contra de un proveedor: uno sin ninguna comprobación fallida por UDP o IPv6 se ofrece para ambos, como antes, y uno que recupera UDP o IPv6 vuelve a ofrecerse para ello en un plazo de 8 horas. Los proxies alojados del operador de red reciben el mismo cambio con su próxima versión, y las apps anteriores a estas versiones mantienen la selección anterior.',
+                'La puntuación, los pesos y los pagos de SN25 no leen ninguna de las comprobaciones de la sonda de calidad, y nada de eso cambia: las recompensas del pool se siguen repartiendo según el uso completado. Un proveedor que se ofrece para el tráfico que transporta sirve más de ese tráfico, así que gana más solo gracias a él.',
+                'Con las mismas versiones, el estado de un proveedor en las apps indica cuántas de sus comprobaciones fallaron solo por HTTP/3 (UDP), o solo por IPv6, y para qué se ofrece. No tienes que hacer nada. Un proveedor que no transporta UDP puede volver a transportarlo si se actualiza a la última versión, ya que algunas compilaciones antiguas no enrutan UDP, y si su red no bloquea UDP.',
+            ],
+            link: 'Leer el aviso completo',
+        },
         'notice-extender-pool': {
             title: 'El pool de extensores empieza con la época 8. Los bytes servidos dentro de una misma red cuentan para los extensores, no para los proveedores.',
             paragraphs: [

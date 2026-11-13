@@ -274,6 +274,13 @@ export default {
             detail: 'Die bisherigen Auszahlungen in USDC an Provider sind beendet, und es werden keine weiteren Auszahlungen in USDC gesendet. Provider-Einnahmen werden über SN25 ausgezahlt.',
             sources: [],
         },
+        'providers-without-udp-or-ipv6': {
+            title: 'Provider ohne UDP oder IPv6 werden künftig für den Verkehr angeboten, den sie transportieren',
+            detail: 'Wird mit dem nächsten Server-Release des Netzbetreibers und den nächsten App-Releases ausgerollt: Clients wird ein Provider, dessen Prüfungen durch die Qualitätsmessung nur über HTTP/3 (UDP) fehlgeschlagen sind, für TCP-Verkehr angeboten, und einer, dessen Prüfungen nur über IPv6 fehlgeschlagen sind, für IPv4-Verkehr. Bis dahin besteht ein solcher Provider seine Prüfungen nicht, und Clients wird er selten oder gar nicht angeboten, selbst für den Verkehr, den er transportiert: Am 12. November bestanden etwa 20.700 Provider ihre Prüfungen nur wegen ihrer HTTP/3-Ladevorgänge nicht. Clients werden nie UDP an einen Provider senden, der es nicht transportiert. Jede App wird einige dieser Provider neben ihren üblichen halten, sie um die TCP-Verbindungen konkurrieren lassen, die sie transportieren können, und auf sie zurückgreifen, wo ein Standort zu wenige Provider hat, die UDP transportieren. Apps von vor diesen Releases behalten die bisherige Auswahl. SN25-Bewertung, Gewichte und Auszahlungen lesen keine der Prüfungen der Qualitätsmessung und ändern sich nicht: Pool-Belohnungen werden weiterhin nach abgeschlossener Nutzung aufgeteilt, sodass diese Provider nur durch den Verkehr mehr verdienen, den sie transportieren werden.',
+            sources: [
+                'Die vollständige Mitteilung im sn-Repo',
+            ],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Claims für Epoche 5',
             detail: 'Epoche 5 endet mit Block 9.499.228, und die Claims folgen nach ihrer Anfechtungsfrist von 14.400 Blöcken. Die zurückgewonnene Finanzierung der Epochen 1 und 3 ist nicht Teil der Auszahlung von Epoche 5: Ihre Aufnahme wurde nicht rechtzeitig eingeplant (siehe die Mitteilung zu Epoche 3 oben).',

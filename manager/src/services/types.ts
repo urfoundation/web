@@ -710,7 +710,6 @@ export interface SubscriptionBalanceResponse {
   balance_byte_count: number;
   open_transfer_byte_count: number;
   current_subscription: CurrentSubscription;
-  pending_payout_usd_nano_cents: number;
   update_time: string;
   active_transfer_balances: TransferBalance[];
 }

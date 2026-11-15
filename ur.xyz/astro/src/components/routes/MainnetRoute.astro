@@ -15,11 +15,12 @@
 // around them is the section pages' exactly, so the SPA and this render are
 // pixel-identical.
 //
-// The dated notices at the top are closed to their headers, as the SPA keeps
-// them in state (Mainnet.jsx MainnetNotice): the script below opens and
-// closes the same markup without React (mainnet/notices.js wireNotices). Their
-// text is in the HTML either way, and without script the noscript style
-// shows every notice open, with nothing to tap.
+// The notice board at the top is a table of the dated notices, each closed
+// to its row (Mainnet.jsx NoticeBoard): the script below wires the same
+// markup the SPA wires from an effect (mainnet/notices.js wireNoticeBoard),
+// with the visitor's read and archived marks kept in this browser. The text
+// is in the HTML either way, and without script the noscript style shows
+// every notice open, with no buttons to press.
 import Base from '../../layouts/Base.astro';
 import DisclaimerStatic from '../DisclaimerStatic.astro';
 import NavIsland from '../../islands/NavIsland.jsx';
@@ -47,13 +48,17 @@ const summary = summaryModel(events, mainnetEpochs, { t });
 const dict = await getDict(lang);
 ---
 <Base title={t.meta.title} description={t.meta.description} breadcrumbName={t.meta.breadcrumb} lang={lang} dir={LANGS[lang]?.dir || 'ltr'}>
-    {/* without script, the notices are open and nothing offers to open them */}
+    {/* without script, the notices are open and the board offers no buttons */}
     <noscript slot="head"><style is:inline>
-        .mainnet-page .mainnet-notice .mainnet-notice-panel { grid-template-rows: 1fr; visibility: visible; }
-        .mainnet-page .mainnet-notice .mainnet-notice-more { display: none; }
-        .mainnet-page .mainnet-notice .mainnet-notice-box,
-        .mainnet-page .mainnet-notice .mainnet-notice-toggle { cursor: auto; }
-        .mainnet-page .mainnet-notice .mainnet-notice-box:hover { border-color: rgba(214, 230, 244, 0.28); border-inline-start-color: var(--brand-ur); background: rgba(214, 230, 244, 0.05); }
+        .mainnet-page .mainnet-notice .mainnet-notice-detail { display: table-row; }
+        .mainnet-page .mainnet-notices-tabs,
+        .mainnet-page .mainnet-notices-allread,
+        .mainnet-page .mainnet-notice-actions > *,
+        .mainnet-page .mainnet-notice-chevron,
+        .mainnet-page .mainnet-notices-fine { display: none; }
+        .mainnet-page .mainnet-notice-row,
+        .mainnet-page .mainnet-notice-toggle { cursor: auto; }
+        @media (max-width: 820px) { .mainnet-page .mainnet-notice .mainnet-notice-detail { display: block; } }
     </style></noscript>
     <div class="app">
         <DisclaimerStatic t={dict} />

@@ -18,7 +18,7 @@ import {
     whenParts,
 } from './mainnet/timeline';
 import { localizeActions, localizeEpochs, localizeEvents, localizeNotices } from './mainnet/copy';
-import { keepNoticeInView, noticeAt, noticeClicks } from './mainnet/notices';
+import { noticeVersion, wireNoticeBoard } from './mainnet/notices';
 import { summaryModel } from './mainnet/summary';
 import MainnetSummary from './mainnet/MainnetSummary';
 import '../RoadmapTrack.css';
@@ -43,9 +43,9 @@ const timelineCopy = await loadPageCopy('mainnet/timeline');
  * (i18n/pages/mainnet, components/pages/mainnet/copy.js); the dates,
  * statuses, figures and links are the data's in every language, and the
  * notices are newest first in every language, as the data sorts them. Apart
- * from the summary's "now" and the notices' opening and closing, it needs no
- * browser: the Astro page renders it to static HTML, and its own script opens
- * and closes the notices (mainnet/notices.js).
+ * from the summary's "now" and the notice board's state, it needs no
+ * browser: the Astro page renders it to static HTML, and its own script wires
+ * the notice board (mainnet/notices.js).
  *
  * `updated` is the day the page's content last changed (the sitemap's
  * lastmod), which only the static build knows; the SPA leaves it out.
@@ -60,7 +60,9 @@ export default function MainnetPage({ lang = 'en', updated = null, summary = nul
     const t = pageCopy(lang);
     const data = dataCopy(lang);
     const events = localizeEvents(timeline.events, timelineCopy(lang));
-    const notices = localizeNotices(mainnetNotices, data, t);
+    // each notice's version is its English's (notices.js noticeVersion), so a mark holds in every language
+    const versions = Object.fromEntries(mainnetNotices.map((notice) => [notice.id, noticeVersion(notice)]));
+    const notices = localizeNotices(mainnetNotices, data, t).map((notice) => ({ ...notice, version: versions[notice.id] }));
     const epochs = localizeEpochs(mainnetEpochs, data);
     const groups = groupByEpoch(events, epochs, {
         before: { ...mainnetBeforeEpochs, ...data.before },
@@ -71,7 +73,7 @@ export default function MainnetPage({ lang = 'en', updated = null, summary = nul
 
     return (
         <div className="mainnet-page">
-            {notices.map((notice) => <MainnetNotice key={notice.id} notice={notice} t={t} />)}
+            <NoticeBoard notices={notices} t={t} />
             <MinerActions actions={localizeActions(mainnetActions, data)} lang={lang} t={t} />
 
             <Section id="mainnet" eyebrow={t.intro.eyebrow} title={t.intro.title} headingLevel="h1">
@@ -138,71 +140,106 @@ function after(sentence, parts) {
 }
 
 /**
- * One of the dated notices above the box at the top (data/mainnet.js
- * mainnetNotices, which lists them newest first), anchored at its id, with a
- * link to its full text or to its milestone. Its date is the day it was
- * posted, as the page's language writes it (copy.js noticeDate).
+ * The notice board above the box at the top: the dated notices
+ * (data/mainnet.js mainnetNotices, newest first) as a table, a row group
+ * each, anchored at the notice's id (/mainnet#notice). A row shows the
+ * unread mark, the day it was posted (copy.js noticeDate), the title, which
+ * is the button that opens the row, and "Mark read" and "Archive"; open, the
+ * row below it holds the text and the link to the full notice.
  *
- * Closed, it shows only its header: the dateline, the title and "Expand"
- * with a chevron (mainnet/notices.js). The header is the notice's button,
- * inside its h2, an h2 under the page's single h1 like the box's headline; a
- * tap anywhere on the card opens or closes it, and the address can point at
- * it (/mainnet#notice). The text stays in the HTML, closed with CSS, and the
- * static page, which runs no React here, opens and closes the same markup
- * with its own script (notices.js wireNotices). "Expand" and "Collapse" are
- * the eye's: a screen reader hears the button's state (aria-expanded).
+ * React renders the markup only. The state (open, read, archived, the
+ * Inbox or Archived view) is attributes that one controller sets, here from
+ * an effect and on the static page from its own script
+ * (mainnet/notices.js wireNoticeBoard), so the two behave alike. Each label
+ * that changes with the state is written twice, and the CSS shows the one
+ * that applies.
  */
-function MainnetNotice({ notice, t }) {
-    const [open, setOpen] = React.useState(false);
-    // the button states aria-expanded only once script runs: the static HTML, open without script, claims no state
-    const [live, setLive] = React.useState(false);
-    const section = React.useRef(null);
-    React.useEffect(() => {
-        setLive(true);
-        const follow = () => {
-            if (noticeAt(window.location.hash) === section.current) setOpen(true);
-        };
-        follow();
-        window.addEventListener('hashchange', follow);
-        return () => window.removeEventListener('hashchange', follow);
-    }, []);
-    // the card's clicks (notices.js noticeClicks), made once: they read the state through a ref
-    const isOpen = React.useRef(open);
-    isOpen.current = open;
-    const toggle = React.useMemo(() => noticeClicks(() => {
-        if (isOpen.current) keepNoticeInView(section.current);
-        setOpen((was) => !was);
-    }), []);
+function NoticeBoard({ notices, t }) {
+    const board = React.useRef(null);
+    React.useEffect(() => wireNoticeBoard(board.current), []);
+    const b = t.noticeBoard;
+    return (
+        <section className="mainnet-notices" id="notices" aria-labelledby="notices-heading" data-view="inbox" ref={board}>
+            <div className="mainnet-notices-box">
+                <div className="mainnet-notices-bar">
+                    <h2 className="mainnet-notices-title" id="notices-heading">{b.title}</h2>
+                    <div className="mainnet-notices-tabs" role="group" aria-label={b.viewsAria}>
+                        <button type="button" className="mainnet-notices-tab" data-tab="inbox" aria-pressed="true">
+                            {b.inbox} <span className="mainnet-notices-count" data-count="inbox" />
+                        </button>
+                        <button type="button" className="mainnet-notices-tab" data-tab="archived" aria-pressed="false">
+                            {b.archived} <span className="mainnet-notices-count" data-count="archived" />
+                        </button>
+                    </div>
+                    <button type="button" className="mainnet-notices-allread" data-act="all-read">{b.markAllRead}</button>
+                </div>
+                <table className="mainnet-notices-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" className="mainnet-notices-col-dot"><span className="mainnet-visually-hidden">{b.columns.status}</span></th>
+                            <th scope="col" className="mainnet-notices-col-date">{b.columns.date}</th>
+                            <th scope="col">{b.columns.notice}</th>
+                            <th scope="col" className="mainnet-notices-col-actions"><span className="mainnet-visually-hidden">{b.columns.actions}</span></th>
+                        </tr>
+                    </thead>
+                    {notices.map((notice) => <NoticeRow key={notice.id} notice={notice} t={t} />)}
+                    <tbody className="mainnet-notices-empty" hidden>
+                        <tr>
+                            <td colSpan={4}>
+                                <span data-when-view="inbox">{b.emptyInbox}</span>
+                                <span data-when-view="archived">{b.emptyArchived}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p className="mainnet-notices-fine">{b.stored}</p>
+            </div>
+        </section>
+    );
+}
+
+/** One notice of the board: its row, and below it the row with its text. */
+function NoticeRow({ notice, t }) {
+    const b = t.noticeBoard;
     const external = isExternal(notice.link.href) ? EXTERNAL : {};
     const titleId = `${notice.id}-heading`;
     const textId = `${notice.id}-text`;
     return (
-        <section className="mainnet-notice" id={notice.id} aria-labelledby={titleId} data-open={open ? '' : undefined} ref={section}>
-            {/* the card answers a tap; its button is the control for the keyboard and a screen reader */}
-            <div className="mainnet-notice-box" role="note" onClick={toggle}>
-                <h2 className="mainnet-notice-heading">
-                    <button type="button" className="mainnet-notice-toggle" aria-expanded={live ? open : undefined} aria-controls={textId}>
-                        <span className="mainnet-notice-date">{runs(t.noticeDate, { date: notice.dateText })}</span>
+        <tbody className="mainnet-notice" id={notice.id} data-version={notice.version}>
+            <tr className="mainnet-notice-row">
+                <td className="mainnet-notice-dot">
+                    <span className="mainnet-notice-mark" aria-hidden="true" />
+                    <span className="mainnet-visually-hidden" data-when="unread">{b.unread}</span>
+                </td>
+                <td className="mainnet-notice-date">{notice.dateText}</td>
+                <th scope="row" className="mainnet-notice-cell">
+                    <button type="button" className="mainnet-notice-toggle" aria-controls={textId}>
                         <span className="mainnet-notice-title" id={titleId}>{notice.title}</span>
-                        <span className="mainnet-notice-more" aria-hidden="true" data-nosnippet="">
-                            <span className="mainnet-notice-more-label" data-shows="closed">{t.noticeToggle.expand}</span>
-                            <span className="mainnet-notice-more-label" data-shows="open">{t.noticeToggle.collapse}</span>
-                            <svg className="mainnet-notice-chevron" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
-                                <path d="M2.5 4.25 6 7.75l3.5-3.5" />
-                            </svg>
-                        </span>
+                        <svg className="mainnet-notice-chevron" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                            <path d="M2.5 4.5 6 8l3.5-3.5" />
+                        </svg>
                     </button>
-                </h2>
-                <div className="mainnet-notice-panel" id={textId}>
-                    <div className="mainnet-notice-clip">
-                        <div className="mainnet-notice-text">
-                            {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
-                            <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>
-                        </div>
+                </th>
+                <td className="mainnet-notice-actions">
+                    <button type="button" className="mainnet-notice-act" data-act="read" aria-describedby={titleId}>
+                        <span data-when="unread">{b.markRead}</span>
+                        <span data-when="read">{b.markUnread}</span>
+                    </button>
+                    <button type="button" className="mainnet-notice-act" data-act="archive" aria-describedby={titleId}>
+                        <span data-when="inbox">{b.archive}</span>
+                        <span data-when="archived">{b.restore}</span>
+                    </button>
+                </td>
+            </tr>
+            <tr className="mainnet-notice-detail" id={textId}>
+                <td colSpan={4}>
+                    <div className="mainnet-notice-text">
+                        {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
+                        <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>
                     </div>
-                </div>
-            </div>
-        </section>
+                </td>
+            </tr>
+        </tbody>
     );
 }
 

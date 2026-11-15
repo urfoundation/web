@@ -42,7 +42,22 @@ export default {
     },
 
     noticeDate: 'Mitteilung · {date}',
-    noticeToggle: { expand: 'Aufklappen', collapse: 'Zuklappen' },
+    noticeBoard: {
+        title: 'Mitteilungen',
+        viewsAria: 'Mitteilungsansichten',
+        inbox: 'Posteingang',
+        archived: 'Archiviert',
+        markAllRead: 'Alle als gelesen markieren',
+        markRead: 'Als gelesen markieren',
+        markUnread: 'Als ungelesen markieren',
+        archive: 'Archivieren',
+        restore: 'Wiederherstellen',
+        unread: 'Ungelesen',
+        columns: { status: 'Status', date: 'Datum', notice: 'Mitteilung', actions: 'Aktionen' },
+        emptyInbox: 'Keine Mitteilungen im Posteingang.',
+        emptyArchived: 'Keine archivierten Mitteilungen.',
+        stored: 'Gelesene und archivierte Mitteilungen werden nur in diesem Browser gespeichert.',
+    },
 
     labels: {
         status: { done: 'Erledigt', in_progress: 'Läuft', scheduled: 'Angesetzt', planned: 'Geplant' },

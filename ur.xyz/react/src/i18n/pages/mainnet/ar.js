@@ -46,7 +46,22 @@ export default {
     },
 
     noticeDate: 'إشعار · {date}',
-    noticeToggle: { expand: 'توسيع', collapse: 'طيّ' },
+    noticeBoard: {
+        title: 'الإشعارات',
+        viewsAria: 'عروض الإشعارات',
+        inbox: 'الوارد',
+        archived: 'المؤرشفة',
+        markAllRead: 'تعليم الكل كمقروء',
+        markRead: 'تعليم كمقروء',
+        markUnread: 'تعليم كغير مقروء',
+        archive: 'أرشفة',
+        restore: 'استعادة',
+        unread: 'غير مقروء',
+        columns: { status: 'الحالة', date: 'التاريخ', notice: 'الإشعار', actions: 'الإجراءات' },
+        emptyInbox: 'لا توجد إشعارات في الوارد.',
+        emptyArchived: 'لا توجد إشعارات مؤرشفة.',
+        stored: 'تُحفظ الإشعارات المقروءة والمؤرشفة في هذا المتصفح فقط.',
+    },
 
     labels: {
         status: { done: 'مكتمل', in_progress: 'قيد التنفيذ', scheduled: 'مُجدول', planned: 'مُخطط' },

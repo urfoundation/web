@@ -39,48 +39,91 @@
 .mainnet-page .mainnet-actions-closing a:hover { color: var(--brand-white); }
 .mainnet-page .mainnet-actions a:focus-visible { outline: 2px solid var(--brand-ur); outline-offset: 3px; }
 
-/* the dated notices above the actions: pale blue, with the token's pink edge;
-   the first takes the actions' top padding, and each after it, like the
-   actions, sits close under the one before.
-   Each is closed to its header until opened (Mainnet.jsx MainnetNotice,
-   mainnet/notices.js): the header is the card's button, the dateline with
-   "Expand" or "Collapse" and a chevron at its end, over the title, and the
-   whole card answers a tap. The text stays in the HTML: its row of the panel
-   grows from 0fr to 1fr, and it is hidden once closed, so its link takes no
-   focus and a screen reader skips it. Without script every notice is open
-   (the static route's noscript style), and in print too. */
-.mainnet-page .mainnet-notice { padding: 88px var(--content-gutter) 0; }
-.mainnet-page .mainnet-notice + .mainnet-notice,
-.mainnet-page .mainnet-notice + .mainnet-actions { padding-top: 24px; }
-.mainnet-page .mainnet-notice-box { position: relative; max-width: var(--content-width); margin: 0 auto; border: 1px solid rgba(214, 230, 244, 0.28); border-inline-start: 3px solid var(--brand-ur); background: rgba(214, 230, 244, 0.05); cursor: pointer; scroll-margin-top: calc(var(--nav-height) + 16px); transition: background-color 0.2s ease, border-color 0.2s ease; }
-.mainnet-page .mainnet-notice-heading { margin: 0; font: inherit; }
-.mainnet-page .mainnet-notice-toggle { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'date more' 'title title'; align-items: baseline; gap: 0 20px; width: 100%; margin: 0; padding: 24px 32px 22px; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-/* the focus ring goes round the whole card, the button's reach */
-.mainnet-page .mainnet-notice-toggle:focus-visible { outline: none; }
-.mainnet-page .mainnet-notice-toggle:focus-visible::after { content: ''; position: absolute; inset: -1px; inset-inline-start: -3px; outline: 2px solid var(--brand-ur); outline-offset: 3px; pointer-events: none; }
-.mainnet-page .mainnet-notice-date { grid-area: date; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; line-height: 1.4; text-transform: uppercase; color: var(--brand-ur); }
-.mainnet-page .mainnet-notice-title { grid-area: title; margin: 10px 0 0; font-family: 'PPNeueMontreal', sans-serif; font-size: clamp(1.35rem, 2.6vw, 1.7rem); font-weight: 500; line-height: 1.25; color: var(--brand-white); }
-.mainnet-page .mainnet-notice-more { grid-area: more; display: inline-flex; align-items: center; gap: 8px; justify-self: end; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; line-height: 1.4; text-transform: uppercase; white-space: nowrap; color: var(--brand-ui); transition: color 0.2s ease; }
-.mainnet-page .mainnet-notice[data-open] .mainnet-notice-more-label[data-shows="closed"],
-.mainnet-page .mainnet-notice:not([data-open]) .mainnet-notice-more-label[data-shows="open"] { display: none; }
-.mainnet-page .mainnet-notice-chevron { flex: none; width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
-.mainnet-page .mainnet-notice[data-open] .mainnet-notice-chevron { transform: rotate(180deg); }
+/* the notice board above the actions (Mainnet.jsx NoticeBoard,
+   mainnet/notices.js): the dated notices as a table, in a box with the
+   token's pink edge. A bar on top holds the title, the Inbox and Archived
+   tabs with their counts, and "Mark all read". Each notice is a row group:
+   its row (the unread mark, the date, the title, which opens it, and its
+   buttons) and below it the row with its text, shown once open. The state is
+   attributes: the board's data-view and data-live, a notice's data-open,
+   data-read and data-archived. Without script every notice is open and the
+   buttons are hidden (the static route's noscript style), and in print too. */
+.mainnet-page .mainnet-notices { padding: 88px var(--content-gutter) 0; }
+.mainnet-page .mainnet-notices + .mainnet-actions { padding-top: 24px; }
+.mainnet-page .mainnet-notices-box { max-width: var(--content-width); margin: 0 auto; border: 1px solid rgba(214, 230, 244, 0.28); border-inline-start: 3px solid var(--brand-ur); background: rgba(214, 230, 244, 0.05); }
+.mainnet-page .mainnet-notices-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 18px 24px; border-bottom: 1px solid rgba(214, 230, 244, 0.14); }
+.mainnet-page .mainnet-notices-title { margin: 0; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; line-height: 1.4; text-transform: uppercase; color: var(--brand-ur); }
+.mainnet-page .mainnet-notices-tabs { display: inline-flex; gap: 4px; }
+.mainnet-page .mainnet-notices-tab,
+.mainnet-page .mainnet-notices-allread,
+.mainnet-page .mainnet-notice-act { margin: 0; border: 1px solid rgba(214, 230, 244, 0.22); border-radius: 0; background: none; color: var(--brand-ui); font: inherit; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; line-height: 1.4; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease; }
+.mainnet-page .mainnet-notices-tab { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; }
+.mainnet-page .mainnet-notices-tab[aria-pressed="true"] { border-color: var(--brand-ur); color: var(--brand-white); background: rgba(214, 230, 244, 0.06); }
+.mainnet-page .mainnet-notices-count:empty { display: none; }
+.mainnet-page .mainnet-notices-count { min-width: 18px; padding: 1px 5px; background: var(--brand-ur); color: #0b0b0d; font-size: 0.68rem; letter-spacing: 0; text-align: center; }
+.mainnet-page .mainnet-notices-tab[data-tab="archived"] .mainnet-notices-count { background: rgba(214, 230, 244, 0.22); color: var(--brand-white); }
+.mainnet-page .mainnet-notices-allread { margin-inline-start: auto; padding: 6px 12px; }
+.mainnet-page .mainnet-notices-allread:disabled { opacity: 0.4; cursor: default; }
+.mainnet-page .mainnet-notice-act { padding: 4px 9px; font-size: 0.66rem; }
 @media (hover: hover) {
-    .mainnet-page .mainnet-notice-box:hover { border-color: rgba(214, 230, 244, 0.42); border-inline-start-color: var(--brand-ur); background: rgba(214, 230, 244, 0.075); }
-    .mainnet-page .mainnet-notice-box:hover .mainnet-notice-more { color: var(--brand-white); }
+    .mainnet-page .mainnet-notices-tab:hover,
+    .mainnet-page .mainnet-notices-allread:not(:disabled):hover,
+    .mainnet-page .mainnet-notice-act:hover { color: var(--brand-white); border-color: rgba(214, 230, 244, 0.5); }
+    .mainnet-page .mainnet-notice-row:hover { background: rgba(214, 230, 244, 0.04); }
 }
-.mainnet-page .mainnet-notice-panel { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 0.32s cubic-bezier(0.2, 0, 0, 1), visibility 0s linear 0.32s; }
-.mainnet-page .mainnet-notice[data-open] .mainnet-notice-panel { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
-.mainnet-page .mainnet-notice-clip { min-height: 0; overflow: hidden; }
-.mainnet-page .mainnet-notice-text { padding: 0 32px 22px; }
-.mainnet-page .mainnet-notice-body { margin: 12px 0 0; font-size: 1.02rem; line-height: 1.6; color: var(--brand-ui); }
+.mainnet-page .mainnet-notices button:focus-visible { outline: 2px solid var(--brand-ur); outline-offset: 2px; }
+
+.mainnet-page .mainnet-notices-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.mainnet-page .mainnet-notices-table thead th { padding: 10px 12px; border-bottom: 1px solid rgba(214, 230, 244, 0.14); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.16em; line-height: 1.4; text-align: start; text-transform: uppercase; color: var(--brand-ui); opacity: 0.75; }
+.mainnet-page .mainnet-notices-col-dot { width: 36px; }
+.mainnet-page .mainnet-notices-col-date { width: 160px; }
+.mainnet-page .mainnet-notices-col-actions { width: 210px; }
+.mainnet-page .mainnet-notice { scroll-margin-top: calc(var(--nav-height) + 16px); }
+.mainnet-page .mainnet-notice + .mainnet-notice .mainnet-notice-row > * { border-top: 1px solid rgba(214, 230, 244, 0.1); }
+.mainnet-page .mainnet-notice-row { cursor: pointer; transition: background-color 0.2s ease; }
+.mainnet-page .mainnet-notice-row > * { padding: 14px 12px; vertical-align: baseline; }
+.mainnet-page .mainnet-notice-dot { padding-inline-start: 20px !important; padding-inline-end: 0 !important; }
+.mainnet-page .mainnet-notice-mark { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--brand-ur); }
+.mainnet-page .mainnet-notice[data-read] .mainnet-notice-mark { background: none; box-shadow: inset 0 0 0 1px rgba(214, 230, 244, 0.3); }
+.mainnet-page .mainnet-notice-date { font-size: 0.8rem; line-height: 1.5; white-space: nowrap; color: var(--brand-ui); font-variant-numeric: tabular-nums; }
+.mainnet-page .mainnet-notice-cell { font-weight: inherit; text-align: start; }
+.mainnet-page .mainnet-notice-toggle { display: inline-flex; align-items: baseline; gap: 10px; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.mainnet-page .mainnet-notice-title { font-family: 'PPNeueMontreal', sans-serif; font-size: 1.02rem; font-weight: 500; line-height: 1.4; color: var(--brand-white); }
+.mainnet-page .mainnet-notice[data-read] .mainnet-notice-title { font-weight: 400; color: var(--brand-ui); }
+.mainnet-page .mainnet-notice-chevron { flex: none; width: 12px; height: 12px; fill: none; stroke: var(--brand-ui); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+.mainnet-page .mainnet-notice[data-open] .mainnet-notice-chevron { transform: rotate(180deg); }
+.mainnet-page .mainnet-notice-actions { text-align: end; white-space: nowrap; }
+.mainnet-page .mainnet-notice-act + .mainnet-notice-act { margin-inline-start: 6px; }
+
+/* a label written twice shows the one that applies */
+.mainnet-page .mainnet-notice[data-read] [data-when="unread"],
+.mainnet-page .mainnet-notice:not([data-read]) [data-when="read"],
+.mainnet-page .mainnet-notice[data-archived] [data-when="inbox"],
+.mainnet-page .mainnet-notice:not([data-archived]) [data-when="archived"],
+.mainnet-page .mainnet-notices[data-view="inbox"] [data-when-view="archived"],
+.mainnet-page .mainnet-notices[data-view="archived"] [data-when-view="inbox"] { display: none; }
+/* an archived notice can't be marked unread from the Archived view: restore it first */
+.mainnet-page .mainnet-notice[data-archived] [data-act="read"] { display: none; }
+/* once script runs, each view shows its own notices */
+.mainnet-page .mainnet-notices[data-live][data-view="inbox"] .mainnet-notice[data-archived],
+.mainnet-page .mainnet-notices[data-live][data-view="archived"] .mainnet-notice:not([data-archived]) { display: none; }
+
+.mainnet-page .mainnet-notice-detail { display: none; }
+.mainnet-page .mainnet-notice[data-open] .mainnet-notice-detail { display: table-row; }
+.mainnet-page .mainnet-notice-detail > td { padding: 0 24px 22px calc(36px + 12px); }
+.mainnet-page .mainnet-notice-text { max-width: 760px; }
+.mainnet-page .mainnet-notice-body { margin: 12px 0 0; font-size: 0.98rem; line-height: 1.6; color: var(--brand-ui); }
 .mainnet-page .mainnet-notice-body:first-child { margin-top: 0; }
 .mainnet-page .mainnet-notice-link { display: inline-block; margin-top: 14px; font-size: 0.85rem; line-height: 1.45; letter-spacing: 0.02em; color: var(--brand-ur); }
 .mainnet-page .mainnet-notice-link:hover { color: var(--brand-white); }
 .mainnet-page .mainnet-notice a:focus-visible { outline: 2px solid var(--brand-ur); outline-offset: 3px; }
+.mainnet-page .mainnet-notices-empty td { padding: 28px 24px; font-size: 0.92rem; color: var(--brand-ui); text-align: center; }
+.mainnet-page .mainnet-notices-fine { margin: 0; padding: 10px 24px 12px; border-top: 1px solid rgba(214, 230, 244, 0.1); font-size: 0.74rem; line-height: 1.5; color: var(--brand-ui); opacity: 0.7; }
 @media print {
-    .mainnet-page .mainnet-notice .mainnet-notice-panel { grid-template-rows: 1fr; visibility: visible; }
-    .mainnet-page .mainnet-notice .mainnet-notice-more { display: none; }
+    .mainnet-page .mainnet-notice .mainnet-notice-detail { display: table-row; }
+    .mainnet-page .mainnet-notices-bar > :not(.mainnet-notices-title),
+    .mainnet-page .mainnet-notice-actions > *,
+    .mainnet-page .mainnet-notices-fine { display: none; }
 }
 
 .mainnet-page #mainnet { border-top: 0; padding-top: 88px; padding-bottom: 72px; }
@@ -246,9 +289,24 @@
 
 @media (max-width: 820px) {
     .mainnet-page .mainnet-actions { padding-top: 72px; }
-    .mainnet-page .mainnet-notice { padding-top: 72px; }
-    .mainnet-page .mainnet-notice + .mainnet-notice,
-    .mainnet-page .mainnet-notice + .mainnet-actions { padding-top: 20px; }
+    .mainnet-page .mainnet-notices { padding-top: 72px; }
+    .mainnet-page .mainnet-notices + .mainnet-actions { padding-top: 20px; }
+    /* the table as stacked rows: the mark and date, then the title, then the buttons */
+    .mainnet-page .mainnet-notices-table,
+    .mainnet-page .mainnet-notices-table tbody { display: block; }
+    .mainnet-page .mainnet-notices-table thead { display: none; }
+    .mainnet-page .mainnet-notice-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); grid-template-areas: 'dot date' '. title' '. actions'; padding: 14px 18px 14px 0; }
+    .mainnet-page .mainnet-notice + .mainnet-notice .mainnet-notice-row > * { border-top: 0; }
+    .mainnet-page .mainnet-notice + .mainnet-notice .mainnet-notice-row { border-top: 1px solid rgba(214, 230, 244, 0.1); }
+    .mainnet-page .mainnet-notice-row > * { padding: 0; }
+    .mainnet-page .mainnet-notice-dot { grid-area: dot; padding-inline-start: 16px !important; }
+    .mainnet-page .mainnet-notice-date { grid-area: date; font-size: 0.74rem; }
+    .mainnet-page .mainnet-notice-cell { grid-area: title; margin-top: 4px; }
+    .mainnet-page .mainnet-notice-actions { grid-area: actions; margin-top: 10px; text-align: start; }
+    .mainnet-page .mainnet-notice[data-open] .mainnet-notice-detail { display: block; }
+    .mainnet-page .mainnet-notice-detail > td { display: block; padding: 0 18px 18px 28px; }
+    .mainnet-page .mainnet-notices-empty tr,
+    .mainnet-page .mainnet-notices-empty td { display: block; }
     .mainnet-page #mainnet { padding-top: 64px; padding-bottom: 52px; }
     .mainnet-page #settlement { padding-top: 52px; padding-bottom: 52px; }
     .mainnet-page #milestones { padding-top: 52px; }
@@ -259,11 +317,8 @@
 
 @media (max-width: 520px) {
     .mainnet-page .mainnet-actions-box { padding: 22px 18px 20px; }
-    /* the notice's header in one column: "Expand" goes under the title */
-    .mainnet-page .mainnet-notice-toggle { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'date' 'title' 'more'; padding: 18px 18px 16px; }
-    .mainnet-page .mainnet-notice-more { justify-self: start; margin-top: 12px; }
-    .mainnet-page .mainnet-notice-text { padding: 0 18px 16px; }
-    .mainnet-page .mainnet-notice-body { font-size: 0.98rem; }
+    .mainnet-page .mainnet-notices-bar { padding: 14px 16px; }
+    .mainnet-page .mainnet-notices-allread { margin-inline-start: 0; }
     .mainnet-page .mainnet-actions-steps li { grid-template-columns: 32px minmax(0, 1fr); gap: 0 8px; }
     .mainnet-page .mainnet-actions-step p,
     .mainnet-page .mainnet-actions-closing { font-size: 0.98rem; }
@@ -339,11 +394,11 @@
 .mainnet-page:lang(ar) * { letter-spacing: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-    .mainnet-page .mainnet-notice-box,
-    .mainnet-page .mainnet-notice-more,
+    .mainnet-page .mainnet-notice-row,
     .mainnet-page .mainnet-notice-chevron,
-    .mainnet-page .mainnet-notice-panel,
-    .mainnet-page .mainnet-notice[data-open] .mainnet-notice-panel,
+    .mainnet-page .mainnet-notices-tab,
+    .mainnet-page .mainnet-notices-allread,
+    .mainnet-page .mainnet-notice-act,
     .mainnet-page .mainnet-epochs li > a,
     .mainnet-page .mainnet-epoch-days,
     .mainnet-page .mainnet-sources-more > summary::before,

@@ -53,8 +53,25 @@ export default {
     // a notice's dateline: {date}, the day it was posted (dates.long)
     noticeDate: 'Notice · {date}',
 
-    // a notice's header is its button: what a tap does, beside its chevron (closed, then open)
-    noticeToggle: { expand: 'Expand', collapse: 'Collapse' },
+    // the notice board at the top: its title, the views (tabs) and their group's name, a row's buttons
+    // (each written for both states), the unread mark's spoken name, the column heads, the empty views,
+    // and the line under the table saying where the marks are kept
+    noticeBoard: {
+        title: 'Notices',
+        viewsAria: 'Notice views',
+        inbox: 'Inbox',
+        archived: 'Archived',
+        markAllRead: 'Mark all read',
+        markRead: 'Mark read',
+        markUnread: 'Mark unread',
+        archive: 'Archive',
+        restore: 'Restore',
+        unread: 'Unread',
+        columns: { status: 'Status', date: 'Date', notice: 'Notice', actions: 'Actions' },
+        emptyInbox: 'No notices in your inbox.',
+        emptyArchived: 'No archived notices.',
+        stored: 'Read and archived notices are kept in this browser only.',
+    },
 
     labels: {
         // a milestone's status, in the pill beside its date

@@ -42,7 +42,22 @@ export default {
     },
 
     noticeDate: '通知 · {date}',
-    noticeToggle: { expand: '展开', collapse: '收起' },
+    noticeBoard: {
+        title: '通知',
+        viewsAria: '通知视图',
+        inbox: '收件箱',
+        archived: '已归档',
+        markAllRead: '全部标为已读',
+        markRead: '标为已读',
+        markUnread: '标为未读',
+        archive: '归档',
+        restore: '恢复',
+        unread: '未读',
+        columns: { status: '状态', date: '日期', notice: '通知', actions: '操作' },
+        emptyInbox: '收件箱中没有通知。',
+        emptyArchived: '没有已归档的通知。',
+        stored: '已读和归档状态仅保存在此浏览器中。',
+    },
 
     labels: {
         status: { done: '已完成', in_progress: '进行中', scheduled: '已排定', planned: '计划中' },

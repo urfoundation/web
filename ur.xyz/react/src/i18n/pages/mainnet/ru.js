@@ -43,7 +43,22 @@ export default {
     },
 
     noticeDate: 'Уведомление · {date}',
-    noticeToggle: { expand: 'Развернуть', collapse: 'Свернуть' },
+    noticeBoard: {
+        title: 'Уведомления',
+        viewsAria: 'Разделы уведомлений',
+        inbox: 'Входящие',
+        archived: 'Архив',
+        markAllRead: 'Прочитать все',
+        markRead: 'Прочитано',
+        markUnread: 'Не прочитано',
+        archive: 'В архив',
+        restore: 'Вернуть',
+        unread: 'Не прочитано',
+        columns: { status: 'Статус', date: 'Дата', notice: 'Уведомление', actions: 'Действия' },
+        emptyInbox: 'Во входящих нет уведомлений.',
+        emptyArchived: 'В архиве нет уведомлений.',
+        stored: 'Отметки о прочтении и архиве хранятся только в этом браузере.',
+    },
 
     labels: {
         status: { done: 'Выполнено', in_progress: 'В процессе', scheduled: 'Назначено', planned: 'Планируется' },

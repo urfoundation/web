@@ -55,7 +55,7 @@ test('the file has the explorers and the events, and nothing else', () => {
 test('every milestone has a unique id, a readable date, a known status, a title and a detail', () => {
     const ids = new Set();
     // ids the page itself uses: the notices (with their titles and texts), the sections and the epoch groups
-    const reserved = new Set([...mainnetNotices.flatMap((n) => [n.id, `${n.id}-heading`, `${n.id}-text`]), 'actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
+    const reserved = new Set([...mainnetNotices.flatMap((n) => [n.id, `${n.id}-heading`, `${n.id}-text`]), 'notices', 'notices-heading', 'actions', 'mainnet', 'settlement', 'milestones', 'before-launch', ...mainnetEpochs.map((e) => `epoch-${e.number}`), `after-epoch-${mainnetEpochs.at(-1).number}`]);
     for (const event of events) {
         const fields = Object.keys(event).filter((key) => key !== 'approximate' && key !== 'key').sort();
         assert.deepEqual(fields, ['date', 'detail', 'id', 'sources', 'status', 'title'], `${event.id}: fields`);

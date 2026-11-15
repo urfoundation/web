@@ -43,7 +43,22 @@ export default {
     },
 
     noticeDate: 'Aviso · {date}',
-    noticeToggle: { expand: 'Expandir', collapse: 'Contraer' },
+    noticeBoard: {
+        title: 'Avisos',
+        viewsAria: 'Vistas de avisos',
+        inbox: 'Bandeja de entrada',
+        archived: 'Archivados',
+        markAllRead: 'Marcar todo como leído',
+        markRead: 'Marcar como leído',
+        markUnread: 'Marcar como no leído',
+        archive: 'Archivar',
+        restore: 'Restaurar',
+        unread: 'No leído',
+        columns: { status: 'Estado', date: 'Fecha', notice: 'Aviso', actions: 'Acciones' },
+        emptyInbox: 'No hay avisos en la bandeja de entrada.',
+        emptyArchived: 'No hay avisos archivados.',
+        stored: 'Los avisos leídos y archivados se guardan solo en este navegador.',
+    },
 
     labels: {
         status: { done: 'Hecho', in_progress: 'En curso', scheduled: 'Programado', planned: 'Previsto' },

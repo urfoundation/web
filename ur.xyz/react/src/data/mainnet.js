@@ -233,6 +233,19 @@ const NOTICES = [
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-providers-without-udp-or-ipv6.md' },
     },
+    {
+        id: 'notice-extender-webrtc-relay-share',
+        date: 'November 16, 2026',
+        title: 'Extenders reached only over WebRTC earn their share only on contracts they relay. Devices that share their address are not relayed.',
+        paragraphs: [
+            "From the network operator's first server release after November 16, an extender that can be reached only over WebRTC is one of a contract's hops, and earns its share of the contract's usage, only when the contract's device also holds a connection to the platform that does not come through that extender. This follows the subnet owner's rule of November 11: only contracts actually relayed through an extender earn its share.",
+            "WebRTC lets a host behind a home router or a carrier-grade NAT relay. A device reaches such an extender only by signaling it through the device's own connection to the platform, so every device it relays holds a connection that does not come through it. A device behind the same router or NAT as the extender holds none: it connects to the platform directly, from the address it shares with the extender.",
+            "So such a device no longer makes the extender a hop, and its provider is credited the whole of the contract's usage, where the extender was credited a share of it, usually half. On November 16, one such extender was a hop on every contract of 84 devices of two other networks behind its address, none of which held a connection anywhere else. A device the extender relays keeps it as one of its contracts' hops, as before.",
+            "Extenders that can be reached over TCP, QUIC or DNS are judged as before. Contracts created before the release keep their hops.",
+            "SN25 pool rewards are still split by completed usage, and the network operator's provider subsidy, which for traffic since the October 6 cutoff only counts toward the weekly points it awards, follows the same hops. There is nothing you need to do.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-16-webrtc-extender-relay-share.md' },
+    },
 ];
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

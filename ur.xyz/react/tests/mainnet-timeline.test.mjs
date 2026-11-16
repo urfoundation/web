@@ -723,12 +723,69 @@ test('providers without UDP or IPv6: a milestone and a notice as the next releas
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
+test('extenders reached only over WebRTC: a milestone and a notice as the next server release rolls it out, with SN25 rewards still split by completed usage', () => {
+    // the network operator's server change of November 16 (server ff4b49d56, the merge 6bef7cf29 of
+    // fix/extender-signaled-relay-tag-1116: model contractExtenderInsertSql), which the release of November 16
+    // does not carry: the note is worded to be true from the first server release after it, and says the
+    // change is rolling out, never that it is live
+    const milestone = events.find((e) => e.id === 'extender-webrtc-relay-share');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'in_progress');
+    assert.equal(milestone.approximate, undefined);
+    assert.equal(milestone.date, '2026-11-16');
+    assert.equal(whenText(parseWhen(milestone.date), { approxStart: isApproximate(milestone) }), 'Mon Nov 16');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-6');
+    assert.equal(milestone.key, undefined);
+    // in date order: after epoch 5's claims, before capture the flag's presence sampling
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('epoch-5-claims-with-recovery') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-presence-sampling'));
+    // the full text in the sn repo, on its main branch (sn 5236bf40), named by the day the note was posted
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-16-webrtc-extender-relay-share.md';
+    assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
+    assert.equal(milestone.title, 'Extenders reached only over WebRTC earn their share only on contracts they relay');
+    assert.ok(milestone.detail.startsWith("Rolling out with the network operator's first server release after November 16: an extender that can be reached only over WebRTC is one of a contract's hops, and earns its share of the contract's usage, only when the contract's device also holds a connection to the platform that does not come through that extender. "));
+    // why the rule holds: the WebRTC carrier signals through the dialer's own connection (connect EXTENDER.md S8)
+    assert.match(milestone.detail, / A device reaches such an extender only by signaling it through its own connection to the platform, so every device it relays holds one, while a device behind the same router or carrier-grade NAT connects directly from the address it shares with the extender and holds none\. /);
+    assert.match(milestone.detail, / Those devices no longer make the extender a hop, so their providers are credited the whole of their contracts' usage, where the extender was credited a share of it\. /);
+    // the case that was measured on Main on November 16
+    assert.match(milestone.detail, / On November 16, one such extender was a hop on every contract of 84 devices of two other networks behind its address\. /);
+    assert.match(milestone.detail, / Extenders that can be reached over TCP, QUIC or DNS are judged as before, contracts created before the release keep their hops, and SN25 pool rewards are still split by completed usage\.$/);
+
+    const notice = mainnetNotices.find((n) => n.id === 'notice-extender-webrtc-relay-share');
+    assert.ok(notice, 'the notice is listed');
+    // posted the day of the milestone
+    assert.equal(notice.date, 'November 16, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 16));
+    assert.equal(notice.title, 'Extenders reached only over WebRTC earn their share only on contracts they relay. Devices that share their address are not relayed.');
+    assert.equal(notice.paragraphs.length, 5);
+    const [rule, why, effect, unchanged, sn25] = notice.paragraphs;
+    assert.ok(rule.startsWith("From the network operator's first server release after November 16, an extender that can be reached only over WebRTC is one of a contract's hops, and earns its share of the contract's usage, only when the contract's device also holds a connection to the platform that does not come through that extender. "));
+    assert.match(rule, / This follows the subnet owner's rule of November 11: only contracts actually relayed through an extender earn its share\.$/);
+    assert.match(why, /^WebRTC lets a host behind a home router or a carrier-grade NAT relay\. A device reaches such an extender only by signaling it through the device's own connection to the platform, /);
+    assert.match(why, / A device behind the same router or NAT as the extender holds none: it connects to the platform directly, from the address it shares with the extender\.$/);
+    assert.match(effect, /^So such a device no longer makes the extender a hop, and its provider is credited the whole of the contract's usage, where the extender was credited a share of it, usually half\. /);
+    assert.match(effect, / On November 16, one such extender was a hop on every contract of 84 devices of two other networks behind its address, none of which held a connection anywhere else\. /);
+    assert.match(effect, / A device the extender relays keeps it as one of its contracts' hops, as before\.$/);
+    assert.equal(unchanged, 'Extenders that can be reached over TCP, QUIC or DNS are judged as before. Contracts created before the release keep their hops.');
+    assert.match(sn25, /^SN25 pool rewards are still split by completed usage, /);
+    assert.match(sn25, / There is nothing you need to do\.$/);
+    // rolling out, never live, and the release of November 16 does not carry it: nothing says it is in effect,
+    // names a release day, or gives a figure of a reward
+    const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
+    assert.doesNotMatch(words, /\blive\b|\bnow (?:in effect|takes? effect|credited)\b|\breleases? of November\b|\bsince November 1[6-7]\b|\d\s?%|\$\s?\d|\bGB\b|\bMB\b|\d\s?α|\balpha\b/i);
+    // its full text is in the sn repo, as the milestone's is
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+});
+
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the providers without UDP or IPv6,
-    // of November 13, then the extender pool and the extenders' share, both of November 12, then capture the
-    // flag and Pro data, both of November 11, the later-posted first, then epoch 3's of October 31. The data
-    // lists them in the order they were posted, the other way round, so this order is the sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): the share of extenders reached only
+    // over WebRTC, of November 16, then the providers without UDP or IPv6, of November 13, then the extender
+    // pool and the extenders' share, both of November 12, then capture the flag and Pro data, both of November
+    // 11, the later-posted first, then epoch 3's of October 31. The data lists them in the order they were
+    // posted, the other way round, so this order is the sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
+        ['notice-extender-webrtc-relay-share', 'November 16, 2026'],
         ['notice-providers-without-udp-or-ipv6', 'November 13, 2026'],
         ['notice-extender-pool', 'November 12, 2026'],
         ['notice-extender-relay-share', 'November 12, 2026'],
@@ -756,7 +813,7 @@ test('the notices at the top run newest first, by the day each was posted', () =
         assert.ok(Number.isNaN(noticeDay(posted('x', date))), `"${date}" should not read`);
         assert.throws(() => newestFirst([posted('x', date)]), /is not a day such as "November 11, 2026"/, `"${date}"`);
     }
-    // with six notices at the top, the milestones and the box name the one they point to
+    // with seven notices at the top, the milestones and the box name the one they point to
     const pointers = [...events.map((e) => e.detail), ...mainnetActions.steps.map((s) => s.detail)];
     for (const text of pointers) assert.doesNotMatch(text, /\bthe notice at the top\b/);
     assert.equal(pointers.filter((text) => text.includes('the epoch 3 notice at the top')).length, 7);

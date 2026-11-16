@@ -464,11 +464,13 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     assert.match(pool.detail, / a provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one, and the share goes to the extender pool, while the contract's other hops keep theirs\. /);
     assert.match(pool.detail, / Only traffic that a data balance funded counts, never the network operator's own measurement and test traffic, and same-network credit earned before epoch 8 is kept\. /);
     // with no eligible extender, Z is dropped (decision 4)
-    assert.match(pool.detail, /so extenders earn at most half of a pool; with no eligible extender, it is dropped\. /);
+    assert.match(pool.detail, /so extenders earn at most half of a pool; with no eligible extender, it is dropped, and with none that relayed, all of it goes by block\. /);
+    // half by block and half by relay bytes, the subnet owner's decision of November 16 (sn WHITEPAPER.md §8.6.8, decision 17)
+    assert.match(pool.detail, / Each operator's pool spreads half of it evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, and the other half over the eligible extenders in proportion to the bytes each relayed in the epoch, as the subnet owner decided on November 16, /);
     // who counts: E1, E4, E5 and E3
     assert.match(pool.detail, / An extender is eligible when, at the end of the epoch, it is active with at least one address that passes the operator's five-minute challenge, has a payout wallet, is not bound to a top-level miner's fleet and is not on one of the operator's own networks, and records that share a provider client, an IPv4 address or an IPv6 \/64 count once\. /);
     // what is published (§8.6.4): the header's component, never an address, statement v2, and the shadow runs of epochs 6 and 7
-    assert.match(pool.detail, / each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(pool.detail, / each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, the bytes each relayed, and their shares, /);
     assert.match(pool.detail, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\. /);
     // not a key milestone: on the summary, capture the flag marks epoch 8's first block (tests/mainnet-summary.test.mjs)
     assert.equal(pool.key, undefined);
@@ -645,7 +647,9 @@ test('the extender pool from epoch 8: a notice beside its milestone, with the ru
     assert.match(rule, / Same-network credit earned before epoch 8 is kept\.$/);
     // funded traffic only, never measurement; units, then extenders; the cap; an empty set drops the bytes; Q7
     assert.match(split, /^Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it\. /);
-    assert.match(split, / spread evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, /);
+    assert.match(split, / half of the pool's bytes is spread evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, /);
+    // the other half by relay bytes (the subnet owner's decision of November 16, sn WHITEPAPER.md §8.6.8, decision 17)
+    assert.match(split, / and the other half goes to the eligible extenders in proportion to the bytes each relayed in the epoch, as the subnet owner decided on November 16; with none that relayed, all of it goes by block\. /);
     assert.match(split, / so extenders take at most half of a pool\. With no eligible extender, the bytes are dropped\. /);
     assert.match(split, / keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract\.$/);
     // who counts: E1, E4, E5, then E3
@@ -653,7 +657,7 @@ test('the extender pool from epoch 8: a notice beside its milestone, with the ru
     assert.match(who, / it has a payout wallet and is not bound to a top-level miner's fleet; and it is not on one of the network operator's own networks\. /);
     assert.match(who, / Records that share a provider client, an IPv4 address or an IPv6 \/64 count once\.$/);
     // what is published: the header's component, never an address, statement v2, and the shadow runs
-    assert.match(published, /^From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(published, /^From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, the bytes each relayed, and their shares, /);
     assert.match(published, / the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it\. /);
     assert.match(published, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\.$/);
     // the signed entry, beside capture the flag's, where the milestone links it

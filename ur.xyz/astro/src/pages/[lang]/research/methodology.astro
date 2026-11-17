@@ -1,0 +1,12 @@
+---
+// /<lang>/research/methodology — the research methodology in ru, ar, zh, de
+// and es, built while the research-methodology group is localized
+// (react/src/i18n/pages/research-methodology/group.js).
+import { localizedStaticPaths } from '../../../lib/route-localization.js';
+import ResearchMethodologyRoute from '../../../components/routes/ResearchMethodologyRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('research-methodology');
+}
+---
+<ResearchMethodologyRoute lang={Astro.params.lang} />

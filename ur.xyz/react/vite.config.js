@@ -94,6 +94,11 @@ export default defineConfig({
         // virtual-module plugin already mediates access.
         fs: {
             allow: [PROJECT_ROOT]
+        },
+        // /dashboard reads grafana.bringyour.com, whose CORS allowlist names
+        // ur.xyz and ur.io, not localhost
+        proxy: {
+            '/__grafana': { target: 'https://grafana.bringyour.com', changeOrigin: true, rewrite: (p) => p.replace(/^\/__grafana/, '') }
         }
     }
 });

@@ -1,0 +1,13 @@
+---
+// /<lang>/investors: the Investor Centre in each translation. The page is
+// InvestorsRoute's, as is the English one (src/pages/investors.astro); it is
+// built only while the investors page group is localized
+// (react/src/i18n/pages/investors/group.js).
+import InvestorsRoute from '../../components/routes/InvestorsRoute.astro';
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('investors');
+}
+---
+<InvestorsRoute lang={Astro.params.lang} />

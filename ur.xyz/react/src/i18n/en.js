@@ -22,7 +22,15 @@ export default {
         browseDocs:   'Browse docs',
         search:       'Search',
         ctaAria:    'Usage cost — the current network price',
-        denomAria:  'Price denomination'
+        denomAria:  'Price denomination',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'About',
+        build:       'Build',
+        investors:   'Investors',
+        dashboard:   'Dashboard',
+        liveDashboard: 'Live dashboard',
+        ctf:         'Capture the flag'
     },
 
     footer: {
@@ -48,7 +56,12 @@ export default {
         socialTelegram: 'UR subnet on Telegram',
         socialDiscord:  'URnetwork Discord',
         socialGithub:   'UR subnet on GitHub',
-        productsAria:   'URnetwork products at ur.io'
+        productsAria:   'URnetwork products at ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'Build on UR',
+        reserve:       'Reserve',
+        mainnet:       'Mainnet',
+        investorCentre:  'Investor Centre'
     },
 
     disclaimer: {
@@ -155,7 +168,23 @@ export default {
         usdUnavailable: 'Live α price unavailable, so USD equivalents are hidden.',
         subscribe: 'Subscribe to price changes (RSS)',
         rawFile:   'Raw price sheet (price.yml)',
-        initialPeriod: 'Initial period: the published rate is 0 α. No operator demand deposits are collected while the network is being hardened; every operator pool is given equal demand, so measured quality alone steers the pool channel.'
+        initialPeriod: 'Initial period: the published rate is 0 α. No operator demand deposits are collected while the network is being hardened; every operator pool is given equal demand, so measured quality alone steers the pool channel.',
+        signedNote: 'Signed by the subnet owner: these rates apply from epoch {epoch}, with a deposit cap of {cap} α per operator per epoch. {before}',
+        signedEarlier: 'Earlier signed prices, newest first:',
+        colFromEpoch: 'From epoch',
+        colCap: 'Cap per epoch',
+        signedBefore:          'Epochs before epoch {epoch} keep the earlier rate.',
+        signedBeforeInitial:   'Until epoch {epoch}, the initial period\'s rate of 0 α stays in force.',
+        sourcingTitle:         'Sourcing commitment',
+        sourcingPays:          'From the first priced epoch, network operator 1 pays each of its SN25 demand deposits with alpha bought on the open market with its revenue. It uses no alpha obtained any other way.',
+        sourcingRoute:         'Every purchase is on chain. USDC is swapped for TAO on Solana through Jupiter, bridged to Bittensor over LayerZero, and staked into SN25 alpha by the deposit wallet:',
+        sourcingUsdcWallet:    'USDC wallet (Solana):',
+        sourcingDepositWallet: 'Deposit wallet (Bittensor):',
+        sourcingCheck:         'Anyone can check it: from the first priced epoch on, the alpha the deposit wallet has deposited never exceeds the alpha it has bought this way.',
+        sourcingCopy:          'Copy',
+        sourcingCopied:        'Copied',
+        sourcingCopiedStatus:  'Copied to the clipboard',
+        sourcingView:          'View on {explorer}'
     },
 
     roadmap: {
@@ -265,13 +294,15 @@ operators: {
         metaTitle: 'Research: Open algorithms, data and audits — UR',
         metaDescription: 'UR research in the open: routing, matching, transfer and reward algorithms with source and anonymized data, the Apex SN1 latency competition, and audits.',
         intro:   'The protocol is a decentralized-native, multi-IP, multi-transport system designed to scale to millions of miners per network operator. Each algorithm area below is published with its source and, where applicable, anonymized data sets for independent analysis.',
-        // the card for the research report (an English page), under the intro
+        // the card for the research report, under the intro
         report: {
             tag: 'Report',
             date: 'August 24 – October 24, 2026',
             title: 'August–October 2026 Research Report',
             body: 'The research aims to give everyone the best encryption and the best speed, for everyday use, that makes your internet better. The report follows 39 measured changes toward that on one timeline, how far each kind of gain went, and how the research was done.',
-            cta: 'Read the report'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'Read the report',
+            ctaEnglish: 'Read the report (in English)'
         },
         methodology: {
             tag: 'Methodology',
@@ -279,6 +310,7 @@ operators: {
             title: 'Self-improving research loops',
             body: 'How the lab, the open competition and the volunteer field nodes each improve the network, and improve how the next round is measured. All three share one discipline: a frozen baseline, measured noise, and every attempt on the record.',
             cta: 'Read the methodology',
+            ctaEnglish: 'Read the methodology (in English)',
             loops: [
                 { name: 'Lab', detail: 'PERFVAR · every change' },
                 { name: 'Competition', detail: 'Apex SN1 · weekly' },
@@ -386,7 +418,29 @@ operators: {
             units: { days: 'Days', hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds' },
             startDate: 'Thursday, October 29 · 00:00 UTC',
             startedDate: 'Started Thursday, October 29 · 00:00 UTC',
-            imageAlt: 'Two nodes joined by routes through a barrier: the Apex sim-latency competition'
+            imageAlt: 'Two nodes joined by routes through a barrier: the Apex sim-latency competition',
+            // the progress and results under the text, from APEX_RESULTS in
+            // research-competition.js: {done} and {total} count epochs; {epoch}
+            // is an epoch's number, {date} the day of the figures, {value} a
+            // change in percent and {before} and {after} a figure's values, all
+            // written in the page's language. lower or higher words a change by
+            // its sign; ttfb follows caveat while time to first byte is no better
+            results: {
+                progressLabel: 'Competition progress',
+                progress: '{done} of {total} epochs complete',
+                title: 'Net improvement since the start',
+                comparison: 'Epoch {epoch} winner against the starting baseline',
+                asOf: 'As of {date}',
+                lower: '{value}% lower',
+                higher: '{value}% higher',
+                metrics: {
+                    p95CompletionS: { name: 'p95 full-request completion time', range: '{before} s to {after} s' },
+                    medianThroughputMbps: { name: 'Median transfer throughput', range: '{before} to {after} Mbps' }
+                },
+                caveat: 'These are benchmark evaluation results against the starting baseline, not deployed product gains.',
+                ttfb: 'Time to first byte did not improve.',
+                link: 'Epoch {epoch} results (JSON)'
+            }
         },
         anonymization: {
             title: 'Anonymization',

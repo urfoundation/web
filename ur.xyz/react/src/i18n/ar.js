@@ -21,7 +21,15 @@ export default {
         browseDocs:   'تصفّح الوثائق',
         search:       'بحث',
         ctaAria:    'تكلفة الاستخدام — سعر الشبكة الحالي',
-        denomAria:  'عملة عرض السعر'
+        denomAria:  'عملة عرض السعر',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'من نحن',
+        build:       'التطوير',
+        investors:   'المستثمرون',
+        dashboard:   'لوحة البيانات',
+        liveDashboard: 'لوحة البيانات المباشرة',
+        ctf:         'الاستيلاء على العلم'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'شبكة UR الفرعية على Telegram',
         socialDiscord:  'Discord الخاص بـ URnetwork',
         socialGithub:   'شبكة UR الفرعية على GitHub',
-        productsAria:   'منتجات URnetwork على ur.io'
+        productsAria:   'منتجات URnetwork على ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'ابنِ على UR',
+        reserve:       'الاحتياطي',
+        mainnet:       'الشبكة الرئيسية',
+        investorCentre:  'مركز المستثمرين'
     },
 
     disclaimer: {
@@ -129,7 +142,23 @@ export default {
         usdUnavailable: 'سعر α المباشر غير متاح — مكافئات USD مخفية.',
         subscribe: 'اشترك في تغييرات السعر (RSS)',
         rawFile:   'ورقة الأسعار الخام (price.yml)',
-        initialPeriod: 'الفترة الأولية: التعرفة المنشورة هي 0 α. لا تُحصَّل ودائع طلب من المشغّلين أثناء تحصين الشبكة؛ ويُمنح كل مجمّع مشغّل طلبًا متساويًا، بحيث توجّه الجودة المقاسة وحدها قناة المجمّعات.'
+        initialPeriod: 'الفترة الأولية: التعرفة المنشورة هي 0 α. لا تُحصَّل ودائع طلب من المشغّلين أثناء تحصين الشبكة؛ ويُمنح كل مجمّع مشغّل طلبًا متساويًا، بحيث توجّه الجودة المقاسة وحدها قناة المجمّعات.',
+        signedNote: 'موقَّع من مالك الشبكة الفرعية: تسري هذه التعرفات ابتداءً من الحقبة {epoch}، بسقف وديعة قدره {cap} α لكل مشغّل في كل حقبة. {before}',
+        signedEarlier: 'الأسعار الموقَّعة السابقة، الأحدث أولًا:',
+        colFromEpoch: 'ابتداءً من الحقبة',
+        colCap: 'السقف لكل حقبة',
+        signedBefore:          'وتبقى الحقب التي تسبق الحقبة {epoch} على التعرفة السابقة.',
+        signedBeforeInitial:   'وحتى بداية الحقبة {epoch} تبقى تعرفة الفترة الأولية البالغة 0 α سارية.',
+        sourcingTitle:         'التزام بمصدر α',
+        sourcingPays:          'منذ أول حقبة مسعَّرة، يدفع مشغّل الشبكة 1 كل وديعة طلب خاصة به في SN25 بـ α مشترى من السوق المفتوحة بإيراداته، ولا يستخدم أي α حصل عليه بطريقة أخرى.',
+        sourcingRoute:         'تتم كل عملية شراء على السلسلة. يُبادَل USDC بـ TAO على Solana عبر Jupiter، ويُنقل إلى Bittensor عبر LayerZero، ثم ترهنه محفظة الإيداع في α الخاص بـ SN25:',
+        sourcingUsdcWallet:    'محفظة USDC (Solana):',
+        sourcingDepositWallet: 'محفظة الإيداع (Bittensor):',
+        sourcingCheck:         'يمكن لأي شخص التحقق من ذلك: منذ أول حقبة مسعَّرة، لا يتجاوز α الذي أودعته محفظة الإيداع أبدًا α الذي اشترته بهذه الطريقة.',
+        sourcingCopy:          'نسخ',
+        sourcingCopied:        'تم النسخ',
+        sourcingCopiedStatus:  'تم النسخ إلى الحافظة',
+        sourcingView:          'عرض على {explorer}'
     },
 
     roadmap: {
@@ -245,14 +274,17 @@ operators: {
             date: '24 أغسطس – 24 أكتوبر 2026',
             title: 'تقرير الأبحاث، أغسطس–أكتوبر 2026',
             body: 'تهدف الأبحاث إلى منح الجميع أفضل تشفير وأفضل سرعة في الاستخدام اليومي، بما يجعل الإنترنت لديك أفضل. يعرض التقرير على خط زمني واحد 39 تغييرًا مُقاسًا نحو هذا الهدف، ومدى ما بلغه كل نوع من التحسينات، وكيف أُجريت الأبحاث.',
-            cta: 'اقرأ التقرير (بالإنجليزية)'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'اقرأ التقرير',
+            ctaEnglish: 'اقرأ التقرير (بالإنجليزية)'
         },
         methodology: {
             tag: 'المنهجية',
             topic: 'ثلاث حلقات بحثية',
             title: 'حلقات بحثية تُحسّن نفسها',
             body: 'كيف يُحسّن المختبر والمسابقة المفتوحة والعُقد الميدانية التطوعية الشبكة، ويُحسّن كلٌّ منها طريقة قياس الجولة التالية. تتشارك الثلاث انضباطًا واحدًا: خط أساس مُجمَّد، وضوضاء مُقاسة، وكل محاولة مُسجَّلة.',
-            cta: 'اقرأ المنهجية (بالإنجليزية)',
+            cta: 'اقرأ المنهجية',
+            ctaEnglish: 'اقرأ المنهجية (بالإنجليزية)',
             loops: [
                 { name: 'المختبر', detail: 'PERFVAR · كل تغيير' },
                 { name: 'المسابقة', detail: 'Apex SN1 · أسبوعيًا' },
@@ -353,7 +385,23 @@ operators: {
             units: { days: 'أيام', hours: 'ساعات', minutes: 'دقائق', seconds: 'ثوانٍ' },
             startDate: 'الخميس 29 أكتوبر · 00:00 بتوقيت UTC',
             startedDate: 'بدأت الخميس 29 أكتوبر · 00:00 بتوقيت UTC',
-            imageAlt: 'عقدتان تربط بينهما مسارات عبر حاجز: مسابقة Apex لزمن الاستجابة في المحاكاة'
+            imageAlt: 'عقدتان تربط بينهما مسارات عبر حاجز: مسابقة Apex لزمن الاستجابة في المحاكاة',
+            results: {
+                progressLabel: 'تقدّم المسابقة',
+                progress: 'الحقب المكتملة: {done} من {total}',
+                title: 'صافي التحسّن منذ البداية',
+                comparison: 'الفائز في الحقبة {epoch} مقارنةً بخط الأساس الأولي',
+                asOf: 'حتى {date}',
+                lower: 'أقل بنسبة {value}%',
+                higher: 'أعلى بنسبة {value}%',
+                metrics: {
+                    p95CompletionS: { name: 'زمن إكمال الطلب الكامل (p95)', range: 'من {before} ث إلى {after} ث' },
+                    medianThroughputMbps: { name: 'الوسيط لمعدل نقل البيانات', range: 'من {before} إلى {after} ميغابت/ث' }
+                },
+                caveat: 'هذه نتائج تقييم على معيار الأداء مقارنةً بخط الأساس الأولي، وليست مكاسب في المنتج المنشور.',
+                ttfb: 'لم يتحسّن زمن وصول البايت الأول.',
+                link: 'نتائج الحقبة {epoch} (JSON)'
+            }
         },
         anonymization: {
             title: 'إخفاء الهوية',

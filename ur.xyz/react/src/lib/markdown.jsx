@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useRef, useState } from 'react';
 
 import { codeLabel, isDiagram, lineShape, wrapInline, wrapLine } from './code-marks.js';
 import { copyText } from './clipboard.js';
+import { parseBlocks, slugify } from './markdown-blocks.js';
 
 /**
  * Tiny markdown renderer for the docs corpus shipped at /docs.
@@ -18,14 +19,6 @@ import { copyText } from './clipboard.js';
  * naturally with the rest of the site.
  */
 
-const HEADING_RE = /^(#{1,6})\s+(.*)$/;
-const HR_RE      = /^(?:-{3,}|\*{3,}|_{3,})\s*$/;
-const ULIST_RE   = /^(\s*)[-*+]\s+(.*)$/;
-const OLIST_RE   = /^(\s*)\d+\.\s+(.*)$/;
-const FENCE_RE   = /^```\s*([a-zA-Z0-9_+-]*)\s*$/;
-const QUOTE_RE   = /^>\s?(.*)$/;
-const TABLE_SEP  = /^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)+\|?\s*$/;
-
 /**
  * `dropTitle` removes the document's first level-1 heading, for a page whose
  * own <h1> already shows the document title (the docs pages print it in their
@@ -36,17 +29,27 @@ const TABLE_SEP  = /^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*)+\|?\s*$/;
  * `images` maps an image's resolved src to its intrinsic { width, height },
  * which the <img> carries so the page reserves its box before it loads (the
  * static build reads the files; without a size the image is drawn as before).
+ *
+ * A translated document (react/src/i18n/pages/docs/corpus/) passes three more:
+ * `headingIds`, the ids of its English document's headings in order
+ * (markdown-blocks.js headingIdsOf), so each heading keeps the id every
+ * language's links name (a translated heading has no Latin letters to slug);
+ * `hrefFor`, which turns a link the document writes (/docs/miner) into the
+ * page in the reader's language; and `labels`, the code blocks' Copy, Copied
+ * and status words.
  */
-export function Markdown({ source, baseHref, dropTitle = false, headingBase = null, images = null }) {
+export function Markdown({ source, baseHref, dropTitle = false, headingBase = null, images = null, headingIds = null, hrefFor = null, labels = null }) {
     if (!source) return null;
     let blocks = parseBlocks(source);
+    const ids = new Map();
+    if (headingIds) blocks.filter(b => b.type === 'heading').forEach((b, i) => { if (headingIds[i] != null) ids.set(b, headingIds[i]); });
     if (dropTitle) {
         const title = blocks.findIndex(b => b.type === 'heading' && b.level === 1);
         if (title !== -1) blocks = blocks.filter((_, i) => i !== title);
     }
     const levels = headingBase == null ? null : outlineLevels(blocks, headingBase);
     // what inline rendering resolves against: links and images, and the images' sizes
-    const ctx = { baseHref, images };
+    const ctx = { baseHref, images, ids, hrefFor, labels };
     return (
         <div className="md">
             {blocks.map((b, i) => renderBlock(b, i, ctx, levels))}
@@ -68,152 +71,11 @@ function outlineLevels(blocks, base) {
     return levels;
 }
 
-function parseBlocks(src) {
-    // Strip carriage returns and yaml front-matter, if any. None of the
-    // shipped docs use front-matter today but it is cheap to be tolerant.
-    let text = src.replace(/\r\n?/g, '\n');
-    if (text.startsWith('---\n')) {
-        const end = text.indexOf('\n---', 4);
-        if (end !== -1) text = text.slice(end + 4).replace(/^\n+/, '');
-    }
-
-    const lines = text.split('\n');
-    const blocks = [];
-    let i = 0;
-
-    while (i < lines.length) {
-        const line = lines[i];
-
-        if (!line.trim()) { i++; continue; }
-
-        // Fenced code block
-        const fence = line.match(FENCE_RE);
-        if (fence) {
-            const lang = fence[1] || '';
-            const buf = [];
-            i++;
-            while (i < lines.length && !FENCE_RE.test(lines[i])) {
-                buf.push(lines[i]);
-                i++;
-            }
-            if (i < lines.length) i++; // consume closing fence
-            blocks.push({ type: 'code', lang, content: buf.join('\n') });
-            continue;
-        }
-
-        // Heading
-        const h = line.match(HEADING_RE);
-        if (h) {
-            blocks.push({ type: 'heading', level: h[1].length, text: h[2].trim() });
-            i++;
-            continue;
-        }
-
-        // Horizontal rule
-        if (HR_RE.test(line)) {
-            blocks.push({ type: 'hr' });
-            i++;
-            continue;
-        }
-
-        // Blockquote
-        if (QUOTE_RE.test(line)) {
-            const buf = [];
-            while (i < lines.length && QUOTE_RE.test(lines[i])) {
-                buf.push(lines[i].match(QUOTE_RE)[1]);
-                i++;
-            }
-            blocks.push({ type: 'quote', content: buf.join('\n') });
-            continue;
-        }
-
-        // Pipe table — needs a separator row directly under the header
-        if (line.includes('|') && lines[i + 1] && TABLE_SEP.test(lines[i + 1])) {
-            const rows = [splitRow(line)];
-            i += 2; // skip header + separator
-            while (i < lines.length && lines[i].trim() && lines[i].includes('|')) {
-                rows.push(splitRow(lines[i]));
-                i++;
-            }
-            blocks.push({ type: 'table', rows });
-            continue;
-        }
-
-        // Lists (we don't track nesting beyond a flat list — adequate for
-        // these docs and keeps the parser simple).
-        if (ULIST_RE.test(line)) {
-            const items = [];
-            while (i < lines.length && ULIST_RE.test(lines[i])) {
-                items.push(lines[i].match(ULIST_RE)[2]);
-                i++;
-                // Allow simple paragraph continuations on the next indented line.
-                while (i < lines.length && /^\s{2,}\S/.test(lines[i])) {
-                    items[items.length - 1] += ' ' + lines[i].trim();
-                    i++;
-                }
-            }
-            blocks.push({ type: 'ulist', items });
-            continue;
-        }
-        if (OLIST_RE.test(line)) {
-            const items = [];
-            while (i < lines.length && OLIST_RE.test(lines[i])) {
-                items.push(lines[i].match(OLIST_RE)[2]);
-                i++;
-                while (i < lines.length && /^\s{2,}\S/.test(lines[i])) {
-                    items[items.length - 1] += ' ' + lines[i].trim();
-                    i++;
-                }
-            }
-            blocks.push({ type: 'olist', items });
-            continue;
-        }
-
-        // Paragraph: collect until a blank line or another block start.
-        const para = [];
-        while (i < lines.length && lines[i].trim() && !startsBlock(lines[i], lines[i + 1])) {
-            para.push(lines[i]);
-            i++;
-        }
-        if (para.length) blocks.push({ type: 'paragraph', text: para.join(' ') });
-    }
-
-    return blocks;
-}
-
-/**
- * True when `line` is the first line of a new block (so a paragraph
- * collector should stop here). The `next` line is needed to detect
- * tables, which require a separator row right after the header.
- */
-function startsBlock(line, next) {
-    if (!line) return false;
-    if (HEADING_RE.test(line)) return true;
-    if (HR_RE.test(line)) return true;
-    if (FENCE_RE.test(line)) return true;
-    if (QUOTE_RE.test(line)) return true;
-    if (ULIST_RE.test(line)) return true;
-    if (OLIST_RE.test(line)) return true;
-    if (line.includes('|') && next && TABLE_SEP.test(next)) return true;
-    return false;
-}
-
-function splitRow(line) {
-    // Strip leading/trailing pipes, then split. Cells keep their
-    // surrounding whitespace trimmed because that is how readers expect
-    // pipe tables to render.
-    return line
-        .replace(/^\s*\|/, '')
-        .replace(/\|\s*$/, '')
-        .split('|')
-        .map(c => c.trim());
-}
-
 function renderBlock(block, idx, ctx, levels = null) {
     switch (block.type) {
         case 'heading': {
             const Tag = `h${levels?.get(block) ?? Math.min(6, Math.max(1, block.level))}`;
-            const id = slugify(block.text);
+            const id = ctx.ids?.get(block) ?? slugify(block.text);
             return <Tag key={idx} id={id} className={`md-h md-h${block.level}`}>{renderInline(block.text, ctx)}</Tag>;
         }
         case 'paragraph':
@@ -227,7 +89,7 @@ function renderBlock(block, idx, ctx, levels = null) {
                 </blockquote>
             );
         case 'code':
-            return <CodeBlock key={idx} lang={block.lang} source={block.content} />;
+            return <CodeBlock key={idx} lang={block.lang} source={block.content} labels={ctx.labels} />;
         case 'ulist':
             return (
                 <ul key={idx} className="md-ul">
@@ -279,7 +141,10 @@ function renderBlock(block, idx, ctx, levels = null) {
  * should something ever be, the block becomes a tab stop, so it can be
  * scrolled from the keyboard (Safari does not make a scroller focusable).
  */
-function CodeBlock({ lang, source }) {
+const CODE_LABELS = { copy: 'Copy', copied: 'Copied', status: 'Copied to the clipboard' };
+
+function CodeBlock({ lang, source, labels = null }) {
+    const words = labels || CODE_LABELS;
     const [copied, setCopied] = useState(false);
     const [scrolls, setScrolls] = useState(false);
     const pre = useRef(null);
@@ -308,7 +173,8 @@ function CodeBlock({ lang, source }) {
         reset.current = setTimeout(() => setCopied(false), 2000);
     };
 
-    const label = codeLabel(lang);
+    // a plain-text block's bar says so in the page's language (labels.text)
+    const label = words.text && codeLabel(lang) === codeLabel('text') ? words.text : codeLabel(lang);
     const lines = source.split('\n');
     const diagram = isDiagram(source);
 
@@ -324,12 +190,12 @@ function CodeBlock({ lang, source }) {
                     </svg>
                     {/* both words are laid in one cell, so the button is the same size in either state */}
                     <span className="md-codeblock-copy-label">
-                        <span data-shown={!copied}>Copy</span>
-                        <span data-shown={copied}>Copied</span>
+                        <span data-shown={!copied}>{words.copy}</span>
+                        <span data-shown={copied}>{words.copied}</span>
                     </span>
                     <span className="md-visually-hidden"> {label}</span>
                 </button>
-                <span className="md-visually-hidden" role="status">{copied ? 'Copied to the clipboard' : ''}</span>
+                <span className="md-visually-hidden" role="status">{copied ? words.status : ''}</span>
             </div>
             <pre ref={pre} className="md-pre" tabIndex={scrolls ? 0 : undefined}>
                 <code className={`md-code md-lang-${lang || 'text'}`} translate="no">
@@ -421,7 +287,8 @@ function renderInline(input, ctx) {
         if (text[i] === '[') {
             const m = text.slice(i).match(/^\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
             if (m) {
-                const href = resolveHref(m[2], ctx.baseHref);
+                const resolved = resolveHref(m[2], ctx.baseHref);
+                const href = ctx.hrefFor ? ctx.hrefFor(resolved) : resolved;
                 const external = /^(https?:|mailto:)/i.test(href);
                 push(
                     <a
@@ -521,14 +388,6 @@ function resolveHref(href, baseHref) {
     if (!baseHref) return href;
     // Relative — anchor to the doc's base path.
     return baseHref.replace(/\/[^/]*$/, '/') + href;
-}
-
-function slugify(s) {
-    return s
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .trim()
-        .replace(/\s+/g, '-');
 }
 
 /**

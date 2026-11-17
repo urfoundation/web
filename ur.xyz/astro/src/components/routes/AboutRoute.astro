@@ -1,0 +1,38 @@
+---
+// /about in any site language: the English page (pages/about.astro) and its
+// translations (pages/[lang]/about.astro) both render this. The page's words
+// are the `about` copy unit (react/src/i18n/pages/about/), the shell's (the
+// disclaimer, nav and footer) the site dictionary's.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import FooterStatic from '../FooterStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import AboutPage from '@react/components/pages/About.jsx';
+import { getDict } from '../../lib/i18n.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const { meta } = (await loadPageCopy('about'))(lang);
+---
+
+<Base title={meta.title} description={meta.description} breadcrumbName={meta.breadcrumb} lang={lang}>
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="about" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            {/* the same component the SPA renders at /about (App.jsx SectionPage);
+                hydrated for its scroll-reveal effect, server-rendered identically */}
+            <AboutPage lang={lang} client:load />
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

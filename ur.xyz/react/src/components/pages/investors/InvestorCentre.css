@@ -1103,3 +1103,47 @@
         transition: none;
     }
 }
+
+/* --- right to left (the Arabic translation) -------------------------------
+   The rules above are written left to right; these mirror what has a side
+   on the page the Investor Centre renders. Scoped to [dir="rtl"], so the
+   English page is untouched. The arrows turn round (a down arrow is the same
+   either way); grid and flex placement already follow the direction. */
+[dir="rtl"] .featured-letter__action i,
+[dir="rtl"] .archive-row__format a span {
+    display: inline-block;
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .featured-letter:hover .featured-letter__action i {
+    transform: scaleX(-1) translateX(4px);
+}
+
+[dir="rtl"] .explore-panel {
+    padding: 31px 0 32px 36px;
+}
+
+[dir="rtl"] .explore-panel + .explore-panel {
+    padding-right: 36px;
+    padding-left: 0;
+    border-right: 1px solid var(--investor-line-strong);
+    border-left: 0;
+}
+
+@media (max-width: 820px) {
+    [dir="rtl"] .explore-panel {
+        padding: 29px 0 31px;
+    }
+
+    [dir="rtl"] .explore-panel + .explore-panel {
+        padding: 31px 0;
+        border-right: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    [dir="rtl"] .archive-count {
+        margin-right: 4px;
+        margin-left: 0;
+    }
+}

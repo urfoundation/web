@@ -24,7 +24,11 @@
  *   node ../scripts/generate-agent-assets-llms.mjs build/main   (from astro/)
  *
  * The files stay small on purpose: one line per page, and llms-full.txt only
- * carries documents an agent would otherwise fetch one by one.
+ * carries documents an agent would otherwise fetch one by one. Capture the
+ * flag's 249 country pages (/ctf/<cc>) are the exception to "every page": a
+ * line each would break llms.txt's 16 KiB budget (seo-audit.mjs), so its
+ * section lists the hub, the URL pattern of the country pages, the JSON API
+ * they are built from and the API's OpenAPI document.
  */
 
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -34,6 +38,7 @@ import { DOC_ORDER, DOC_PAGE_PATHS, HIDDEN_DOC_SLUGS, UNLISTED_DOC_SLUGS, slugFo
 import { investorCentre } from '../react/src/data/investors.js';
 import { pageFacts, SITEMAP_FILES } from '../astro/scripts/page-dates.mjs';
 import { absoluteLinks } from './agent-markdown.mjs';
+import { OPERATORS_FILE, OPERATORS_URL, parseOperatorList } from './ctf-import.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -50,14 +55,28 @@ const PAGE_ORDER = [
 const LEGAL = ['/terms', '/privacy', '/vdp'];
 const FILE_LABELS = { '/audits/masa-l2-2025.pdf': 'MASA L2 2025 audit (PDF): third-party peer audit' };
 // The machine-readable files the site publishes for programs, listed when the
-// build has them: the protocol repository's published operator list and the
-// price sheet with its change feed.
+// build has them: the protocol repository's published operator list, the price
+// sheet with its change feed, and the signed settlement amendments.
 const MACHINE_FILES = [
     ['/operators.yml', 'Network operator list (YAML)', 'the network operators miners and validators serve; they refresh it hourly'],
     ['/price.yml', 'Price sheet (YAML)', 'the published demand deposits, in alpha per GiB and per user for each 7-day block, by staked-alpha tier'],
     ['/price.rss', 'Price sheet changes (RSS)', 'a feed of changes to the published price sheet'],
+    ['/amendments.yml', 'Settlement amendments (YAML)', 'the signed changes to how SN25 settles from an epoch on, each one line signed with the price sheet\'s key'],
 ];
 const SOURCE_REPO = 'https://github.com/urfoundation/sn';
+// Capture the flag: the hub, its country pages' pattern, and the API every
+// network operator of the operator list serves, which the pages add up
+// (sn/api/operator.yml, served by each at /sn/openapi.yml).
+const CTF_HUB = '/ctf';
+const isCtfCountry = (u) => /^\/ctf\/[a-z]{2}$/.test(u);
+const CTF_OPERATORS = parseOperatorList(readFileSync(OPERATORS_FILE, 'utf8'));
+const CTF_LINES = [
+    `- Each country's page: ${SITE}/ctf/<cc>, for each of the 249 lowercase ISO 3166-1 alpha-2 codes (${SITE}/ctf/ke is Kenya's)`,
+    `- Capture the flag is part of the SN25 protocol: every network operator of [the operator list](${OPERATORS_URL}) runs its own pool and draw, serves its state as JSON (public, CORS-open, amounts in alpha and rao, times in UTC), and the pages add every operator's up`,
+    ...CTF_OPERATORS.map(({ domain, api_url: api }) => `- [${domain}: capture the flag state (JSON)](${api}/sn/ctf): every country's slots, pots and chance to win at this operator, this epoch and last; one country: ${api}/sn/ctf/country/<cc>, with its history since the first epoch; the open pots ranked: ${api}/sn/ctf/top?role=provider|extender|any; the API's document: ${api}/sn/openapi.yml`),
+    `- [Operator API (OpenAPI 3.1)](${SOURCE_REPO}/blob/main/api/operator.yml): the routes and their fields`,
+    `- [Design](${SOURCE_REPO}/blob/main/CAPTURETHEFLAG.md): how the slots, the draw and the pots work`,
+];
 // the section boundary in llms-full.txt; no embedded document may contain it
 const SECTION_MARK = '<!-- source:';
 
@@ -183,7 +202,7 @@ export function buildLlms(distDir) {
     );
 
     const siteLines = en
-        .filter(([u]) => !u.startsWith('/docs') && !LEGAL.includes(u))
+        .filter(([u]) => !u.startsWith('/docs') && !LEGAL.includes(u) && u !== CTF_HUB && !isCtfCountry(u))
         .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
         .map(([u, p]) => {
             const label = u === '/' ? 'Home' : pageName(p.html, p.title);
@@ -206,6 +225,11 @@ export function buildLlms(distDir) {
         ...SITEMAP_FILES.filter((f) => existsSync(path.join(distDir, f))).map((f) => `- [${FILE_LABELS[f] || f}](${SITE}${f})`),
         ...LEGAL.filter((u) => pages.has(u)).map((u) => `- [${shortTitle(pages.get(u).title)}](${SITE}${u})${twinOf(u)}: ${pages.get(u).description}`),
     ];
+
+    const ctfHub = pages.get(CTF_HUB);
+    const ctfSection = ctfHub
+        ? `\n## Capture the flag\n\n- [${pageName(ctfHub.html, ctfHub.title)}](${SITE}${CTF_HUB}): ${ctfHub.description}\n${CTF_LINES.join('\n')}\n`
+        : '';
 
     const machineLines = MACHINE_FILES
         .filter(([f]) => existsSync(path.join(distDir, f)))
@@ -235,7 +259,7 @@ ${[...machineLines, securityLine].filter(Boolean).join('\n')}
 ## Pages
 
 ${siteLines.join('\n')}
-
+${ctfSection}
 ## Docs
 
 - [Documentation index](${SITE}/docs)

@@ -20,7 +20,15 @@ export default {
         browseDocs:   '浏览文档',
         search:       '搜索',
         ctaAria:    '使用成本——当前网络价格',
-        denomAria:  '价格计价单位'
+        denomAria:  '价格计价单位',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       '关于',
+        build:       '构建',
+        investors:   '投资者',
+        dashboard:   '数据面板',
+        liveDashboard: '实时数据面板',
+        ctf:         '夺旗'
     },
 
     footer: {
@@ -45,7 +53,12 @@ export default {
         socialTelegram: 'UR 子网的 Telegram',
         socialDiscord:  'URnetwork 的 Discord',
         socialGithub:   'UR 子网的 GitHub',
-        productsAria:   'ur.io 上的 URnetwork 产品'
+        productsAria:   'ur.io 上的 URnetwork 产品',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     '在 UR 上构建',
+        reserve:       '储备',
+        mainnet:       '主网',
+        investorCentre:  '投资者中心'
     },
 
     disclaimer: {
@@ -128,7 +141,23 @@ export default {
         usdUnavailable: '实时 α 价格不可用——已隐藏 USD 等值。',
         subscribe: '订阅价格变更 (RSS)',
         rawFile:   '原始价格表 (price.yml)',
-        initialPeriod: '初始阶段：公开费率为 0 α。在网络加固期间不收取运营商需求存款；每个运营商池被赋予相同的需求，因此仅由实测质量决定池通道的分配。'
+        initialPeriod: '初始阶段：公开费率为 0 α。在网络加固期间不收取运营商需求存款；每个运营商池被赋予相同的需求，因此仅由实测质量决定池通道的分配。',
+        signedNote: '由子网所有者签名：这些费率自周期 {epoch} 起适用，每个运营商每个周期的存款上限为 {cap} α。{before}',
+        signedEarlier: '此前已签名的价格（最新的在前）：',
+        colFromEpoch: '起始周期',
+        colCap: '每周期上限',
+        signedBefore:          '周期 {epoch} 之前的各周期沿用此前的费率。',
+        signedBeforeInitial:   '在周期 {epoch} 开始之前，初始阶段 0 α 的费率继续有效。',
+        sourcingTitle:         'α 来源承诺',
+        sourcingPays:          '自首个定价周期起，网络运营商 1 以其收入在公开市场上购买的 α 支付其每一笔 SN25 需求存款，不使用以任何其他方式获得的 α。',
+        sourcingRoute:         '每一笔购买都在链上进行。USDC 在 Solana 上通过 Jupiter 兑换为 TAO，经 LayerZero 跨链转入 Bittensor，再由存款钱包质押为 SN25 的 α：',
+        sourcingUsdcWallet:    'USDC 钱包（Solana）：',
+        sourcingDepositWallet: '存款钱包（Bittensor）：',
+        sourcingCheck:         '任何人都可以核查：自首个定价周期起，存款钱包存入的 α 从不超过它以这种方式购买的 α。',
+        sourcingCopy:          '复制',
+        sourcingCopied:        '已复制',
+        sourcingCopiedStatus:  '已复制到剪贴板',
+        sourcingView:          '在 {explorer} 上查看'
     },
 
     roadmap: {
@@ -244,14 +273,17 @@ operators: {
             date: '2026年8月24日至10月24日',
             title: '2026年8月至10月研究报告',
             body: '这项研究的目标是让每个人在日常使用中都获得最好的加密和最快的速度，让你的互联网变得更好。报告在一条时间线上展示了朝这一目标迈进的39项经过测量的改动、每类改进各自走了多远，以及研究是如何进行的。',
-            cta: '阅读报告（英文）'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: '阅读报告',
+            ctaEnglish: '阅读报告（英文）'
         },
         methodology: {
             tag: '方法论',
             topic: '三个研究循环',
             title: '自我改进的研究循环',
             body: '实验室、公开竞赛和志愿者现场节点各自如何改进网络，并同时改进下一轮的测量方式。三者遵循同一套原则：冻结的基线、实测的噪声，以及记录在案的每一次尝试。',
-            cta: '阅读方法论（英文）',
+            cta: '阅读方法论',
+            ctaEnglish: '阅读方法论（英文）',
             loops: [
                 { name: '实验室', detail: 'PERFVAR · 每次变更' },
                 { name: '竞赛', detail: 'Apex SN1 · 每周' },
@@ -352,7 +384,23 @@ operators: {
             units: { days: '天', hours: '时', minutes: '分', seconds: '秒' },
             startDate: '10月29日（星期四）00:00 UTC',
             startedDate: '已于10月29日（星期四）00:00 UTC 开赛',
-            imageAlt: '两个节点经由穿过屏障的路由相连：Apex 模拟延迟竞赛'
+            imageAlt: '两个节点经由穿过屏障的路由相连：Apex 模拟延迟竞赛',
+            results: {
+                progressLabel: '竞赛进度',
+                progress: '共 {total} 个周期，已完成 {done} 个',
+                title: '开赛以来的净提升',
+                comparison: '第 {epoch} 周期胜出方案对比初始基线',
+                asOf: '截至 {date}',
+                lower: '降低 {value}%',
+                higher: '提高 {value}%',
+                metrics: {
+                    p95CompletionS: { name: '完整请求的 p95 完成时间', range: '从 {before} 秒到 {after} 秒' },
+                    medianThroughputMbps: { name: '传输吞吐量中位数', range: '从 {before} 到 {after} Mbps' }
+                },
+                caveat: '以上为相对初始基线的基准评测结果，并非已部署产品的提升。',
+                ttfb: '首字节时间没有改善。',
+                link: '第 {epoch} 周期结果（JSON）'
+            }
         },
         anonymization: {
             title: '匿名化',

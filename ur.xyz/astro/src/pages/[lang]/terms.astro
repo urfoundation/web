@@ -1,13 +1,14 @@
 ---
-// The legal documents are English-only (a translated contract would be a
-// different contract), so /<lang>/terms is not a page of its own: it 301s to
-// /terms. nginx answers it at the HTTP layer; this stub is the static fallback,
-// like the /<lang>/docs ones.
-import { NON_EN_LANGS } from '../../lib/i18n.js';
+// /<lang>/terms: the translation of the legal page /terms, built in every
+// language once the docs page group is localized. It says that the English
+// page is the authoritative text and links it (components/LegalPage.astro).
+import LegalPage from '../../components/LegalPage.astro';
+import { localizedStaticPaths } from '../../lib/route-localization.js';
 
 export function getStaticPaths() {
-    return NON_EN_LANGS.map(lang => ({ params: { lang } }));
+    return localizedStaticPaths('docs');
 }
 
-return Astro.redirect('/terms', 301);
+const { lang } = Astro.params;
 ---
+<LegalPage lang={lang} doc="terms" />

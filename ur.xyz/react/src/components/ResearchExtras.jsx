@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './ResearchExtras.css';
 import { openResearchArea, researchAreaId } from './research-areas.js';
-import { APEX_COMPETITION, competitionPhase, countdown } from './research-competition.js';
+import { APEX_COMPETITION, competitionPhase, competitionResultsText, countdown, sentenceGap } from './research-competition.js';
 import ResearchLoops, { ResearchLoopsKey } from './ResearchLoops';
+import { groupPageHref } from '../../../astro/src/lib/route-localization.js';
 
 /**
  * Research page extras — the algo-competition card, the algorithm areas,
@@ -164,12 +165,82 @@ function CompetitionClock({ c, phase, now }) {
     );
 }
 
+// names the progress bar; the card is on the page once
+const PROGRESS_LABEL_ID = 'research-competition-progress-label';
+
+/**
+ * The competition's progress and results, under the card's text: how many of
+ * its epochs are complete, as a bar of one segment per epoch, then the net
+ * change from the starting baseline to the current best (the newest approved
+ * winner) and what those figures are not. They come from APEX_RESULTS
+ * (research-competition.js) and change by edit, not with the clock, so unlike
+ * the band this block is in the sitemap's content fingerprint and in the
+ * parity test's pixels. Figures and the day are in the page's language.
+ *
+ * The bar is a progressbar named by its label, with the count as its value
+ * text; the same count is written beside the label for the eye and hidden
+ * from assistive technology, which reads it from the bar.
+ */
+function CompetitionResults({ copy, lang }) {
+    if (!copy) return null;
+    const r = competitionResultsText(copy, lang);
+    const caveat = r.net ? r.net.caveat : '';
+    return (
+        <div className="research-competition-results">
+            <div className="research-competition-progress">
+                <span className="research-competition-label" id={PROGRESS_LABEL_ID}>{r.progressLabel}</span>
+                <span className="research-competition-progress-count" aria-hidden="true">{r.progress}</span>
+                <div
+                    className="research-competition-progress-bar"
+                    role="progressbar"
+                    aria-labelledby={PROGRESS_LABEL_ID}
+                    aria-valuemin={0}
+                    aria-valuemax={r.total}
+                    aria-valuenow={r.done}
+                    aria-valuetext={r.progress}
+                >
+                    {Array.from({ length: r.total }, (_, i) => (
+                        <span key={i} data-done={i < r.done ? '' : undefined} />
+                    ))}
+                </div>
+            </div>
+            {r.net && (
+                <div className="research-competition-net">
+                    <h3 className="research-competition-label">{r.net.title}</h3>
+                    <p className="research-competition-net-meta">
+                        {keepDot(`${r.net.comparison} · `)}
+                        <time dateTime={r.net.asOfIso}>{r.net.asOf}</time>
+                    </p>
+                    <div className="research-competition-stats">
+                        {r.net.metrics.map((m) => (
+                            <div className="research-competition-stat" key={m.key} data-worse={m.improved ? undefined : ''}>
+                                <b>{m.change}</b>
+                                <span className="research-competition-stat-name">{m.name}</span>
+                                <span className="research-competition-stat-range">{m.range}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+            {(caveat || r.link) && (
+                <p className="research-competition-caveat">
+                    {caveat}
+                    {caveat && r.link ? sentenceGap(caveat) : ''}
+                    {r.link && <a className="research-competition-code" href={r.link.href} {...external}>{r.link.label}</a>}
+                </p>
+            )}
+        </div>
+    );
+}
+
 /**
  * Gold competition card at the top of the research page: the art, the
- * countdown band, the eyebrow, the title, the body and the button. The body
- * carries a link of its own, so the card is not one big link (anchors cannot
- * nest): the art, the title and the button each link to the competition. The
- * title renders once the dictionary has one (research.competition.title).
+ * countdown band, the eyebrow, the title, the body and the button, then the
+ * competition's progress and results (CompetitionResults). The body carries a
+ * link of its own, so the card is not one big link (anchors cannot nest): the
+ * art, the title and the button each link to the competition. The title
+ * renders once the dictionary has one (research.competition.title). `lang` is
+ * the page's language, which the results' figures follow.
  *
  * The band follows the visitor's clock. Until the clock is read the phase is
  * `initialPhase` (the Astro page passes the phase at build time, so the
@@ -177,7 +248,7 @@ function CompetitionClock({ c, phase, now }) {
  * effect on it is the phase at the browser's time, and the band turns from
  * the countdown to live at the start without a reload.
  */
-export function ResearchCompetition({ t, copy, initialPhase }) {
+export function ResearchCompetition({ t, copy, initialPhase, lang = 'en' }) {
     const c = copy || t.research.competition;
     const now = useClock(clockStep);
     const phase = now == null ? (initialPhase || competitionPhase(Date.now())) : competitionPhase(now);
@@ -220,39 +291,56 @@ export function ResearchCompetition({ t, copy, initialPhase }) {
                     ? <a className="research-competition-cta" href={APEX_COMPETITION_URL} {...external}>{c.cta}</a>
                     : <span className="research-competition-cta research-competition-cta--pending" aria-disabled="true">{c.cta}</span>}
             </div>
+            <CompetitionResults copy={c.results} lang={lang} />
         </div>
     );
 }
 
 /**
- * A dictionary sentence with one `{placeholder}` replaced by a link; shown
- * as written when the label is missing or the placeholder is absent.
+ * A dictionary sentence with one `{placeholder}` replaced by a link, to the
+ * page in `lang` when it has translations; shown as written when the label is
+ * missing or the placeholder is absent.
  */
-function withLink(text, placeholder, href, label, className) {
+function withLink(text, placeholder, href, label, className, lang = 'en') {
     const s = String(text || '');
     if (!label || !s.includes(placeholder)) return s;
     return s.split(placeholder).flatMap((part, i) => (i === 0 ? [part] : [
-        <a key={i} className={className} href={href}>{label}</a>,
+        <a key={i} className={className} href={groupPageHref(href, lang) || href}>{label}</a>,
         part,
     ]));
 }
 
 /**
+ * Where a research card leads in `lang`, and what its call to action says: the
+ * page in the reader's language once its page group is translated, else the
+ * English page, whose call to action says it is in English (`ctaEnglish`).
+ */
+function cardLink(path, lang, copy) {
+    const translated = groupPageHref(path, lang);
+    return translated ? { href: translated, cta: copy.cta } : { href: path, cta: copy.ctaEnglish };
+}
+
+// A card's "go" arrow points along the page language's reading direction, as
+// the home page's (RoleBlocks.astro): ← right to left (lib/i18n.js LANGS).
+const RTL = new Set(['ar']);
+const goArrow = (lang) => (RTL.has(lang) ? '←' : '→');
+
+/**
  * The research report's card, under the page's intro: the latest report, as a
- * link to its page. The report is English-only, so the card links the English
- * page from every language, and the translations' call to action says so.
- * The path is the report's (router RESEARCH_REPORT_SLUGS).
+ * link to its page in the reader's language (cardLink). The path is the
+ * report's (router RESEARCH_REPORT_SLUGS).
  */
 export const RESEARCH_REPORT_HREF = '/research/2026-q3-report';
 
-export function ResearchReportCard({ t }) {
+export function ResearchReportCard({ t, lang = 'en' }) {
     const r = t.research.report;
+    const link = cardLink(RESEARCH_REPORT_HREF, lang, r);
     return (
-        <a className="research-report-card" href={RESEARCH_REPORT_HREF}>
+        <a className="research-report-card" href={link.href}>
             <span className="research-report-card-tag">{r.tag} · {r.date}</span>
             <h2 className="research-report-card-title">{r.title}</h2>
             <p className="research-report-card-body">{r.body}</p>
-            <span className="research-report-card-cta">{r.cta} <span aria-hidden="true">→</span></span>
+            <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">{goArrow(lang)}</span></span>
         </a>
     );
 }
@@ -260,10 +348,8 @@ export function ResearchReportCard({ t }) {
 /**
  * The research methodology's card, under the report's: the three research
  * loops' rings as its hero (ResearchLoops.jsx, turning in CSS), then a link to
- * /research/methodology, where the same rings head the page. The methodology
- * is English-only, so the card links the English page from every language,
- * and the translations' call to action says so, as the report card's does.
- * The rings and their key repeat what the text says, so they are hidden from
+ * /research/methodology in the reader's language (cardLink), where the same
+ * rings head the page. The rings and their key repeat what the text says, so they are hidden from
  * assistive technology here; the page labels its drawing.
  */
 export const RESEARCH_METHODOLOGY_HREF = '/research/methodology';
@@ -271,11 +357,12 @@ export const RESEARCH_METHODOLOGY_HREF = '/research/methodology';
 // the dictionaries name the loops innermost first; each takes its ring's colour
 const METHOD_LOOP_KEYS = ['lab', 'competition', 'field'];
 
-export function ResearchMethodologyCard({ t }) {
+export function ResearchMethodologyCard({ t, lang = 'en' }) {
     const m = t.research.methodology;
     const loops = m.loops.map((l, i) => ({ ...l, key: METHOD_LOOP_KEYS[i] }));
+    const link = cardLink(RESEARCH_METHODOLOGY_HREF, lang, m);
     return (
-        <a className="research-method-card" href={RESEARCH_METHODOLOGY_HREF}>
+        <a className="research-method-card" href={link.href}>
             <div className="research-method-card-hero">
                 <ResearchLoops />
                 <ResearchLoopsKey loops={loops} hidden />
@@ -284,7 +371,7 @@ export function ResearchMethodologyCard({ t }) {
                 <span className="research-report-card-tag">{m.tag} · {m.topic}</span>
                 <h2 className="research-report-card-title">{m.title}</h2>
                 <p className="research-report-card-body">{m.body}</p>
-                <span className="research-report-card-cta">{m.cta} <span aria-hidden="true">→</span></span>
+                <span className="research-report-card-cta">{link.cta} <span aria-hidden="true">{goArrow(lang)}</span></span>
             </div>
         </a>
     );
@@ -339,9 +426,10 @@ export function ResearchAreas({ t }) {
 /**
  * The page-level notes after the areas: how the block exports are
  * anonymized, and the program for researchers and builders (its `{vdp}`
- * placeholder renders as the link to the Vulnerability Disclosure Program).
+ * placeholder renders as the link to the Vulnerability Disclosure Program, in
+ * the page's language).
  */
-export function ResearchNotes({ t }) {
+export function ResearchNotes({ t, lang = 'en' }) {
     const { anonymization: a, researchers: r } = t.research;
     return (
         <>
@@ -351,7 +439,7 @@ export function ResearchNotes({ t }) {
             </div>
             <div className="research-subsection" id="researchers">
                 <h2 className="research-subsection-title">{r.title}</h2>
-                <p className="research-subsection-body">{withLink(r.body, '{vdp}', '/vdp', r.vdpLabel, 'research-subsection-link')}</p>
+                <p className="research-subsection-body">{withLink(r.body, '{vdp}', '/vdp', r.vdpLabel, 'research-subsection-link', lang)}</p>
             </div>
         </>
     );

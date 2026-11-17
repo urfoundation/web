@@ -1,5 +1,7 @@
 /* Legal document prose (terms | privacy | vdp) — rendered from the generated
-   react/src/data/legal.js on both renderers. */
+   react/src/data/legal.js on both renderers, and a translation from its
+   markdown (react/src/i18n/pages/docs/corpus/<lang>/legal/). Indents are
+   logical, so an Arabic page mirrors them. */
 
 .legal-updated {
     font-size: 12px;
@@ -39,7 +41,7 @@
 
 .legal-doc ul {
     margin: 0 0 13px;
-    padding-left: 24px;
+    padding-inline-start: 24px;
 }
 
 .legal-doc li {
@@ -60,15 +62,33 @@
 .legal-doc blockquote {
     margin: 0 0 13px;
     padding: 8px 16px;
-    border-left: 2px solid var(--brand-ur);
+    border-inline-start: 2px solid var(--brand-ur);
     opacity: 0.85;
 }
 
 /* contract clause nesting (1. / a. / i.) */
 .legal-doc p.clause-1 {
-    margin-left: 24px;
+    margin-inline-start: 24px;
 }
 
 .legal-doc p.clause-2 {
-    margin-left: 48px;
+    margin-inline-start: 48px;
+}
+
+/* A translated legal page's note, above the document, that the English page
+   is the authoritative text, with a link to it. */
+.legal-translation-note {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--brand-ui);
+    margin: 0 0 24px;
+    padding: 12px 16px;
+    border-inline-start: 2px solid var(--brand-ur);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.legal-translation-note a {
+    color: var(--brand-white);
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }

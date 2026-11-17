@@ -57,6 +57,10 @@ Allow: /
 User-agent: Meta-ExternalFetcher
 Allow: /
 
+# Meta AI's search index, which its answers cite (in WhatsApp too).
+User-agent: Meta-WebIndexer
+Allow: /
+
 User-agent: Timpibot
 Allow: /
 

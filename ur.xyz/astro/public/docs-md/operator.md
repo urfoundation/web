@@ -1,7 +1,7 @@
 
 # How to become a network operator
 
-A network operator runs the servers of the UR privacy network: the API and connect services that users and miners attach to, the `/verify` endpoint that validators walk, and the epoch pipeline that settles its miners' rewards on **Bittensor SN25 (netuid 25)**. An operator brings its own users and products (the ur.io apps are one operator's), deposits α as a revenue-backed signal of real demand, and each settlement epoch commits the Merkle payout list that splits its pool among its miners. It reports the usage the split follows but never holds anyone else's α: the immutable settlement vault owns the pool and every miner claims from it directly.
+A network operator runs the servers of the UR privacy network: the API and Connect services that users and miners attach to, the `/verify` endpoint that validators walk, and the epoch pipeline that settles its miners' rewards on **Bittensor SN25 (netuid 25)**. An operator brings its own users and products (the ur.io apps are one operator's), deposits α as a revenue-backed signal of real demand, and each settlement epoch commits the Merkle payout list that splits its pool among its miners. It reports the usage the split follows but never holds anyone else's α: the immutable settlement vault owns the pool and every miner claims from it directly.
 
 The [`server/cli/all/main.go`](https://github.com/urnetwork/server/blob/main/cli/all/main.go) entry point runs the API, Connect and the production taskworker together. You deploy one operator executable; PostgreSQL, Redis, artifact storage and public TLS ingress remain backing services. For the mechanism read the [litepaper](https://ur.xyz/docs/litepaper); for the other roles see [How to run a miner](https://ur.xyz/docs/miner) and [How to run a validator](https://ur.xyz/docs/validator).
 
@@ -51,7 +51,7 @@ Use this layout. Names such as `pg.yml` are literal resource names; `<...>` valu
 ```text
 /usr/local/bin/ur-operator
 /etc/urnetwork/operator.env
-/etc/urnetwork/durable-volumes.json   # external declaration for artifact storage
+/etc/urnetwork/durable-volumes.json  # external declaration for artifact storage
 /srv/urnetwork-data/                 # separately mounted persistent filesystem
   operator-blob/                     # preprovisioned artifact root
   operator-identity/                 # external volume marker and root lease
@@ -63,9 +63,9 @@ Use this layout. Names such as `pg.yml` are literal resource names; `<...>` valu
       tls.yml
       provider_egress_probe.yml
       sn.yml                         # reviewed earnings/activation declaration
-      operator-gas-authority.yml      # independently provisioned public approval
+      operator-gas-authority.yml     # independently provisioned public approval
       mmdb/
-        geolite2.mmdb                 # real GeoLite2-City database
+        geolite2.mmdb                # real GeoLite2-City database
         places.yml                   # place export from the same database
     all/                             # optional resources shared by environments
   vault/

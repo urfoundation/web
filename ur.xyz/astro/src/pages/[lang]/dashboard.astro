@@ -1,0 +1,12 @@
+---
+// /dashboard, the live network and SN25 stats, in the site's other languages: the same route as the English
+// page (components/routes/DashboardRoute.astro), built per language once the
+// `dashboard` page group is localized.
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+import DashboardRoute from '../../components/routes/DashboardRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('dashboard');
+}
+---
+<DashboardRoute lang={Astro.params.lang} />

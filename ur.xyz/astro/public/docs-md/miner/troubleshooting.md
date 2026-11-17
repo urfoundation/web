@@ -15,7 +15,7 @@ That's Windows' default script policy. Type `urnet-tools.cmd` instead of `urnet-
 
 ### `no systemd user session` (Linux)
 
-The installer couldn't reach your user's systemd, which happens in a `sudo su` shell, in many containers and in WSL without systemd. It installs the miner anyway, but can't run it in the background. Log in directly as the user who will run the miner (over SSH or at the console) and run the installer again, or run it in the foreground: the first time with `urnetwork provide --allow-client-registration`, then with `urnetwork provide`. Without a user session there are no automatic updates, so run `urnet-tools update` yourself from time to time, or use a system service instead: `sudo urnetwork service install --system`.
+The installer couldn't reach your user's systemd, which happens in a `sudo su` shell, in many containers and in WSL without systemd. It installs the miner anyway, but can't run it in the background. Log in directly as the user who will run the miner (over SSH or at the console) and run the installer again, or run it in the foreground: the first time with `urnetwork provide --allow-client-registration`, then with `urnetwork provide`. Without a user session there are no automatic updates, so run `urnet-tools update` yourself from time to time, or use a system service instead: `sudo urnetwork service install --system`. Run as root in such a shell, the installer installs a system service by itself.
 
 ### The installer says your processor isn't supported
 
@@ -92,6 +92,24 @@ On Windows, the installer starts the miner when you sign in, and it stops when y
 ### `operator <domain> is awaiting auth`
 
 With `--all-operators`, that operator has no sign-in yet. Run `provider auth --operator=<domain>`, or start with `--auto-register --hotkey_seed_file=<path>`. The miner checks again every five minutes. See [Mine every listed operator](https://ur.xyz/docs/miner/advanced#mine-every-listed-operator).
+
+## The extender
+
+`provider status` has an Extender line, and `provider doctor` an Inbound 443 line. In the log, the `extender` record's `reason` says what's wrong and its `guidance` how to fix it. The miner keeps mining while its extender is off. See [Run an extender](https://ur.xyz/docs/miner/extender).
+
+### The extender can't bind TCP port 443
+
+The miner couldn't listen on TCP port 443, so its extender is off. It tries again every 3 minutes.
+
+- `tcp_443_permission_denied`: on Linux, a miner that runs as your user isn't allowed to listen on ports below 1024. Install it as a system service that may: with the installer, `curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_Install_Linux.sh | sh -s -- --system`; with `provider service`, `sudo "$(command -v provider)" service install --system --as="$USER"`. See [Let the miner listen on port 443](https://ur.xyz/docs/miner/extender#linux-let-the-miner-listen-on-port-443).
+- `tcp_443_in_use`: another program holds the port, such as a web server or another miner process on the same computer. Only one program per computer can have it; the miner takes it within 3 minutes of it coming free.
+- `tcp_443_bind_failed`: it failed for another reason. Read the log lines around it.
+
+### The extender is unreachable on TCP 443
+
+`unreachable_on_tcp_443`: the miner listens on port 443, but the operator's test couldn't reach it from the internet, so the extender isn't listed. A firewall, a cloud security group or a home router is keeping incoming connections out, or the connection is behind carrier-grade NAT. Open TCP 443 (and UDP 443 and 4053): see [Open the ports](https://ur.xyz/docs/miner/extender#open-the-ports).
+
+The miner tries again once a day. After you open the ports, restart it to try at once: `provider service restart`, or `urnet-tools restart` with an installer.
 
 ## Getting paid
 

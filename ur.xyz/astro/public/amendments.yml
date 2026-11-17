@@ -1,0 +1,10 @@
+sn: 25
+# Settlement amendments: changes to how SN25 settles from an epoch on, for one
+# network operator, made without a new policy hash.
+#
+# Each entry is one line of plain text that names its chain, subnet, operator
+# and first epoch and every term it binds, signed by the owner's key that signs
+# price.yml. Only signed entries count, and a signed entry is permanent. An
+# entry applies from its first epoch until a later entry of the same kind for
+# the same operator takes effect. Version 1 is the extender pool (WHITEPAPER.md
+# section 8.6), version 2 capture the flag (CAPTURETHEFLAG.md).

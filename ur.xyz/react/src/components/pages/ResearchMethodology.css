@@ -43,7 +43,7 @@
 .rm-index { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--rm-line); }
 .rm-index li { border-inline-start: 1px solid var(--rm-line); }
 .rm-index li:first-child { border-inline-start: 0; }
-.rm-index a { display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 4px 12px; padding: 18px 16px 20px 18px; color: inherit; text-decoration: none; }
+.rm-index a { display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 4px 12px; padding-block: 18px 20px; padding-inline: 18px 16px; color: inherit; text-decoration: none; }
 .rm-index li:first-child a { padding-inline-start: 0; }
 .rm-index a::before { content: ""; width: 10px; height: 10px; margin-top: 7px; border-radius: 50%; background: var(--rl-c); grid-row: span 2; }
 .rm-index b { font-weight: 400; font-size: 1.05rem; line-height: 1.4; color: var(--brand-white); }
@@ -83,9 +83,9 @@
 .rm-stages-wide .rm-rail-label { font: 400 12.5px 'PPNeueMontreal', sans-serif; fill: var(--rm-muted); }
 .rm-stages-list, .rm-rails-list { display: none; margin: 0; padding: 0; list-style: none; }
 .rm-stages-list { position: relative; padding-inline-start: 28px; counter-reset: rm-stage; }
-.rm-stages-list::before { content: ""; position: absolute; left: 6px; top: 10px; bottom: 28px; border-left: 1px solid rgba(214, 230, 244, 0.32); }
+.rm-stages-list::before { content: ""; position: absolute; inset-inline-start: 6px; top: 10px; bottom: 28px; border-inline-start: 1px solid rgba(214, 230, 244, 0.32); }
 .rm-stages-list li { position: relative; padding: 0 0 18px; counter-increment: rm-stage; }
-.rm-stages-list li::before { content: ""; position: absolute; left: -27px; top: 6px; width: 11px; height: 11px; border-radius: 50%; border: 1.6px solid var(--brand-ur); background: var(--brand-bg); }
+.rm-stages-list li::before { content: ""; position: absolute; inset-inline-start: -27px; top: 6px; width: 11px; height: 11px; border-radius: 50%; border: 1.6px solid var(--brand-ur); background: var(--brand-bg); }
 .rm-stages-list b { display: block; font: 400 0.72rem/1.4 var(--rm-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand-ur); }
 .rm-stages-list b::before { content: counter(rm-stage) "\00a0\00a0"; color: var(--rm-faint); }
 .rm-stages-list span { font-size: 0.92rem; line-height: 1.5; }
@@ -120,7 +120,7 @@
 .rm-loop h3 { margin: 0 0 14px; font-size: clamp(1.35rem, 2.6vw, 1.75rem); font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--brand-white); text-wrap: balance; }
 .rm-page .section-body .rm-loop > p { margin: 0 0 18px; }
 .rm-facts { display: grid; grid-template-columns: repeat(var(--rm-n, 4), minmax(0, 1fr)); margin: 8px 0 18px; border-block: 1px solid var(--rm-line); }
-.rm-facts div { min-width: 0; padding: 16px 14px 16px 16px; border-inline-start: 1px solid var(--rm-line); }
+.rm-facts div { min-width: 0; padding-block: 16px; padding-inline: 16px 14px; border-inline-start: 1px solid var(--rm-line); }
 .rm-facts div:first-child { padding-inline-start: 0; border-inline-start: 0; }
 .rm-facts b { display: block; font-weight: 400; font-size: clamp(1.35rem, 2.4vw, 1.75rem); line-height: 1.05; color: var(--brand-white); white-space: nowrap; }
 .rm-facts span { display: block; margin-top: 8px; font-size: 0.78rem; line-height: 1.42; color: var(--rm-muted); }
@@ -140,3 +140,15 @@
     .rm-links a, .rm-page .rm-cta { min-height: 44px; display: inline-flex; align-items: center; gap: 0.3em; }
     .rm-index a { min-height: 44px; }
 }
+
+/* --- right to left (Arabic) ---
+ * The page mirrors through logical properties; what points is turned here. The
+ * five stages keep their left-to-right flow and their rails, so the drawing's
+ * labels keep their side: in a right-to-left label the anchor's start and end
+ * swap. Arabic is never letter-spaced: spacing breaks its joined letters. */
+[dir="rtl"] .rm-links a > span[aria-hidden], [dir="rtl"] .rm-cta > span[aria-hidden] { display: inline-block; transform: scaleX(-1); }
+[dir="rtl"] .rm-stages-wide text:not([text-anchor]), [dir="rtl"] .rm-stages-wide text[text-anchor="start"] { text-anchor: end; }
+[dir="rtl"] .rm-stages-wide text[text-anchor="end"] { text-anchor: start; }
+:lang(ar) .rm-page :is(.rm-rule-n, .rm-stages-list b, .rm-example-tag, .rm-loop-tag, .rm-loop h3),
+:lang(ar) .rm-stages-wide :is(.rm-stage-name, .rm-rail-key) { letter-spacing: 0; }
+

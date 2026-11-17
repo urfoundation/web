@@ -11,6 +11,11 @@
  * private, is named without a link. tests/research-methodology.test.mjs checks
  * that the lab's figures are the report's and the competition's are the
  * competition card's.
+ *
+ * This is the page's English. Its copy unit (i18n/pages/research-methodology/
+ * en.js) takes the words from here and its translations mirror them; the page
+ * formats the dates in its own language (`published`, and the competition's
+ * start, a fact's `date`, filling its {date}).
  */
 import { APEX_COMPETITION } from '../components/research-competition.js';
 
@@ -23,8 +28,6 @@ const SOURCES = {
     friends: 'https://ur.io/friends-of-the-network',
 };
 
-const startDay = new Date(APEX_COMPETITION.startsAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-
 export const METHODOLOGY = Object.freeze({
     path: '/research/methodology',
     eyebrow: 'Research · Methodology',
@@ -32,7 +35,6 @@ export const METHODOLOGY = Object.freeze({
     description: 'How UR’s research improves the network and its own measurements: three loops, the lab, an open competition and volunteer field nodes, sharing one discipline.',
     figure: 'Three nested research loops: the lab innermost, the competition around it, the field outermost',
     published: '2026-10-30',
-    publishedLabel: 'October 30, 2026',
     metaNote: 'Lab figures are from the August–October 2026 research report.',
     lede: 'UR improves its network through three nested research loops that share one discipline. The lab measures every change, an open competition runs weekly, and volunteer field nodes report every quarter. Each loop improves the network, and improves how the next round is measured.',
     reportHref: REPORT_HREF,
@@ -114,7 +116,7 @@ export const METHODOLOGY = Object.freeze({
                 title: 'Each week’s winner becomes the baseline everyone must beat',
                 body: 'The Sim Latency Algo Competition on Apex (Bittensor SN1) opens routing and matching to outside researchers. A fixed simulator scores each submission on a deterministic fleet against a frozen nine-run control, and no submission can touch the scorer. An approved winner becomes the next epoch’s baseline, under a margin that never weakens.',
                 facts: [
-                    { v: String(APEX_COMPETITION.rounds), l: `weekly epochs from ${startDay}` },
+                    { v: String(APEX_COMPETITION.rounds), l: 'weekly epochs from {date}', date: APEX_COMPETITION.startsAt },
                     { v: '26.9%', l: 'margin, frozen in advance from calibration runs' },
                     { v: 'p ≤ 0.05', l: 'a one-sided Welch test must agree' },
                     { v: '2', l: 'independent reviewer models must both approve' },

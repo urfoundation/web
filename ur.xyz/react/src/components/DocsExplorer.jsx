@@ -4,7 +4,7 @@ import Disclaimer, { useDisclaimerVisible } from './Disclaimer';
 import Nav from './Nav';
 import Footer from './Footer';
 import { Markdown } from '../lib/markdown.jsx';
-import { docsIndex, findDoc } from '../lib/docs';
+import { docIn, docsCopy, docsIndexIn, localizedHref } from '../lib/docs-i18n';
 import { buildPath, navigate, useRoute } from '../router';
 import { useLanguage } from '../i18n';
 
@@ -16,17 +16,20 @@ import { useLanguage } from '../i18n';
  * placeholder when no slug is selected, otherwise the markdown body of
  * the requested doc. The static build renders the docs pages without React
  * (astro/src/pages/docs/*.astro, components/DocsShell.astro); this is the
- * SPA's, which the visual parity test compares the /docs landing with.
+ * SPA's, which the visual parity test compares the /docs landing with. A
+ * translated page (`lang`, which App.jsx passes) shows the translations
+ * (lib/docs-i18n.js) in the docs copy's words.
  */
-export default function DocsExplorer({ activeRoute, initialSlug = null } = {}) {
+export default function DocsExplorer({ activeRoute, initialSlug = null, lang = null } = {}) {
     const route = useRoute();
-    const { code } = useLanguage();
+    const { code: routeCode } = useLanguage();
+    const code = lang || routeCode;
 
     // During SSR the router has no window and resolves no slug — the static
     // build passes the page's own slug so the document body ships as HTML
     // instead of the landing placeholder. On the client the router wins.
     const slug = route.slug ?? initialSlug;
-    const doc = slug ? findDoc(slug) : null;
+    const doc = slug ? docIn(slug, code) : null;
 
     // If the URL points at a slug we don't have a doc for, fall back to
     // the docs landing rather than rendering nothing. We rewrite the URL
@@ -44,7 +47,7 @@ export default function DocsExplorer({ activeRoute, initialSlug = null } = {}) {
             <Disclaimer visible={disclaimerVisible} />
             <Nav disclaimerVisible={disclaimerVisible} activeRoute={activeRoute} />
             <Explorer initialSlug={initialSlug}>
-                {!doc ? <DocsLanding code={code} /> : <DocBody doc={doc} />}
+                {!doc ? <DocsLanding code={code} /> : <DocBody doc={doc} code={code} />}
             </Explorer>
             <Footer />
         </div>
@@ -62,20 +65,24 @@ function DocsLanding({ code }) {
         e.preventDefault();
         navigate(href);
     };
+    const words = docsCopy(code).index;
     return (
         <>
             <header className="explorer-page-header">
-                <span className="explorer-page-eyebrow">Documentation</span>
-                <h1 className="explorer-page-title">UR docs</h1>
+                <span className="explorer-page-eyebrow">{words.eyebrow}</span>
+                <h1 className="explorer-page-title">{words.heading}</h1>
                 <p className="explorer-page-meta">
-                    How to take part in the UR privacy network on Bittensor SN25, one guide
-                    per role, and the litepaper that explains the mechanism they take part in.
-                    Every document is also served as markdown.
+                    {code === 'en' ? words.intro : `${words.intro}${/[。！？]$/u.test(words.intro) ? '' : ' '}${words.markdownEnglish}`}
                 </p>
             </header>
 
+            {/* the notice above the guides, if any (docs-shared.js), as the static landing draws it */}
+            {words.notice && (code === 'en'
+                ? <Markdown source={words.notice} baseHref="/docs/" />
+                : <Markdown source={words.notice} baseHref="/docs/" hrefFor={(href) => localizedHref(href, code)} labels={docsCopy(code).code} />)}
+
             <div className="md">
-                {docsIndex.map(d => {
+                {docsIndexIn(code).map(d => {
                     const href = docHref(d, code);
                     const id = `docs-index-${d.slug.replace(/[^a-z0-9]+/gi, '-')}`;
                     return (
@@ -92,7 +99,7 @@ function DocsLanding({ code }) {
     );
 }
 
-function DocBody({ doc }) {
+function DocBody({ doc, code }) {
     // Reset scroll on doc change so a long previous doc doesn't strand
     // the visitor in the middle of the new one.
     useEffect(() => {
@@ -104,14 +111,16 @@ function DocBody({ doc }) {
     return (
         <article>
             <header className="explorer-page-header">
-                <span className="explorer-page-eyebrow">Docs</span>
+                <span className="explorer-page-eyebrow">{docsCopy(code).page.eyebrow}</span>
                 {/* the static page says under the title when the content last
                     changed (the sitemap's lastmod), which the SPA does not know */}
                 <h1 className="explorer-page-title">{doc.title}</h1>
             </header>
             {/* the header's h1 is the document's title: drop the markdown's own
                 "# Title" and nest the remaining headings beneath it */}
-            <Markdown source={doc.content} baseHref={`/docs/${doc.path}`} dropTitle headingBase={1} />
+            {doc.lang
+                ? <Markdown source={doc.content} baseHref={`/docs/${doc.path}`} dropTitle headingBase={1} headingIds={doc.headingIds} hrefFor={(href) => localizedHref(href, doc.lang)} labels={docsCopy(doc.lang).code} />
+                : <Markdown source={doc.content} baseHref={`/docs/${doc.path}`} dropTitle headingBase={1} />}
         </article>
     );
 }

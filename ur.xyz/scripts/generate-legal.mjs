@@ -4,7 +4,9 @@
  * real documents on both renderers instead of placeholders.
  *
  * legal-md.mjs is a copy of mmm/ur.io/react/scripts/legal-md.mjs (the repos
- * build independently); if the converter grows, update both.
+ * build independently); if the converter grows, update both. This copy also
+ * renders *italic* (the terms' *Howey* and closing licence line); ur.io's
+ * documents use none, so its copy still renders them alike.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";

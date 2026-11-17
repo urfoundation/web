@@ -2,6 +2,11 @@
 //
 // Covers Astro-only pages that the React/Astro pixel-parity test cannot compare,
 // and locks down the shared navigation contract at the two responsive boundaries.
+// /dashboard, standalone (no site nav or footer), is checked in every language,
+// tab by tab: Grafana answered by tests/dashboard-fixture.mjs, Bittensor mainnet
+// left unreachable, as on a network that blocks it; and once, how it takes
+// answers that come late: a Grafana read held until the page has drawn, and one
+// refused until the page asks again.
 import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 import http from 'node:http';
@@ -9,6 +14,10 @@ import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OFFLINE_CHROMIUM_ARGS } from './offline-chromium.mjs';
+import { localizedSamples } from './localized-samples.mjs';
+import { dashboardGrafana } from './dashboard-fixture.mjs';
+import { loadPageCopy } from '../src/i18n/page-copy.js';
+import { SITE_LANG_CODES, basePathFor, langForPath } from '../../astro/src/lib/route-localization.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ASTRO_DIR = path.resolve(__dirname, '../../astro');
@@ -18,7 +27,15 @@ const ROOT = path.join(ASTRO_DIR, 'build', UR_ENV);
 // /docs/operator: the guide with the longest code lines and two tables of
 // code; /docs/miner: a directory tree. Their code wraps and their tables stack,
 // so neither a code block nor a table scrolls sideways at any width.
-const ROUTES = ['/build', '/about', '/investors', '/reserve', '/mainnet', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner'];
+// /ctf: the 249-country grid; /ctf/vc and /ctf/gs: the longest country names.
+// /dashboard in every language (and so its Arabic and German samples).
+const DASHBOARD = SITE_LANG_CODES.map((lang) => (lang === 'en' ? '/dashboard' : `/${lang}/dashboard`));
+const ROUTES = [...new Set(['/build', '/about', '/investors', '/reserve', '/mainnet', '/ctf', '/ctf/ke', '/ctf/vc', '/ctf/gs', '/research/2026-q3-report', '/research/methodology', '/', '/operators', '/miners', '/validators', '/research', '/docs', '/docs/operator', '/docs/miner',
+    // a page of each localized page group, in Arabic and German (localized-samples.mjs)
+    ...localizedSamples(['ar', 'de']), ...DASHBOARD])];
+const DASHBOARD_TABS = ['overview', 'network', 'providers', 'subnet', 'more', 'method'];
+// the dashboard's note for what it reads from Bittensor mainnet, by language
+const dashboardScript = await loadPageCopy('dashboard/script');
 const PROFILES = [
   { name: 'desktop', width: 1280, height: 900 },
   { name: 'desktop-edge', width: 1080, height: 800 },
@@ -29,7 +46,9 @@ const PROFILES = [
   { name: 'phone-landscape', width: 844, height: 390 },
 ];
 const PRIMARY_ORDER = ['research', 'build', 'investors', 'about', 'docs'];
-const MOBILE_ORDER = ['operators', 'miners', 'validators', ...PRIMARY_ORDER];
+const MOBILE_ORDER = ['operators', 'miners', 'validators', 'dashboard', 'capture the flag', ...PRIMARY_ORDER];
+// a page whose nav link reads otherwise than its path
+const NAV_NAME = { '/ctf': 'capture the flag' };
 const LANGUAGE_ORDER = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
 
 function freePort() {
@@ -97,19 +116,27 @@ async function visible(locator) {
 async function auditPage(browser, base, route, profile) {
   const page = await browser.newPage({ viewport: { width: profile.width, height: profile.height } });
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  const dashboard = basePathFor(route) === '/dashboard';
   // opentensor.ai: the reserve page reads Bittensor mainnet in the browser, and
   // geckoterminal.com the α price with USD selected; an empty answer keeps this
   // audit independent of the chain (the page then shows its "waiting for the
-  // chain" state, which is the layout under test).
-  await page.route(/bringyour\.com|ur\.network|opentensor\.ai|geckoterminal\.com/, (request) => request.fulfill({ json: {} }).catch(() => request.abort()));
+  // chain" state, which is the layout under test). /dashboard's Grafana, which it
+  // reads through /__grafana off ur.xyz, is the fixture's, and its chain is left
+  // unreachable: the page shows what it reads there as unavailable.
+  await page.route(dashboard ? /bringyour\.com|ur\.network|geckoterminal\.com/ : /bringyour\.com|ur\.network|opentensor\.ai|geckoterminal\.com/, (request) => request.fulfill({ json: {} }).catch(() => request.abort()));
+  if (dashboard) await page.route('**/__grafana/**', dashboardGrafana());
   const errors = [];
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() !== 'error') return;
+    // the browser's own line for each request to the unreachable chain
+    if (dashboard && /^Failed to load resource/.test(message.text()) && /^https:\/\/[^/]*\.opentensor\.ai\//.test(message.location()?.url || '')) return;
+    errors.push(message.text());
   });
   page.on('pageerror', (error) => errors.push(error.message));
 
   const response = await page.goto(base + route, { waitUntil: 'networkidle' });
   assert(response?.status() === 200, `${route} returned ${response?.status() || 'no response'}`);
+  if (dashboard) await page.waitForFunction(() => !document.body.classList.contains('is-loading'), null, { timeout: 30_000 });
 
   const shell = await page.evaluate(() => ({
     h1s: document.querySelectorAll('h1').length,
@@ -120,9 +147,19 @@ async function auditPage(browser, base, route, profile) {
   assert(shell.overflow <= 1, `${route} overflows horizontally by ${shell.overflow}px at ${profile.width}px`);
   assert(shell.brokenImages.length === 0, `${route} has broken images: ${shell.brokenImages.join(', ')}`);
   assert(errors.length === 0, `${route} logged errors: ${errors.join(' | ')}`);
-  assert(await page.locator('footer a[href="/about"]').count() > 0, `${route} footer has no About link`);
+  // a translated page (localized-samples.mjs) is held to the language-neutral
+  // checks: one h1, no sideways scroll, images, errors, and its page's layout
+  // checks below; the nav's names and order are English's
+  const lang = langForPath(route);
+  const pagePath = basePathFor(route);
+  if (dashboard) {
+    await auditDashboard(page, route, lang, profile, errors);
+    await page.close();
+    return;
+  }
+  if (lang === 'en') assert(await page.locator('footer a[href="/about"]').count() > 0, `${route} footer has no About link`);
 
-  if (route.startsWith('/docs/')) {
+  if (pagePath.startsWith('/docs/')) {
     const sideways = await page.evaluate(() => [...document.querySelectorAll('.md-pre, .md-table-wrap')]
       .filter((el) => el.scrollWidth > el.clientWidth + 1)
       .map((el) => `${el.className}: ${el.textContent.trim().slice(0, 40)}`));
@@ -133,7 +170,9 @@ async function auditPage(browser, base, route, profile) {
   const menuToggle = page.locator('header button[aria-label*="menu" i], header summary[aria-label*="menu" i]');
   const mobile = profile.width <= 1020;
 
-  if (!mobile) {
+  if (lang !== 'en') {
+    // the nav's checks below read English names
+  } else if (!mobile) {
     assert(await visible(primary), `${route} desktop navigation is hidden at ${profile.width}px`);
     assert(!(await visible(menuToggle)), `${route} mobile toggle is visible at ${profile.width}px`);
     const order = (await primary.locator(':scope > a').allTextContents()).map(linkName);
@@ -188,7 +227,7 @@ async function auditPage(browser, base, route, profile) {
       });
       assert(networkRhythm.underline === 'none', `${route} mobile Network label still renders a divider`);
       assert(networkRhythm.firstGap >= 3, `${route} Operators sits too close to the Network label`);
-      assert(networkRhythm.nextGap <= 8, `${route} leaves too much space between Validators and Research`);
+      assert(networkRhythm.nextGap <= 8, `${route} leaves too much space between the Network links and Research`);
       assert(networkRhythm.activeShadow === 'none', `${route} active Network link still renders a table-like side rule`);
     }
 
@@ -203,19 +242,19 @@ async function auditPage(browser, base, route, profile) {
     assert(!(await visible(mobileNav)), `${route} mobile navigation remains visible after Escape`);
   }
 
-  const activeRoute = route === '/' ? null : route.slice(1);
+  const activeRoute = route === '/' || lang !== 'en' ? null : NAV_NAME[route] || route.slice(1);
   if (activeRoute && MOBILE_ORDER.includes(activeRoute)) {
     const active = page.locator(`a[href="${route}"][aria-current="page"]`);
     assert(await active.count() > 0, `${route} has no aria-current=page navigation link`);
   }
 
-  if (profile.width <= 844 && route === '/about') {
+  if (profile.width <= 844 && pagePath === '/about') {
     for (const link of await page.locator('.core-contributor__identity a').all()) {
       const box = await link.boundingBox();
       assert(box && box.width >= 44 && box.height >= 44, `/about contributor profile target is ${box?.width}×${box?.height}px`);
     }
   }
-  if (route === '/about') {
+  if (pagePath === '/about') {
     const sectionGaps = await page.evaluate(() => {
       const bottom = (selector) => document.querySelector(selector).getBoundingClientRect().bottom + scrollY;
       const top = (selector) => document.querySelector(selector).getBoundingClientRect().top + scrollY;
@@ -227,18 +266,123 @@ async function auditPage(browser, base, route, profile) {
     const maxGap = profile.width <= 820 ? 110 : 150;
     assert(sectionGaps.every((gap) => gap <= maxGap), `/about section spacing is too large: ${sectionGaps.map(Math.round).join(', ')}px`);
   }
-  if (profile.width <= 844 && route === '/investors') {
+  if (profile.width <= 844 && pagePath === '/investors') {
     for (const link of await page.locator('.resource-dl, .research-links a').all()) {
       const box = await link.boundingBox();
       assert(box && box.height >= 44, `/investors touch target is only ${box?.height}px high`);
     }
   }
-  if (profile.width <= 844 && route === '/build') {
+  if (profile.width <= 844 && pagePath === '/build') {
     const proofLink = page.locator('.proof-v12 a').first();
     const box = await proofLink.boundingBox();
     assert(box && box.height >= 44, `/build proof link is only ${box?.height}px high`);
   }
 
+  await page.close();
+}
+
+// /dashboard, standalone: its own nav (the rail), every tab without sideways scroll,
+// Grafana's panels drawn from the fixture, and what it reads from Bittensor mainnet
+// (the reserve, its inflow and the conviction locks) shown as unavailable in the
+// page's language, without a page error
+async function auditDashboard(page, route, lang, profile, errors) {
+  const chainLine = dashboardScript(lang).chainUnavailable;
+  assert(typeof chainLine === 'string' && chainLine.length > 0, `${route}: no chainUnavailable copy`);
+  assert(!(await page.evaluate(() => document.body.classList.contains('is-error'))), `${route} shows its error state with Grafana answering`);
+  assert(await page.locator('.rail .nav button').count() >= 5, `${route} has no section nav`);
+  const unavailable = new Map();
+  for (const tab of DASHBOARD_TABS) {
+    await page.evaluate((t) => { history.pushState(null, '', `#${t}`); dispatchEvent(new PopStateEvent('popstate')); }, tab);
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const state = await page.evaluate((t) => {
+      const section = document.querySelector(`section[data-tab="${t}"]`);
+      return {
+        shown: !!section && !section.hidden && section.getBoundingClientRect().height > 0,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        waiting: section ? section.querySelectorAll('.pn.wait').length : 0,
+        unavailable: section ? [...section.querySelectorAll('.pn.na')].map((pn) => [pn.querySelector('.pt')?.id || pn.querySelector('[id]')?.id || '?', pn.dataset.na]) : [],
+        sna: document.getElementById('s-na')?.hidden === false ? document.getElementById('s-na').textContent : null,
+      };
+    }, tab);
+    assert(state.shown, `${route} #${tab} is not shown at ${profile.width}px`);
+    assert(state.overflow <= 1, `${route} #${tab} overflows horizontally by ${state.overflow}px at ${profile.width}px`);
+    assert(state.waiting === 0, `${route} #${tab} still waits for the unreachable chain`);
+    for (const [id, text] of state.unavailable) unavailable.set(id, text);
+    if (tab === 'overview') {
+      assert(state.sna === chainLine, `${route} SN25 card says "${state.sna}" for the unreachable chain`);
+      // the live figures (the stats feed's and the hourly gauges') are drawn
+      const live = await page.evaluate(() => ['#o-users', '#o-prov', '#o-data', '#o-nets', '#c-ctry', '#s-px'].map((id) => [id, document.querySelector(id)?.textContent.trim()]));
+      for (const [id, text] of live) assert(text && text !== '—', `${route} ${id} shows "${text}"`);
+    }
+  }
+  // with Grafana answering, only the chain's two panels on the SN25 tab lack their data
+  const ids = [...unavailable.keys()].sort();
+  assert(JSON.stringify(ids) === JSON.stringify(['cv-tot', 'r-bal']), `${route} panels unavailable: ${ids.join(', ') || 'none'}`);
+  for (const [id, text] of unavailable) assert(text === chainLine, `${route} ${id} says "${text}" for the unreachable chain`);
+  assert(errors.length === 0, `${route} logged errors: ${errors.join(' | ')}`);
+}
+
+// /dashboard's late answers, once (desktop, English). Grafana's panel 33 (the
+// countries now) is held until the page has drawn: its panels shimmer, then fill
+// once it answers. The stats feed is refused once: once nothing else is out, its
+// panels say they couldn't load, then fill when the page asks again (its first
+// retry, 10 s on). Nothing is logged but the refused request and the chain's.
+async function auditDashboardLate(browser, base) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const fixture = dashboardGrafana();
+  const held = [];
+  let holding = true, refused = 0;
+  await page.route(/bringyour\.com|ur\.network|geckoterminal\.com/, (request) => request.fulfill({ json: {} }).catch(() => request.abort()));
+  await page.route('**/__grafana/**', (route) => {
+    const url = new URL(route.request().url());
+    if (holding && /\/panels\/33\/query$/.test(url.pathname)) { held.push(route); return undefined; }
+    if (url.pathname.endsWith('/stats.json') && refused++ === 0) return route.fulfill({ status: 503, body: 'down' });
+    return fixture(route);
+  });
+  const errors = [];
+  page.on('console', (message) => {
+    if (message.type() !== 'error') return;
+    const at = message.location()?.url || '';
+    if (/^Failed to load resource/.test(message.text()) && (/^https:\/\/[^/]*\.opentensor\.ai\//.test(at) || /\/__grafana\/stats\.json$/.test(at))) return;
+    errors.push(message.text());
+  });
+  page.on('pageerror', (error) => errors.push(error.message));
+  const panel = (selector) => page.evaluate((sel) => {
+    const pn = document.querySelector(sel)?.closest('.pn');
+    return pn ? { na: pn.classList.contains('na') ? pn.dataset.na : null, wait: pn.classList.contains('wait') } : null;
+  }, selector);
+  const { unavailable } = dashboardScript('en');
+
+  // the held reads keep the network busy: wait for the page's own draw, not for quiet
+  await page.goto(`${base}/dashboard`, { waitUntil: 'load' });
+  await page.waitForFunction(() => !document.body.classList.contains('is-loading'), null, { timeout: 30_000 });
+  assert(held.length > 0, '/dashboard (late answers) never asked for panel 33');
+  assert((await panel('#c-reg'))?.wait, '/dashboard (late answers) coverage does not wait for its held read');
+  assert((await panel('#oe-figs'))?.wait, '/dashboard (late answers) this epoch does not wait while a read is out');
+
+  holding = false;
+  for (const route of held.splice(0)) await fixture(route);
+  await page.waitForFunction(() => {
+    const pn = document.querySelector('#c-reg')?.closest('.pn');
+    return pn && !pn.classList.contains('na') && !pn.classList.contains('wait') && document.querySelectorAll('#c-reg .r').length > 0;
+  }, null, { timeout: 15_000 }).catch(() => {});
+  const coverage = await panel('#c-reg');
+  assert(coverage && !coverage.na && !coverage.wait, `/dashboard (late answers) coverage after its read: ${JSON.stringify(coverage)}`);
+  // what panel 33 feeds: the continents and the country search's list (the count of countries is the stats feed's)
+  const fed = await page.evaluate(() => [document.querySelectorAll('#c-reg .r').length, document.querySelectorAll('#c-list option').length]);
+  assert(fed[0] === 6 && fed[1] > 0, `/dashboard (late answers) coverage after its read: ${fed[0]} continents, ${fed[1]} countries`);
+  const epoch = await panel('#oe-figs');
+  assert(epoch?.na === unavailable, `/dashboard (late answers) this epoch without the stats feed: ${JSON.stringify(epoch)}`);
+
+  await page.waitForFunction(() => {
+    const pn = document.querySelector('#oe-figs')?.closest('.pn');
+    return pn && !pn.classList.contains('na') && document.querySelector('#oe-figs')?.textContent.trim() !== '';
+  }, null, { timeout: 30_000 }).catch(() => {});
+  const filled = await panel('#oe-figs');
+  assert(filled && !filled.na && !filled.wait, `/dashboard (late answers) this epoch after the retry: ${JSON.stringify(filled)}`);
+  assert(refused >= 2, '/dashboard (late answers) never asked for the stats feed again');
+  assert(errors.length === 0, `/dashboard (late answers) logged errors: ${errors.join(' | ')}`);
   await page.close();
 }
 
@@ -268,12 +412,15 @@ async function main() {
         console.log(`PASS  ${route}`);
       }
     }
+    await auditDashboardLate(browser, base);
+    passed += 1;
+    console.log('\nPASS  /dashboard (late answers)');
   } finally {
     await browser.close();
     await new Promise((resolve) => server.close(resolve));
   }
 
-  console.log(`\n${passed}/${ROUTES.length * PROFILES.length} responsive shell checks passed.`);
+  console.log(`\n${passed}/${ROUTES.length * PROFILES.length + 1} responsive shell checks passed.`);
 }
 
 main().catch((error) => {

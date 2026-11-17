@@ -2,18 +2,25 @@
  * The pure parts of the research report page (pages/ResearchReport.jsx): the
  * meters' state as of each entry, glossary links, chart layouts and number
  * formatting. No React and no DOM, so tests/research-report.test.mjs can run
- * it under node.
+ * it under node. The words are the page's copy units
+ * (i18n/pages/research-report/), in the page's language.
  */
+import { formatNumber } from '../../../i18n/format.js';
+import { TERM_PATTERNS_BY_LANG } from '../../../i18n/pages/research-report/terms.js';
 
-export const fmt = (v, d = 0) => v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+/** A figure with `d` decimals, in the page's language: 2,552.3 (en), 2.552,3 (de), 2 552,3 (ru). */
+export const fmt = (v, d = 0, lang = 'en') => formatNumber(v, lang, { minimumFractionDigits: d, maximumFractionDigits: d });
+
+/** A figure with the decimals the data writes it with (9.9, 40, 92.5), in the page's language. */
+export const fmtAsWritten = (v, lang = 'en') => fmt(v, (String(v).split('.')[1] || '').length, lang);
+
+/** The languages written right to left: their charts keep left-to-right axes (ResearchReport.css). */
+export const isRtl = (lang) => lang === 'ar';
 
 export const PLURAL = { gain: 'gains', recovery: 'recoveries', observation: 'observations', mixed: 'mixed', rejected: 'rejected', groundwork: 'groundwork' };
 
-export const MONTHS = [
-    { key: 'aug', name: 'August', label: 'Aug' },
-    { key: 'sep', name: 'September', label: 'Sep' },
-    { key: 'oct', name: 'October', label: 'Oct' },
-];
+/** The months of the timeline; their names are the copy's `months`. */
+export const MONTHS = [{ key: 'aug' }, { key: 'sep' }, { key: 'oct' }];
 
 const DAY = 86_400_000;
 /** Days from `startIso` to `iso` (both YYYY-MM-DD, UTC). */
@@ -23,6 +30,8 @@ export const daysBetween = (startIso, iso) => (Date.parse(`${iso}T00:00:00Z`) - 
  * The meters as of every entry: states[0] is before the first entry and
  * states[i + 1] is after entry i. A meter moves only at the entry that
  * recorded its evidence; nothing is ever summed or multiplied across entries.
+ * Each item keeps `i`, its entry's index, and `ref`, where its words are in
+ * that entry's meter labels in the page copy (wordsOf).
  */
 export function computeStates(entries) {
     const st = { i: -1, load: { baselines: [], points: [], latest: null, final: false }, bulk: { controlled: null, points: [] }, path: [], memory: [], fixed: [] };
@@ -32,23 +41,33 @@ export function computeStates(entries) {
         const m = e.meters || {};
         st.i = i;
         if (m.load) {
-            if (m.load.baseline) st.load.baselines.push({ ...m.load.baseline, i });
-            for (const p of m.load.points || []) {
-                st.load.points.push({ ...p, i });
-                st.load.latest = { ...p, i, date: e.date };
+            if (m.load.baseline) st.load.baselines.push({ ...m.load.baseline, i, ref: 'load.baseline' });
+            (m.load.points || []).forEach((p, k) => {
+                st.load.points.push({ ...p, i, ref: `load.points.${k}` });
+                st.load.latest = { ...p, i, date: e.date, ref: `load.points.${k}` };
                 if (p.final) st.load.final = true;
-            }
+            });
         }
         if (m.bulk) {
-            if (m.bulk.controlled) st.bulk.controlled = { ...m.bulk.controlled, i, date: e.date };
-            for (const p of m.bulk.points || []) st.bulk.points.push({ ...p, i, date: e.date });
+            if (m.bulk.controlled) st.bulk.controlled = { ...m.bulk.controlled, i, date: e.date, ref: 'bulk.controlled' };
+            (m.bulk.points || []).forEach((p, k) => st.bulk.points.push({ ...p, i, date: e.date, ref: `bulk.points.${k}` }));
         }
-        for (const it of m.path || []) st.path.push({ ...it, i, date: e.date });
-        for (const it of m.memory || []) st.memory.push({ ...it, i, date: e.date });
-        if (m.fixed) st.fixed.push({ ...m.fixed, i, date: e.date });
+        (m.path || []).forEach((it, k) => st.path.push({ ...it, i, date: e.date, ref: `path.${k}` }));
+        (m.memory || []).forEach((it, k) => st.memory.push({ ...it, i, date: e.date, ref: `memory.${k}` }));
+        if (m.fixed) st.fixed.push({ ...m.fixed, i, date: e.date, ref: 'fixed' });
         states.push(copy());
     });
     return states;
+}
+
+/**
+ * A meter item's words in the page copy `t`: its entry's meter labels
+ * (i18n/pages/research-report/english.js), at the item's `ref`. A load or bulk
+ * point and a recovery are a label; a path or memory item is { l, t }; the
+ * controlled bulk run is its multiple ("6.7×").
+ */
+export function wordsOf(t, entries, item) {
+    return item.ref.split('.').reduce((o, key) => (o == null ? o : o[key]), t.entries[entries[item.i].id].meters);
 }
 
 /** The meters an entry moves, in meter order. */
@@ -123,11 +142,25 @@ const TERM_PATTERNS = {
 /** The anchor id of a glossary term: "WebSocket masking" is g-websocket-masking, "H1+" g-h1-plus. */
 export const termId = (term) => `g-${term.toLowerCase().replace(/\+/g, ' plus ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
-/** The glossary terms the page links, longest pattern first so H1+ wins over H1. */
-export function termMatchers(glossary) {
-    return glossary
-        .filter(([term]) => TERM_PATTERNS[term])
-        .map(([term, def]) => ({ term, def, id: termId(term), re: TERM_PATTERNS[term] }))
+const PATTERNS_BY_ID = Object.fromEntries(Object.entries(TERM_PATTERNS).map(([term, re]) => [termId(term), re]));
+
+
+/**
+ * The glossary terms the page links, longest pattern first so H1+ wins over
+ * H1. `glossary` is the copy's `terms` ({ id: { term, def } }), or the data's
+ * [term, def] pairs; `lang` picks the patterns.
+ */
+export function termMatchers(glossary, lang = 'en') {
+    const terms = Array.isArray(glossary)
+        ? glossary.map(([term, def]) => [termId(term), { term, def }])
+        : Object.entries(glossary);
+    // names and acronyms (ACK, H1+, PERFVAR, cwnd) stay as they are in every
+    // language, so the English patterns find them; a term that is a word takes
+    // the translation's own wording (i18n/pages/research-report/terms.js)
+    const local = (lang !== 'en' && TERM_PATTERNS_BY_LANG[lang]) || {};
+    return terms
+        .map(([id, { term, def }]) => ({ term, def, id, re: local[id] || PATTERNS_BY_ID[id] }))
+        .filter((t) => t.re)
         .sort((a, b) => b.re.source.length - a.re.source.length);
 }
 
@@ -182,13 +215,14 @@ export function linkHtml(html, matchers, used) {
 // ── the page's sections ───────────────────────────────────────────────────────
 // The order the page reads in, and what the sidebar (wide screens) and the
 // section menu (tablets and phones) list: each group's id is an element on the
-// page, and so is each of its items.
+// page, and so is each of its items. Their labels are the copy's toc.labels,
+// by id.
 export const TOC = [
-    { id: 'report', label: 'Intro', items: [{ id: 'glance', label: 'At a glance' }, { id: 'why', label: 'Why it matters' }] },
-    { id: 'timeline', label: 'Timeline', items: [{ id: 'month-aug', label: 'August' }, { id: 'month-sep', label: 'September' }, { id: 'month-oct', label: 'October' }] },
-    { id: 'methods', label: 'Methods', items: [] },
-    { id: 'milestones', label: 'Milestones', items: [{ id: 'milestone', label: 'Gigabit-class throughput' }] },
-    { id: 'details', label: 'Details', items: [{ id: 'end', label: 'Start to end' }, { id: 'instruments', label: 'Instruments' }, { id: 'open', label: 'Open questions' }, { id: 'glossary', label: 'Glossary' }] },
+    { id: 'report', items: [{ id: 'glance' }, { id: 'why' }] },
+    { id: 'timeline', items: [{ id: 'month-aug' }, { id: 'month-sep' }, { id: 'month-oct' }] },
+    { id: 'methods', items: [] },
+    { id: 'milestones', items: [{ id: 'milestone' }] },
+    { id: 'details', items: [{ id: 'end' }, { id: 'instruments' }, { id: 'open' }, { id: 'glossary' }] },
 ];
 
 /** Every section id in page order, groups before their items. */

@@ -1,0 +1,12 @@
+---
+// /price, the published price sheet, in the site's other languages: the same route as the English
+// page (components/routes/PriceRoute.astro), built per language once the
+// `price` page group is localized.
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+import PriceRoute from '../../components/routes/PriceRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('price');
+}
+---
+<PriceRoute lang={Astro.params.lang} />

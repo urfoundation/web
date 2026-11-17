@@ -22,11 +22,25 @@
  * at the moment the change is first synced — that is the "published" time
  * the RSS feed reports. Re-running the script without a change is a no-op,
  * so build output is deterministic.
+ *
+ * Nothing is written unless the sheet passes the publish gate. scripts/price-gate.mjs
+ * holds it to what readers accept and what the site can show truthfully, and refuses
+ * a sheet that drops or changes a signed entry already published, or adds one before
+ * them. Signatures are the sn repo's to check: with a checkout that has
+ * cli/pricesheet, its `verify` runs on the exact bytes about to publish, and a
+ * refusal stops the publish. Without one, a sheet with signed entries publishes only
+ * if it is what was published last.
+ *
+ * With --check it writes nothing and fails unless the tracked copies are what a sync
+ * would leave: the build's gates run this, because nothing in the build syncs.
  */
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseYaml } from '../react/src/lib/yaml.js';
+import { parsePriceSheet } from '../react/src/lib/price.js';
+import { checkPriceSheet } from './price-gate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SN_DIR = process.env.SN_DIR || path.resolve(ROOT, '../../sn');
@@ -61,18 +75,6 @@ function loadSheet() {
     process.exit(1);
 }
 
-/** Normalized tier list from the sheet: ascending staked-α thresholds. */
-function tiersOf(sheet) {
-    const raw = sheet.tiered_per_block_demand_deposits || {};
-    return Object.keys(raw)
-        .map(k => ({
-            minStakeAlpha: Number(k),
-            alphaPerGib: Number(raw[k]?.alpha_per_gib ?? 0),
-            alphaPerUser: Number(raw[k]?.alpha_per_user ?? 0)
-        }))
-        .sort((a, b) => a.minStakeAlpha - b.minStakeAlpha);
-}
-
 function escapeHtml(s) {
     return String(s)
         .replaceAll('&', '&amp;')
@@ -85,19 +87,20 @@ function escapeHtml(s) {
 function entryHtml(entry) {
     let sheet;
     try {
-        sheet = parseYaml(entry.yaml);
+        sheet = parsePriceSheet(entry.yaml);
     } catch {
-        sheet = {};
+        sheet = { tiers: [], signed: [] };
     }
-    const tiers = tiersOf(sheet);
-    const rows = tiers.map((t, i) => `<tr><td>${i}</td><td>${
-        t.minStakeAlpha === 0 ? '0 (everyone)' : `&#8805; ${t.minStakeAlpha}`
-    }</td><td>${t.alphaPerGib}</td><td>${t.alphaPerUser}</td></tr>`).join('');
+    const newest = sheet.signed[sheet.signed.length - 1];
+    const rows = (newest ? newest.tiers : sheet.tiers).map((t, i) => `<tr><td>${i}</td><td>${
+        t.minStakeAlpha === 0 ? '0 (everyone)' : `&#8805; ${t.exact.minStake}`
+    }</td><td>${t.exact.gib}</td><td>${t.exact.user}</td></tr>`).join('');
 
     return [
         `<p>UR subnet ${sheet.sn ?? '?'} — demand deposit price per block (7 days).`,
         ` An operator pays the best tier whose staked-&#945; threshold it meets;`,
         ` tier 0 applies to everyone.</p>`,
+        newest ? `<p>Signed by the subnet owner: these rates apply from epoch ${newest.effectiveEpoch}, with a deposit cap of ${newest.capAlpha} &#945; per operator per epoch.</p>` : '',
         `<table border="1" cellpadding="4" cellspacing="0">`,
         `<tr><th>Tier</th><th>Staked &#945; threshold</th><th>&#945; / GiB</th><th>&#945; / user</th></tr>`,
         rows,
@@ -143,24 +146,97 @@ function buildRss(history) {
     ].filter(l => l !== null).join('\n');
 }
 
-function main() {
-    let content = loadSheet();
-    if (!content.endsWith('\n')) content += '\n';
+/** Stop without writing anything. */
+function refuse(reasons) {
+    for (const reason of reasons) console.error(`[sync-price] ${reason}`);
+    console.error('[sync-price] not publishing');
+    process.exit(1);
+}
 
-    // Fail loudly on an unparsable or empty sheet rather than publishing it.
-    const sheet = parseYaml(content);
-    if (typeof sheet.sn !== 'number' || tiersOf(sheet).length === 0) {
-        console.error('[sync-price] price.yml is missing "sn" or "tiered_per_block_demand_deposits" — not publishing');
-        process.exit(1);
+/**
+ * The pricesheet tool's verdict on these exact bytes: { passed }, { refused } or,
+ * when there is no tool to ask, { unavailable }. Building it apart from running it
+ * keeps a checkout that does not compile from reading as a bad signature.
+ */
+function verifySignatures(content) {
+    if (!fs.existsSync(path.join(SN_DIR, 'cli', 'pricesheet'))) {
+        return { unavailable: `no cli/pricesheet at ${SN_DIR}` };
     }
+    const work = fs.mkdtempSync(path.join(os.tmpdir(), 'sync-price-'));
+    try {
+        const tool = path.join(work, 'pricesheet');
+        log('building the pricesheet tool');
+        const build = spawnSync('go', ['build', '-o', tool, './cli/pricesheet'], { cwd: SN_DIR, encoding: 'utf8' });
+        if (build.error || build.status !== 0) {
+            return { unavailable: `cli/pricesheet did not build: ${build.error?.message ?? build.stderr.trim()}` };
+        }
+        const file = path.join(work, 'price.yml');
+        fs.writeFileSync(file, content);
+        const verify = spawnSync(tool, ['verify', `--in=${file}`], { encoding: 'utf8' });
+        if (verify.error || verify.status !== 0) {
+            return { refused: verify.error?.message ?? (verify.stderr.trim() || 'pricesheet verify failed') };
+        }
+        return { passed: verify.stdout.trim() };
+    } finally {
+        fs.rmSync(work, { recursive: true, force: true });
+    }
+}
 
+/** --check: the tracked copies are what a sync would leave, and they pass the gate. */
+function check(history) {
+    if (!fs.existsSync(CANONICAL)) refuse([`no ${path.relative(ROOT, CANONICAL)}`]);
+    const content = fs.readFileSync(CANONICAL, 'utf8');
+    const last = history[history.length - 1];
+    const problems = checkPriceSheet(content, { previous: history[history.length - 2]?.yaml });
+    if (!last || last.yaml !== content) problems.push(`${path.relative(ROOT, CANONICAL)} is not the last entry of the history`);
+    const rss = buildRss(history);
+    for (const dir of PUBLIC_DIRS) {
+        const copies = [['price.yml', content], ['price.rss', rss]];
+        for (const [name, want] of copies) {
+            const file = path.join(dir, name);
+            if (!fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== want) {
+                problems.push(`${path.relative(ROOT, file)} is not what a sync would write`);
+            }
+        }
+    }
+    if (problems.length > 0) refuse([...problems, 'run scripts/sync-price.mjs']);
+    log('the tracked sheet and its copies are in order');
+}
+
+function main() {
     let history = [];
     if (fs.existsSync(HISTORY)) {
         history = JSON.parse(fs.readFileSync(HISTORY, 'utf8'));
     }
+    if (process.argv.includes('--check')) {
+        check(history);
+        return;
+    }
+
+    let content = loadSheet();
+    if (!content.endsWith('\n')) content += '\n';
 
     const last = history[history.length - 1];
-    if (!last || last.yaml !== content) {
+    const changed = !last || last.yaml !== content;
+
+    // Fail loudly on a sheet that is broken rather than publishing it.
+    const previous = changed ? last?.yaml : history[history.length - 2]?.yaml;
+    const problems = checkPriceSheet(content, { previous });
+    if (problems.length > 0) refuse(problems);
+
+    const verdict = verifySignatures(content);
+    if (verdict.refused) refuse([`pricesheet verify: ${verdict.refused}`]);
+    if (verdict.unavailable) {
+        // What the last sync verified needs no new word. A new signed price does.
+        if (changed && parsePriceSheet(content).signed.length > 0) {
+            refuse([`this sheet has signed entries and nothing can check them: ${verdict.unavailable}`]);
+        }
+        log(`signatures not checked: ${verdict.unavailable}`);
+    } else {
+        log(`pricesheet verify passed: ${verdict.passed.split('\n').join(' | ')}`);
+    }
+
+    if (changed) {
         history.push({ date: new Date().toISOString(), yaml: content });
         log(`price change recorded (${history.length} ${history.length === 1 ? 'entry' : 'entries'})`);
     } else {

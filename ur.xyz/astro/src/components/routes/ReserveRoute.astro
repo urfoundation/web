@@ -1,0 +1,51 @@
+---
+// /reserve, the Network Capacity Reserve, in any site language: the English
+// page (pages/reserve.astro) and its translations (pages/[lang]/reserve.astro)
+// render this.
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/Reserve.jsx), rendered on the server here and
+// hydrated on load: the reserve's balance, the SN25 pool and emission and
+// the routing of the miner allocation are read in the browser from Bittensor
+// mainnet (react/src/lib/subtensor.js), so the static HTML carries the
+// editorial content and the projection's frame, and the chain fills in the
+// figures. The shell around it is the section pages' exactly, so the SPA and
+// this render are pixel-identical. The page's words are the `reserve` copy
+// units (react/src/i18n/pages/reserve/), the shell's (the disclaimer, nav and
+// footer) the site dictionary's.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import ReservePage from '@react/components/pages/Reserve.jsx';
+import { getDict } from '../../lib/i18n.js';
+import { loadPageCopy } from '@react/i18n/page-copy.js';
+import { FINNEY_RPC } from '@react/lib/subtensor.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const { meta } = (await loadPageCopy('reserve'))(lang);
+---
+<Base title={meta.title} description={meta.description} breadcrumbName={meta.breadcrumb} lang={lang}>
+    {/* the first chain read happens on hydration; warm the connection */}
+    <link slot="head" rel="preconnect" href={FINNEY_RPC[0]} crossorigin />
+    {/* the wallet address, under the lede, is set in the code face */}
+    <link slot="head" rel="preload" href="/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="reserve" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            <ReservePage route={{ name: 'reserve', slug: null }} lang={lang} client:load />
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

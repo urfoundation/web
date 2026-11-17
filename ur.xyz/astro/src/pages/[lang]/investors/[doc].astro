@@ -1,0 +1,20 @@
+---
+// /<lang>/investors/<doc>: each Investor Centre document in each translation,
+// one for every English page in src/pages/investors/ (the registry's documents,
+// react/src/data/investors.js). The page is InvestorsRoute's, as is the English
+// one; it is built only while the investors page group is localized
+// (react/src/i18n/pages/investors/group.js). The letter's former address,
+// /investors/august-investment-letter, has no translation: nginx sends
+// /<lang>/investors/august-investment-letter on to the English redirect.
+import InvestorsRoute from '../../../components/routes/InvestorsRoute.astro';
+import { localizedStaticPaths } from '../../../lib/route-localization.js';
+import { investorCentre } from '@react/data/investors.js';
+
+export function getStaticPaths() {
+    const docs = [...new Set(Object.values(investorCentre)
+        .filter((doc) => doc && typeof doc === 'object' && typeof doc.href === 'string' && doc.href.startsWith('/investors/'))
+        .map((doc) => doc.href.slice('/investors/'.length)))];
+    return localizedStaticPaths('investors', docs.map((doc) => ({ params: { doc } })));
+}
+---
+<InvestorsRoute lang={Astro.params.lang} slug={Astro.params.doc} />

@@ -6,6 +6,8 @@
  *   button — pill button; disabled look until button.href exists
  * Card titles are h2s: the grid sits directly under the section page's h1
  * (.card-title sets the look, so the level does not change it).
+ * `lang` is the page's language: a link to a page of this site that has
+ * translations leads to the page in it.
  */
 interface Props {
     items: Array<{
@@ -17,15 +19,18 @@ interface Props {
         soon?: string;
         button?: { label: string; href?: string };
     }>;
+    lang?: string;
 }
 
 import { EXTERNAL, isExternal } from '@react/lib/links.js';
+import { groupPageHref } from '../lib/route-localization.js';
 
-const { items } = Astro.props;
+const { items, lang = 'en' } = Astro.props;
 
 // only an external link opens a new tab; a guide on this site (/docs/miner)
 // opens in place, as in the React sections (react/src/lib/links.js)
 const linkAttrs = (href) => (isExternal(href) ? EXTERNAL : {});
+const local = (href) => groupPageHref(href, lang) || href;
 ---
 <div class="card-grid">
     {items.map(r => (
@@ -34,14 +39,14 @@ const linkAttrs = (href) => (isExternal(href) ? EXTERNAL : {});
             <h2 class="card-title">{r.title}</h2>
             <p class="card-body">{r.body}</p>
             {r.href && (
-                <a href={r.href} class="card-link" {...linkAttrs(r.href)}>
+                <a href={local(r.href)} class="card-link" {...linkAttrs(r.href)}>
                     {r.linkLabel}
                 </a>
             )}
             {r.soon && <span class="card-soon">{r.soon}</span>}
             {r.button && (
                 r.button.href
-                    ? <a href={r.button.href} class="card-button" {...linkAttrs(r.button.href)}>{r.button.label}</a>
+                    ? <a href={local(r.button.href)} class="card-button" {...linkAttrs(r.button.href)}>{r.button.label}</a>
                     : <span class="card-button is-disabled">{r.button.label}</span>
             )}
         </div>

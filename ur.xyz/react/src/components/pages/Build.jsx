@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BUILD_ARCH, BUILD_V12 } from '../../data/buildContent';
+import { loadPageCopy } from '../../i18n/page-copy.js';
+import { formatPercent, interpolate, intlLocale } from '../../i18n/format.js';
 import {
     COLORS,
     ChassisScene, SpineScene, TowerScene, FoundationScene, TerminalScene, Terminal3Scene,
 } from './BuildScenes';
 import { ArchitectureReadout, BriefPanel, Readout } from './BuildBrief';
+import { hasLocalizedVersion, localizedPathFor } from '../../../../astro/src/lib/route-localization.js';
 import './Build.css';
 
 /**
@@ -34,7 +37,17 @@ import './Build.css';
  * variables) live on the page wrapper, and Build.css keys off it. Astro renders
  * the component on the server, so the default is rendered first and the query
  * string is read in an effect; nothing touches window/document during render.
+ *
+ * Its words are four copy units in the page's language `lang`
+ * (react/src/i18n/pages/build/): `build` (this page and the brief's labels),
+ * `build/opportunities` and `build/briefs` (the six examples, paired by index
+ * with buildContent.js, which keeps their data) and `build/scenes` (the models).
  */
+
+const pageCopy = await loadPageCopy('build');
+const opportunitiesCopy = await loadPageCopy('build/opportunities');
+const briefsCopy = await loadPageCopy('build/briefs');
+const scenesCopy = await loadPageCopy('build/scenes');
 
 const OPS = BUILD_ARCH.opportunities;
 const MODELS = ['chassis', 'spine', 'tower', 'foundation', 'terminal', 'terminal3'];
@@ -53,42 +66,37 @@ const isTerminalModel = (model) => model === 'terminal' || model === 'terminal3'
 const initialView = (model) => (isTerminalModel(model) ? 'scrub' : 'open');
 const initialBriefMode = (model) => (model === 'terminal3' ? 'editorial' : 'structured');
 
-/* ---------- copy ---------- */
+/* ---------- the page's words in a language ---------- */
 
-const MODEL_COPY = {
-    chassis: { number: '05 / Exchange chassis', title: 'Open the network operator.', copy: 'The chassis turns the architecture into one coherent machine. Open it to separate the customer product from the operator, subnet access, validation, miner market and residential supply.', meta: 'UR / NETWORK OPERATOR EXCHANGE' },
-    spine: { number: '06 / Transit spine', title: 'Follow demand through the subnet.', copy: 'The transit spine reads left to right: customer demand enters an operator, crosses SN25 and its validation bridge, resolves through miner UIDs and exits through residential supply.', meta: 'UR / DEMAND TRANSIT SPINE' },
-    tower: { number: '07 / Subnet tower', title: 'Build upward from SN25.', copy: 'The tower makes the hierarchy literal. Residential supply and the miner market support SN25; validators measure it; the operator and customer product occupy the floors above.', meta: 'UR / SUBNET FOUNDATION TOWER' },
-    foundation: { number: '08 / Operator gateway', title: 'Change the product. Keep the foundation.', copy: 'The gateway is one coherent system: the selected opportunity becomes the product module, the Network Operator remains the control plane, and SN25 stays underneath as the shared foundation for routing, measurement and incentives.', meta: 'UR / NETWORK OPERATOR GATEWAY' },
-    terminal: { number: '09 / Operator terminal', title: 'See the product. Then open the system.', copy: 'The terminal begins as the customer-facing product a Network Operator brings to market. Drag it apart to see how operator services and the shared SN25 architecture power that product underneath.', meta: 'UR / NETWORK OPERATOR TERMINAL' },
-    terminal3: { number: '10 / Three-plane terminal', title: 'One operator product. Two shared planes underneath.', copy: 'The product and Network Operator now form one changing module. Open the terminal to reveal the shared provider-and-validator network seated on the SN25 protocol and economic foundation.', meta: 'UR / THREE-PLANE OPERATOR TERMINAL' },
-};
-const SECTION_HEAD_V11 = { number: 'Six starting points', title: 'What could run on UR?', copy: 'Choose an example to see an illustrative product surface above the same provider network and SN25 foundation. The six are prompts for builders, not a limit on what the infrastructure can support.', meta: 'UR / BUILD ON SHARED INFRASTRUCTURE' };
-const SECTION_HEAD_V12 = { number: 'Network Operator model', title: 'See the network beneath the product.', copy: 'Select one of six example products, then reveal the provider network and subnet foundation beneath its interface. Each shows one way builders could use the same shared infrastructure.', meta: 'UR / ONE PRODUCT · TWO SHARED PLANES' };
+/** The three planes of the terminal3 model: their keys and numbers (their words are build/scenes `planes`). */
+const PLANES = [{ key: 'operatorproduct', n: '01' }, { key: 'network', n: '02' }, { key: 'subnetbase', n: '03' }];
+const FLOW_COLORS = ['var(--green)', 'var(--pale)', 'var(--pink)'];
 
-const HERO_V10 = { eyebrow: 'The opportunity', h2: ['Bring the product.', 'Build on the subnet.'], p: 'A Network Operator turns customer demand into a product powered by UR. The operator owns the experience and commercial relationship; SN25 supplies measured residential routing and the incentive market beneath it.' };
-const HERO_V11 = { eyebrow: 'For builders', h2: ['Bring the product.', 'Build on the network.'], p: 'Build a customer product on top of UR’s shared residential network. You own the experience, users and commercial model; SN25 coordinates access, service measurement and incentives underneath.' };
-const HERO_V12 = { eyebrow: 'Build', p: 'Launch or migrate existing products onto UR’s residential privacy network. Network Operators own the customer experience and bring demand; UR provides the infrastructure. UR (SN25) is extending network coordination and incentives to Bittensor.' };
-
-const CTA_V11 = { eyebrow: 'Bring the next opportunity', title: 'What should run on UR?', copy: 'Bring an existing product or an idea these examples do not cover. Start a conversation about network fit, available infrastructure and what it could take to operate on SN25.' };
-const CTA = { eyebrow: 'The next operator', title: 'Become a Network Operator', copy: 'Bring an existing product or explore launching a new one on top of our fleet of network providers. Read the documentation and speak with the UR team about network fit.' };
-
-/** The three planes of the terminal3 model, worded per edition. */
-const TERMINAL3_COMPONENTS = [
-    { key: 'operatorproduct', n: '01', verb: 'CHANGES', name: 'Network Operator product', short: 'The product, audience and commercial relationship change.', detail: 'The Network Operator brings the customer-facing product, app or API, brand, users, policy, billing and product logic. Selecting another opportunity changes this entire top module.' },
-    { key: 'network', n: '02', verb: 'ROUTES + MEASURES', name: 'Miner UID + provider network', short: 'Provider supply attaches to miner UIDs; validators check it separately.', detail: 'Every miner is represented by a UID, with residential providers attached to those UIDs. Some miners participate through a pooled arrangement. Customer traffic traverses selected miner UIDs and provider routes; validators independently test the service but are not traffic hops.' },
-    { key: 'subnetbase', n: '03', verb: 'COORDINATES', name: 'SN25 protocol + economic backplane', short: 'Coordinates access, UIDs, measurement, reserve and settlement.', detail: 'SN25 is the shared substrate beneath every Network Operator. It coordinates network access and the UID registry, accepts independent measurement, and keeps operator demand into the reserve separate from chain emission paid to measured miners and validators.' },
-];
-const TERMINAL3_COMPONENTS_V11 = [
-    { key: 'operatorproduct', n: '01', verb: 'CHANGES', name: 'Illustrative operator product', short: 'The product and customer relationship change.', detail: 'The Network Operator brings the customer-facing product, audience, brand, policy, billing and product logic. Selecting another example changes this top plane.' },
-    { key: 'network', n: '02', verb: 'CONNECTS', name: 'Provider network + validation', short: 'Shared routes beneath every product.', detail: 'Residential providers connect through miner UIDs to form distributed supply. Validators check service quality separately; they are not traffic hops.' },
-    { key: 'subnetbase', n: '03', verb: 'COORDINATES', name: 'SN25 shared foundation', short: 'The common coordination and incentive layer.', detail: 'SN25 coordinates access to the provider network, service measurement and the incentive system supporting useful supply.' },
-];
-const TERMINAL3_COMPONENTS_V12 = [
-    { key: 'operatorproduct', n: '01', verb: 'CHANGES', name: 'Network Operator product', short: 'The product, audience and customer relationship change.', mobileDetail: 'Owns the product experience, users, policy, billing and support. This plane changes with each opportunity.', detail: 'The operator owns the customer experience, users, identity, policy, billing, support and the reason for network demand to exist. This plane changes with every opportunity.' },
-    { key: 'network', n: '02', verb: 'ROUTES + MEASURES', name: 'Residential routing network', short: 'Miner UIDs organise supply; validators measure separately.', mobileDetail: 'Miner UIDs organise residential routes while validators measure uptime, transfer and proof-of-transit separately.', detail: 'Residential providers participate as miners, directly or through pools, supplying routable capacity under miner UIDs. Encrypted traffic moves through those paths while validators measure uptime, transfer and proof-of-transit separately.' },
-    { key: 'subnetbase', n: '03', verb: 'COORDINATES', name: 'UR Subnet (SN25)', short: 'Access, measurement, incentives and settlement.', mobileDetail: 'Coordinates operator demand, measurement, miner incentives and settlement beneath every operator product.', detail: 'SN25 coordinates operator demand, validator measurement, miner incentives and settlement. It is shared infrastructure beneath every Network Operator, not the customer product above it.' },
-];
+const localized = new Map();
+/**
+ * Everything the page shows in `lang`: the page copy, the models' copy, and
+ * the opportunities, the live page's wording of them and the architecture's
+ * components with their words merged over their data (index for index).
+ */
+function wordsIn(lang) {
+    if (!localized.has(lang)) {
+        const scenes = scenesCopy(lang);
+        localized.set(lang, {
+            t: pageCopy(lang),
+            scenes,
+            locale: intlLocale(lang),
+            ops: OPS.map((o, i) => ({ ...o, ...opportunitiesCopy(lang).items[i] })),
+            v12: BUILD_V12.map((b, i) => ({ ...b, ...briefsCopy(lang).items[i] })),
+            components: BUILD_ARCH.components.map((c, i) => ({ ...c, ...scenes.components[i] })),
+            planes: {
+                v10: PLANES.map((p, i) => ({ ...p, ...scenes.planes.v10[i] })),
+                v11: PLANES.map((p, i) => ({ ...p, ...scenes.planes.v11[i] })),
+                v12: PLANES.map((p, i) => ({ ...p, ...scenes.planes.v12[i] })),
+            },
+        });
+    }
+    return localized.get(lang);
+}
 
 /* ---------- the terminal models' scrub (assembled → revealed) ---------- */
 
@@ -164,16 +172,29 @@ function stageHeightFor(p, { mobile, compact }) {
 /* ---------- the "trace one session" simulation (terminal3) ---------- */
 
 const TRACE_MODE_BY_VISUAL = { vpn: 'point', comms: 'point', agent: 'roundtrip', search: 'roundtrip', visibility: 'fanout', verification: 'fanout' };
-const TRACE_MODE_COPY = {
-    point: { idle: 'POINT-TO-POINT · TRACE ONE SESSION', start: '01A / SESSION ENTERS THE NETWORK', messages: [['01B / BLUE INGRESS PROVIDER CONNECTED', 850], ['01C / MINER UIDS ROUTE THE SESSION', 1500], ['01D / BLUE EGRESS PROVIDER REACHED', 2600], ['01E / DESTINATION ENDPOINT REACHED', 3350]] },
-    roundtrip: { idle: 'REQUEST + RESPONSE · TRACE ONE SESSION', start: '01A / PRODUCT REQUEST ENTERS THE NETWORK', messages: [['01B / BLUE INGRESS PROVIDER CONNECTED', 850], ['01C / MINER UIDS ROUTE THE REQUEST', 1500], ['01D / BLUE EGRESS PROVIDER REACHES THE TARGET', 2600], ['01E / RESPONSE RETURNS TO THE PRODUCT', 3350]] },
-    fanout: { idle: 'FAN-OUT + COLLECT · TRACE ONE RUN', start: '01A / PRODUCT REQUEST ENTERS THE NETWORK', messages: [['01B / BLUE INGRESS PROVIDER CONNECTED', 850], ['01C / REQUEST FANS ACROSS MINER UIDS', 1450], ['01D / RESIDENTIAL OBSERVATIONS COLLECTED', 2450], ['01E / EVIDENCE RETURNS TO THE PRODUCT', 3400]] },
+// When each of a trace mode's status messages shows during the traffic step,
+// in ms (their words are the `build` unit's trace.modes[mode].messages).
+const TRACE_MESSAGE_DELAYS = {
+    point: [850, 1500, 2600, 3350],
+    roundtrip: [850, 1500, 2600, 3350],
+    fanout: [850, 1450, 2450, 3400],
 };
 const SIM_PHASES = [['traffic', 4100], ['quality', 2600]];
-const SIM_IDLE = { running: false, phase: null, complete: false, glyph: 'play', label: 'TRACE ONE SESSION', status: null };
+// `label` is the trace button's word (trace.start / stop / replay) and
+// `status` the status line's: null (idle), 'start', 'message<i>', 'quality',
+// 'opening' or 'done', put into words while rendering.
+const SIM_IDLE = { running: false, phase: null, complete: false, glyph: 'play', label: 'start', status: null };
 const GLYPHS = { play: '▶', stop: '■', replay: '↻' };
-const traceCopyFor = (mode) => TRACE_MODE_COPY[mode] || TRACE_MODE_COPY.roundtrip;
-const idleStatus = (model, traceMode) => (model === 'terminal3' ? traceCopyFor(traceMode).idle : 'WATCH ONE PRODUCT SESSION ROUTE + VALIDATE');
+const traceModeOf = (mode) => (TRACE_MESSAGE_DELAYS[mode] ? mode : 'roundtrip');
+const traceCopyFor = (t, mode) => t.trace.modes[traceModeOf(mode)];
+const idleStatus = (t, model, traceMode) => (model === 'terminal3' ? traceCopyFor(t, traceMode).idle : t.trace.idleOther);
+/** The status line's words for a sim status. */
+function statusWords(t, status, traceMode) {
+    const copy = traceCopyFor(t, traceMode);
+    if (status === 'start') return copy.start;
+    if (status.startsWith('message')) return copy.messages[Number(status.slice('message'.length))];
+    return t.trace[status];
+}
 
 /** The element id, and so the address (#brief-<slug>), of an opportunity's brief. */
 const briefId = (o) => `brief-${o.slug}`;
@@ -194,7 +215,8 @@ function syncAddress(index, briefOpen) {
     window.history.replaceState(window.history.state, '', `${window.location.pathname}${qs ? `?${qs}` : ''}${hash}`);
 }
 
-export default function BuildPage() {
+export default function BuildPage({ lang = 'en' }) {
+    const { t, scenes, locale, ops, v12: briefs, components, planes } = wordsIn(lang);
     const [variant, setVariant] = useState(DEFAULT_VARIANT);
     const { model, version, isV11, isV12, builder } = variant;
     const isTerminal = isTerminalModel(model);
@@ -235,7 +257,7 @@ export default function BuildPage() {
     // a brief opened from its address is scrolled to once it is drawn
     const revealBriefRef = useRef(false);
 
-    const op = OPS[opIndex];
+    const op = ops[opIndex];
     const briefIsOpen = briefOpen === true;
     const traceMode = TRACE_MODE_BY_VISUAL[op.visual] || 'roundtrip';
     useEffect(() => { variantRef.current = variant; }, [variant]);
@@ -298,17 +320,16 @@ export default function BuildPage() {
         if (s.step >= SIM_PHASES.length) {
             s.running = false;
             s.phase = null;
-            setSim((prev) => ({ ...prev, running: false, phase: null, complete: true, glyph: 'replay', label: 'REPLAY TRACE', status: 'SESSION ROUTED + VALIDATED' }));
+            setSim((prev) => ({ ...prev, running: false, phase: null, complete: true, glyph: 'replay', label: 'replay', status: 'done' }));
             return;
         }
         const [phase, phaseDuration] = SIM_PHASES[s.step];
-        const copy = traceCopyFor(traceModeRef.current);
         s.phase = phase;
-        setSim((prev) => ({ ...prev, phase, complete: false, status: phase === 'traffic' ? copy.start : '02 / VALIDATORS CHECK UPTIME, TRANSFER + TRANSIT' }));
+        setSim((prev) => ({ ...prev, phase, complete: false, status: phase === 'traffic' ? 'start' : 'quality' }));
         const reduced = prefersReducedMotion();
         if (phase === 'traffic' && !reduced) {
-            copy.messages.forEach(([message, delay]) => s.subTimers.push(setTimeout(() => {
-                if (s.running && s.phase === 'traffic') setSim((prev) => (prev.phase === 'traffic' ? { ...prev, status: message } : prev));
+            TRACE_MESSAGE_DELAYS[traceModeOf(traceModeRef.current)].forEach((delay, i) => s.subTimers.push(setTimeout(() => {
+                if (s.running && s.phase === 'traffic') setSim((prev) => (prev.phase === 'traffic' ? { ...prev, status: `message${i}` } : prev));
             }, delay)));
         }
         s.timer = setTimeout(advanceSimulation, reduced ? 900 : phaseDuration);
@@ -319,10 +340,10 @@ export default function BuildPage() {
         if (s.running) { resetSimulation(); return; }
         resetSimulation(true);
         s.running = true;
-        setSim((prev) => ({ ...prev, running: true, complete: false, glyph: 'stop', label: 'STOP TRACE' }));
+        setSim((prev) => ({ ...prev, running: true, complete: false, glyph: 'stop', label: 'stop' }));
         const launch = () => { if (s.running) { updateRouteBridge(); advanceSimulation(); } };
         if (progressRef.current < .84) {
-            setSim((prev) => ({ ...prev, status: 'OPENING THE THREE PLANES…' }));
+            setSim((prev) => ({ ...prev, status: 'opening' }));
             applyProgress(1);
             s.timer = setTimeout(launch, prefersReducedMotion() ? 0 : 900);
         } else {
@@ -476,50 +497,55 @@ export default function BuildPage() {
     /* --- derived --- */
 
     const activeComponents = model === 'terminal3'
-        ? (isV12 ? TERMINAL3_COMPONENTS_V12 : isV11 ? TERMINAL3_COMPONENTS_V11 : TERMINAL3_COMPONENTS)
-        : BUILD_ARCH.components;
+        ? (isV12 ? planes.v12 : isV11 ? planes.v11 : planes.v10)
+        : components;
     const component = activeComponents.find((c) => c.key === focus);
+    const layerCopy = t.layer;
     const layer = {
-        name: component ? component.name : model === 'terminal3' ? (builder ? 'Product above shared infrastructure' : 'Complete three-plane system') : 'Complete operator system',
+        name: component ? component.name : model === 'terminal3' ? (builder ? layerCopy.builder.name : layerCopy.terminal3.name) : layerCopy.other.name,
         detail: component
             ? (viewport.mobile && component.mobileDetail ? component.mobileDetail : component.detail)
             : model === 'terminal3'
-                ? (builder
-                    ? 'The selected operator product sits above the shared provider network and SN25 foundation. Move the reveal slider to separate the system, then select a plane to understand its role.'
-                    : 'The terminal has three planes: the changing Network Operator product, the shared provider-and-validator network, and the shared SN25 protocol and economic foundation. Drag the reveal control to separate them.')
-                : model === 'terminal'
-                    ? 'The terminal starts as the complete customer-facing product. Drag the reveal control to separate its product screen, operator services and shared SN25 architecture, then select a labelled layer to inspect its role.'
-                    : 'Open the gateway to see the product module above the operator control plane and shared SN25 foundation. Select any labelled layer to isolate its role.',
+                ? (builder ? layerCopy.builder.detail : layerCopy.terminal3.detail)
+                : model === 'terminal' ? layerCopy.terminal.detail : layerCopy.other.detail,
         short: component
             ? `${component.n} / ${component.verb} · ${component.short}`
-            : model === 'terminal3' ? 'ONE OPERATOR PRODUCT · TWO SHARED PLANES' : model === 'terminal' ? 'ONE RECOGNISABLE PRODUCT · ONE SHARED FOUNDATION' : 'ONE PRODUCT MODULE · ONE SHARED FOUNDATION',
+            : model === 'terminal3' ? layerCopy.terminal3.short : model === 'terminal' ? layerCopy.terminal.short : layerCopy.other.short,
         color: component ? COLORS[component.key] : '#d6e6f4',
         onClose: closeLayer,
+        t,
     };
 
-    const head = isV12 ? SECTION_HEAD_V12 : isV11 ? SECTION_HEAD_V11 : MODEL_COPY[model];
-    const hero = isV12 ? HERO_V12 : isV11 ? HERO_V11 : HERO_V10;
-    const cta = isV11 ? CTA_V11 : CTA;
+    const head = isV12 ? t.section.v12 : isV11 ? t.section.v11 : t.section.models[model];
+    const hero = isV12
+        ? { eyebrow: t.hero.eyebrow, p: t.hero.intro }
+        : isV11
+            ? { eyebrow: t.hero.v11.eyebrow, h2: t.hero.v11.heading, p: t.hero.v11.intro }
+            : { eyebrow: t.hero.v10.eyebrow, h2: t.hero.v10.heading, p: t.hero.v10.intro };
+    const cta = isV11 ? t.cta.v11 : t.cta;
     // what the readout shows for opportunity i (version 12 words it from BUILD_V12)
     const readoutFor = (i) => {
-        const o = OPS[i];
-        const w = isV12 ? BUILD_V12[i] : null;
+        const o = ops[i];
+        const w = isV12 ? briefs[i] : null;
         return w
             ? { category: w.category, title: w.displayTitle || w.title, teaser: w.summary }
             : { category: o.category, title: o.title, teaser: o.teaser };
     };
-    const briefLabel = isV12
-        ? (triggerOpen ? 'HIDE EXAMPLE BRIEF ' : 'OPEN EXAMPLE BRIEF ')
-        : (triggerOpen ? 'CLOSE THIS OPPORTUNITY ' : 'EXPLORE THIS OPPORTUNITY ');
+    const briefLabel = `${isV12
+        ? (triggerOpen ? t.readout.hideBrief : t.readout.openBrief)
+        : (triggerOpen ? t.readout.closeOpportunity : t.readout.exploreOpportunity)} `;
 
     const layers = isTerminal ? layerTransforms(model, builder, viewport.mobile, progress) : NO_LAYERS;
     const revealed = (key) => progress >= (CALLOUT_THRESHOLDS[model]?.[key] ?? Infinity);
     const worldStyle = isTerminal ? { transform: worldTransform(model, builder, progress) } : undefined;
     const traceReady = model === 'terminal3' && progress >= .34;
-    const scrubLabels = model === 'terminal3' ? (builder ? ['ASSEMBLED', 'REVEALED'] : ['ASSEMBLED', 'EXPLODED']) : ['PRODUCT', 'NETWORK'];
+    const scrubLabels = model === 'terminal3'
+        ? (builder ? [t.scrub.assembled, t.scrub.revealed] : [t.scrub.assembled, t.scrub.exploded])
+        : [t.scrub.product, t.scrub.network];
     const pct = Math.round(progress * 100);
-    const valueText = progress < .04 ? 'Network Operator product assembled' : progress > .96 ? 'Three network planes fully revealed' : `${pct} percent exploded`;
-    const status = sim.status ?? idleStatus(model, traceMode);
+    const valueText = progress < .04 ? t.scrub.valueStart : progress > .96 ? t.scrub.valueEnd : interpolate(t.scrub.valueMiddle, { pct });
+    const pctText = lang === 'en' ? `${pct}%` : formatPercent(pct / 100, lang, { maximumFractionDigits: 0 });
+    const status = sim.status ? statusWords(t, sim.status, traceMode) : idleStatus(t, model, traceMode);
 
     const scrub = (
         <div className="stage-scrub">
@@ -532,7 +558,7 @@ export default function BuildPage() {
                 max="1000"
                 step={isV11 ? 10 : 1}
                 value={Math.round(progress * 1000)}
-                aria-label="Reveal the network architecture inside the operator terminal"
+                aria-label={t.scrub.aria}
                 aria-valuetext={isTerminal ? valueText : undefined}
                 style={isTerminal ? { '--scrub-p': progress.toFixed(3) } : undefined}
                 onChange={(e) => applyProgress(Number(e.target.value) / 1000)}
@@ -542,26 +568,26 @@ export default function BuildPage() {
                 onPointerCancel={finishScrub}
             />
             <label htmlFor="terminal-scrub">{scrubLabels[1]}</label>
-            <output htmlFor="terminal-scrub">{`${pct}%`}</output>
+            <output htmlFor="terminal-scrub">{pctText}</output>
         </div>
     );
     const playButton = (
         <button type="button" className={builder ? 'system-play' : undefined} aria-pressed={sim.running} onClick={runSimulation}>
-            <i aria-hidden="true" data-glyph={sim.glyph}>{GLYPHS[sim.glyph]}</i><span>{sim.label}</span>
+            <i aria-hidden="true" data-glyph={sim.glyph}>{GLYPHS[sim.glyph]}</i><span>{t.trace[sim.label]}</span>
         </button>
     );
     const simulationReadout = (
         <div className="simulation-readout">
             <output>{status}</output>
-            <ol aria-label="System trace steps">
-                <li data-sim-step="traffic" aria-current={sim.phase ? sim.phase === 'traffic' : undefined}><b>01</b> ROUTE</li>
-                <li data-sim-step="quality" aria-current={sim.phase ? sim.phase === 'quality' : undefined}><b>02</b> VALIDATE</li>
+            <ol aria-label={t.trace.stepsAria}>
+                <li data-sim-step="traffic" aria-current={sim.phase ? sim.phase === 'traffic' : undefined}><b>01</b>{` ${t.trace.stepRoute}`}</li>
+                <li data-sim-step="quality" aria-current={sim.phase ? sim.phase === 'quality' : undefined}><b>02</b>{` ${t.trace.stepValidate}`}</li>
             </ol>
         </div>
     );
     const opTabs = (
-        <nav className="op-tabs" role="tablist" aria-label="Six example opportunities" ref={tabsRef}>
-            {OPS.map((o, i) => (
+        <nav className="op-tabs" role="tablist" aria-label={t.tabsAria} ref={tabsRef}>
+            {ops.map((o, i) => (
                 <button
                     key={o.slug}
                     type="button"
@@ -579,7 +605,7 @@ export default function BuildPage() {
             ))}
         </nav>
     );
-    const sceneProps = { op, focus, onFocus: onPieceFocus };
+    const sceneProps = { op, t: scenes, locale, focus, onFocus: onPieceFocus };
 
     return (
         <div
@@ -595,9 +621,9 @@ export default function BuildPage() {
         >
             <header className="build-hero shell">
                 {isV12 ? (
-                    <div className="hero-title"><span className="eyebrow">{hero.eyebrow}</span><h1>Build on UR</h1></div>
+                    <div className="hero-title"><span className="eyebrow">{hero.eyebrow}</span><h1>{t.hero.title}</h1></div>
                 ) : (
-                    <div className="hero-title"><h1>Build on UR</h1><span className="hero-kicker"><i />Network Operator opportunities</span></div>
+                    <div className="hero-title"><h1>{t.hero.title}</h1><span className="hero-kicker"><i />{t.hero.kicker}</span></div>
                 )}
                 <div className="hero-intro">
                     {!isV12 && <span className="eyebrow">{hero.eyebrow}</span>}
@@ -606,17 +632,17 @@ export default function BuildPage() {
                         <p>{hero.p}</p>
                     </div>
                 </div>
-                <div className="proof-strip v11-only" aria-label="UR network reach">
+                <div className="proof-strip v11-only" aria-label={t.hero.proofAria}>
                     {isV12 ? (
-                        <><span><b>100K+</b> providers</span><span><b>100+</b> countries</span><span><b>350K+</b> monthly users on URnetwork</span></>
+                        <><span><b>100K+</b>{` ${t.hero.proof.providers}`}</span><span><b>100+</b>{` ${t.hero.proof.countries}`}</span><span><b>350K+</b>{` ${t.hero.proof.users}`}</span></>
                     ) : (
-                        <><span><b>100K+</b> NETWORK PROVIDERS</span><span><b>100+</b> COUNTRIES</span><span><b>LIVE</b> NETWORK INFRASTRUCTURE</span></>
+                        <><span><b>100K+</b>{` ${t.hero.proofV11.providers}`}</span><span><b>100+</b>{` ${t.hero.proofV11.countries}`}</span><span><b>{t.hero.proofV11.live}</b>{` ${t.hero.proofV11.infrastructure}`}</span></>
                     )}
                 </div>
-                <p className="hero-quiet v12-only">The network is live. Its next product may not exist yet.</p>
+                <p className="hero-quiet v12-only">{t.hero.quiet}</p>
                 <div className="boundary">
-                    <article><b>YOU BRING</b><h2>Product, customers and distribution</h2><p>Brand, interface, identity, billing, policy, support and a useful reason for network demand.</p></article>
-                    <article><b>THE SUBNET PROVIDES</b><h2>Supply, measurement and incentives</h2><p>100K+ residential providers across 100+ countries, validators, miner UIDs and SN25 settlement.</p></article>
+                    <article><b>{t.hero.bring.label}</b><h2>{t.hero.bring.title}</h2><p>{t.hero.bring.body}</p></article>
+                    <article><b>{t.hero.provides.label}</b><h2>{t.hero.provides.title}</h2><p>{t.hero.provides.body}</p></article>
                 </div>
             </header>
 
@@ -626,17 +652,17 @@ export default function BuildPage() {
                     <div>
                         <h2 id="model-title">{head.title}</h2>
                         <p>{head.copy}</p>
-                        <span className="model-note">Functional teaching model · architecture grounded in the SN25 deck</span>
+                        <span className="model-note">{t.section.modelNote}</span>
                     </div>
                 </header>
                 <div className="opportunity-intro">
-                    <div><small>SELECT ONE OF SIX EXAMPLES</small><strong>The product changes. The network foundation does not.</strong></div>
-                    <p>These are inspiration points rather than a catalogue of what can be built. Choose an example to see its customer proposition and demand profile placed on the same SN25 architecture.</p>
+                    <div><small>{t.intro.kicker}</small><strong>{t.intro.title}</strong></div>
+                    <p>{t.intro.body}</p>
                 </div>
                 {!isV12 && opTabs}
-                <div className="content-switch" role="tablist" aria-label="Choose live model or detailed opportunity brief">
-                    <button type="button" role="tab" aria-selected={contentView === 'architecture'} onClick={() => setContentView('architecture')}>LIVE PRODUCT + NETWORK MODEL</button>
-                    <button type="button" role="tab" aria-selected={contentView === 'brief'} onClick={() => setContentView('brief')}>PRODUCT BRIEF — FULL EXPLAINER</button>
+                <div className="content-switch" role="tablist" aria-label={t.contentSwitch.aria}>
+                    <button type="button" role="tab" aria-selected={contentView === 'architecture'} onClick={() => setContentView('architecture')}>{t.contentSwitch.model}</button>
+                    <button type="button" role="tab" aria-selected={contentView === 'brief'} onClick={() => setContentView('brief')}>{t.contentSwitch.brief}</button>
                 </div>
                 <div className="architecture-panel">
                     <div className="model-grid">
@@ -655,7 +681,7 @@ export default function BuildPage() {
                             onPointerMove={isTerminal ? onStagePointerMove : undefined}
                             onPointerLeave={isTerminal ? onStagePointerLeave : undefined}
                         >
-                            <div className="stage-meta"><span>{head.meta}</span><span>TRAFFIC, QUALITY + ECONOMICS SHOWN SEPARATELY</span></div>
+                            <div className="stage-meta"><span>{head.meta}</span><span>{t.stage.separately}</span></div>
 
                             <ChassisScene active={model === 'chassis'} {...sceneProps} />
                             <SpineScene active={model === 'spine'} {...sceneProps} />
@@ -681,19 +707,19 @@ export default function BuildPage() {
 
                             <svg className="terminal3-route-bridge" aria-hidden="true" ref={bridgeRef}><path className="route-bridge-in" pathLength="1" /><path className="route-bridge-out" pathLength="1" /></svg>
 
-                            <div className="stage-controls" aria-label="Architecture view">
-                                <button type="button" data-show-all="" aria-pressed={!focus} onClick={() => setFocus('')}>SHOW ALL</button>
-                                <button type="button" data-view="assembled" aria-pressed={view === 'assembled'} onClick={() => setView('assembled')}>ASSEMBLED</button>
-                                <button type="button" data-view="open" aria-pressed={view === 'open'} onClick={() => setView('open')}>OPEN ARCHITECTURE</button>
+                            <div className="stage-controls" aria-label={t.stage.controlsAria}>
+                                <button type="button" data-show-all="" aria-pressed={!focus} onClick={() => setFocus('')}>{t.stage.showAll}</button>
+                                <button type="button" data-view="assembled" aria-pressed={view === 'assembled'} onClick={() => setView('assembled')}>{t.stage.assembled}</button>
+                                <button type="button" data-view="open" aria-pressed={view === 'open'} onClick={() => setView('open')}>{t.stage.openArchitecture}</button>
                                 {!builder && scrub}
                             </div>
                             <div className="flow-key">
-                                <span style={{ '--c': 'var(--accent)' }}><i />TRAFFIC</span>
-                                <span style={{ '--c': '#eff7bb' }}><i />VERIFICATION</span>
-                                <span style={{ '--c': '#ed8fff' }}><i />ECONOMICS</span>
+                                <span style={{ '--c': 'var(--accent)' }}><i />{t.stage.traffic}</span>
+                                <span style={{ '--c': '#eff7bb' }}><i />{t.stage.verification}</span>
+                                <span style={{ '--c': '#ed8fff' }}><i />{t.stage.economics}</span>
                             </div>
                             {builder ? (
-                                <div className="system-rail-v11" aria-label="Reveal and trace the network system">
+                                <div className="system-rail-v11" aria-label={t.stage.railAria}>
                                     {playButton}{scrub}{simulationReadout}
                                 </div>
                             ) : (
@@ -702,12 +728,12 @@ export default function BuildPage() {
                             {builder && <ArchitectureReadout className="architecture-readout layer-caption-v11" headingLevel="h3" {...layer} />}
                         </div>
                         {isV12 && opTabs}
-                        {isV12 && <p className="selector-frame-v12"><span>SIX PLACES TO BEGIN</span><b>Illustrative opportunities for builders.</b></p>}
+                        {isV12 && <p className="selector-frame-v12"><span>{t.stage.selectorKicker}</span><b>{t.stage.selectorTitle}</b></p>}
                         {/* Every opportunity's readout is in the page (the six
                             examples are the page's substance, and a reader or a
                             crawler without the tabs should find them all); the
                             tabs show one and hide the rest. */}
-                        {OPS.map((o, i) => (
+                        {ops.map((o, i) => (
                             <Readout
                                 key={o.slug}
                                 id={`opportunity-readout-${o.slug}`}
@@ -724,12 +750,14 @@ export default function BuildPage() {
                                 briefLabel={briefLabel}
                                 onOpenBrief={onOpenBrief}
                                 onToggleBrief={onToggleBrief}
+                                t={t}
+                                locale={locale}
                             />
                         ))}
                     </div>
-                    <nav className="component-key" aria-label="Inspect architecture components">
+                    <nav className="component-key" aria-label={t.componentKey.aria}>
                         <button type="button" data-component="" aria-pressed={!focus} style={{ '--cc': '#d6e6f4' }} onClick={() => setFocus('')}>
-                            <b>00 / ALL</b><strong>{model === 'terminal3' ? 'Complete three-plane system' : 'Complete system'}</strong><span>Show all architecture functions.</span>
+                            <b>{t.componentKey.all}</b><strong>{model === 'terminal3' ? t.componentKey.allTerminal3 : t.componentKey.allOther}</strong><span>{t.componentKey.allDetail}</span>
                         </button>
                         {activeComponents.map((c) => (
                             <button key={c.key} type="button" data-component={c.key} aria-pressed={focus === c.key} style={{ '--cc': COLORS[c.key] }} onClick={() => onPieceFocus(c.key)}>
@@ -738,7 +766,7 @@ export default function BuildPage() {
                         ))}
                     </nav>
                 </div>
-                {OPS.map((o, i) => (
+                {ops.map((o, i) => (
                     <BriefPanel
                         key={o.slug}
                         id={briefId(o)}
@@ -747,8 +775,8 @@ export default function BuildPage() {
                         hidden={i !== opIndex || (isV12 && !briefIsOpen)}
                         panelRef={i === opIndex ? briefPanelRef : undefined}
                         op={o}
-                        v12={isV12 ? BUILD_V12[i] : null}
-                        opportunities={OPS}
+                        v12={isV12 ? briefs[i] : null}
+                        opportunities={ops}
                         builder={builder}
                         open={i === opIndex && briefIsOpen}
                         briefMode={briefMode}
@@ -756,53 +784,49 @@ export default function BuildPage() {
                         onPrev={() => stepOpportunity(-1)}
                         onNext={() => stepOpportunity(1)}
                         onClose={onCloseBrief}
+                        t={t}
+                        locale={locale}
                     />
                 ))}
             </div></section>
 
             <section className="proof-v12 v12-only"><div className="shell proof-v12-grid">
-                <header><span className="eyebrow">LIVE TODAY / BRINGYOUR</span><h2>BringYour is the first Network Operator.</h2></header>
+                <header><span className="eyebrow">{t.proof.eyebrow}</span><h2>{t.proof.title}</h2></header>
                 <div className="proof-v12-copy">
-                    <p>Its first product, URnetwork, is a consumer VPN available across mobile, desktop and browser. BringYour owns the product experience and customer relationship; UR provides the network that powers it.</p>
-                    <p>URnetwork has more than 350K monthly active users. This shows the model working at consumer scale: operator demand routed across shared provider capacity.</p>
+                    <p>{t.proof.body[0]}</p>
+                    <p>{t.proof.body[1]}</p>
                     <div className="proof-chain-v12">
-                        <span><b>CUSTOMER PRODUCT</b>URnetwork VPN</span>
-                        <span><b>NETWORK DEMAND</b>Active users + data moved</span>
-                        <span><b>SHARED SUPPLY</b>100K+ providers across 100+ countries</span>
+                        {t.proof.chain.map((c) => <span key={c.label}><b>{c.label}</b>{c.value}</span>)}
                     </div>
-                    <a href="https://ur.io/products" target="_blank" rel="noopener noreferrer">EXPLORE THE URNETWORK VPN ↗</a>
+                    <a href="https://ur.io/products" target="_blank" rel="noopener noreferrer">{t.proof.link}</a>
                 </div>
             </div></section>
 
             <section className="flows shell">
                 <div className="v10-flow">
-                    <header className="flows-head"><span className="eyebrow">The shared foundation in three paths</span><div><h2>One demand signal. Three network responses.</h2></div></header>
+                    <header className="flows-head"><span className="eyebrow">{t.flows.eyebrow}</span><div><h2>{t.flows.title}</h2></div></header>
                     <div className="flow-grid">
-                        <article className="flow-card" style={{ '--fc': 'var(--green)' }}><b>01 / TRAFFIC</b><h3>Customer demand becomes routed service</h3><p>The operator authenticates and applies product policy. SN25 coordinates a measured path through miner capacity and residential ingress or egress.</p><em>Product → operator → miner path → provider exit</em></article>
-                        <article className="flow-card" style={{ '--fc': 'var(--pale)' }}><b>02 / QUALITY</b><h3>Validators test the path independently</h3><p>Validators walk operator-assigned chains and measure uptime, transfer and proof-of-transit. That quality signal informs consensus.</p><em>Validator probes → measured quality → UID scoring</em></article>
-                        <article className="flow-card" style={{ '--fc': 'var(--pink)' }}><b>03 / ECONOMICS</b><h3>Demand and rewards remain separate flows</h3><p>Operator deposits enter the subnet reserve. Bittensor emission rewards miners and validators for measured useful service; deposits are not passed through as miner payouts.</p><em>Operator deposit → reserve · emission → measured supply</em></article>
+                        {t.flows.cards.map((card, i) => (
+                            <article key={card.label} className="flow-card" style={{ '--fc': FLOW_COLORS[i] }}><b>{card.label}</b><h3>{card.title}</h3><p>{card.body}</p><em>{card.path}</em></article>
+                        ))}
                     </div>
                 </div>
                 <div className="responsibility-v11 v11-only">
                     <header>
-                        <span className="eyebrow">{isV12 ? 'Shared infrastructure / independent products' : 'A shared foundation, not a finished business'}</span>
-                        <h2>You build the reason to use the network.</h2>
-                        <p>SN25 is UR’s Bittensor subnet: the coordination and incentive layer beneath the provider network. It gives builders infrastructure to draw on without deciding what the customer product should be.</p>
+                        <span className="eyebrow">{isV12 ? t.responsibility.eyebrow : t.responsibility.eyebrowV11}</span>
+                        <h2>{t.responsibility.title}</h2>
+                        <p>{t.responsibility.body}</p>
                     </header>
                     <div className="responsibility-grid">
                         <article>
-                            <b>THE NETWORK OPERATOR BRINGS</b>
-                            <h3>The product and customer relationship</h3>
-                            <p>{isV12
-                                ? 'Product experience, brand, users, identity, billing, policy, support, compliance and the commercial reason for network demand.'
-                                : 'Product experience, brand, users, identity, billing, policy, support and the commercial reason for network demand.'}</p>
+                            <b>{t.responsibility.operator.label}</b>
+                            <h3>{t.responsibility.operator.title}</h3>
+                            <p>{isV12 ? t.responsibility.operator.body : t.responsibility.operator.bodyV11}</p>
                         </article>
                         <article>
-                            <b>{isV12 ? 'UR (SN25) PROVIDES' : 'UR / SN25 COORDINATES'}</b>
-                            <h3>{isV12 ? 'Access to network infrastructure' : 'Access to shared network infrastructure'}</h3>
-                            <p>{isV12
-                                ? 'Distributed residential network providers, encrypted bandwidth, and an incentive system supporting reliable supply.'
-                                : 'Residential provider reach, miner UIDs, independent service measurement and the incentive system supporting useful supply.'}</p>
+                            <b>{isV12 ? t.responsibility.subnet.label : t.responsibility.subnet.labelV11}</b>
+                            <h3>{isV12 ? t.responsibility.subnet.title : t.responsibility.subnet.titleV11}</h3>
+                            <p>{isV12 ? t.responsibility.subnet.body : t.responsibility.subnet.bodyV11}</p>
                         </article>
                     </div>
                 </div>
@@ -811,8 +835,8 @@ export default function BuildPage() {
             <section className="cta"><div className="shell cta-grid">
                 <div><span className="eyebrow">{cta.eyebrow}</span><h2>{cta.title}</h2><p>{cta.copy}</p></div>
                 <div className="cta-actions-v12">
-                    <a href="https://t.me/ursn25" target="_blank" rel="noopener noreferrer">TALK TO UR TEAM ↗</a>
-                    <a className="cta-secondary-v12 v12-only" href="/docs">EXPLORE SN25 DOCUMENTATION →</a>
+                    <a href="https://t.me/ursn25" target="_blank" rel="noopener noreferrer">{t.cta.talk}</a>
+                    <a className="cta-secondary-v12 v12-only" href={hasLocalizedVersion('/docs') ? localizedPathFor('/docs', lang) : '/docs'}>{t.cta.docs}</a>
                 </div>
             </div></section>
         </div>

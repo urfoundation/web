@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef, ComponentProps } from 'react';
-import { Wallet, RefreshCw, AlertCircle, Settings, Clock, TrendingUp, Database, DollarSign, User, Trash2, AlertTriangle, HardDrive, Activity, CreditCard, BarChart3 } from 'lucide-react';
+import { Wallet, RefreshCw, AlertCircle, Settings, TrendingUp, Database, DollarSign, User, Trash2, AlertTriangle, HardDrive, Activity, CreditCard, BarChart3, Upload } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { fetchWalletStats, fetchNetworkUser, fetchNetworkReliability } from '../services/api';
+import { fetchWalletStats, fetchNetworkUser, fetchNetworkReliability, fetchAccountEpochs } from '../services/api';
 import { saveWalletStats, getWalletStatsHistory, clearWalletStatsHistory, getStorageInfo, type WalletStatsRecord } from '../services/localStorage';
+import { servedEpochRows, servedThisBlock, accountEpochsRefreshDue } from '../services/servedBytes';
 import type { NetworkUser } from '../services/api';
-import type { ReliabilityWindow } from '../services/types';
+import type { AccountEpochsResponse, ReliabilityWindow } from '../services/types';
 import toast from 'react-hot-toast';
 import ConfirmModal from './ConfirmModal';
 import PayoutStatsSection from './PayoutStatsSection';
@@ -50,6 +51,12 @@ const DEFAULT_SETTINGS: WalletStatsSettings = {
 // LocalStorage key for settings
 const WALLET_SETTINGS_KEY = 'wallet_stats_settings';
 
+// The least time between two automatic reads of GET /account/epochs, in
+// milliseconds. Its running figures move about once an hour on the server, so
+// an auto refresh faster than this reads them at most once a minute. Refresh
+// always reads.
+const ACCOUNT_EPOCHS_MIN_REFRESH_MILLIS = 60 * 1000;
+
 // Helper functions for localStorage
 const saveSettingsToStorage = (settings: WalletStatsSettings): void => {
   try {
@@ -75,7 +82,7 @@ const loadSettingsFromStorage = (): WalletStatsSettings => {
 const WalletStatsSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'data' | 'payouts'>('data');
   const { token } = useAuth();
-  const [currentStats, setCurrentStats] = useState({ paid_mb: 0, unpaid_mb: 0 });
+  const [currentStats, setCurrentStats] = useState({ paid_mb: 0 });
   const [statsHistory, setStatsHistory] = useState<WalletStatsRecord[]>([]);
   const [networkUser, setNetworkUser] = useState<NetworkUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -87,6 +94,10 @@ const WalletStatsSection: React.FC = () => {
   const [storageInfo, setStorageInfo] = useState({ totalRecords: 0, storageSize: '0 KB' });
   const [reliabilityData, setReliabilityData] = useState<ReliabilityWindow | null>(null);
   const [reliabilityError, setReliabilityError] = useState<string | null>(null);
+  const [accountEpochs, setAccountEpochs] = useState<AccountEpochsResponse | null>(null);
+  const [accountEpochsError, setAccountEpochsError] = useState<string | null>(null);
+  // when the newest read of the epochs started; null before the first
+  const accountEpochsReadMillis = useRef<number | null>(null);
   const [showReliabilityWeight, setShowReliabilityWeight] = useState(true);
   const [showWeightedClients, setShowWeightedClients] = useState(true);
   const [showTotalClients, setShowTotalClients] = useState(true);
@@ -182,7 +193,6 @@ const WalletStatsSection: React.FC = () => {
           const latest = data[0];
           setCurrentStats({
             paid_mb: bytesToMB(latest.paid_bytes_provided),
-            unpaid_mb: bytesToMB(latest.unpaid_bytes_provided),
           });
         }
       }
@@ -210,6 +220,31 @@ const WalletStatsSection: React.FC = () => {
     }
   }, [token]);
 
+  // Read the data served by epoch: always when forced (the first load, Refresh),
+  // else only when due. Only the newest read's answer is kept, so an answer for a
+  // network signed out of meanwhile is dropped.
+  const loadAccountEpochs = useCallback(async (force: boolean) => {
+    if (!token) return;
+    const readMillis = Date.now();
+    if (!force && !accountEpochsRefreshDue(accountEpochsReadMillis.current, readMillis, ACCOUNT_EPOCHS_MIN_REFRESH_MILLIS)) return;
+    accountEpochsReadMillis.current = readMillis;
+
+    try {
+      const response = await fetchAccountEpochs(token);
+      if (accountEpochsReadMillis.current !== readMillis) return;
+      if (response.error) {
+        setAccountEpochsError(response.error.message);
+      } else {
+        setAccountEpochs(response);
+        setAccountEpochsError(null);
+      }
+    } catch (err) {
+      if (accountEpochsReadMillis.current !== readMillis) return;
+      const message = err instanceof Error ? err.message : 'Failed to load the data served';
+      setAccountEpochsError(message);
+    }
+  }, [token]);
+
   // Fetch wallet stats from API and save to localStorage
   const loadWalletStats = useCallback(async (showToast = true) => {
     if (!token || !networkUser?.network_name || !networkUser?.user_id) return;
@@ -227,9 +262,8 @@ const WalletStatsSection: React.FC = () => {
         }
       } else {
         const paidMB = bytesToMB(response.paid_bytes_provided);
-        const unpaidMB = bytesToMB(response.unpaid_bytes_provided);
-        
-        setCurrentStats({ paid_mb: paidMB, unpaid_mb: unpaidMB });
+
+        setCurrentStats({ paid_mb: paidMB });
         setLastUpdated(new Date().toISOString());
         
         // Save to localStorage using the user ID and network name from networkUser
@@ -277,7 +311,7 @@ const WalletStatsSection: React.FC = () => {
         console.error('Error clearing history:', error);
       } else {
         setStatsHistory([]);
-        setCurrentStats({ paid_mb: 0, unpaid_mb: 0 });
+        setCurrentStats({ paid_mb: 0 });
         updateStorageInfo();
         toast.success('History cleared successfully');
       }
@@ -302,10 +336,12 @@ const WalletStatsSection: React.FC = () => {
     if (settings.isAutoRefreshEnabled && networkUser?.network_name && networkUser?.user_id) {
       // Initial load
       loadWalletStats(false);
+      loadAccountEpochs(false);
 
       // Setup interval
       intervalRef.current = setInterval(() => {
         loadWalletStats(false);
+        loadAccountEpochs(false);
       }, settings.refreshInterval * 60 * 1000);
     }
 
@@ -314,7 +350,7 @@ const WalletStatsSection: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [loadWalletStats, settings.refreshInterval, settings.isAutoRefreshEnabled, networkUser?.network_name, networkUser?.user_id]);
+  }, [loadWalletStats, loadAccountEpochs, settings.refreshInterval, settings.isAutoRefreshEnabled, networkUser?.network_name, networkUser?.user_id]);
 
   // Load network user on component mount
   useEffect(() => {
@@ -335,6 +371,17 @@ const WalletStatsSection: React.FC = () => {
     }
   }, [loadReliabilityData, token]);
 
+  // Read the data served by epoch once the token is available, and afresh for a
+  // new token, so one network's figures never show under another's
+  useEffect(() => {
+    accountEpochsReadMillis.current = null;
+    setAccountEpochs(null);
+    setAccountEpochsError(null);
+    if (token) {
+      loadAccountEpochs(true);
+    }
+  }, [loadAccountEpochs, token]);
+
   // Update storage info on mount
   useEffect(() => {
     updateStorageInfo();
@@ -351,6 +398,15 @@ const WalletStatsSection: React.FC = () => {
       minute: '2-digit',
       second: '2-digit',
     }).format(date);
+  };
+
+  const formatDate = (millis: number) => {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: settings.timezone,
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(millis));
   };
 
   const getTimezoneOptions = () => {
@@ -391,7 +447,7 @@ const WalletStatsSection: React.FC = () => {
   );
 
   // Create chart data
-  const createChartData = (dataKey: 'paid_bytes_provided' | 'unpaid_bytes_provided', color: string, label: string) => {
+  const createChartData = (dataKey: 'paid_bytes_provided', color: string, label: string) => {
     if (statsHistory.length === 0) return null;
 
     // Reverse to show chronological order and limit data points
@@ -648,9 +704,11 @@ const WalletStatsSection: React.FC = () => {
     },
   };
 
-  const paidChartData = createChartData('paid_bytes_provided', '#87fb67', 'Paid Data Transfer');
-  const unpaidChartData = createChartData('unpaid_bytes_provided', '#eff7bb', 'Unpaid Data Transfer');
+  const paidChartData = createChartData('paid_bytes_provided', '#87fb67', 'Data Paid in USDC');
   const reliabilityChartData = createReliabilityChartData();
+  const servedRows = servedEpochRows(accountEpochs);
+  const servedOpenEpoch = servedRows.find((row) => row.open) ?? null;
+  const servedBlock = servedThisBlock(accountEpochs);
 
   return (
     <div className="space-y-8">
@@ -677,7 +735,7 @@ const WalletStatsSection: React.FC = () => {
  }`}
           >
             <CreditCard size={16} className="inline mr-2" />
-            Payout Stats
+            Past USDC Payouts
           </button>
         </div>
       </div>
@@ -694,7 +752,7 @@ const WalletStatsSection: React.FC = () => {
               Data Statistics
             </h2>
             <p className="text-ur-gray mt-2">
-              Real-time tracking of data transfer earnings (stored locally)
+              The data your network served, by epoch, and the data your past USDC payouts covered. USDC payouts ended on November 12, 2026, and provider earnings are paid through SN25. The USDC history is stored locally.
             </p>
             {networkUser && (
               <div className="flex items-center gap-2 mt-3">
@@ -741,7 +799,10 @@ const WalletStatsSection: React.FC = () => {
             </button>
             
             <button
-              onClick={() => loadWalletStats(true)}
+              onClick={() => {
+                loadWalletStats(true);
+                loadAccountEpochs(true);
+              }}
               disabled={isLoading}
               className="flex items-center justify-center gap-2 bg-ur-green hover:bg-ur-green/90 text-ur-black px-4 py-2 rounded-lg transition-all duration-200 border border-ur-green "
             >
@@ -891,24 +952,12 @@ const WalletStatsSection: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-staggerFadeUp" style={{ animationDelay: '0.2s' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-staggerFadeUp" style={{ animationDelay: '0.2s' }}>
               <StatCard
-                title="Current Paid Data"
+                title="Data Paid in USDC"
                 value={formatMBValue(currentStats.paid_mb)}
                 icon={DollarSign}
                 accent="bg-ur-green"
-              />
-              <StatCard
-                title="Current Unpaid Data"
-                value={formatMBValue(currentStats.unpaid_mb)}
-                icon={Clock}
-                accent="bg-ur-yellow-light"
-              />
-              <StatCard
-                title="Total Data"
-                value={formatMBValue(currentStats.paid_mb + currentStats.unpaid_mb)}
-                icon={Database}
-                accent="bg-ur-blue-light"
               />
               <StatCard
                 title="Data Points"
@@ -918,28 +967,104 @@ const WalletStatsSection: React.FC = () => {
               />
             </div>
 
+            <div className="bg-ur-panel rounded-ur shadow-ur-flat overflow-hidden border border-ur-border animate-staggerFadeUp" style={{ animationDelay: '0.22s' }}>
+              <div className="px-6 py-4 bg-ur-raised border-b border-ur-border">
+                <h3 className="font-medium text-ur-white flex items-center gap-2">
+                  <Upload size={18} className="text-ur-blue-light" />
+                  Data Served, by Epoch
+                </h3>
+                <p className="text-sm text-ur-gray mt-1">
+                  The data your network served behind each epoch's points, as the server counts it: the weekly blocks, Sunday 00:00 UTC to the next, that end in the epoch. The open epoch and this week's block are running figures.
+                </p>
+                {(servedOpenEpoch || servedBlock) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {servedOpenEpoch && (
+                      <div>
+                        <p className="text-sm text-ur-gray">Served This Epoch So Far (epoch {servedOpenEpoch.epoch})</p>
+                        <p className="text-2xl font-semibold mt-1 text-ur-white">{formatBytes(servedOpenEpoch.servedBytes)}</p>
+                        {servedOpenEpoch.asOfMillis !== undefined && (
+                          <p className="text-xs text-ur-gray-dark mt-1">
+                            Counted through {formatDateTime(new Date(servedOpenEpoch.asOfMillis).toISOString())}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {servedBlock && (
+                      <div>
+                        <p className="text-sm text-ur-gray">Served This Week So Far (block {servedBlock.blockNumber})</p>
+                        <p className="text-2xl font-semibold mt-1 text-ur-white">{formatBytes(servedBlock.servedBytes)}</p>
+                        <p className="text-xs text-ur-gray-dark mt-1">
+                          {servedBlock.inOpenEpoch
+                            ? `Counts in epoch ${servedBlock.epoch}, so it is part of that epoch's figure.`
+                            : `Counts in epoch ${servedBlock.epoch} once the block ends.`}
+                          {' '}Counted through {formatDateTime(new Date(servedBlock.asOfMillis).toISOString())}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              {accountEpochsError && (
+                <div className="px-6 py-3 flex items-center gap-3 text-ur-coral border-b border-ur-border">
+                  <AlertCircle size={18} />
+                  <span>Failed to load the data served: {accountEpochsError}</span>
+                </div>
+              )}
+              <div className="max-h-96 overflow-y-auto">
+                <table className="min-w-full divide-y divide-ur-border">
+                  <thead className="bg-ur-black sticky top-0">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-ur-gray uppercase tracking-wider">
+                        Epoch
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-ur-gray uppercase tracking-wider">
+                        Window
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-ur-gray uppercase tracking-wider">
+                        Data Served
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-ur-gray uppercase tracking-wider">
+                        Points
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-ur-panel divide-y divide-ur-border">
+                    {servedRows.map((row) => (
+                      <tr key={`${row.open ? 'open' : 'finalized'}-${row.epoch}`} className={row.open ? 'bg-ur-blue/10 border-l-4 border-ur-blue' : 'hover:bg-ur-raised/50'}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-ur-white">
+                          {row.open ? `${row.epoch} (open)` : row.epoch}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-ur-gray">
+                          {formatDate(row.startMillis)} – {formatDate(row.endMillis)}{row.open ? ' (projected)' : ''}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-ur-blue-light font-medium">
+                          {formatBytes(row.servedBytes)}{row.open ? ' so far' : ''}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-ur-gray">
+                          {row.points === undefined ? '—' : row.points.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {servedRows.length === 0 && !accountEpochsError && (
+                  <div className="text-center py-8">
+                    <p className="text-ur-gray italic">{accountEpochs ? 'No epochs yet.' : 'Loading the data served…'}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {statsHistory.length > 0 && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-chartSlideUp" style={{ animationDelay: '0.25s' }}>
+              <div className="grid grid-cols-1 gap-8 animate-chartSlideUp" style={{ animationDelay: '0.25s' }}>
                 {paidChartData && (
                   <div className="bg-ur-panel rounded-ur shadow-ur-flat p-6 border border-ur-border">
                     <h3 className="text-lg font-medium text-ur-white mb-6 flex items-center gap-2">
                       <DollarSign size={20} className="text-ur-green" />
-                      Paid Data Transfer History
+                      Data Paid in USDC, History
                     </h3>
                     <div className="h-64 md:h-80">
                       <Line data={paidChartData} options={chartOptions as ComponentProps<typeof Line>["options"]} />
-                    </div>
-                  </div>
-                )}
-                
-                {unpaidChartData && (
-                  <div className="bg-ur-panel rounded-ur shadow-ur-flat p-6 border border-ur-border">
-                    <h3 className="text-lg font-medium text-ur-white mb-6 flex items-center gap-2">
-                      <Clock size={20} className="text-ur-yellow-light" />
-                      Unpaid Data Transfer History
-                    </h3>
-                    <div className="h-64 md:h-80">
-                      <Line data={unpaidChartData} options={chartOptions as ComponentProps<typeof Line>["options"]} />
                     </div>
                   </div>
                 )}
@@ -1026,13 +1151,7 @@ const WalletStatsSection: React.FC = () => {
                         Timestamp
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-ur-gray uppercase tracking-wider">
-                        Paid Data
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-ur-gray uppercase tracking-wider">
-                        Unpaid Data
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-ur-gray uppercase tracking-wider">
-                        Total Data
+                        Data Paid in USDC
                       </th>
                     </tr>
                   </thead>
@@ -1044,12 +1163,6 @@ const WalletStatsSection: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-ur-green font-medium">
                           {formatBytes(entry.paid_bytes_provided)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-ur-yellow-light font-medium">
-                          {formatBytes(entry.unpaid_bytes_provided)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-ur-white">
-                          {formatBytes(entry.paid_bytes_provided + entry.unpaid_bytes_provided)}
                         </td>
                       </tr>
                     ))}

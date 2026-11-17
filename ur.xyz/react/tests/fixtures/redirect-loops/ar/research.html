@@ -1,0 +1,16 @@
+<!doctype html>
+<!--
+  A deliberate loop, for tests/redirect-loops.mjs --overlay tests/fixtures/redirect-loops: laid over a build, the
+  Arabic /research sends the visitor back to the English page 700 ms after it loads, with no referrer. The page
+  settles before it moves, so the gate finds the move while it watches the settled page, and fails it at once: as a
+  loop when the second return comes while it watches, else as a page that moved after settling.
+-->
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<title>الأبحاث</title>
+<script>setTimeout(function () { location.replace('/research'); }, 700);</script>
+</head>
+<body></body>
+</html>

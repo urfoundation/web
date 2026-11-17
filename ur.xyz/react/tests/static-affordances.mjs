@@ -12,6 +12,19 @@
 //                         script); the search box fetches /docs-search.json on
 //                         first use; the phone sidebar toggle and the code
 //                         blocks' Copy buttons work without React
+//   /ctf, /ctf/<cc>       every figure and every country's link in the HTML;
+//                         a control that needs the script (sorting, the
+//                         search, the picker; the tap to open a card is not
+//                         drawn at all) is disabled until it runs, and the
+//                         hydrated board finds a country, opens on the
+//                         visitor's (/sn/ctf/here) and lets a tap open a card;
+//                         before capture the flag starts, the note above the
+//                         heading of the hub and of a country page says when
+//                         in the HTML of every language, and nothing of after
+//                         the start; on the visitor's clock it counts down
+//                         and turns live at the start, and nothing moves as
+//                         its figures arrive (phone widths, every language)
+//                         or as it turns
 //
 // Usage (from astro/, after a build):  node ../react/tests/static-affordances.mjs
 import { chromium } from 'playwright-core';
@@ -21,6 +34,8 @@ import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OFFLINE_CHROMIUM_ARGS } from './offline-chromium.mjs';
+import { SNAPSHOT } from './ctf-fixtures.mjs';
+import { buildModel, localModel, startNote } from '../src/components/pages/ctf/model.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UR_ENV = process.env.UR_ENV || 'main';
@@ -147,6 +162,147 @@ async function main() {
             const source = await block.locator('.md-pre > code').textContent();
             check(await block.locator('.md-codeblock-copy').getAttribute('data-state') === 'copied' && copied === source, '/docs/miner Copy puts the code block\'s text on the clipboard and says so');
             await context.close();
+        }
+        {
+            // capture the flag: the grid is plain HTML, one link per country
+            const { page, close } = await open(browser, `${base}/ctf`, false);
+            const links = await page.$$eval('.ctf-grid .ctf-cname a', (els) => els.map((a) => a.getAttribute('href')));
+            check(links.length === 249 && links.every((h) => /^\/ctf\/[a-z]{2}$/.test(h)) && new Set(links).size === 249, '/ctf without JavaScript links all 249 country pages');
+            check(await page.locator('.ctf-cell-hit, .ctf-fc-hit').count() === 0, '/ctf without JavaScript draws no tap control that needs the script');
+            const inert = await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.map((el) => el.disabled));
+            check(inert.length >= 4 && inert.every(Boolean), '/ctf without JavaScript disables the sorting, the search and the picker, which need the script');
+            check(Boolean((await page.textContent('.ctf-live').catch(() => '')).trim()), '/ctf without JavaScript shows the live bar');
+            // the flags wave out of step, as design.html staggers them: each grid flag starts its wave at its country's
+            // delay (model.js waveDelay; read from the attribute as written, since the style object rewrites -1.0s as -1s)
+            const waves = buildModel(SNAPSHOT).byCode;
+            const flags = await page.$$eval('.ctf-grid .ctf-flag', (els) => els.map((el) => [el.getAttribute('src'), el.getAttribute('style')]));
+            const own = flags.filter(([src, style]) => style === `animation-delay:${waves.get((src.match(/\/([a-z]{2})\.svg$/) || [])[1])?.wave}`);
+            check(flags.length === 249 && own.length === 249 && new Set(flags.map(([, style]) => style)).size >= 20, `/ctf's flags wave out of step, each at its own country's delay (${own.length} of ${flags.length})`);
+            await close();
+        }
+        {
+            const { page, close } = await open(browser, `${base}/ctf/ke`, false);
+            check(/Earn crypto in Kenya/.test(await page.textContent('h1').catch(() => '')), '/ctf/ke without JavaScript leads with its plain-words heading');
+            check((await page.locator('.ctf-faq details').count()) === 6 && /Kenya/.test(await page.textContent('.ctf-intro').catch(() => '')), '/ctf/ke without JavaScript answers its questions with its own figures');
+            await close();
+        }
+        {
+            // hydrated: the visitor's country, the search and a card that opens on a tap
+            const context = await browser.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true });
+            const page = await context.newPage();
+            await page.route(/bringyour\.com/, (r) => r.fulfill({ json: r.request().url().includes('/sn/ctf/here') ? { country: 'ke' } : {} }).catch(() => r.abort()));
+            await page.goto(`${base}/ctf`, { waitUntil: 'networkidle' });
+            await page.waitForSelector('.ctf-cell-hit', { timeout: 8000 }).catch(() => {});
+            check(await page.textContent('.ctf-me-name').catch(() => '') === 'Kenya', '/ctf opens on the visitor\'s country from /sn/ctf/here');
+            check(await page.$$eval('.ctf-seg button, #ctf-q, #ctf-country', (els) => els.length >= 4 && els.every((el) => !el.disabled)), '/ctf, hydrated, enables its controls');
+            await page.fill('#ctf-q', 'nigeria');
+            await page.waitForTimeout(200);
+            check(JSON.stringify(await page.$$eval('.ctf-grid .ctf-cname a', (els) => els.map((a) => a.textContent))) === '["Nigeria"]', '/ctf finds a country by name');
+            await page.fill('#ctf-q', '');
+            const cell = page.locator('.ctf-grid .ctf-cell').first();
+            await cell.locator('.ctf-cell-hit').click().catch(() => {});
+            await page.waitForTimeout(1000);
+            check(await cell.evaluate((el) => el.classList.contains('ctf-expanded') && el.querySelector('.ctf-cell-more') !== null).catch(() => false), '/ctf on a tablet opens a country\'s card on a tap');
+            await context.close();
+        }
+        {
+            // capture the flag before it starts: the note above the heading of the hub and of every country page (Kenya's
+            // checked), in the HTML in every language and counting down on the visitor's clock; once the snapshot is from
+            // after the start, no note
+            const LANGS = ['en', 'ru', 'ar', 'zh', 'de', 'es'];
+            const notes = Object.fromEntries(LANGS.map((lang) => [lang, startNote(localModel(buildModel(SNAPSHOT), lang))]));
+            const pathOf = (lang, page) => `${lang === 'en' ? '' : `/${lang}`}/ctf${page}`;
+            const hub = (lang) => `${base}${pathOf(lang, '')}`;
+            if (!notes.en) {
+                for (const page of ['', '/ke']) {
+                    const { page: p, close } = await open(browser, `${base}/ctf${page}`, false);
+                    check(await p.locator('.ctf-start').count() === 0, `/ctf${page} after the start has no countdown note`);
+                    await close();
+                }
+            } else {
+                const start = Date.parse(notes.en.startsAt);
+                const DAY = 86_400_000;
+                // the note's height and where the heading stands, at phone widths: before the figures arrive (no
+                // JavaScript) and after (the clock held 15 days 3 hours and 38 minutes before the start); and,
+                // with the figures, whether the units' names under the tiles run into each other
+                const PHONES = [320, 360, 375, 390, 430];
+                const layout = async (page) => {
+                    await page.evaluate(() => document.fonts.ready.then(() => true));
+                    const out = [];
+                    for (const width of PHONES) {
+                        await page.setViewportSize({ width, height: 900 });
+                        out.push(await page.evaluate(() => {
+                            const names = [...document.querySelectorAll('.ctf-start-uname')].map((el) => {
+                                const range = document.createRange();
+                                range.selectNodeContents(el);
+                                const r = range.getBoundingClientRect();
+                                return [r.left, r.right];
+                            }).sort((a, b) => a[0] - b[0]);
+                            return {
+                                note: document.querySelector('.ctf-start').getBoundingClientRect().height,
+                                h1: document.querySelector('h1').getBoundingClientRect().top + window.scrollY,
+                                touching: names.some((r, i) => i > 0 && r[0] < names[i - 1][1] + 2),
+                            };
+                        }));
+                    }
+                    return out;
+                };
+                for (const page of ['', '/ke']) {
+                    for (const lang of LANGS) {
+                        const note = notes[lang];
+                        const where = pathOf(lang, page);
+                        const { page: p, close } = await open(browser, `${base}${where}`, false);
+                        const said = await p.textContent('.ctf-start [role="status"]').catch(() => '');
+                        const first = await p.evaluate(() => {
+                            const start = document.querySelector('.ctf-start');
+                            const h1 = document.querySelector('h1');
+                            return Boolean(start && h1 && start.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING);
+                        });
+                        const all = await p.textContent('.ctf-start').catch(() => '');
+                        check(said === note.note && first, `${where} without JavaScript says above its heading when capture the flag starts: ${note.note}`);
+                        check(!all.includes(note.live) && !all.includes(note.words.go), `${where}'s HTML says nothing of after the start before it`);
+                        if (lang === 'en') check(await p.textContent('.ctf-start-tiles').catch(() => '') === `--${note.words.units[0]}:--${note.words.units[1]}:--${note.words.units[2]}:--${note.words.units[3]}`, `${where} without JavaScript shows no figure it cannot know`);
+                        const still = await layout(p);
+                        await close();
+                        const context = await browser.newContext({ viewport: { width: PHONES[0], height: 900 } });
+                        const live = await context.newPage();
+                        const at = start - (15 * DAY + (3 * 60 + 38) * 60_000);
+                        await live.clock.setFixedTime(at);
+                        await live.route(/bringyour\.com/, (r) => r.fulfill({ json: {} }).catch(() => r.abort()));
+                        await live.goto(`${base}${where}`, { waitUntil: 'networkidle' });
+                        await live.waitForSelector('.ctf-start.ctf-start-on', { timeout: 8000 }).catch(() => {});
+                        const running = await layout(live);
+                        await context.close();
+                        const moved = PHONES.filter((w, i) => Math.abs(still[i].note - running[i].note) > 0.5 || Math.abs(still[i].h1 - running[i].h1) > 0.5);
+                        check(moved.length === 0, `${where}: nothing moves when the countdown's figures arrive at ${PHONES.join(', ')} px${moved.length ? ` (it does at ${moved.join(', ')})` : ''}`);
+                        const touching = PHONES.filter((w, i) => running[i].touching);
+                        check(touching.length === 0, `${where}: the countdown's units stand apart at ${PHONES.join(', ')} px${touching.length ? ` (they touch at ${touching.join(', ')})` : ''}`);
+                    }
+                }
+                // hydrated, three days before the start on the visitor's clock (held there), then past it
+                const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+                const page = await context.newPage();
+                // a fixed Date (the island hydrates when the browser is idle, which a stopped clock would never be)
+                await page.clock.setFixedTime(start - 3 * DAY);
+                await page.route(/bringyour\.com/, (r) => r.fulfill({ json: {} }).catch(() => r.abort()));
+                await page.goto(`${base}/ctf`, { waitUntil: 'networkidle' });
+                await page.waitForSelector('.ctf-start.ctf-start-on', { timeout: 8000 }).catch(() => {});
+                const box = async () => page.evaluate(() => {
+                    const r = document.querySelector('.ctf-start').getBoundingClientRect();
+                    return { height: r.height, h1: document.querySelector('h1').getBoundingClientRect().top + window.scrollY };
+                });
+                const before = await box();
+                const figures = await page.$$eval('.ctf-start-num', (els) => els.map((el) => el.textContent));
+                check(JSON.stringify(figures) === '["03","00","00","00"]', `/ctf counts down on the visitor's clock: ${figures.join(' : ')}`);
+                check(await page.textContent('.ctf-start .ctf-sr').catch(() => '') === 'Starts in about 3 days.', '/ctf says the time left in words for a screen reader');
+                check(/≈ 21,600$/.test(await page.textContent('.ctf-start-blocks b').catch(() => '')), '/ctf counts the blocks left, one every 12 seconds');
+                await page.clock.setFixedTime(start + 1000);
+                await page.waitForSelector('.ctf-start[data-phase="live"]', { timeout: 5000 }).catch(() => {});
+                const after = await box();
+                check(await page.textContent('.ctf-start [role="status"]').catch(() => '') === notes.en.live && await page.locator('.ctf-start .ctf-sr').count() === 0, `/ctf turns live at the start, not a count below zero: ${notes.en.live}`);
+                check(Math.abs(after.height - before.height) < 0.5 && Math.abs(after.h1 - before.h1) < 0.5, `/ctf's note holds its size as it turns live (${before.height} → ${after.height} px)`);
+                await context.close();
+            }
         }
         {
             const { page, close } = await open(browser, `${base}/reserve`, false);

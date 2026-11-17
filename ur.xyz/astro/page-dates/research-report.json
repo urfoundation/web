@@ -1,0 +1,29 @@
+{
+  "about": "The day each page of the ur.xyz page group research-report (react/src/i18n/pages/research-report/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
+  "pages": {
+    "/ar/research/2026-q3-report": {
+      "fingerprint": "50ee2a80e9de5d44",
+      "lastmod": "2026-11-12"
+    },
+    "/de/research/2026-q3-report": {
+      "fingerprint": "8d879d6245f19ccf",
+      "lastmod": "2026-11-12"
+    },
+    "/es/research/2026-q3-report": {
+      "fingerprint": "adef6a4c15c44b3d",
+      "lastmod": "2026-11-12"
+    },
+    "/research/2026-q3-report": {
+      "fingerprint": "e619f695f1f9b1eb",
+      "lastmod": "2026-10-30"
+    },
+    "/ru/research/2026-q3-report": {
+      "fingerprint": "503db91e2b877d3d",
+      "lastmod": "2026-11-12"
+    },
+    "/zh/research/2026-q3-report": {
+      "fingerprint": "fffbc99d02f30c96",
+      "lastmod": "2026-11-12"
+    }
+  }
+}

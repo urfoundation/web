@@ -1,0 +1,18 @@
+---
+// /<lang>/ctf/<cc> — a country's capture the flag page in Russian, Arabic,
+// Chinese, German and Spanish, for each of the snapshot's 249 codes: the
+// English page's body (components/routes/CtfCountryRoute.astro) in the page's
+// language, built once the ctf page group is localized. It is indexed as its
+// English page is (components/routes/ctf-paths.js).
+import CtfCountryRoute from '../../../components/routes/CtfCountryRoute.astro';
+import { ctfCountryPaths } from '../../../components/routes/ctf-paths.js';
+import { localizedStaticPaths } from '../../../lib/route-localization.js';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('ctf', ctfCountryPaths());
+}
+
+const { lang, cc } = Astro.params;
+const { noindex } = Astro.props;
+---
+<CtfCountryRoute lang={lang} cc={cc} noindex={noindex} />

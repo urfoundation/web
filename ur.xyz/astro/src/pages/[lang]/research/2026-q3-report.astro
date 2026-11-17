@@ -1,0 +1,12 @@
+---
+// /<lang>/research/2026-q3-report — the research report in ru, ar, zh, de
+// and es, built while the research-report group is localized
+// (react/src/i18n/pages/research-report/group.js).
+import { localizedStaticPaths } from '../../../lib/route-localization.js';
+import ResearchReportRoute from '../../../components/routes/ResearchReportRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('research-report');
+}
+---
+<ResearchReportRoute lang={Astro.params.lang} />

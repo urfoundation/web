@@ -17,11 +17,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const report = JSON.parse(fs.readFileSync(path.join(__dirname, '../src/data/research-report-2026-q3.json'), 'utf8'));
 const loop = (key) => M.sections.loops.find((l) => l.key === key);
 
-test('the methodology is an English-only route under the research section', () => {
+test('the methodology is a route of every site language under the research section', () => {
     assert.deepEqual(parseRoute('/research/methodology'), { name: 'research-methodology', slug: null });
     assert.deepEqual(parseRoute('/de/research/methodology'), { name: 'research-methodology', slug: null });
-    assert.equal(buildPath({ name: 'research-methodology' }, 'de'), M.path);
-    assert.equal(isTranslatedRoute({ name: 'research-methodology' }), false);
+    assert.equal(buildPath({ name: 'research-methodology' }, 'en'), M.path);
+    assert.equal(buildPath({ name: 'research-methodology' }, 'de'), `/de${M.path}`);
+    assert.equal(isTranslatedRoute({ name: 'research-methodology' }), true);
     assert.equal(M.path, '/research/methodology');
 });
 

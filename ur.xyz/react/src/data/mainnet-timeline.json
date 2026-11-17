@@ -138,91 +138,30 @@
     {
       "id": "settlement-v2-release-checks",
       "date": "2026-10-16",
-      "status": "planned",
-      "title": "Settlement v2 release checks",
-      "detail": "The rollout dates that follow hold if the settlement v2 release passes its final checks by the morning of October 16.",
-      "sources": []
-    },
-    {
-      "id": "operator-services-updated",
-      "date": "2026-10-16",
-      "status": "planned",
-      "title": "Network operator services updated, v2 off",
-      "detail": "During the day, the network operator's services move to the settlement v2 release, with v2 still switched off.",
+      "status": "done",
+      "title": "Settlement v2 release not ready by October 16",
+      "detail": "The settlement v2 release had not passed its final checks by the morning of October 16, so the rollout dates planned after it did not hold. The release went out from October 22 to 25, too late for epoch 3.",
       "sources": []
     },
     {
       "id": "epoch-1-closes",
-      "date": "2026-10-16T18:09:00Z/2026-10-16T18:33:00Z",
-      "status": "scheduled",
-      "title": "Epoch 1 closes on version 1",
-      "detail": "The close window is 120 blocks, from block 9,297,628 to 9,297,748. The epoch 1 payout root is due by block 9,298,828, around 22:09 UTC.",
-      "sources": [
-        { "label": "Epoch 1 close", "kind": "evm_tx", "ref": "" },
-        { "label": "Epoch 1 payout root", "kind": "evm_tx", "ref": "" }
-      ]
-    },
-    {
-      "id": "connect-service-updated",
-      "date": "2026-10-17T08:35:00Z",
-      "status": "planned",
-      "title": "Connect service updated, v2 off",
-      "detail": "The network operator's connect service follows its other services, ahead of the validator.",
-      "sources": []
-    },
-    {
-      "id": "v2-validator-starts",
-      "date": "2026-10-17T15:48:00Z/2026-10-17T16:08:00Z",
-      "status": "planned",
-      "title": "Settlement v2 validator starts, v2 off",
-      "detail": "The validator runs its new release on unchanged settings, after the connect service.",
-      "sources": []
-    },
-    {
-      "id": "v2-contracts-deployed",
-      "date": "2026-10-17",
+      "date": "2026-10-16T18:09:48Z",
       "status": "done",
-      "key": true,
-      "approximate": true,
-      "title": "Settlement v2 contracts deployed",
-      "detail": "vault2, which holds the funds, and STSettlement2 are on chain beside the unchanged version 1 contracts. Deploying them does not activate settlement v2: the v2 pool must also be registered.",
+      "title": "Epoch 1 closes on version 1",
+      "detail": "Epoch 1 closed at block 9,297,631, within its 120-block close window, and the settlement vault took in its 3,482.26 α. Epoch 1 had no eligible work to pay out, so no payout root was committed by block 9,298,828, and its funding carried forward (see the epoch 3 notice at the top).",
       "sources": [
-        { "label": "vault2", "kind": "evm_address", "ref": "0xe4865eb1bebdf5c6a10c9d37f3ccdd59aee8f20c" },
-        { "label": "STSettlement2", "kind": "evm_address", "ref": "" },
-        { "label": "STSettlement2 implementation", "kind": "evm_address", "ref": "" },
-        { "label": "vault2 created", "kind": "evm_tx", "ref": "" },
-        { "label": "Escrow registered", "kind": "evm_tx", "ref": "" },
-        { "label": "STSettlement2 implementation created", "kind": "evm_tx", "ref": "" },
-        { "label": "STSettlement2 created", "kind": "evm_tx", "ref": "" },
-        { "label": "vault2 linked to STSettlement2", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 1 close, block 9,297,631", "kind": "evm_tx", "ref": "0xa57407ac020ab2592e1f8a324c06b9064d24befe5acfcdd524c0e77434fab5a6" }
       ]
     },
     {
       "id": "first-v1-claims",
-      "date": "2026-10-18T18:09:00Z",
-      "status": "scheduled",
-      "title": "First version 1 claims (epoch 1)",
-      "detail": "The epoch 1 payout root can finalize from block 9,312,028 at the earliest, and claims open then. As explained above, version 1 does not pay every miner.",
+      "date": "2026-10-18T18:09:48Z",
+      "status": "done",
+      "title": "Epoch 1 finalized without a payout root",
+      "detail": "Epoch 1 had no payout root, so it had no version 1 claims. Its 3,482.26 α carried forward under the protocol's missed-commit rule, and it is recovered with epoch 3's funding (see the epoch 3 notice at the top).",
       "sources": [
-        { "label": "Epoch 1 finalized", "kind": "evm_tx", "ref": "" },
-        { "label": "First version 1 claim", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 1 finalized, block 9,312,031", "kind": "evm_tx", "ref": "0x900e7f9ffa6524ecfd8b42c04846641124ea0118194039a15eaae78e018a601d" }
       ]
-    },
-    {
-      "id": "validator-adopts-v2-settings",
-      "date": "2026-10-18/2026-10-19",
-      "status": "planned",
-      "title": "Validator adopts its settlement v2 settings",
-      "detail": "Kept clear of the epoch 1 finalization on the evening of October 18.",
-      "sources": []
-    },
-    {
-      "id": "operator-switches-to-v2-contracts",
-      "date": "2026-10-19/2026-10-20",
-      "status": "planned",
-      "title": "Network operator switches to the v2 contracts",
-      "detail": "The network operator's servers switch to the settlement v2 contracts on October 19, and checks run on October 20. Apps pin vault2 from October 18 to 20.",
-      "sources": []
     },
     {
       "id": "v2-pool-registration-window",
@@ -233,96 +172,355 @@
       "sources": []
     },
     {
+      "id": "v2-validator-starts",
+      "date": "2026-10-22T20:48:38Z",
+      "status": "done",
+      "title": "Settlement v2 validator starts, v2 off",
+      "detail": "The validator started its settlement v2 release, on unchanged settings.",
+      "sources": []
+    },
+    {
+      "id": "v2-contracts-deployed",
+      "date": "2026-10-23T05:55:24Z/2026-10-23T07:51:36Z",
+      "status": "done",
+      "key": true,
+      "title": "Settlement v2 contracts deployed",
+      "detail": "Six deployment steps on Bittensor's EVM, in blocks 9,344,278 to 9,344,859, put vault2, which holds the funds, STSettlement2 and a claim batcher on chain beside the unchanged version 1 contracts. Deploying them does not activate settlement v2: the v2 pool must also be registered.",
+      "sources": [
+        { "label": "vault2", "kind": "evm_address", "ref": "0xe4865eb1bebdf5c6a10c9d37f3ccdd59aee8f20c" },
+        { "label": "STSettlement2", "kind": "evm_address", "ref": "0xB5e3e23CD1A733410d769b0C95e1c4CA25e821b0" },
+        { "label": "STSettlement2's first implementation", "kind": "evm_address", "ref": "0x23667cc6dfa46d305bdabcb214af9397ea7e07e7" },
+        { "label": "Claim batcher", "kind": "evm_address", "ref": "0x14174e7c5671ce1499aef9c68d74bebffa58c41a" },
+        { "label": "vault2 created, block 9,344,278", "kind": "evm_tx", "ref": "0xee0ee166e1dcac96d795536b5e7f0b8777e8bbbf6575d733579cbc42960df7ad" },
+        { "label": "Escrow registered, block 9,344,278", "kind": "evm_tx", "ref": "0xb90cb8ff4589c54eaf7be4b4f17db790238b2a82d73664c87768c19d62275395" },
+        { "label": "STSettlement2 implementation created, block 9,344,354", "kind": "evm_tx", "ref": "0x50f2f371acc7d3f848c8438dbaba48982bf5668ddc40a8b4f8d039f323123395" },
+        { "label": "STSettlement2 created, block 9,344,841", "kind": "evm_tx", "ref": "0x02197b63075fbb0158edbc6e56203519bfb9f9d90b8eaeb4017316c3997f339d" },
+        { "label": "vault2 linked to STSettlement2, block 9,344,851", "kind": "evm_tx", "ref": "0x4279688d3dcd20a66c9eb2ed7c380b5445e036569086b69df96e095d2e1a851c" },
+        { "label": "Claim batcher created, block 9,344,859", "kind": "evm_tx", "ref": "0xbccb2158b68020f8b7da7e28270af7c9fc3f0ee37816cb3ff585c7c07a1a0e04" }
+      ]
+    },
+    {
+      "id": "validator-adopts-v2-settings",
+      "date": "2026-10-23T09:03:57Z",
+      "status": "done",
+      "title": "Validator adopts its settlement v2 settings",
+      "detail": "The validator restarted on its settlement v2 settings, after the v2 contracts were deployed that morning.",
+      "sources": []
+    },
+    {
       "id": "epoch-3-begins-on-v1",
       "date": "2026-10-23T18:09:00Z",
       "status": "done",
       "approximate": true,
       "title": "Epoch 3 begins on version 1",
-      "detail": "Epoch 3 starts at block 9,348,028 without a v2 pool registered, so version 1 settles it. Epoch 2 closes on version 1, with its payout root due by around 22:09 UTC.",
+      "detail": "Epoch 3 starts at block 9,348,028 without a v2 pool registered, so version 1 settles it. Epoch 2 was not closed in its 120-block close window, so its emission was deferred to epoch 3's close.",
       "sources": [
         { "label": "Epoch 3's first block, 9,348,028", "kind": "evm_block", "ref": "9348028" },
-        { "label": "Epoch 2 close", "kind": "evm_tx", "ref": "" },
-        { "label": "Epoch 2 payout root", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 2's emission deferred, block 9,348,551", "kind": "evm_tx", "ref": "0xf8000f667d6adde3c96906afcbcfe005ad1553e1f990e407244d306ce77c3a9c" }
       ]
+    },
+    {
+      "id": "operator-services-updated",
+      "date": "2026-10-23/2026-10-24",
+      "status": "done",
+      "title": "Network operator services updated, v2 off",
+      "detail": "The network operator's services moved to the settlement v2 release with v2 still switched off: the api on October 23, the others on October 24.",
+      "sources": []
+    },
+    {
+      "id": "connect-service-updated",
+      "date": "2026-10-24",
+      "status": "done",
+      "title": "Connect service updated, v2 off",
+      "detail": "The network operator's connect service moved to the settlement v2 release with its other services.",
+      "sources": []
     },
     {
       "id": "v2-pool-registered",
       "date": "2026-10-24T16:40:00Z/2026-10-30T18:24:00Z",
-      "status": "planned",
+      "status": "done",
       "key": true,
-      "title": "Settlement v2 pool registration, pending",
-      "detail": "The governance Safe registers the v2 pool for epoch 4, after the final production checks. This is the activation, and it must finalize before block 9,398,428. At finalized block 9,354,702, on October 24 at 16:40 UTC, the pool was not yet registered.",
+      "title": "Settlement v2 pool registered",
+      "detail": "The governance Safe registered network operator 1's pool in the v2 vault on October 29 at 03:11 UTC, before epoch 4 began, with epoch 4 as its first v2 epoch. This was the activation of settlement v2.",
       "sources": [
-        { "label": "Registration through the governance Safe", "kind": "evm_tx", "ref": "" }
+        { "label": "Registration through the governance Safe, block 9,386,659", "kind": "evm_tx", "ref": "0xca18bba7a7db0718f285c734e013c4d16d8b4f4d1de330209c28989d8b8b0c7b" }
       ],
       "approximate": true
     },
     {
+      "id": "operator-switches-to-v2-contracts",
+      "date": "2026-10-25",
+      "status": "done",
+      "title": "Network operator switches to the v2 contracts",
+      "detail": "The network operator's servers on all six of its hosts switched to the settlement v2 contracts, ahead of the v2 pool registration.",
+      "sources": []
+    },
+    {
       "id": "last-v1-claims",
-      "date": "2026-10-25T18:09:00Z",
-      "status": "scheduled",
-      "title": "Version 1 claims (epoch 2)",
-      "detail": "The epoch 2 payout root can finalize from block 9,362,428 at the earliest. The same version 1 limit applies.",
+      "date": "2026-10-25T18:26:00Z",
+      "status": "done",
+      "title": "Epoch 2 finalized without a payout root",
+      "detail": "Epoch 2 was not closed in its close window, so its emission stayed on the pool and was taken in at epoch 3's close: epoch 3's 4,132.72 α covers about two weeks. With no funding and no payout root, epoch 2 had no version 1 claims.",
       "sources": [
-        { "label": "Epoch 2 finalized", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 2 finalized, block 9,362,431", "kind": "evm_tx", "ref": "0x2b64fb6dc89c4dbe46afd71fe5c1f2549968c82f4495414c6bbd9a55c54cee45" }
       ]
     },
     {
       "id": "settlement-v2-active",
       "date": "2026-10-30T18:25:00Z",
-      "status": "planned",
+      "status": "done",
       "key": true,
-      "title": "Target: settlement v2 active, epoch 4 begins",
-      "detail": "From block 9,398,428, if the v2 pool registration has finalized by then. If it has not, epoch 4 also stays on version 1, and a new date will be set. Epoch 3 still closes on version 1, with its payout root due by around 22:25 UTC.",
+      "approximate": true,
+      "title": "Settlement v2 active: epoch 4 begins",
+      "detail": "From block 9,398,428, settlement v2 pays epoch 4 and every epoch after it. Epoch 3 closed on version 1 without a payout root; its funding is recovered (see the epoch 3 notice at the top).",
       "sources": [
-        { "label": "Epoch 4's first block, 9,398,428", "kind": "evm_block", "ref": "" },
-        { "label": "Epoch 3 close", "kind": "evm_tx", "ref": "" },
-        { "label": "Epoch 3 payout root", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 4's first block, 9,398,428", "kind": "evm_block", "ref": "9398428" }
       ]
     },
     {
       "id": "last-v1-claims-epoch-3",
-      "date": "2026-11-01T18:25:00Z",
-      "status": "scheduled",
-      "title": "Last version 1 claims (epoch 3), if v2 starts with epoch 4",
-      "detail": "The epoch 3 payout root can finalize from block 9,412,828 at the earliest. The same version 1 limit applies.",
+      "date": "2026-11-01T18:26:00Z",
+      "status": "done",
+      "title": "Epoch 3 finalized without a payout root",
+      "detail": "Epoch 3's payout root was not committed in its window, so it had no version 1 claims. Its 4,132.72 α carried forward with epoch 1's 3,482.26 α, and both are recovered (see the epoch 3 notice at the top).",
       "sources": [
-        { "label": "Epoch 3 finalized", "kind": "evm_tx", "ref": "" }
+        { "label": "Epoch 3 finalized, block 9,412,831", "kind": "evm_tx", "ref": "0xa08e2dbb850025d7d47ac5dc0880bb16db28d34622fe62af15a9e8e9b3113d98" }
+      ]
+    },
+    {
+      "id": "settlement-v2-timelock",
+      "date": "2026-11-06T17:43:12Z",
+      "status": "done",
+      "title": "Settlement v2 changes now wait 72 hours",
+      "detail": "The settlement v2 contract that runs payouts is now owned by a timelock. Any change to it, such as an upgrade, a new auditor set or adding recovered funds to an epoch, is announced on chain and waits 72 hours, and can be cancelled during that time. Payout roots, approvals and claims are unaffected.",
+      "sources": [
+        { "label": "Timelock deployed", "kind": "evm_tx", "ref": "0xfa632257a7bc27d394462fd97b77e1b29ac98473f815906ec120b4a6a5029df0" },
+        { "label": "Ownership moved to the timelock", "kind": "evm_tx", "ref": "0x832da70ea60d269ee5a8542c3d42e56378f665f045481aae818e8ea3e4ccebea" },
+        { "label": "Timelock", "kind": "evm_address", "ref": "0x5529dfe070f73A96C14b5aFCf4fb3DdeA6122fAc" }
       ]
     },
     {
       "id": "first-v2-close-and-commit",
-      "date": "2026-11-06T18:25:00Z/2026-11-06T22:25:00Z",
-      "status": "planned",
+      "date": "2026-11-06T19:08:24Z",
+      "status": "done",
       "title": "First settlement v2 close and commit",
-      "detail": "If settlement v2 starts with epoch 4: epoch 4 ends at block 9,448,828, and the first v2 ledger root is due by block 9,450,028.",
+      "detail": "Epoch 4 ended at block 9,448,828. Its v2 ledger root was committed at block 9,449,034 and approved by the validator at block 9,449,041.",
       "sources": [
-        { "label": "First v2 close", "kind": "evm_tx", "ref": "" },
-        { "label": "First v2 ledger root", "kind": "evm_tx", "ref": "" },
-        { "label": "Validator approval", "kind": "evm_tx", "ref": "" }
+        { "label": "First v2 ledger root", "kind": "evm_tx", "ref": "0x07a977c0d4e9e829dd3b9b9e4d6777bf9f8a0940d7a2d8647fa5d182563fa37d" },
+        { "label": "Validator approval", "kind": "evm_tx", "ref": "0x90118e3836c054531ce75618597b5d020ab059d95e83125056f98993ec05e1b4" }
+      ]
+    },
+    {
+      "id": "epoch-3-recovery-root",
+      "date": "2026-11-06T19:09:48Z",
+      "status": "done",
+      "title": "Recovery root sends the epoch 1 and 3 funding to the v2 vault",
+      "detail": "A single version 1 root pays the whole carry, 3,482.26 α from epoch 1 and 4,132.72 α from epoch 3, to the v2 vault. It can be claimed into the vault after its 48-hour challenge period, from about November 8, 18:25 UTC.",
+      "sources": [
+        { "label": "Recovery root", "kind": "evm_tx", "ref": "0x1731a110aba17ae0827a502896f84ba82b0e2d9e45792e8a380dd3f4f838662a" }
       ]
     },
     {
       "id": "first-v2-claim",
-      "date": "2026-11-08T18:25:00Z/2026-11-08T22:25:00Z",
-      "status": "planned",
+      "date": "2026-11-08T19:10:00Z/2026-11-08T19:11:48Z",
+      "status": "done",
       "key": true,
-      "title": "First settlement v2 claims, earliest",
-      "detail": "The first v2 root can finalize 14,400 blocks after its commit, from block 9,463,228 to 9,464,428 at the earliest, and claims follow once it has. Open challenges, a late or invalid root, or delayed finalization can push claims later.",
+      "title": "First settlement v2 claims",
+      "detail": "Epoch 4's root, the first v2 root, finalized at block 9,463,438, 14,404 blocks after its commit, and the first claims followed at block 9,463,447.",
       "sources": [
-        { "label": "First v2 root finalized", "kind": "evm_tx", "ref": "" },
-        { "label": "First v2 claim", "kind": "evm_tx", "ref": "" }
+        { "label": "First v2 root finalized, block 9,463,438", "kind": "evm_tx", "ref": "0x6001380acdf1d850e6dbfc1e4bf22bac9d1e59c9d1075d56b1697c797ef26147" },
+        { "label": "First v2 claims, block 9,463,447", "kind": "evm_tx", "ref": "0x7b049eec195ec9f03554e8b4f45bfda830fcf4e89bc446fcdfc113265a03eafe" }
+      ]
+    },
+    {
+      "id": "epoch-3-recovery-scheduled",
+      "date": "2026-11-10T18:25:00Z",
+      "status": "done",
+      "approximate": true,
+      "title": "Recovered funds not scheduled into epoch 5",
+      "detail": "The recovery reached the v2 vault on November 8 at 18:30 UTC. Adding it to epoch 5's payout had to be scheduled through the 72-hour timelock by about November 10, 18:25 UTC, to take effect before epoch 5 closes. It was not scheduled, so the recovered funds are not paid with epoch 5 (see the epoch 3 notice at the top). The recovery's record on the v2 settlement contract was scheduled on November 6 and has been ready to take effect since November 9, 21:19 UTC.",
+      "sources": [
+        { "label": "Recovery root finalized, block 9,463,231", "kind": "evm_tx", "ref": "0xc9fa804023288aefdb381d0c19dd8f1ef8559530715b045f87475e695a51d6f9" },
+        { "label": "Recovery claimed into the v2 vault, block 9,463,236", "kind": "evm_tx", "ref": "0x18c4e8d3f72ceaea1b6f275b54b27786967a834822e3ae1539d084bc06a7ea28" },
+        { "label": "Recovery taken into the v2 vault's escrow, block 9,463,240", "kind": "evm_tx", "ref": "0xaa66b41505da170231e52a36db68c12198990241a3b1977663bce76d90ce93dc" },
+        { "label": "Recovery record scheduled", "kind": "evm_tx", "ref": "0xd6d37a32a7f1d09cb1837f0be5ccebd58fe8baf554e41eaa9a63c052e6de2dd7" }
       ]
     },
     {
       "id": "fp2-modern-provider-gate",
       "date": "2026-11-11T00:00:00Z",
+      "status": "done",
+      "key": true,
+      "title": "Modern provider gate retired: modern providers are drawn first",
+      "detail": "The gate that would have admitted only providers verified as modern to Quality and Speed did not turn on: on October 28 the subnet owner replaced it with priority. Within each band, providers verified as modern are drawn first and other providers fill what is left, so those keep their Quality and Speed membership. Priority reached the network operator's services that evening, from 22:37 to 23:20 UTC.",
+      "sources": []
+    },
+    {
+      "id": "intra-traffic-billing-planned",
+      "date": "2026-11-11T05:43:00Z/2026-11-11T11:39:00Z",
+      "status": "done",
+      "title": "Same-network and friends-and-family traffic now draws on the data balance",
+      "detail": "Traffic between devices of one network and traffic to a provider in friends-and-family mode now draw on the sending network's data balance, as other traffic does, on the free plan or a paid one. The billing change, approved by the subnet owner on November 10, reached the network operator's services in stages from 05:43 UTC, and all of them by 11:39 UTC. Friends-and-family providers are credited for it as before: paid and free traffic count alike. Contracts opened before the change are not charged.",
+      "sources": [
+        { "label": "The amendment, WHITEPAPER.md §8.6.7", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md" }
+      ]
+    },
+    {
+      "id": "pro-grant-per-cycle",
+      "date": "2026-11-11",
+      "status": "scheduled",
+      "title": "Pro data follows each network's own cycle, and the provider subsidy counts its revenue once",
+      "detail": "From the network operator's server release of November 11, a Pro network gets its full monthly data on its own monthly cycle, counted from the day its subscription started or last renewed, and each cycle's grant carries that cycle's share of the subscription's revenue. The network operator's provider subsidy counts that revenue once, as the traffic the grant funds is settled. Before, a paid period's revenue could count twice, in full through its 600 GiB credit and again as a share through the monthly grant on the 1st, and a long-running Google Play subscription counted only a share spread over the months since it began. SN25 pool rewards are counted as before: the pool is split by completed usage, and subscription payments are not an input. For traffic since the October 6 cutoff, the provider subsidy pays no USDC and only counts toward the weekly points the network operator awards. A Pro network that holds the November 1 grant gets its first cycle grant on December 1 at 00:00 UTC, and nothing granted before the release changes. Customers pay the same.",
+      "sources": [
+        { "label": "How rewards are counted, in the miner guide", "kind": "doc", "ref": "/docs/miner/rewards#how-rewards-are-counted" },
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-pro-data-per-cycle.md" }
+      ]
+    },
+    {
+      "id": "sn25-gamma-payments",
+      "date": "2026-11-11T15:14:12Z",
+      "status": "done",
+      "title": "Gamma payments available on SN25",
+      "detail": "At block 9,483,859, the subnet owner's multisig published the first Gamma service on SN25 and switched on Gamma for SN25, in one call. Gamma, a feature of the Subtensor runtime switched on network-wide on November 9, is a subnet's credit for paying services, valued in US dollars: a buyer mints SN25 gamma, one per dollar, by burning SN25 alpha bought with TAO or taken from stake, and a service published on SN25 spends it on what the buyer orders. Every mint burns SN25 alpha. Gamma cannot be transferred or redeemed, and SN25 gamma pays only for services on SN25. The first is URnetwork's, one place to pay with it: Pro plans and data, by API. Approved by the subnet owner on November 11.",
+      "sources": [
+        { "label": "Published and switched on by the subnet owner's multisig, extrinsic 9483859-0021", "kind": "substrate_extrinsic", "ref": "9483859-21" },
+        { "label": "Paying with Gamma, on ur.io", "kind": "doc", "ref": "https://ur.io/gamma" }
+      ]
+    },
+    {
+      "id": "extender-relay-share",
+      "date": "2026-11-12",
+      "status": "done",
+      "title": "Extenders earn their share only on contracts they can relay",
+      "detail": "From the network operator's server release of November 12, an extender is one of a contract's hops, and earns its share of the contract's usage, only when it can have relayed the contract, as the subnet owner decided on November 11. A connection counts as relayed when it comes from an extender's address, and three kinds come from that address without being relayed: the extender host's own connection, other devices of the extender's own network that share its address, and providers of other networks that share it while providing publicly, which always connect to the platform directly. These no longer make the extender a hop, so their providers are credited the whole of their contracts' usage, where an extender was credited a share of it. A connection from another address of an extender's IPv6 /64, which hosts commonly send from, now counts as relayed by it. Contracts created before the release keep their hops, and SN25 pool rewards are still split by completed usage.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-relay-share.md" }
+      ]
+    },
+    {
+      "id": "usdc-payouts-end",
+      "date": "2026-11-12",
+      "status": "done",
+      "title": "USDC provider payouts end",
+      "detail": "Legacy USDC provider payouts have ended, and no further USDC payouts will be sent. Provider earnings are paid through SN25.",
+      "sources": []
+    },
+    {
+      "id": "providers-without-udp-or-ipv6",
+      "date": "2026-11-13",
+      "status": "in_progress",
+      "title": "Providers without UDP or IPv6 will be offered for the traffic they carry",
+      "detail": "Rolling out with the network operator's next server release and the next app releases: clients will be offered a provider whose quality-probe checks failed only over HTTP/3 (UDP) for TCP traffic, and one whose checks failed only over IPv6 for IPv4 traffic. Until then, such a provider fails its checks, and clients are offered it rarely, if at all, even for the traffic it carries: on November 12, about 20,700 providers failed their checks only because of their HTTP/3 loads. Clients will never send UDP to a provider that does not carry it. Each app will keep a few of these providers beside its usual ones and race them for the TCP connections they can carry, and turn to them where a location has too few providers that carry UDP. Apps from before these releases keep the old selection. SN25 scoring, weights and payouts read none of the quality probe's checks and do not change: pool rewards are still split by completed usage, so these providers earn more only through the traffic they will carry.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-providers-without-udp-or-ipv6.md" }
+      ]
+    },
+    {
+      "id": "epoch-5-claims-with-recovery",
+      "date": "2026-11-15T18:25:00Z/2026-11-15T22:25:00Z",
+      "status": "planned",
+      "title": "Epoch 5 claims",
+      "detail": "Epoch 5 ends at block 9,499,228, and claims follow its 14,400-block challenge period. The recovered epoch 1 and 3 funding is not part of epoch 5's payout: adding it was not scheduled in time (see the epoch 3 notice at the top).",
+      "sources": [
+        { "label": "Epoch 5 ledger root", "kind": "evm_tx", "ref": "" }
+      ]
+    },
+    {
+      "id": "extender-webrtc-relay-share",
+      "date": "2026-11-16",
+      "status": "in_progress",
+      "title": "Extenders reached only over WebRTC earn their share only on contracts they relay",
+      "detail": "Rolling out with the network operator's first server release after November 16: an extender that can be reached only over WebRTC is one of a contract's hops, and earns its share of the contract's usage, only when the contract's device also holds a connection to the platform that does not come through that extender. A device reaches such an extender only by signaling it through its own connection to the platform, so every device it relays holds one, while a device behind the same router or carrier-grade NAT connects directly from the address it shares with the extender and holds none. Those devices no longer make the extender a hop, so their providers are credited the whole of their contracts' usage, where the extender was credited a share of it. On November 16, one such extender was a hop on every contract of 84 devices of two other networks behind its address. Extenders that can be reached over TCP, QUIC or DNS are judged as before, contracts created before the release keep their hops, and SN25 pool rewards are still split by completed usage.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-16-webrtc-extender-relay-share.md" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-presence-sampling",
+      "date": "2026-11-20",
+      "status": "planned",
+      "approximate": true,
+      "title": "Capture the flag: presence sampling by the end of epoch 6",
+      "detail": "Before epoch 6 ends at block 9,549,628, the network operator's servers start sampling every provider and extender each quarter hour: whether it is online and passing the operator's checks, and in which country. Epoch 7 then runs in full as a shadow epoch: after it ends, the operator builds its list of entries, draw and payouts from the real samples without committing them, and publishes an unsigned report that the validator's checks run on. Capture the flag starts with epoch 8 only if the sampling is running when epoch 8 starts.",
+      "sources": []
+    },
+    {
+      "id": "demand-deposits-priced",
+      "date": "2026-11-20T18:25:00Z",
       "status": "scheduled",
       "key": true,
-      "approximate": false,
-      "title": "Modern provider gate turns on",
-      "detail": "Quality and Speed admit only providers verified as modern. The gate turns on automatically at 00:00 UTC, three weeks later than the October 21 first planned.",
-      "sources": []
+      "title": "Signed price goes live: demand deposits from epoch 7",
+      "detail": "From block 9,549,628, each network operator deposits 0.010437 α per GiB and 0.005218 α per active user of epoch 6, capped at 3,000 α per operator per epoch, as signed by the subnet owner in price.yml (published November 3). Validators check each operator's deposit for each epoch against it at every steering pass, with the validator release that ships before epoch 7. Until an operator's deposit matches what its previous epoch's usage owes, its pool gets no weight.",
+      "sources": [
+        { "label": "price.yml", "kind": "doc", "ref": "https://ur.xyz/price.yml" },
+        { "label": "The signed price in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/price.yml" },
+        { "label": "Epoch 7's first block, 9,549,628", "kind": "evm_block", "ref": "" },
+        { "label": "First priced deposit", "kind": "evm_tx", "ref": "" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-pool-registration",
+      "date": "2026-11-22/2026-11-25",
+      "status": "planned",
+      "approximate": true,
+      "title": "Capture the flag pool registered through the 72-hour timelock",
+      "detail": "By about November 22, the governance Safe schedules one operation through the 72-hour public timelock: it upgrades STSettlement2 and registers network operator 1's capture the flag pool, pool 4,294,967,297, from epoch 8. Around November 25, two days before epoch 8, anyone can execute it once its 72 hours have passed. The pool then takes one SN25 UID, early enough to earn weight before its immunity ends, under a hotkey derived only at execution, so it is not public during the 72-hour wait; a failed execution runs again in a later block, and if it cannot run before epoch 8 starts, capture the flag starts with epoch 9. The carry contract, which moves each epoch's pots back to the pool, is created after it, and vault2, which holds the funds, does not change. To execute before epoch 8 starts, the operation has to be scheduled by about November 24, 18:25 UTC.",
+      "sources": [
+        { "label": "Timelock", "kind": "evm_address", "ref": "0x5529dfe070f73A96C14b5aFCf4fb3DdeA6122fAc" },
+        { "label": "STSettlement2", "kind": "evm_address", "ref": "0xB5e3e23CD1A733410d769b0C95e1c4CA25e821b0" },
+        { "label": "Operation scheduled", "kind": "evm_tx", "ref": "" },
+        { "label": "Operation executed: the pool registered", "kind": "evm_tx", "ref": "" },
+        { "label": "Carry contract", "kind": "evm_address", "ref": "" }
+      ]
+    },
+    {
+      "id": "extender-pool-epoch-8",
+      "date": "2026-11-27T18:25:00Z",
+      "status": "scheduled",
+      "title": "Extender pool for intra-platform and intra-network traffic, from epoch 8",
+      "detail": "From block 9,600,028, the first of epoch 8, the part of each contract's traffic that no provider earns counts for extenders instead. That covers traffic between a client and its network operator's platform, and traffic between devices of one network: a provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one, and the share goes to the extender pool, while the contract's other hops keep theirs. Only traffic that a data balance funded counts, never the network operator's own measurement and test traffic, and same-network credit earned before epoch 8 is kept. Each operator's pool spreads half of it evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, and the other half over the eligible extenders in proportion to the bytes each relayed in the epoch, as the subnet owner decided on November 16, up to the epoch's eligible provider usage, so extenders earn at most half of a pool; with no eligible extender, it is dropped, and with none that relayed, all of it goes by block. An extender is eligible when, at the end of the epoch, it is active with at least one address that passes the operator's five-minute challenge, has a payout wallet, is not bound to a top-level miner's fleet and is not on one of the operator's own networks, and records that share a provider client, an IPv4 address or an IPv6 /64 count once. An extender that carries a contract keeps its own share of it, as one of the contract's hops, as the subnet owner decided on November 11. From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed /29 or /48 prefix hash and never by address, the bytes each relayed, and their shares, and the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it. Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid. Approved by the subnet owner on November 10, it takes effect once the signed amendment entry is published before epoch 8 starts.",
+      "sources": [
+        { "label": "The amendment, WHITEPAPER.md §8.6", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md" },
+        { "label": "Signed amendment entry", "kind": "doc", "ref": "https://ur.xyz/amendments.yml" },
+        { "label": "The amendments file in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/amendments.yml" },
+        { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-epoch-8",
+      "date": "2026-11-27T18:25:00Z",
+      "status": "scheduled",
+      "key": true,
+      "title": "Capture the flag from epoch 8: ten slots in every country",
+      "detail": "From block 9,600,028, the first of epoch 8, each network operator has a second pool beside its provider pool, capture the flag, which pays for being present in a country. Each of the 249 ISO 3166-1 countries has five provider slots and five extender slots each epoch, each worth the pool's new funding for the epoch divided by 2,490. A provider or extender enters its country's draw when it was online, passing its operator's checks and in that country for at least half of the epoch, and is active at its end. Each operator commits its list of entries on chain, and a drand round published after it draws up to five winners per country and role. A slot with no winner carries forward into its country's pot, and each winner takes its own slot and a fifth of that pot. The provider pool gets 9/10 of the providers' share instead of all of it, 1,076.26 α instead of 1,195.84 α at epoch 4's scale, and 4/10 once top-level fleets are weighted. UR's validator, which holds the stake majority, weights the pool from epoch 8's first tempo. Approved by the subnet owner on November 11, it takes effect once the signed amendment entry is published before epoch 8 starts.",
+      "sources": [
+        { "label": "The design, CAPTURETHEFLAG.md", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/CAPTURETHEFLAG.md" },
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-11-capture-the-flag.md" },
+        { "label": "Signed amendment entry", "kind": "doc", "ref": "https://ur.xyz/amendments.yml" },
+        { "label": "Epoch 8's first block, 9,600,028", "kind": "evm_block", "ref": "" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-first-draw",
+      "date": "2026-12-04T18:25:00Z/2026-12-04T22:25:00Z",
+      "status": "planned",
+      "title": "Epoch 8's capture the flag draw and root",
+      "detail": "Epoch 8 ends at block 9,650,428. The network operator commits its list of entries by block 9,651,028, a drand round published at least a minute later draws the winners, and the capture the flag root is committed with the provider pool's by block 9,651,628. If the draw is not ready by then, the operator commits no list for epoch 8: every slot carries forward into its country's pot, and the first winners are drawn in epoch 9.",
+      "sources": [
+        { "label": "Epoch 8's list of entries committed", "kind": "evm_tx", "ref": "" },
+        { "label": "Epoch 8's capture the flag root", "kind": "evm_tx", "ref": "" }
+      ]
+    },
+    {
+      "id": "capture-the-flag-first-claims",
+      "date": "2026-12-07",
+      "status": "planned",
+      "approximate": true,
+      "title": "First capture the flag claims",
+      "detail": "Epoch 8's capture the flag claims open once the validator has approved its root and the 14,400-block challenge period has passed, at about the same time as epoch 8's pool claims. The validator release that checks and approves capture the flag roots is due by about December 1, and the approval by the end of epoch 9, about December 11, 18:25 UTC. Winners are paid to the payout wallet the provider pool already uses, and claim in the same claim flow. Until the app releases that name it, an app shows a capture the flag account as \"Pool 4294967297\" and claims it like any pool.",
+      "sources": [
+        { "label": "First capture the flag claims", "kind": "evm_tx", "ref": "" }
+      ]
     }
   ]
 }

@@ -23,7 +23,7 @@ export const DOC_ORDER = Object.freeze(['miner', 'validator', 'operator', 'litep
 export const DOC_CHAPTERS = Object.freeze({
     miner: Object.freeze({
         label: 'Miner guide',
-        chapters: Object.freeze(['install', 'run', 'updates', 'rewards', 'troubleshooting', 'advanced', 'reference']),
+        chapters: Object.freeze(['install', 'run', 'extender', 'updates', 'rewards', 'troubleshooting', 'advanced', 'reference']),
     }),
 });
 
@@ -80,6 +80,13 @@ export const DOC_PAGE_PATHS = Object.freeze({
     'legal/privacy': '/privacy',
     'legal/vdp': '/vdp',
 });
+
+// A notice at the top of the docs landing (/docs), above the guides, where the
+// nav's and the footer's Docs links arrive: markdown, which both renderers of
+// the landing (astro/src/pages/docs/index.astro and DocsExplorer.jsx's
+// DocsLanding) draw with lib/markdown.jsx, as the docs draw a blockquote. Empty
+// when there is none. The full notice is at the top of docs/miner/README.md.
+export const DOCS_LANDING_NOTICE = "> **Miners: if `provider setup` or `provider service install` set up your miner's background service, it hasn't updated itself since release 2026.10.22.** Once the first release after November 11, 2026 is out, update it by hand once: see the notice at the top of [How to run a miner](/docs/miner).";
 
 /** The URL a document is published at. */
 export function docPath(slug) {

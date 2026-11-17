@@ -2,36 +2,50 @@ import React from 'react';
 import Section from '../Section';
 import { EXTERNAL, isExternal } from '../../lib/links';
 import timeline from '../../data/mainnet-timeline.json';
-import { mainnetActions, mainnetAfterEpochs, mainnetBeforeEpochs, mainnetEpochs, mainnetNotice } from '../../data/mainnet';
+import { mainnetActions, mainnetAfterEpochs, mainnetBeforeEpochs, mainnetEpochs, mainnetNotices } from '../../data/mainnet';
+import { loadPageCopy } from '../../i18n/page-copy.js';
+import { interpolate, plural } from '../../i18n/format.js';
+import { groupPageHref } from '../../../../astro/src/lib/route-localization.js';
 import {
-    SETTLEMENT_LABEL,
-    STATUS_LABEL,
     epochBlocks,
     epochDays,
     epochWhen,
     groupByEpoch,
     isApproximate,
+    runs,
     shortHex,
     sourceRows,
     whenParts,
 } from './mainnet/timeline';
+import { localizeActions, localizeEpochs, localizeEvents, localizeNotices } from './mainnet/copy';
+import { keepNoticeInView, noticeAt, noticeClicks } from './mainnet/notices';
 import { summaryModel } from './mainnet/summary';
 import MainnetSummary from './mainnet/MainnetSummary';
 import '../RoadmapTrack.css';
 import './Mainnet.css';
 
+// The page's words in every language (i18n/pages/mainnet): its own, the data's
+// (data/mainnet.js: the notices, the box, the epochs) and the milestones'.
+const pageCopy = await loadPageCopy('mainnet');
+const dataCopy = await loadPageCopy('mainnet/data');
+const timelineCopy = await loadPageCopy('mainnet/timeline');
+
 /**
  * MainnetPage — the /mainnet page body: the SN25 mainnet launch timeline.
  *
  * Renders only what goes inside <main class="section-page">: the SPA's
- * SectionPage (App.jsx) and the Astro page (astro/src/pages/mainnet.astro)
- * both provide the Disclaimer + Nav + Footer shell around it, so the two
- * renders share one source. The milestones are data
- * (data/mainnet-timeline.json), grouped by the payout epochs of
- * data/mainnet.js and drawn on the roadmap's vertical track
- * (RoadmapTrack.css). The page is English-only, so no i18n lookup, and
- * apart from the summary's "now" it needs no browser: the Astro page renders
- * it to static HTML.
+ * SectionPage (App.jsx) and the Astro pages (astro/src/pages/mainnet.astro
+ * and its /<lang>/mainnet twins, through components/routes/MainnetRoute.astro)
+ * provide the Disclaimer + Nav + Footer shell around it, so the renders share
+ * one source. The milestones are data (data/mainnet-timeline.json), grouped by
+ * the payout epochs of data/mainnet.js and drawn on the roadmap's vertical
+ * track (RoadmapTrack.css). Every word is the page's copy in `lang`
+ * (i18n/pages/mainnet, components/pages/mainnet/copy.js); the dates,
+ * statuses, figures and links are the data's in every language, and the
+ * notices are newest first in every language, as the data sorts them. Apart
+ * from the summary's "now" and the notices' opening and closing, it needs no
+ * browser: the Astro page renders it to static HTML, and its own script opens
+ * and closes the notices (mainnet/notices.js).
  *
  * `updated` is the day the page's content last changed (the sitemap's
  * lastmod), which only the static build knows; the SPA leaves it out.
@@ -40,47 +54,50 @@ import './Mainnet.css';
  * draws the epochs and the key milestones on one axis, with "now", which
  * needs the visitor's clock. The SPA renders it here; the static page,
  * which renders the rest without script, passes it in as `summary`, an
- * island that hydrates by itself (astro/src/pages/mainnet.astro).
+ * island that hydrates by itself, given its model in the page's language.
  */
-export default function MainnetPage({ updated = null, summary = null }) {
-    const groups = groupByEpoch(timeline.events, mainnetEpochs, { before: mainnetBeforeEpochs, after: mainnetAfterEpochs });
+export default function MainnetPage({ lang = 'en', updated = null, summary = null }) {
+    const t = pageCopy(lang);
+    const data = dataCopy(lang);
+    const events = localizeEvents(timeline.events, timelineCopy(lang));
+    const notices = localizeNotices(mainnetNotices, data, t);
+    const epochs = localizeEpochs(mainnetEpochs, data);
+    const groups = groupByEpoch(events, epochs, {
+        before: { ...mainnetBeforeEpochs, ...data.before },
+        after: { ...mainnetAfterEpochs, ...data.after },
+        t,
+    });
     const grouped = new Set(groups.map((group) => group.id));
 
     return (
         <div className="mainnet-page">
-            {mainnetNotice && <MainnetNotice notice={mainnetNotice} />}
-            <MinerActions actions={mainnetActions} />
+            {notices.map((notice) => <MainnetNotice key={notice.id} notice={notice} t={t} />)}
+            <MinerActions actions={localizeActions(mainnetActions, data)} lang={lang} t={t} />
 
-            <Section id="mainnet" eyebrow="SN25 · Bittensor mainnet" title="Mainnet launch timeline" headingLevel="h1">
+            <Section id="mainnet" eyebrow={t.intro.eyebrow} title={t.intro.title} headingLevel="h1">
                 <div className="mainnet-lede">
-                    <p>
-                        UR's subnet, SN25, went live on Bittensor mainnet on October 8, 2026. This timeline follows the launch by payout epoch, from the version 1 contracts to the first settlement v2 claim.
-                    </p>
+                    <p>{t.intro.lede}</p>
                     <p className="mainnet-note">
-                        Milestones marked <span className="roadmap-flag" data-status="scheduled">Scheduled</span> or <span className="roadmap-flag" data-status="planned">Planned</span> are still ahead, and their dates may change. All times are UTC, and a time marked ≈ is approximate: most are projected from block numbers.
+                        {fill(t.intro.note, {
+                            scheduled: <span className="roadmap-flag" data-status="scheduled">{t.labels.status.scheduled}</span>,
+                            planned: <span className="roadmap-flag" data-status="planned">{t.labels.status.planned}</span>,
+                        })}
                     </p>
                 </div>
-                {summary || <MainnetSummary model={summaryModel(timeline.events, mainnetEpochs)} />}
+                {summary || <MainnetSummary model={summaryModel(events, mainnetEpochs, { t })} />}
             </Section>
 
-            <Section id="settlement" eyebrow="Settlement" title="Version 1, then settlement v2">
-                <p>
-                    SN25 pays providers by payout epoch. These are UR's settlement epochs, not the chain's 72-minute tempo: epoch 0 lasted one day, and each later epoch lasts 7 days (50,400 blocks).
-                </p>
-                <p>
-                    Version 1 launched on October 8 and settles epochs 1 to 3. It pays only the providers the validator has measured, and that measurement is capped at about 1,500 providers an epoch, so most miners receive no version 1 share.
-                </p>
-                <p>
-                    Settlement v2 pays by usage and removes that cap. It was planned to take over from epoch 3, but its pool was not registered before epoch 3 began on October 23, so version 1 settles epoch 3 too. Settlement v2 is now targeting epoch 4, starting around October 30 at 18:25 UTC, pending final production checks and the on-chain pool registration before that epoch starts. The first v2 epoch would finish around November 6, with the first v2 claims no earlier than November 8, after the root is submitted and its challenge period ends. These dates are estimates from block production, and activation is confirmed only once the registration has finalized.
-                </p>
-                <ol className="mainnet-epochs" aria-label="Payout epochs">
-                    {mainnetEpochs.map((epoch) => {
+            <Section id="settlement" eyebrow={t.settlement.eyebrow} title={t.settlement.title}>
+                {t.settlement.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                <ol className="mainnet-epochs" aria-label={t.settlement.epochsAria}>
+                    {epochs.map((epoch) => {
                         const id = `epoch-${epoch.number}`;
                         const row = (
                             <>
-                                <span className="mainnet-epoch-no">Epoch {epoch.number}</span>{' '}
-                                <span className="mainnet-epoch-days"><When parts={whenParts(epochDays(epoch))} /></span>{' '}
-                                <span className="mainnet-epoch-by" data-settlement={epoch.settlement}>{SETTLEMENT_LABEL[epoch.settlement]}</span>
+                                <span className="mainnet-epoch-no">{runs(t.labels.epoch, { number: epoch.number })}</span>{' '}
+                                <span className="mainnet-epoch-days"><When parts={whenParts(epochDays(epoch), { t })} /></span>{' '}
+                                <span className="mainnet-epoch-by" data-settlement={epoch.settlement}>{t.labels.settlement[epoch.settlement]}</span>
+                                {epoch.captureTheFlag && <>{' '}<FlagTag t={t} /></>}
                             </>
                         );
                         return (
@@ -92,11 +109,11 @@ export default function MainnetPage({ updated = null, summary = null }) {
                 </ol>
             </Section>
 
-            <Section id="milestones" eyebrow="Timeline" title="Milestones">
-                {groups.map((group) => <MilestoneGroup key={group.id} group={group} explorers={timeline.explorers} />)}
+            <Section id="milestones" eyebrow={t.milestones.eyebrow} title={t.milestones.title}>
+                {groups.map((group) => <MilestoneGroup key={group.id} group={group} explorers={timeline.explorers} lang={lang} t={t} />)}
                 <p className="mainnet-fine">
-                    The time of a scheduled or planned milestone is a projection, from its block number at 12 seconds a block or from the plan, and is marked ≈ unless it was set for an exact time. A projected time moves a little if blocks run faster or slower. From epoch 1, each epoch closes within 120 blocks of its end, its payout root is due within 1,200 blocks of its end, and its claims open from 14,400 blocks (about two days) after it. Scheduled and planned milestones may change.
-                    {updated && <> Updated <time dateTime={updated}>{updated}</time>.</>}
+                    {t.milestones.fine}
+                    {updated && <>{after(t.milestones.fine, fill(t.milestones.updated, { date: <time dateTime={updated}>{updated}</time> }))}</>}
                 </p>
             </Section>
         </div>
@@ -104,30 +121,105 @@ export default function MainnetPage({ updated = null, summary = null }) {
 }
 
 /**
- * The dated notice above the box at the top (data/mainnet.js
- * mainnetNotice), with a link to its full text. Like the box's headline,
- * its title is an h2 under the page's single h1.
+ * A template's runs as React children (timeline.js runs): the words as text,
+ * each element value in its place with a key.
  */
-function MainnetNotice({ notice }) {
+function fill(template, values) {
+    return runs(template, values).map((part, index) => (React.isValidElement(part) ? React.cloneElement(part, { key: index }) : part));
+}
+
+/**
+ * Runs that follow `sentence`: a space before their first word, as after an
+ * English full stop, but none after a Chinese one (。), which takes no space.
+ */
+function after(sentence, parts) {
+    if (/[。！？]$/u.test(sentence)) return parts;
+    return typeof parts[0] === 'string' ? [` ${parts[0]}`, ...parts.slice(1)] : [' ', ...parts];
+}
+
+/**
+ * One of the dated notices above the box at the top (data/mainnet.js
+ * mainnetNotices, which lists them newest first), anchored at its id, with a
+ * link to its full text or to its milestone. Its date is the day it was
+ * posted, as the page's language writes it (copy.js noticeDate).
+ *
+ * Closed, it shows only its header: the dateline, the title and "Expand"
+ * with a chevron (mainnet/notices.js). The header is the notice's button,
+ * inside its h2, an h2 under the page's single h1 like the box's headline; a
+ * tap anywhere on the card opens or closes it, and the address can point at
+ * it (/mainnet#notice). The text stays in the HTML, closed with CSS, and the
+ * static page, which runs no React here, opens and closes the same markup
+ * with its own script (notices.js wireNotices). "Expand" and "Collapse" are
+ * the eye's: a screen reader hears the button's state (aria-expanded).
+ */
+function MainnetNotice({ notice, t }) {
+    const [open, setOpen] = React.useState(false);
+    // the button states aria-expanded only once script runs: the static HTML, open without script, claims no state
+    const [live, setLive] = React.useState(false);
+    const section = React.useRef(null);
+    React.useEffect(() => {
+        setLive(true);
+        const follow = () => {
+            if (noticeAt(window.location.hash) === section.current) setOpen(true);
+        };
+        follow();
+        window.addEventListener('hashchange', follow);
+        return () => window.removeEventListener('hashchange', follow);
+    }, []);
+    // the card's clicks (notices.js noticeClicks), made once: they read the state through a ref
+    const isOpen = React.useRef(open);
+    isOpen.current = open;
+    const toggle = React.useMemo(() => noticeClicks(() => {
+        if (isOpen.current) keepNoticeInView(section.current);
+        setOpen((was) => !was);
+    }), []);
     const external = isExternal(notice.link.href) ? EXTERNAL : {};
+    const titleId = `${notice.id}-heading`;
+    const textId = `${notice.id}-text`;
     return (
-        <section className="mainnet-notice" id="notice" aria-labelledby="notice-heading">
-            <div className="mainnet-notice-box" role="note">
-                <p className="mainnet-notice-date">Notice · {notice.date}</p>
-                <h2 className="mainnet-notice-title" id="notice-heading">{notice.title}</h2>
-                {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
-                <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">→</span></a>
+        <section className="mainnet-notice" id={notice.id} aria-labelledby={titleId} data-open={open ? '' : undefined} ref={section}>
+            {/* the card answers a tap; its button is the control for the keyboard and a screen reader */}
+            <div className="mainnet-notice-box" role="note" onClick={toggle}>
+                <h2 className="mainnet-notice-heading">
+                    <button type="button" className="mainnet-notice-toggle" aria-expanded={live ? open : undefined} aria-controls={textId}>
+                        <span className="mainnet-notice-date">{runs(t.noticeDate, { date: notice.dateText })}</span>
+                        <span className="mainnet-notice-title" id={titleId}>{notice.title}</span>
+                        <span className="mainnet-notice-more" aria-hidden="true" data-nosnippet="">
+                            <span className="mainnet-notice-more-label" data-shows="closed">{t.noticeToggle.expand}</span>
+                            <span className="mainnet-notice-more-label" data-shows="open">{t.noticeToggle.collapse}</span>
+                            <svg className="mainnet-notice-chevron" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                                <path d="M2.5 4.25 6 7.75l3.5-3.5" />
+                            </svg>
+                        </span>
+                    </button>
+                </h2>
+                <div className="mainnet-notice-panel" id={textId}>
+                    <div className="mainnet-notice-clip">
+                        <div className="mainnet-notice-text">
+                            {notice.paragraphs.map((paragraph) => <p className="mainnet-notice-body" key={paragraph}>{paragraph}</p>)}
+                            <a className="mainnet-notice-link" href={notice.link.href} {...external}>{notice.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );
 }
 
 /**
- * The box at the top: mainnet is live, and what miners need to do now
- * (data/mainnet.js). It comes before the timeline's own title, so its
- * headline is an h2 under the page's single h1.
+ * A link of the page's data to a page of this site, in the page's language
+ * once that page has translations (/docs/miner#1-install is
+ * /de/docs/miner#1-install on /de/mainnet); any other link as it is.
  */
-function MinerActions({ actions }) {
+const localHref = (href, lang) => groupPageHref(href, lang) || href;
+
+/**
+ * The box at the top: mainnet is live, and what miners need to do now
+ * (data/mainnet.js, copy.js localizeActions). It comes before the timeline's
+ * own title, so its headline is an h2 under the page's single h1.
+ */
+function MinerActions({ actions, lang, t }) {
+    const links = Object.fromEntries(actions.links.map((link, index) => [`link${index + 1}`, <a href={localHref(link.href, lang)}>{link.text}</a>]));
     return (
         <section className="mainnet-actions" id="actions" aria-labelledby="actions-heading">
             <div className="mainnet-actions-box">
@@ -139,18 +231,31 @@ function MinerActions({ actions }) {
                             <span className="mainnet-actions-no" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                             <div className="mainnet-actions-step">
                                 <p><strong>{step.title}</strong> {step.detail}</p>
-                                {step.link && <a className="mainnet-actions-link" href={step.link.href}>{step.link.label} <span aria-hidden="true">→</span></a>}
+                                {step.link && <a className="mainnet-actions-link" href={localHref(step.link.href, lang)}>{step.link.label} <span aria-hidden="true">{t.labels.arrow}</span></a>}
                             </div>
                         </li>
                     ))}
                 </ol>
-                <p className="mainnet-actions-closing">
-                    {actions.closing.map((run) => (run.href
-                        ? <a key={run.text} href={run.href}>{run.text}</a>
-                        : <React.Fragment key={run.text}>{run.text}</React.Fragment>))}
-                </p>
+                <p className="mainnet-actions-closing">{fill(actions.closing, links)}</p>
             </div>
         </section>
+    );
+}
+
+/**
+ * Capture the flag beside an epoch's settlement: an epoch in which it pays
+ * beside the provider pool (data/mainnet.js `captureTheFlag`, from epoch 8),
+ * in its row of the epoch list and over its milestones, with a pennant.
+ */
+function FlagTag({ t }) {
+    return (
+        <span className="mainnet-epoch-flag">
+            <svg className="mainnet-flag-icon" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+                <path className="mainnet-flag-pole" d="M2.75 11.25V1" />
+                <path className="mainnet-flag-cloth" d="M3.5 1.25h6.25L8.25 3.6l1.5 2.35H3.5z" />
+            </svg>
+            {t.labels.captureTheFlag}
+        </span>
     );
 }
 
@@ -162,58 +267,59 @@ function When({ parts }) {
 }
 
 /** One payout epoch (or the milestones before or after them) and its track. */
-function MilestoneGroup({ group, explorers }) {
+function MilestoneGroup({ group, explorers, lang, t }) {
     const { epoch } = group;
     const headingId = `${group.id}-heading`;
-    const about = [group.summary, epoch && epochBlocks(epoch)].filter(Boolean).join(' · ');
+    const about = [group.summary, epoch && epochBlocks(epoch, { lang, t })].filter(Boolean).join(' · ');
     return (
         <section className="mainnet-group" id={group.id} aria-labelledby={headingId}>
             <header className="mainnet-group-head">
                 <h3 id={headingId}>{group.title}</h3>
                 {epoch && (
                     <p className="mainnet-group-when">
-                        <When parts={whenParts(epochWhen(epoch), { approxStart: Boolean(epoch.start.projected), approxEnd: Boolean(epoch.end.projected) })} />
+                        <When parts={whenParts(epochWhen(epoch), { approxStart: Boolean(epoch.start.projected), approxEnd: Boolean(epoch.end.projected), t })} />
                     </p>
                 )}
                 {(epoch || about) && (
                     <p className="mainnet-group-sub">
-                        {epoch && <span className="mainnet-epoch-by" data-settlement={epoch.settlement}>{SETTLEMENT_LABEL[epoch.settlement]}</span>}
+                        {epoch && <span className="mainnet-epoch-by" data-settlement={epoch.settlement}>{t.labels.settlement[epoch.settlement]}</span>}
+                        {epoch?.captureTheFlag && <>{' '}<FlagTag t={t} /></>}
                         {epoch && about && ' '}
                         {about && <span className="mainnet-group-about">{about}</span>}
                     </p>
                 )}
             </header>
             <ol className="roadmap mainnet-track">
-                {group.events.map((event) => <Milestone key={event.id} event={event} explorers={explorers} />)}
+                {group.events.map((event) => <Milestone key={event.id} event={event} explorers={explorers} lang={lang} t={t} />)}
             </ol>
         </section>
     );
 }
 
 /** One milestone: its date and status, what happens, and its sources. */
-function Milestone({ event, explorers }) {
-    const { rows, folded } = sourceRows(event.sources, explorers);
+function Milestone({ event, explorers, lang, t }) {
+    const { rows, folded } = sourceRows(event.sources, explorers, { t });
     return (
         <li className="roadmap-stop" id={event.id} data-status={event.status}>
             <span className="roadmap-node" aria-hidden="true" />
             <div className="roadmap-content">
                 <div className="roadmap-meta">
-                    <span className="roadmap-date"><When parts={whenParts(event.when, { approxStart: isApproximate(event, event.when) })} /></span>{' '}
-                    <span className="roadmap-flag" data-status={event.status}>{STATUS_LABEL[event.status] || event.status}</span>
+                    <span className="roadmap-date"><When parts={whenParts(event.when, { approxStart: isApproximate(event, event.when), t })} /></span>{' '}
+                    <span className="roadmap-flag" data-status={event.status}>{t.labels.status[event.status] || event.status}</span>
                 </div>
                 <h4 className="roadmap-title">{event.title}</h4>
                 <p className="roadmap-body">{event.detail}</p>
                 {rows.length > 0 && (
-                    <ul className="mainnet-sources" aria-label={`Sources for ${event.title}`}>
-                        {rows.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} />)}
+                    <ul className="mainnet-sources" aria-label={interpolate(t.labels.sourcesAria, { title: event.title })}>
+                        {rows.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} lang={lang} t={t} />)}
                     </ul>
                 )}
                 {/* a run of transactions (a deployment's) is listed, closed, under its contracts */}
                 {folded.length > 0 && (
                     <details className="mainnet-sources-more">
-                        <summary>{folded.length} transactions</summary>
-                        <ul className="mainnet-sources" aria-label={`Transactions for ${event.title}`}>
-                            {folded.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} />)}
+                        <summary>{runs(plural(lang, folded.length, t.labels.transactions), { count: folded.length })}</summary>
+                        <ul className="mainnet-sources" aria-label={interpolate(t.labels.transactionsAria, { title: event.title })}>
+                            {folded.map(({ source, link }) => <Source key={`${source.kind}:${source.ref}`} source={source} link={link} lang={lang} t={t} />)}
                         </ul>
                     </details>
                 )}
@@ -223,17 +329,17 @@ function Milestone({ event, explorers }) {
 }
 
 /** A source with a ref: its label, a contract's address in the code face, and the link. */
-function Source({ source, link }) {
+function Source({ source, link, lang, t }) {
     const external = isExternal(link.href) ? EXTERNAL : {};
     const arrow = external.target ? <span aria-hidden="true"> ↗</span> : null;
     if (source.kind === 'doc') {
-        return <li><a href={link.href} {...external}>{link.text}{arrow}</a></li>;
+        return <li><a href={localHref(link.href, lang)} {...external}>{link.text}{arrow}</a></li>;
     }
     return (
         <li>
             <span className="mainnet-source-label">{source.label}</span>{' '}
             {link.value && <><code title={link.value} translate="no">{shortHex(link.value)}</code>{' '}</>}
-            <a href={link.href} {...external} aria-label={`${link.text}: ${source.label}`}>{link.text}{arrow}</a>
+            <a href={link.href} {...external} aria-label={interpolate(t.labels.sourceAria, { action: link.text, label: source.label })}>{link.text}{arrow}</a>
         </li>
     );
 }

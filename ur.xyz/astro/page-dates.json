@@ -1,13 +1,9 @@
 {
-  "about": "The day each ur.xyz page last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
+  "about": "The day each ur.xyz page last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The pages of the page groups are in page-dates/<group>.json. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
     "/": {
       "fingerprint": "ffab891975f1c26b",
       "lastmod": "2026-10-14"
-    },
-    "/about": {
-      "fingerprint": "dd4231f4cbbaeb35",
-      "lastmod": "2026-10-24"
     },
     "/ar": {
       "fingerprint": "08dd5e1e22a8304c",
@@ -22,8 +18,8 @@
       "lastmod": "2026-10-31"
     },
     "/ar/research": {
-      "fingerprint": "71cc09faaa712341",
-      "lastmod": "2026-10-30"
+      "fingerprint": "284a3f264199ac42",
+      "lastmod": "2026-11-12"
     },
     "/ar/validators": {
       "fingerprint": "307cc71152692456",
@@ -32,10 +28,6 @@
     "/audits/masa-l2-2025.pdf": {
       "fingerprint": "4f992398684c330c",
       "lastmod": "2026-08-18"
-    },
-    "/build": {
-      "fingerprint": "63fbb0c9ba9ad02f",
-      "lastmod": "2026-09-25"
     },
     "/de": {
       "fingerprint": "35d3cc2ed3d9b6e2",
@@ -50,59 +42,11 @@
       "lastmod": "2026-10-31"
     },
     "/de/research": {
-      "fingerprint": "9ba268a7d2dbbcc0",
-      "lastmod": "2026-10-30"
+      "fingerprint": "df772509a3dfca79",
+      "lastmod": "2026-11-12"
     },
     "/de/validators": {
       "fingerprint": "7affbf410116fb54",
-      "lastmod": "2026-10-07"
-    },
-    "/docs": {
-      "fingerprint": "6884578b7e50d132",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/litepaper": {
-      "fingerprint": "46d8efc515ec1266",
-      "lastmod": "2026-10-14"
-    },
-    "/docs/miner": {
-      "fingerprint": "bb304571be71be73",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/miner/advanced": {
-      "fingerprint": "5915e3107382c2c6",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/miner/install": {
-      "fingerprint": "2cf02484bd533ffa",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/miner/reference": {
-      "fingerprint": "ebc58c128914af33",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/miner/rewards": {
-      "fingerprint": "a80cef42fcdff894",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/miner/run": {
-      "fingerprint": "287e047496ca1cb3",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/miner/troubleshooting": {
-      "fingerprint": "eb4ca841a67b4160",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/miner/updates": {
-      "fingerprint": "97f3ec3923721a02",
-      "lastmod": "2026-10-22"
-    },
-    "/docs/operator": {
-      "fingerprint": "da0e99cd16f3c48b",
-      "lastmod": "2026-10-21"
-    },
-    "/docs/validator": {
-      "fingerprint": "379ef84ea8d1a11b",
       "lastmod": "2026-10-07"
     },
     "/es": {
@@ -110,52 +54,20 @@
       "lastmod": "2026-10-14"
     },
     "/es/miners": {
-      "fingerprint": "a42998c868e84300",
-      "lastmod": "2026-10-14"
+      "fingerprint": "f8ab676fe8b71bf5",
+      "lastmod": "2026-11-12"
     },
     "/es/operators": {
       "fingerprint": "a599e9dd550d6662",
       "lastmod": "2026-10-31"
     },
     "/es/research": {
-      "fingerprint": "7529d7b53e1b81d8",
-      "lastmod": "2026-10-30"
+      "fingerprint": "ed34bb833b28b8ea",
+      "lastmod": "2026-11-12"
     },
     "/es/validators": {
-      "fingerprint": "b19a149314e5bbd7",
-      "lastmod": "2026-09-25"
-    },
-    "/investors": {
-      "fingerprint": "8a6ff5fbf107a9e6",
-      "lastmod": "2026-10-28"
-    },
-    "/investors/apex-competition": {
-      "fingerprint": "0f49030e015f1b0c",
-      "lastmod": "2026-10-28"
-    },
-    "/investors/conviction-lock": {
-      "fingerprint": "f2df794171d4f722",
-      "lastmod": "2026-10-28"
-    },
-    "/investors/deck": {
-      "fingerprint": "4b16781637e88d9d",
-      "lastmod": "2026-10-28"
-    },
-    "/investors/funding-network-capacity": {
-      "fingerprint": "db757cfe4e96ce32",
-      "lastmod": "2026-10-28"
-    },
-    "/investors/letter-to-tokenholders-september-2026": {
-      "fingerprint": "6d81afcadd8d497a",
-      "lastmod": "2026-10-28"
-    },
-    "/investors/our-letter-to-bittensor": {
-      "fingerprint": "bea6c43d6881e1a1",
-      "lastmod": "2026-08-18"
-    },
-    "/mainnet": {
-      "fingerprint": "a646e4021d4e134b",
-      "lastmod": "2026-10-31"
+      "fingerprint": "aaa46789c1e2f957",
+      "lastmod": "2026-11-12"
     },
     "/miners": {
       "fingerprint": "017465877eafc6ae",
@@ -165,29 +77,9 @@
       "fingerprint": "90a61a8d2655a1fb",
       "lastmod": "2026-10-31"
     },
-    "/price": {
-      "fingerprint": "83df0721f46586da",
-      "lastmod": "2026-09-25"
-    },
-    "/privacy": {
-      "fingerprint": "a14ca6884f5119cc",
-      "lastmod": "2026-09-25"
-    },
     "/research": {
-      "fingerprint": "abb87d955a44e9f6",
-      "lastmod": "2026-10-30"
-    },
-    "/research/2026-q3-report": {
-      "fingerprint": "e619f695f1f9b1eb",
-      "lastmod": "2026-10-30"
-    },
-    "/research/methodology": {
-      "fingerprint": "2659f507139d5868",
-      "lastmod": "2026-10-30"
-    },
-    "/reserve": {
-      "fingerprint": "2169c502532f3e07",
-      "lastmod": "2026-10-24"
+      "fingerprint": "80cd30c344b14739",
+      "lastmod": "2026-11-09"
     },
     "/ru": {
       "fingerprint": "cc8748da94050d2b",
@@ -202,24 +94,16 @@
       "lastmod": "2026-10-31"
     },
     "/ru/research": {
-      "fingerprint": "9394d22bb5d15dbf",
-      "lastmod": "2026-10-30"
+      "fingerprint": "f98d16edcc1de4c8",
+      "lastmod": "2026-11-12"
     },
     "/ru/validators": {
       "fingerprint": "27a02f30eaf105ca",
       "lastmod": "2026-10-07"
     },
-    "/terms": {
-      "fingerprint": "4b2c884bb4f4da33",
-      "lastmod": "2026-10-07"
-    },
     "/validators": {
       "fingerprint": "f8bdea96812e7a04",
       "lastmod": "2026-09-25"
-    },
-    "/vdp": {
-      "fingerprint": "c5ed84b60e9ab960",
-      "lastmod": "2026-08-14"
     },
     "/zh": {
       "fingerprint": "958694d8eeff277a",
@@ -234,8 +118,8 @@
       "lastmod": "2026-10-31"
     },
     "/zh/research": {
-      "fingerprint": "9abe8c3d9d1f9f7b",
-      "lastmod": "2026-10-30"
+      "fingerprint": "51aa716640c6604b",
+      "lastmod": "2026-11-12"
     },
     "/zh/validators": {
       "fingerprint": "beb18ab2dde5e282",

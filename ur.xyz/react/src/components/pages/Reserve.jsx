@@ -3,21 +3,28 @@ import { reserve, publishedPrograms, activePrograms } from '../../data/reserve';
 import { isLive, useReserve } from '../../lib/useReserve';
 import { FINNEY_ARCHIVE, FINNEY_RPC, multisigAccountId, ss58Encode } from '../../lib/subtensor';
 import { copyText } from '../../lib/clipboard';
+import { loadPageCopy } from '../../i18n/page-copy.js';
+import { formatList, interpolate, plural } from '../../i18n/format.js';
 import XYChart from './reserve/XYChart';
 import SplitBar from './reserve/SplitBar';
 import { PRICE_HOSTS, PriceNote, UnitToggle, useDenom } from './reserve/Denom';
-import { compact, whole, alpha as fmtAlpha, usd as fmtUsd, pct, shortDate, shortDateYear, monthLabel, monthLong, isoDay, timeUtc, daysBetween } from './reserve/format';
+import { formatsFor, isoDay, daysBetween } from './reserve/format';
 import { projectBalance, spliceLive, flowsOf, observedInflow, monthlyFlows, dailyFlows } from './reserve/projection';
 import { RANGES, RangeToggle, ExpandButton } from './reserve/ChartControls';
-import { inflowPerDay, momentumOf } from './reserve/momentum';
+import { MIN_SEEN, inflowPerDay, momentumOf } from './reserve/momentum';
+import { fill } from './reserve/fill';
+import { hasLocalizedVersion, localizedPathFor } from '../../../../astro/src/lib/route-localization.js';
 import './Reserve.css';
 
 /**
  * ReservePage — /reserve, the Network Capacity Reserve.
  *
  * Renders only what goes inside <main class="section-page">: the SPA's
- * SectionPage (App.jsx) and astro/src/pages/reserve.astro both wrap it in the
- * shared Disclaimer / Nav / Footer shell. English-only, like /about.
+ * SectionPage (App.jsx) and astro/src/components/routes/ReserveRoute.astro
+ * both wrap it in the shared Disclaimer / Nav / Footer shell. Its words are
+ * the `reserve` copy units (react/src/i18n/pages/reserve/: the hero, then
+ * balance/, programs/ and custody/), in the page's language `lang`, which
+ * also formats its figures and dates (reserve/format.js).
  *
  * The figures are read in the visitor's browser from Bittensor mainnet
  * through its public RPC endpoints (lib/subtensor.js, lib/useReserve.js): the
@@ -36,8 +43,17 @@ import './Reserve.css';
  *
  * The server render carries no chain data, no price and no calendar
  * (hydration stays deterministic); the client fills them in and keeps them
- * fresh.
+ * fresh. A template whose placeholders sit among text the server renders is
+ * filled with fill() (reserve/fill.js), which keeps the text nodes the JSX
+ * had; text that was one string is filled with interpolate().
  */
+
+const [heroCopy, balanceCopy, programsCopy, custodyCopy] = await Promise.all([
+    loadPageCopy('reserve'),
+    loadPageCopy('reserve/balance'),
+    loadPageCopy('reserve/programs'),
+    loadPageCopy('reserve/custody'),
+]);
 
 // The emission schedule the chain confirms on every read, used for the
 // projection until it does: 1 α per block (7,200 a day), an 18% owner share,
@@ -85,13 +101,26 @@ function Legend({ items }) {
     );
 }
 
-export default function ReservePage() {
+export default function ReservePage({ lang = 'en' }) {
+    // the page's words (the hero; 01; 02 and 03; 04 and the fine print) and its formats
+    const t = heroCopy(lang);
+    const tb = balanceCopy(lang);
+    const tp = programsCopy(lang);
+    const tc = custodyCopy(lang);
+    const f = formatsFor(lang);
+    // a count in a plural phrase: { one: '{count} day', other: '{count} days' }
+    const counted = (forms, count, values = {}) => interpolate(plural(lang, count, forms), { count, ...values });
+    // a list of names: English with commas alone, as it always was; other languages as they list
+    const listOf = (items) => (lang === 'en' ? items.join(', ') : formatList(items, lang));
+    // an amount of α a day: "2,657 α a day"
+    const perDayText = (v) => interpolate(t.perDay, { amount: f.whole(v) });
+
     const { snapshot, history, historyReady, error, updatedAt } = useReserve({ address: reserve.address, netuid: reserve.netuid, launch: reserve.launch });
     // the calendar is read on the client: the server render has no "today"
     const [today, setToday] = useState(null);
     useEffect(() => { setToday(isoDay(Date.now())); }, [updatedAt]);
     // α or USD; the USD path is reserve/Denom.jsx
-    const denom = useDenom();
+    const denom = useDenom(lang);
     // the charts' window (7D | 30D | All) and the one card widened to the full row
     const [range, setRange] = useState('all');
     const [expanded, setExpanded] = useState(null);
@@ -122,10 +151,12 @@ export default function ReservePage() {
     const otherShare = routing ? Math.max(0, 1 - routing.reserve - routing.burned) : 0;
     const launchMomentum = reserve.launchMomentumBps / 10_000;
     const { momentum, fromChain, burned: burnedShare } = momentumOf({ routing, live, launchMomentum });
+    // the sentences that name where momentum's value comes from have one form for each
+    const basis = fromChain ? 'onChain' : 'launch';
     const perDay = inflowPerDay(minerPerDay, momentum, burnedShare);
     const momentumPerDay = minerPerDay * momentum;
     // the worked line is labelled by where its momentum comes from
-    const calcLabel = !fromChain ? 'At launch:' : live ? `At block ${whole(snapshot.block)}:` : 'At the current momentum:';
+    const calcLabel = !fromChain ? t.formula.atLaunch : live ? interpolate(t.formula.atBlock, { block: f.whole(snapshot.block) }) : t.formula.atCurrent;
     // TAO per α at the pool's reserves: the one valuation the chain itself gives
     const priceTao = snapshot?.pool.priceTao ?? null;
     const daysToLaunch = today ? daysBetween(today, reserve.launch) : null;
@@ -162,14 +193,16 @@ export default function ReservePage() {
     const months = useMemo(() => monthlyFlows({ live: chart.livePts, projected: chart.projected }), [chart]);
     // the chart spans two Octobers, so its dates carry the year
     const yearSpan = chart.points.length > 0 && chart.points[0].date.slice(0, 4) !== end.date.slice(0, 4);
-    const dateLabel = yearSpan ? shortDateYear : shortDate;
+    const dateLabel = yearSpan ? f.shortDateYear : f.shortDate;
 
     // ── programs ──
     const earmarked = publishedPrograms.reduce((s, p) => s + Math.max(0, (p.ceilingAlpha || 0) - p.payments.reduce((t, x) => t + x.alpha, 0)), 0);
     const statusesPresent = Object.keys(reserve.programStatus).filter((s) => reserve.programs.some((p) => p.status === s));
     const countOf = (s) => reserve.programs.filter((p) => p.status === s).length;
-    // "1 in preparation · 3 indicative"
-    const statusCounts = statusesPresent.filter((s) => s !== 'active' && s !== 'complete').map((s) => `${countOf(s)} ${reserve.programStatus[s].toLowerCase()}`).join(' · ');
+    // "1 in preparation · 3 indicative": each status not yet active, with its own count phrase
+    const statusCounts = statusesPresent.filter((s) => s !== 'active' && s !== 'complete')
+        .map((s) => counted(tp.counts.byStatus[s] || { other: `{count} ${tp.statuses[s]}` }, countOf(s))).join(' · ');
+    const activeCount = counted(tp.counts.active, activePrograms.length);
     const [filter, setFilter] = useState('all');
     const shownPrograms = reserve.programs.filter((p) => filter === 'all' || p.status === filter);
     // sizes and payments are columns only once a program has them
@@ -185,60 +218,68 @@ export default function ReservePage() {
     }, []);
 
     // [lead, more, tail]: a phone shows the lead and the tail only
+    const blockTail = snapshot ? ` · ${interpolate(t.status.block, { block: f.whole(snapshot.block) })}` : '';
     const status = !snapshot
-        ? (error ? ['Chain read unavailable', ' · retrying', ''] : ['Reading Bittensor mainnet…', '', ''])
+        ? (error ? [t.status.unavailable, ` · ${t.status.retrying}`, ''] : [t.status.reading, '', ''])
         : live
-            ? ['Live', ' · Bittensor mainnet · finalized', ` · block ${whole(snapshot.block)}`]
-            : [overdue ? 'Awaiting the first receipt' : 'Pre-launch', ' · projected from on-chain emission', ` · block ${whole(snapshot.block)}`];
+            ? [t.status.live, ` · ${t.status.liveDetail}`, blockTail]
+            : [overdue ? t.status.awaiting : t.status.preLaunch, ` · ${t.status.preDetail}`, blockTail];
     const statusState = !snapshot ? (error ? 'error' : 'loading') : live ? 'live' : 'pre';
 
     // ── the three figures ──
     const monthlyObserved = live && observed ? observed : null;
     const stats = [
         {
-            label: 'Reserve balance',
+            label: t.stats.balance,
             value: snapshot ? denom.amount(snapshot.alpha) : '—',
-            sub: !snapshot ? 'reading Bittensor mainnet…'
-                : !live ? 'nothing received yet'
-                    : flows ? `${denom.short(flows.received)} in · ${denom.short(flows.spent)} paid out`
-                        : 'reading the balance history…',
+            sub: !snapshot ? t.stats.balanceReading
+                : !live ? t.stats.balanceNothing
+                    : flows ? interpolate(t.stats.balanceFlows, { received: denom.short(flows.received), spent: denom.short(flows.spent) })
+                        : t.stats.balanceReadingHistory,
         },
         {
-            label: 'Monthly inflow',
+            label: t.stats.inflow,
             value: denom.amount((monthlyObserved ? monthlyObserved.perDay : perDay) * DAYS_PER_MONTH),
             sub: monthlyObserved
-                ? `${whole(monthlyObserved.perDay)} α a day observed, last ${monthlyObserved.days} day${monthlyObserved.days === 1 ? '' : 's'}`
-                : `${whole(perDay)} α a day projected · miner emissions × (1 − momentum)`,
+                ? counted(t.stats.inflowObserved, monthlyObserved.days, { amount: f.whole(monthlyObserved.perDay) })
+                : interpolate(t.stats.inflowProjected, { amount: f.whole(perDay) }),
         },
         {
-            label: 'Committed to programs',
+            label: t.stats.committed,
             value: denom.amount(earmarked),
             sub: activePrograms.length
-                ? `${pct(earmarked / (perDay * 365), 0)} of 12-month inflow · ${activePrograms.length} active program${activePrograms.length === 1 ? '' : 's'}`
-                : `none active · ${statusCounts}`,
+                ? counted(tp.counts.committedShare, activePrograms.length, { share: f.pct(earmarked / (perDay * 365), 0) })
+                : `${tp.counts.noneActive} · ${statusCounts}`,
         },
     ];
 
     // ── the balance chart ──
     const sc = (v) => (v == null ? undefined : denom.scale(v));
     const balanceSeries = [
-        ...(chart.livePts.length ? [{ name: 'Live balance', color: 'var(--rv-live)', type: 'area', values: chart.liveValues.map(sc) }] : []),
-        ...(chart.projected.length ? [{ name: 'Projected', color: 'var(--rv-reserve)', type: 'dash', values: chart.projValues.map(sc), end: end ? denom.short(end.alpha) : undefined }] : []),
+        ...(chart.livePts.length ? [{ name: tb.series.live, color: 'var(--rv-live)', type: 'area', values: chart.liveValues.map(sc) }] : []),
+        ...(chart.projected.length ? [{ name: tb.series.projected, color: 'var(--rv-reserve)', type: 'dash', values: chart.projValues.map(sc), end: end ? denom.short(end.alpha) : undefined }] : []),
     ];
     const balanceLegend = [
-        ...(chart.livePts.length ? [{ name: 'Live balance', kind: 'line', color: 'var(--rv-live)' }] : []),
-        ...(chart.projected.length ? [{ name: 'Projected', kind: 'dash', color: 'var(--rv-reserve)' }] : []),
+        ...(chart.livePts.length ? [{ name: tb.series.live, kind: 'line', color: 'var(--rv-live)' }] : []),
+        ...(chart.projected.length ? [{ name: tb.series.projected, kind: 'dash', color: 'var(--rv-reserve)' }] : []),
     ];
-    const todayMarks = chart.livePts.length && chart.projected.length ? [{ index: chart.livePts.length - 1, label: 'today' }] : [];
+    const todayMarks = chart.livePts.length && chart.projected.length ? [{ index: chart.livePts.length - 1, label: tb.today }] : [];
     const balanceLabel = chart.livePts.length
-        ? (chart.projected.length ? `Reserve balance · live, projected to ${dateLabel(end.date)}` : 'Reserve balance · live')
-        : (end ? `Reserve balance · projected to ${dateLabel(end.date)}` : 'Reserve balance');
-    const momentumBasis = fromChain ? 'its value on chain' : 'its launch value';
-    const balanceNote = chart.livePts.length
-        ? `Live balance sampled daily from finalized chain state; projected at miner emissions × (1 − momentum) with momentum at ${momentumBasis}, and no program payments.`
-        : `Projected at miner emissions × (1 − momentum) with momentum at ${momentumBasis} and no programs paid. Switches to the live balance once the reserve receives emission.`;
-    const unitWord = denom.rate != null ? 'USD at the live α price' : 'α';
-    const balanceAria = `Reserve balance, ${unitWord}: ${chart.livePts.length ? `live to ${dateLabel(chart.livePts[chart.livePts.length - 1].date)}${chart.projected.length ? ', then ' : ''}` : ''}${chart.projected.length ? `projected to ${denom.short(end.alpha)} by ${dateLabel(end.date)}` : ''}. Arrow keys read each day.`;
+        ? (chart.projected.length ? interpolate(tb.balance.label.liveProjected, { date: dateLabel(end.date) }) : tb.balance.label.live)
+        : (end ? interpolate(tb.balance.label.projected, { date: dateLabel(end.date) }) : tb.balance.label.plain);
+    const balanceNote = chart.livePts.length ? tb.balance.note.live[basis] : tb.balance.note.projected[basis];
+    const unitWord = denom.rate != null ? tb.unitUsd : 'α';
+    // (drawn only with a point: the live history, the projection or both)
+    const lastLive = chart.livePts[chart.livePts.length - 1];
+    const balanceAria = interpolate(
+        chart.livePts.length ? (chart.projected.length ? tb.balance.aria.liveProjected : tb.balance.aria.live) : tb.balance.aria.projected,
+        {
+            unit: unitWord,
+            liveDate: lastLive ? dateLabel(lastLive.date) : '',
+            amount: chart.projected.length ? denom.short(end.alpha) : '',
+            date: end ? dateLabel(end.date) : '',
+        },
+    );
 
     // the table twin of the balance chart: every live day, then the
     // projection's first day, month ends and last day
@@ -252,27 +293,29 @@ export default function ReservePage() {
     // ── the monthly chart: receipts up, payments down, the projection on top ──
     const monthSeries = [
         ...(chart.livePts.length ? [
-            { name: 'Received', color: 'var(--rv-live)', type: 'bar', stack: 'month', values: months.map((m) => denom.scale(m.received)) },
-            { name: 'Spent', color: 'var(--rv-gray-1)', type: 'bar', stack: 'month', values: months.map((m) => -denom.scale(m.spent)), fmt: (v) => denom.fmt(-v) },
+            { name: tb.series.received, color: 'var(--rv-live)', type: 'bar', stack: 'month', values: months.map((m) => denom.scale(m.received)) },
+            { name: tb.series.spent, color: 'var(--rv-gray-1)', type: 'bar', stack: 'month', values: months.map((m) => -denom.scale(m.spent)), fmt: (v) => denom.fmt(-v) },
         ] : []),
-        { name: 'Projected inflow', color: 'var(--rv-reserve)', type: 'bar', stack: 'month', opacity: 0.45, values: months.map((m) => denom.scale(m.projected)) },
+        { name: tb.series.projectedInflow, color: 'var(--rv-reserve)', type: 'bar', stack: 'month', opacity: 0.45, values: months.map((m) => denom.scale(m.projected)) },
     ];
     const monthLegend = chart.livePts.length
         ? [
-            { name: 'Received', kind: 'rect', color: 'var(--rv-live)' },
-            { name: 'Spent', kind: 'rect', color: 'var(--rv-gray-1)' },
-            { name: 'Projected inflow', kind: 'rect', color: 'var(--rv-reserve)', opacity: 0.45 },
+            { name: tb.series.received, kind: 'rect', color: 'var(--rv-live)' },
+            { name: tb.series.spent, kind: 'rect', color: 'var(--rv-gray-1)' },
+            { name: tb.series.projectedInflow, kind: 'rect', color: 'var(--rv-reserve)', opacity: 0.45 },
         ]
         : [];
     const monthHead = flows
-        ? [`${denom.amount(flows.received)} in`, ` → ${denom.amount(flows.spent)} to programs so far`]
-        : live ? ['—', ' reading the balance history…']
-            : snapshot ? [`${denom.amount(perDay * DAYS_PER_MONTH)} a month`, ' projected · no programs paid']
+        ? [interpolate(tb.flows.received, { amount: denom.amount(flows.received) }), ` ${interpolate(tb.flows.toPrograms, { amount: denom.amount(flows.spent) })}`]
+        : live ? ['—', ` ${tb.flows.readingHistory}`]
+            : snapshot ? [interpolate(tb.flows.perMonth, { amount: denom.amount(perDay * DAYS_PER_MONTH) }), ` ${tb.flows.projectedNoPrograms}`]
                 : ['—', ''];
-    const monthNote = chart.livePts.length
-        ? 'Receipts and payments are the rises and falls between daily samples of the chain; the inflow after the last sample is projected at the same momentum as the balance.'
-        : 'Every month is projected until the reserve receives emission.';
-    const monthAria = `Monthly inflow and program spend, ${unitWord}: ${months.length} months from ${months.length ? monthLong(months[0].month) : ''}${months.length ? ` to ${monthLong(months[months.length - 1].month)}` : ''}${chart.livePts.length ? ', received and spent from the chain, then projected' : ', all projected'}. Arrow keys read each month.`;
+    const monthNote = chart.livePts.length ? tb.flows.note.live : tb.flows.note.projected;
+    const monthAria = counted(chart.livePts.length ? tb.flows.aria.live : tb.flows.aria.projected, months.length, {
+        unit: unitWord,
+        from: months.length ? f.monthLong(months[0].month) : '',
+        to: months.length ? f.monthLong(months[months.length - 1].month) : '',
+    });
 
     // ── the 7D / 30D windows: the trailing days of the live history, no projection ──
     const rangeDays = RANGES.find((r) => r.id === range)?.days ?? null;
@@ -281,66 +324,64 @@ export default function ReservePage() {
     const windowPts = windowed ? chart.livePts.slice(-(rangeDays + 1)) : [];
     const windowSpan = windowed ? daysBetween(windowPts[0].date, windowPts[windowPts.length - 1].date) : 0;
     // fewer days of history than the window asks for: say how many there are
-    const windowWord = `last ${windowSpan} day${windowSpan === 1 ? '' : 's'}`;
+    const overWindow = (forms, values) => counted(forms, windowSpan, values);
     const windowChange = windowed ? windowPts[windowPts.length - 1].alpha - windowPts[0].alpha : 0;
     const days = windowed ? dailyFlows(windowPts) : [];
     const dayTotals = days.reduce((t, d) => ({ received: t.received + d.received, spent: t.spent + d.spent }), { received: 0, spent: 0 });
     const windowBalance = {
-        label: `Reserve balance · ${windowWord}`,
-        legend: [{ name: 'Live balance', kind: 'line', color: 'var(--rv-live)' }],
-        dim: ` ${windowChange >= 0 ? '+' : '−'}${denom.short(Math.abs(windowChange))} over the ${windowWord}`,
-        labels: windowPts.map((p) => shortDate(p.date)),
-        series: [{ name: 'Live balance', color: 'var(--rv-live)', type: 'area', values: windowPts.map((p) => sc(p.alpha)) }],
-        aria: `Reserve balance, ${unitWord}, over the ${windowWord}, read from the chain. Arrow keys read each day.`,
-        note: 'Live balance sampled daily from finalized chain state.',
+        label: overWindow(tb.balance.label.window),
+        legend: [{ name: tb.series.live, kind: 'line', color: 'var(--rv-live)' }],
+        dim: ` ${overWindow(tb.balance.windowChange, { change: `${windowChange >= 0 ? '+' : '−'}${denom.short(Math.abs(windowChange))}` })}`,
+        labels: windowPts.map((p) => f.shortDate(p.date)),
+        series: [{ name: tb.series.live, color: 'var(--rv-live)', type: 'area', values: windowPts.map((p) => sc(p.alpha)) }],
+        aria: overWindow(tb.balance.aria.window, { unit: unitWord }),
+        note: tb.balance.note.window,
         rows: windowPts.map((p, i) => ({ date: p.date, alpha: p.alpha, change: i === 0 ? null : p.alpha - windowPts[i - 1].alpha, kind: 'live' })),
     };
     const windowFlows = {
-        label: 'Daily inflow · program spend',
-        legend: [{ name: 'Received', kind: 'rect', color: 'var(--rv-live)' }, { name: 'Spent', kind: 'rect', color: 'var(--rv-gray-1)' }],
-        head: [`${denom.amount(dayTotals.received)} in`, ` → ${denom.amount(dayTotals.spent)} to programs, ${windowWord}`],
-        labels: days.map((d) => shortDate(d.date)),
-        tipLabels: days.map((d) => shortDateYear(d.date)),
+        label: tb.flows.windowLabel,
+        legend: [{ name: tb.series.received, kind: 'rect', color: 'var(--rv-live)' }, { name: tb.series.spent, kind: 'rect', color: 'var(--rv-gray-1)' }],
+        head: [interpolate(tb.flows.received, { amount: denom.amount(dayTotals.received) }), ` ${overWindow(tb.flows.toProgramsWindow, { amount: denom.amount(dayTotals.spent) })}`],
+        labels: days.map((d) => f.shortDate(d.date)),
+        tipLabels: days.map((d) => f.shortDateYear(d.date)),
         series: [
-            { name: 'Received', color: 'var(--rv-live)', type: 'bar', stack: 'day', values: days.map((d) => denom.scale(d.received)) },
-            { name: 'Spent', color: 'var(--rv-gray-1)', type: 'bar', stack: 'day', values: days.map((d) => -denom.scale(d.spent)), fmt: (v) => denom.fmt(-v) },
+            { name: tb.series.received, color: 'var(--rv-live)', type: 'bar', stack: 'day', values: days.map((d) => denom.scale(d.received)) },
+            { name: tb.series.spent, color: 'var(--rv-gray-1)', type: 'bar', stack: 'day', values: days.map((d) => -denom.scale(d.spent)), fmt: (v) => denom.fmt(-v) },
         ],
-        aria: `Daily inflow and program spend, ${unitWord}, over the ${windowWord}, read from the chain. Arrow keys read each day.`,
-        note: 'Receipts and payments are the rises and falls between daily samples of the chain.',
+        aria: overWindow(tb.flows.aria.window, { unit: unitWord }),
+        note: tb.flows.note.window,
     };
     const chartHeight = (id) => (expanded === id ? 420 : undefined);
 
     return (
         <div className="reserve-page">
             <header className="reserve-hero reserve-shell">
-                <span className="reserve-eyebrow">SN25 · Miner emissions</span>
-                <h1>{reserve.name}</h1>
-                <p className="reserve-tagline">{reserve.tagline}</p>
+                <span className="reserve-eyebrow">{t.hero.eyebrow}</span>
+                <h1>{t.hero.name}</h1>
+                <p className="reserve-tagline">{t.hero.tagline}</p>
                 <div className="reserve-rule" aria-hidden="true" />
-                <p className="reserve-lede">
-                    SN25's miner emissions are split two ways: momentum, paid to providers now, and the reserve, which receives the rest. The reserve pays providers for verified network capacity: more coverage, more reliable routes, and capacity for new Network Operators.
-                </p>
+                <p className="reserve-lede">{t.hero.lede}</p>
                 <div className="reserve-facts">
                     <div className="reserve-formula">
-                        <span className="reserve-fact-label">Formula</span>
+                        <span className="reserve-fact-label">{t.formula.label}</span>
                         <p className="reserve-formula-eq">
-                            <span className="reserve-nw"><span className="is-reserve">Reserve</span> =</span>{' '}
-                            <span className="reserve-nw">miner emissions ×</span>{' '}
-                            <span className="reserve-nw">(1 − <span className="is-momentum">momentum</span>)</span>
+                            <span className="reserve-nw"><span className="is-reserve">{t.formula.reserve}</span> =</span>{' '}
+                            <span className="reserve-nw">{`${t.formula.minerEmissions} ×`}</span>{' '}
+                            <span className="reserve-nw">(1 − <span className="is-momentum">{t.formula.momentum}</span>)</span>
                         </p>
                         <p className="reserve-formula-calc">
                             <span className="reserve-nw">{calcLabel}</span>{' '}
-                            <span className="reserve-nw">{whole(perDay)} α a day</span>{' '}
-                            <span className="reserve-nw">= {whole(minerPerDay)} α a day</span>{' '}
-                            <span className="reserve-nw">× (1 − momentum{burnedShare >= 0.0005 ? ` − ${pct(burnedShare)} burned` : ''})</span>
+                            <span className="reserve-nw">{fill(t.perDay, { amount: f.whole(perDay) })}</span>{' '}
+                            <span className="reserve-nw">{fill(`= ${t.perDay}`, { amount: f.whole(minerPerDay) })}</span>{' '}
+                            <span className="reserve-nw">{`× (1 − ${t.formula.momentum}`}{burnedShare >= 0.0005 ? ` − ${interpolate(t.formula.burned, { share: f.pct(burnedShare) })}` : ''})</span>
                         </p>
                         <p className="reserve-formula-def">
-                            <dfn>Momentum</dfn> is the share of the miner emissions used now to power the network, as rewards to providers. The reserve is not a fixed share. It receives whatever momentum does not use, so it receives less as momentum grows.
-                            {live && !fromChain && routing ? ` The chain shows no momentum yet: at block ${whole(snapshot.block)} the reserve's recipients receive the remainder of the miner allocation, and the page follows the chain's momentum once it is at least 0.1%.` : ''}
+                            {fill(t.formula.definition, { term: <dfn>{t.formula.term}</dfn> })}
+                            {live && !fromChain && routing ? ` ${interpolate(t.formula.noMomentumYet, { block: f.whole(snapshot.block), min: f.pct(MIN_SEEN, 1) })}` : ''}
                         </p>
                     </div>
                     <div className="reserve-wallet">
-                        <span className="reserve-fact-label">Reserve wallet</span>
+                        <span className="reserve-fact-label">{t.wallet.label}</span>
                         <div className="reserve-wallet-row">
                             <Address value={reserve.address} codeRef={addressRef} />
                             <span className="reserve-wallet-actions">
@@ -352,14 +393,14 @@ export default function ReservePage() {
                                     </svg>
                                     {/* both words are laid in one cell, so the button is the same size in either state */}
                                     <span className="reserve-copy-label">
-                                        <span data-shown={!copied}>Copy</span>
-                                        <span data-shown={copied}>Copied</span>
+                                        <span data-shown={!copied}>{t.wallet.copy}</span>
+                                        <span data-shown={copied}>{t.wallet.copied}</span>
                                     </span>
-                                    <span className="reserve-visually-hidden"> the wallet address</span>
+                                    <span className="reserve-visually-hidden">{` ${t.wallet.copyTarget}`}</span>
                                 </button>
-                                <a className="reserve-wallet-link" href={reserve.explorerUrl} target="_blank" rel="noopener noreferrer">View on Taostats <span aria-hidden="true">↗</span></a>
+                                <a className="reserve-wallet-link" href={reserve.explorerUrl} target="_blank" rel="noopener noreferrer">{`${t.wallet.viewOnTaostats} `}<span aria-hidden="true">↗</span></a>
                             </span>
-                            <span className="reserve-visually-hidden" role="status">{copied ? 'Copied to the clipboard' : ''}</span>
+                            <span className="reserve-visually-hidden" role="status">{copied ? t.wallet.copiedStatus : ''}</span>
                         </div>
                     </div>
                 </div>
@@ -369,47 +410,50 @@ export default function ReservePage() {
                         <i aria-hidden="true" />
                         <span>{status[0]}<span className="reserve-status-more">{status[1]}</span>{status[2]}</span>
                     </p>
-                    <UnitToggle denom={denom} />
+                    <UnitToggle denom={denom} lang={lang} />
                 </div>
                 <div className="reserve-proof">
                     {stats.map((s) => <Stat key={s.label} {...s} />)}
                 </div>
-                <PriceNote denom={denom} />
+                <PriceNote denom={denom} lang={lang} />
                 {/* in the page's HTML, for a reader or an agent that does not run it:
                     where the figures come from and where to check them */}
                 <p className="reserve-verify">
-                    Verify it yourself: these figures are read from Bittensor mainnet in your browser. The reserve is held by coldkey <code translate="no">{reserve.address}</code>; see it on <a href={reserve.explorerUrl} target="_blank" rel="noopener noreferrer">Taostats</a>.
+                    {fill(t.verify, {
+                        address: <code translate="no">{reserve.address}</code>,
+                        explorer: <a href={reserve.explorerUrl} target="_blank" rel="noopener noreferrer">Taostats</a>,
+                    })}
                 </p>
             </header>
 
             <section className="reserve-block" id="balance" aria-labelledby="reserve-balance-h">
                 <div className="reserve-shell">
-                    <span className="reserve-kicker">01 / The reserve</span>
-                    <h2 id="reserve-balance-h">Reserve balance.</h2>
+                    <span className="reserve-kicker">{tb.kicker}</span>
+                    <h2 id="reserve-balance-h">{tb.title}</h2>
                     <p className="reserve-sub">
                         {chart.livePts.length
-                            ? `The balance and its flows by month, read from finalized chain state and projected to ${dateLabel(reserve.projectThrough)} at momentum's ${fromChain ? 'on-chain' : 'launch'} value.`
-                            : `What the policy implies until the reserve receives emission: miner emissions × (1 − momentum), with momentum at ${momentumBasis}, and no programs paid.`}
+                            ? interpolate(tb.sub.live[basis], { date: dateLabel(reserve.projectThrough) })
+                            : tb.sub.projected[basis]}
                     </p>
 
                     {canWindow && (
                         <div className="reserve-chart-bar">
-                            <RangeToggle range={range} onChange={setRange} />
+                            <RangeToggle range={range} onChange={setRange} t={tb.controls} />
                         </div>
                     )}
                     <div className="reserve-charts">
                         <div className={`reserve-card reserve-chart-card${expanded === 'balance' ? ' is-expanded' : ''}`}>
                             <div className="reserve-card-head">
                                 <span className="reserve-card-label">{windowed ? windowBalance.label : balanceLabel}</span>
-                                <ExpandButton expanded={expanded === 'balance'} onToggle={() => toggleExpanded('balance')} label="the balance chart" />
+                                <ExpandButton expanded={expanded === 'balance'} onToggle={() => toggleExpanded('balance')} label={tb.controls.balanceChart} t={tb.controls} />
                             </div>
                             <div className="reserve-card-legend"><Legend items={windowed ? windowBalance.legend : balanceLegend} /></div>
                             <p className="reserve-card-num">
                                 <span>{snapshot ? denom.amount(snapshot.alpha) : '—'}</span>
                                 {windowed && <span className="is-dim">{windowBalance.dim}</span>}
-                                {!windowed && end && chart.projected.length > 0 && <span className="is-dim"> → {denom.short(end.alpha)} by {dateLabel(end.date)}</span>}
+                                {!windowed && end && chart.projected.length > 0 && <span className="is-dim">{fill(` ${tb.balance.projectedTo}`, { amount: denom.short(end.alpha), date: dateLabel(end.date) })}</span>}
                             </p>
-                            {chart.points.length === 0 && <p className="reserve-chart-note">Nothing to chart yet: the reserve has received no emission.</p>}
+                            {chart.points.length === 0 && <p className="reserve-chart-note">{tb.nothingToChart}</p>}
                             {windowed && (
                                 <XYChart
                                     key={`balance-${range}`}
@@ -419,6 +463,7 @@ export default function ReservePage() {
                                     axisFmt={denom.axis}
                                     height={chartHeight('balance')}
                                     aria={windowBalance.aria}
+                                    emptyLabel={tb.nothingThisPeriod}
                                 />
                             )}
                             {!windowed && chart.points.length > 0 && (
@@ -431,25 +476,26 @@ export default function ReservePage() {
                                     axisFmt={denom.axis}
                                     height={chartHeight('balance')}
                                     aria={balanceAria}
+                                    emptyLabel={tb.nothingThisPeriod}
                                 />
                             )}
                             <p className="reserve-card-note">
                                 {windowed ? windowBalance.note : balanceNote}
-                                {live && !historyReady ? ' Reading the balance history…' : ''}
+                                {live && !historyReady ? ` ${tb.balance.note.readingHistory}` : ''}
                             </p>
                             {(windowed ? windowBalance.rows : balanceRows).length > 0 && (
                                 <details className="reserve-table">
-                                    <summary><span>Show as a table · <Alpha /></span></summary>
+                                    <summary><span>{`${tb.table.show} · `}<Alpha /></span></summary>
                                     <div className="reserve-table-scroll">
                                         <table>
-                                            <thead><tr><th scope="col">Day</th><th scope="col">Balance</th><th scope="col">Change</th><th scope="col">Basis</th></tr></thead>
+                                            <thead><tr><th scope="col">{tb.table.day}</th><th scope="col">{tb.table.balance}</th><th scope="col">{tb.table.change}</th><th scope="col">{tb.table.basis}</th></tr></thead>
                                             <tbody>
                                                 {(windowed ? windowBalance.rows : balanceRows).map((r) => (
                                                     <tr key={`${r.kind}-${r.date}`}>
-                                                        <td>{shortDateYear(r.date)}</td>
-                                                        <td>{fmtAlpha(r.alpha, 1)}</td>
-                                                        <td>{r.change == null ? '—' : `${r.change >= 0 ? '+' : '−'}${fmtAlpha(Math.abs(r.change), 1)}`}</td>
-                                                        <td>{r.kind === 'live' ? 'Chain' : 'Projected'}</td>
+                                                        <td>{f.shortDateYear(r.date)}</td>
+                                                        <td>{f.alpha(r.alpha, 1)}</td>
+                                                        <td>{r.change == null ? '—' : `${r.change >= 0 ? '+' : '−'}${f.alpha(Math.abs(r.change), 1)}`}</td>
+                                                        <td>{r.kind === 'live' ? tb.table.chain : tb.table.basisProjected}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -461,15 +507,15 @@ export default function ReservePage() {
 
                         <div className={`reserve-card reserve-chart-card${expanded === 'flows' ? ' is-expanded' : ''}`}>
                             <div className="reserve-card-head">
-                                <span className="reserve-card-label">{windowed ? windowFlows.label : 'Monthly inflow · program spend'}</span>
-                                <ExpandButton expanded={expanded === 'flows'} onToggle={() => toggleExpanded('flows')} label="the inflow chart" />
+                                <span className="reserve-card-label">{windowed ? windowFlows.label : tb.flows.label}</span>
+                                <ExpandButton expanded={expanded === 'flows'} onToggle={() => toggleExpanded('flows')} label={tb.controls.flowsChart} t={tb.controls} />
                             </div>
                             <div className="reserve-card-legend"><Legend items={windowed ? windowFlows.legend : monthLegend} /></div>
                             <p className="reserve-card-num">
                                 <span>{windowed ? windowFlows.head[0] : monthHead[0]}</span>
                                 {(windowed ? windowFlows.head[1] : monthHead[1]) && <span className="is-dim">{windowed ? windowFlows.head[1] : monthHead[1]}</span>}
                             </p>
-                            {!windowed && months.length === 0 && <p className="reserve-chart-note">Nothing to chart yet: the reserve has received no emission.</p>}
+                            {!windowed && months.length === 0 && <p className="reserve-chart-note">{tb.nothingToChart}</p>}
                             {windowed && (
                                 <XYChart
                                     key={`flows-${range}`}
@@ -480,33 +526,35 @@ export default function ReservePage() {
                                     axisFmt={denom.axis}
                                     height={chartHeight('flows')}
                                     aria={windowFlows.aria}
+                                    emptyLabel={tb.nothingThisPeriod}
                                 />
                             )}
                             {!windowed && months.length > 0 && (
                                 <XYChart
                                     key="flows-all"
-                                    labels={months.map((m) => monthLabel(m.month))}
-                                    tipLabels={months.map((m) => monthLong(m.month))}
+                                    labels={months.map((m) => f.monthLabel(m.month))}
+                                    tipLabels={months.map((m) => f.monthLong(m.month))}
                                     series={monthSeries}
                                     fmt={denom.fmt}
                                     axisFmt={denom.axis}
                                     height={chartHeight('flows')}
                                     aria={monthAria}
+                                    emptyLabel={tb.nothingThisPeriod}
                                 />
                             )}
                             <p className="reserve-card-note">{windowed ? windowFlows.note : monthNote}</p>
                             {windowed && days.length > 0 && (
                                 <details className="reserve-table">
-                                    <summary><span>Show as a table · <Alpha /></span></summary>
+                                    <summary><span>{`${tb.table.show} · `}<Alpha /></span></summary>
                                     <div className="reserve-table-scroll">
                                         <table>
-                                            <thead><tr><th scope="col">Day</th><th scope="col">Received</th><th scope="col">Spent</th></tr></thead>
+                                            <thead><tr><th scope="col">{tb.table.day}</th><th scope="col">{tb.table.received}</th><th scope="col">{tb.table.spent}</th></tr></thead>
                                             <tbody>
                                                 {days.map((d) => (
                                                     <tr key={d.date}>
-                                                        <td>{shortDateYear(d.date)}</td>
-                                                        <td>{d.received ? fmtAlpha(d.received, 1) : '—'}</td>
-                                                        <td>{d.spent ? fmtAlpha(d.spent, 1) : '—'}</td>
+                                                        <td>{f.shortDateYear(d.date)}</td>
+                                                        <td>{d.received ? f.alpha(d.received, 1) : '—'}</td>
+                                                        <td>{d.spent ? f.alpha(d.spent, 1) : '—'}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -516,17 +564,17 @@ export default function ReservePage() {
                             )}
                             {!windowed && months.length > 0 && (
                                 <details className="reserve-table">
-                                    <summary><span>Show as a table · <Alpha /></span></summary>
+                                    <summary><span>{`${tb.table.show} · `}<Alpha /></span></summary>
                                     <div className="reserve-table-scroll">
                                         <table>
-                                            <thead><tr><th scope="col">Month</th><th scope="col">Received</th><th scope="col">Spent</th><th scope="col">Projected</th></tr></thead>
+                                            <thead><tr><th scope="col">{tb.table.month}</th><th scope="col">{tb.table.received}</th><th scope="col">{tb.table.spent}</th><th scope="col">{tb.table.projected}</th></tr></thead>
                                             <tbody>
                                                 {months.map((m) => (
                                                     <tr key={m.month}>
-                                                        <td>{monthLabel(m.month)}</td>
-                                                        <td>{m.received ? fmtAlpha(m.received, 1) : '—'}</td>
-                                                        <td>{m.spent ? fmtAlpha(m.spent, 1) : '—'}</td>
-                                                        <td>{m.projected ? fmtAlpha(m.projected, 1) : '—'}</td>
+                                                        <td>{f.monthLabel(m.month)}</td>
+                                                        <td>{m.received ? f.alpha(m.received, 1) : '—'}</td>
+                                                        <td>{m.spent ? f.alpha(m.spent, 1) : '—'}</td>
+                                                        <td>{m.projected ? f.alpha(m.projected, 1) : '—'}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -539,58 +587,66 @@ export default function ReservePage() {
 
                     {flows && flows.received > 0 && (flows.spent > 0 || earmarked > 0) && (
                         <SplitBar
-                            title="Everything the reserve has received"
+                            title={tb.splits.received.title}
                             meta={denom.short(flows.received)}
                             fmt={(v) => denom.short(v)}
                             segments={[
-                                { label: 'Spent', value: flows.spent, color: 'var(--rv-gray-1)' },
-                                { label: 'Committed', value: Math.min(earmarked, Math.max(0, flows.received - flows.spent)), color: 'var(--rv-reserve)', className: 'is-earmarked' },
-                                { label: 'Unallocated', value: Math.max(0, flows.received - flows.spent - earmarked), color: 'var(--rv-reserve)' },
+                                { label: tb.splits.received.spent, value: flows.spent, color: 'var(--rv-gray-1)' },
+                                { label: tb.splits.received.committed, value: Math.min(earmarked, Math.max(0, flows.received - flows.spent)), color: 'var(--rv-reserve)', className: 'is-earmarked' },
+                                { label: tb.splits.received.unallocated, value: Math.max(0, flows.received - flows.spent - earmarked), color: 'var(--rv-reserve)' },
                             ]}
+                            t={tb.splits.bar}
+                            lang={lang}
                         />
                     )}
 
-                    <h3 className="reserve-h3">Where the miner allocation goes</h3>
+                    <h3 className="reserve-h3">{tb.splits.heading}</h3>
                     <div className="reserve-splits">
                         <SplitBar
-                            title="SN25 emission"
-                            meta={`${whole(emission.alphaPerDay)} α a day`}
-                            fmt={(v) => `${whole(v)} α a day`}
+                            title={tb.splits.emission.title}
+                            meta={perDayText(emission.alphaPerDay)}
+                            fmt={perDayText}
                             segments={[
-                                { label: 'Subnet owner', value: emission.ownerPerDay, color: 'var(--rv-gray-2)' },
-                                { label: 'Validators', value: emission.validatorPerDay, color: 'var(--rv-gray-1)' },
-                                { label: 'Miner allocation', value: emission.minerPerDay, color: 'var(--rv-reserve)' },
+                                { label: tb.splits.emission.owner, value: emission.ownerPerDay, color: 'var(--rv-gray-2)' },
+                                { label: tb.splits.emission.validators, value: emission.validatorPerDay, color: 'var(--rv-gray-1)' },
+                                { label: tb.splits.emission.miners, value: emission.minerPerDay, color: 'var(--rv-reserve)' },
                             ]}
-                            note={`The owner share is ${pct(emission.ownerCut, 0)}; validators and miners split the rest evenly.`}
+                            note={interpolate(tb.splits.emission.note, { share: f.pct(emission.ownerCut, 0) })}
+                            t={tb.splits.bar}
+                            lang={lang}
                         />
                         {routing ? (
                             <SplitBar
-                                title="Miner allocation, on chain now"
+                                title={tb.splits.onChain.title}
                                 showPercentages={false}
-                                meta={`${whole(minerPerDay)} α a day`}
-                                fmt={(v) => `${whole(v)} α a day`}
+                                meta={perDayText(minerPerDay)}
+                                fmt={perDayText}
                                 segments={[
-                                    { label: 'Momentum, to providers', value: minerPerDay * otherShare, color: 'var(--rv-providers)' },
-                                    { label: 'Reserve', value: minerPerDay * routing.reserve, color: 'var(--rv-reserve)' },
-                                    { label: 'Owner-directed, burned', value: minerPerDay * routing.burned, color: 'var(--rv-burn)' },
+                                    { label: tb.splits.onChain.momentum, value: minerPerDay * otherShare, color: 'var(--rv-providers)' },
+                                    { label: tb.splits.onChain.reserve, value: minerPerDay * routing.reserve, color: 'var(--rv-reserve)' },
+                                    { label: tb.splits.onChain.burned, value: minerPerDay * routing.burned, color: 'var(--rv-burn)' },
                                 ]}
                                 note={live
-                                    ? 'The reserve receives what momentum leaves: 1 − momentum.'
+                                    ? tb.splits.onChain.noteLive
                                     : fromChain
-                                        ? `Momentum is on chain now: ${whole(momentumPerDay)} α a day goes to providers. The reserve receives the rest, 1 − momentum (${whole(perDay)} α a day), once its hotkeys are paid.`
-                                        : `From ${shortDate(reserve.launch)}, momentum goes to providers (${whole(momentumPerDay)} α a day), and the reserve receives the rest, 1 − momentum (${whole(perDay)} α a day). Until then the chain burns the owner-directed share.`}
+                                        ? interpolate(tb.splits.onChain.noteOnChain, { momentum: f.whole(momentumPerDay), reserve: f.whole(perDay) })
+                                        : interpolate(tb.splits.onChain.notePreLaunch, { date: f.shortDate(reserve.launch), momentum: f.whole(momentumPerDay), reserve: f.whole(perDay) })}
+                                t={tb.splits.bar}
+                                lang={lang}
                             />
                         ) : (
                             <SplitBar
-                                title={`Miner allocation from ${shortDate(reserve.launch)}`}
+                                title={interpolate(tb.splits.planned.title, { date: f.shortDate(reserve.launch) })}
                                 showPercentages={false}
-                                meta={`${whole(minerPerDay)} α a day`}
-                                fmt={(v) => `${whole(v)} α a day`}
+                                meta={perDayText(minerPerDay)}
+                                fmt={perDayText}
                                 segments={[
-                                    { label: 'Momentum, to providers', value: momentumPerDay, color: 'var(--rv-providers)' },
-                                    { label: 'Reserve, 1 − momentum', value: perDay, color: 'var(--rv-reserve)' },
+                                    { label: tb.splits.planned.momentum, value: momentumPerDay, color: 'var(--rv-providers)' },
+                                    { label: tb.splits.planned.reserve, value: perDay, color: 'var(--rv-reserve)' },
                                 ]}
-                                note="The live split shows once the chain answers."
+                                note={tb.splits.planned.note}
+                                t={tb.splits.bar}
+                                lang={lang}
                             />
                         )}
                     </div>
@@ -599,92 +655,102 @@ export default function ReservePage() {
 
             <section className="reserve-block" id="program-types" aria-labelledby="reserve-types-h">
                 <div className="reserve-shell">
-                    <span className="reserve-kicker">02 / Program types</span>
-                    <h2 id="reserve-types-h">What the reserve pays for.</h2>
-                    <p className="reserve-sub">Programs buy services from providers, not equipment.</p>
+                    <span className="reserve-kicker">{tp.types.kicker}</span>
+                    <h2 id="reserve-types-h">{tp.types.title}</h2>
+                    <p className="reserve-sub">{tp.types.sub}</p>
                     <div className="reserve-boundary">
-                        {reserve.programTypes.map((t) => (
-                            <article key={t.tag}>
-                                <b className="reserve-type-tag">{t.tag}</b>
-                                <h3>{t.title}</h3>
-                                <p>{t.summary}</p>
-                                <dl>
-                                    <div><dt>Verified by</dt><dd>{t.verifiedBy}</dd></div>
-                                    <div><dt>Paid as</dt><dd>{t.paidAs}</dd></div>
-                                </dl>
-                            </article>
-                        ))}
+                        {reserve.programTypes.map((type, i) => {
+                            const words = tp.types.list[i];
+                            return (
+                                <article key={type.tag}>
+                                    <b className="reserve-type-tag">{words.tag}</b>
+                                    <h3>{words.title}</h3>
+                                    <p>{words.summary}</p>
+                                    <dl>
+                                        <div><dt>{tp.types.verifiedBy}</dt><dd>{words.verifiedBy}</dd></div>
+                                        <div><dt>{tp.types.paidAs}</dt><dd>{words.paidAs}</dd></div>
+                                    </dl>
+                                </article>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
             <section className="reserve-block" id="programs" aria-labelledby="reserve-programs-h">
                 <div className="reserve-shell">
-                    <span className="reserve-kicker">03 / Programs</span>
-                    <h2 id="reserve-programs-h">Current programs.</h2>
+                    <span className="reserve-kicker">{tp.programs.kicker}</span>
+                    <h2 id="reserve-programs-h">{tp.programs.title}</h2>
                     <p className="reserve-sub">
-                        Programs are published here before they are paid. One in preparation is having its terms prepared; an indicative one is expected but not yet approved. A program is active only once its terms are published and providers have accepted them, and its size and payments appear with it.{activePrograms.length === 0 ? ' None is active yet.' : ''}
+                        {tp.programs.sub}{activePrograms.length === 0 ? ` ${tp.programs.noneActiveYet}` : ''}
                     </p>
                     <div className="reserve-programs-bar">
-                        <div className="reserve-chips" role="group" aria-label="Filter programs by status">
-                            <span className="reserve-card-label">Programs</span>
+                        <div className="reserve-chips" role="group" aria-label={tp.programs.filterAria}>
+                            <span className="reserve-card-label">{tp.programs.label}</span>
                             {statusesPresent.length > 1 && (
                                 <>
-                                    <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>All · {reserve.programs.length}</button>
+                                    <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>{`${tp.programs.all} · `}{reserve.programs.length}</button>
                                     {statusesPresent.map((s) => (
                                         <button key={s} type="button" aria-pressed={filter === s} onClick={() => setFilter(s)}>
-                                            {reserve.programStatus[s]} · {countOf(s)}
+                                            {tp.statuses[s]} · {countOf(s)}
                                         </button>
                                     ))}
                                 </>
                             )}
                         </div>
                         <span className="reserve-programs-count">
-                            {earmarked > 0 ? `${denom.short(earmarked)} committed · ${activePrograms.length} active` : `Nothing committed yet · ${activePrograms.length || 'none'} active`}
+                            {earmarked > 0
+                                ? `${interpolate(tp.programs.committed, { amount: denom.short(earmarked) })} · ${activeCount}`
+                                : `${tp.programs.nothingCommitted} · ${activePrograms.length ? activeCount : tp.counts.noneActive}`}
                         </span>
                     </div>
                     <div className="reserve-card reserve-table-card">
                         <table className="reserve-programs" role="table">
                             <thead>
                                 <tr role="row">
-                                    <th role="columnheader" scope="col">Program</th>
-                                    <th role="columnheader" scope="col">Type</th>
-                                    <th role="columnheader" scope="col">Pays</th>
-                                    {hasFigures && <th role="columnheader" scope="col" className="is-num">Size</th>}
-                                    {hasFigures && <th role="columnheader" scope="col">Paid</th>}
-                                    <th role="columnheader" scope="col">Status</th>
+                                    <th role="columnheader" scope="col">{tp.programs.head.program}</th>
+                                    <th role="columnheader" scope="col">{tp.programs.head.type}</th>
+                                    <th role="columnheader" scope="col">{tp.programs.head.pays}</th>
+                                    {hasFigures && <th role="columnheader" scope="col" className="is-num">{tp.programs.head.size}</th>}
+                                    {hasFigures && <th role="columnheader" scope="col">{tp.programs.head.paid}</th>}
+                                    <th role="columnheader" scope="col">{tp.programs.head.status}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {shownPrograms.map((p) => {
+                                    const words = tp.programs.list[reserve.programs.indexOf(p)];
+                                    // a program's type reads as its type's title (02 above)
+                                    const typeAt = reserve.programTypes.findIndex((type) => type.title === p.type);
+                                    const typeTitle = typeAt >= 0 ? tp.types.list[typeAt].title : p.type;
+                                    const payRule = p.payRule ? words.payRule : null;
                                     const paid = p.payments.reduce((s, x) => s + x.alpha, 0);
                                     return (
                                         <tr key={p.id} role="row">
                                             <td role="cell" data-label="Program">
-                                                <b>{p.title}</b>
-                                                <span className="reserve-program-sum">{p.summary}</span>
+                                                <b>{words.title}</b>
+                                                <span className="reserve-program-sum">{words.summary}</span>
                                                 {/* the phone card's one meta line; the columns are hidden there */}
-                                                <span className="reserve-program-meta">{[p.type, p.payRule || 'Terms to be published', ...(p.ceilingAlpha != null ? [`${denom.short(p.ceilingAlpha)} ceiling`, `${pct(paid / p.ceilingAlpha, 0)} paid`] : [])].join(' · ')}</span>
+                                                <span className="reserve-program-meta">{[typeTitle, payRule || tp.programs.termsTbd, ...(p.ceilingAlpha != null ? [interpolate(tp.programs.ceiling, { amount: denom.short(p.ceilingAlpha) }), interpolate(tp.programs.paidShare, { share: f.pct(paid / p.ceilingAlpha, 0) })] : [])].join(' · ')}</span>
                                             </td>
-                                            <td role="cell" data-label="Type" className="reserve-program-col">{p.type}</td>
-                                            <td role="cell" data-label="Pays" className="reserve-program-col">{p.payRule || <span className="is-dim">Terms to be published</span>}</td>
+                                            <td role="cell" data-label="Type" className="reserve-program-col">{typeTitle}</td>
+                                            <td role="cell" data-label="Pays" className="reserve-program-col">{payRule || <span className="is-dim">{tp.programs.termsTbd}</span>}</td>
                                             {hasFigures && <td role="cell" data-label="Size" className="is-num reserve-program-col">{p.ceilingAlpha != null ? denom.short(p.ceilingAlpha) : '—'}</td>}
                                             {hasFigures && (
                                                 <td role="cell" data-label="Paid" className="reserve-program-col">
                                                     {p.ceilingAlpha != null ? (
-                                                        <span className="reserve-paid" aria-label={`${fmtAlpha(paid)} α paid of a ${fmtAlpha(p.ceilingAlpha)} α ceiling`}>
+                                                        <span className="reserve-paid" aria-label={interpolate(tp.programs.paidAria, { paid: f.alpha(paid), ceiling: f.alpha(p.ceilingAlpha) })}>
                                                             <span className="reserve-use" aria-hidden="true"><i style={{ width: `${Math.min(100, (paid / p.ceilingAlpha) * 100)}%` }} /></span>
-                                                            <span>{pct(paid / p.ceilingAlpha, 0)}</span>
+                                                            <span>{f.pct(paid / p.ceilingAlpha, 0)}</span>
                                                         </span>
                                                     ) : '—'}
                                                 </td>
                                             )}
-                                            <td role="cell" data-label="Status" className="reserve-program-status"><span className="reserve-pill" data-status={p.status}>{reserve.programStatus[p.status]}</span></td>
+                                            <td role="cell" data-label="Status" className="reserve-program-status"><span className="reserve-pill" data-status={p.status}>{tp.statuses[p.status]}</span></td>
                                         </tr>
                                     );
                                 })}
                                 {shownPrograms.length === 0 && (
-                                    <tr role="row"><td role="cell" colSpan={hasFigures ? 6 : 4} className="reserve-programs-empty">No program has this status.</td></tr>
+                                    <tr role="row"><td role="cell" colSpan={hasFigures ? 6 : 4} className="reserve-programs-empty">{tp.programs.empty}</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -694,85 +760,97 @@ export default function ReservePage() {
 
             <section className="reserve-block" id="process" aria-labelledby="reserve-process-h">
                 <div className="reserve-shell">
-                    <span className="reserve-kicker">04 / How a program goes live</span>
-                    <h2 id="reserve-process-h">Published first, paid last.</h2>
+                    <span className="reserve-kicker">{tc.process.kicker}</span>
+                    <h2 id="reserve-process-h">{tc.process.title}</h2>
                     <div className="reserve-steps">
                         {reserve.steps.map((s, i) => (
                             <div key={s.title}>
                                 <span className="reserve-k">{String(i + 1).padStart(2, '0')}</span>
-                                <b>{s.title}</b>
-                                <p>{s.detail}</p>
+                                <b>{tc.process.steps[i].title}</b>
+                                <p>{tc.process.steps[i].detail}</p>
                             </div>
                         ))}
                     </div>
 
-                    <h3 className="reserve-custody-h">Custody</h3>
+                    <h3 className="reserve-custody-h">{tc.custody.heading}</h3>
                     <div className="reserve-custody-cards">
                         <div className="reserve-card reserve-custody-card">
                             <div className="reserve-card-head">
-                                <span className="reserve-card-label">Reserve account · {reserve.custody.threshold} multisig</span>
-                                {snapshot && <span className="reserve-pill" data-status={live ? 'active' : 'preparing'}>{live ? 'On chain' : 'Awaiting funds'}</span>}
+                                <span className="reserve-card-label">{fill(tc.custody.accountLabel, { threshold: tc.custody.threshold })}</span>
+                                {snapshot && <span className="reserve-pill" data-status={live ? 'active' : 'preparing'}>{live ? tc.custody.onChain : tc.custody.awaitingFunds}</span>}
                             </div>
                             <Address value={reserve.address} />
                             <p className="reserve-card-text">
-                                {reserve.custody.modeNote}
-                                {snapshot ? ` It holds ${snapshot.account.freeTao.toFixed(4)} TAO free at block ${whole(snapshot.block)}.` : ''}
+                                {tc.custody.modeNote}
+                                {snapshot ? ` ${interpolate(tc.custody.holds, { tao: f.fixed(snapshot.account.freeTao, 4), block: f.whole(snapshot.block) })}` : ''}
                             </p>
                             <dl className="reserve-recipients">
-                                <dt>Recipient hotkeys</dt>
-                                {!snapshot ? <dd>—</dd> : snapshot.hotkeys.length === 0 ? <dd>Not yet registered</dd> : snapshot.hotkeys.map((h) => (
+                                <dt>{tc.custody.recipients}</dt>
+                                {!snapshot ? <dd>—</dd> : snapshot.hotkeys.length === 0 ? <dd>{tc.custody.notRegistered}</dd> : snapshot.hotkeys.map((h) => (
                                     <dd key={h.hotkey}>
-                                        <code title={h.hotkey} translate="no">{shortKey(h.hotkey)}</code> UID {h.uid ?? '—'}{h.registeredAt ? ` · registered at block ${whole(h.registeredAt)}` : ''}
+                                        <code title={h.hotkey} translate="no">{shortKey(h.hotkey)}</code> UID {h.uid ?? '—'}{h.registeredAt ? ` · ${interpolate(tc.custody.registeredAt, { block: f.whole(h.registeredAt) })}` : ''}
                                     </dd>
                                 ))}
                             </dl>
-                            <a className="reserve-wallet-link" href={reserve.explorerUrl} target="_blank" rel="noopener noreferrer">View on Taostats <span aria-hidden="true">↗</span></a>
+                            <a className="reserve-wallet-link" href={reserve.explorerUrl} target="_blank" rel="noopener noreferrer">{`${t.wallet.viewOnTaostats} `}<span aria-hidden="true">↗</span></a>
                         </div>
                         <div className="reserve-card reserve-custody-card">
                             <div className="reserve-card-head">
-                                <span className="reserve-card-label">Signers · {reserve.custody.threshold}</span>
+                                <span className="reserve-card-label">{fill(tc.custody.signersLabel, { threshold: tc.custody.threshold })}</span>
                             </div>
                             <ul className="reserve-signers">
-                                {reserve.custody.signers.map((s) => (
-                                    <li key={s.label}><span>{s.label}</span><Address value={s.address} /></li>
+                                {reserve.custody.signers.map((s, i) => (
+                                    <li key={s.label}><span>{tc.custody.signers[i].label}</span><Address value={s.address} /></li>
                                 ))}
                             </ul>
                             <p className="reserve-card-text">
-                                {reserve.custody.thresholdNote}{' '}
+                                {tc.custody.thresholdNote}{' '}
                                 {derivesAccount
-                                    ? `These ${reserve.custody.signers.length} keys at threshold ${reserve.custody.multisigThreshold} derive the reserve account above.`
-                                    : 'These keys do not derive the reserve account above: check the published signers.'}
-                                {' '}Identities are not published.
+                                    ? counted(tc.custody.derives, reserve.custody.signers.length, { threshold: reserve.custody.multisigThreshold })
+                                    : tc.custody.notDerived}
+                                {' '}{tc.custody.identities}
                             </p>
                         </div>
                     </div>
 
                     <div className="reserve-ctas">
-                        <a className="reserve-cta" href={reserve.contactUrl} target="_blank" rel="noopener noreferrer">Talk to UR team <span aria-hidden="true">↗</span></a>
-                        <a className="reserve-link" href={reserve.minerGuideUrl}>Read the miner guide <span aria-hidden="true">→</span></a>
-                        <a className="reserve-link" href={reserve.policyUrl} target="_blank" rel="noopener noreferrer">Emission policy on GitHub <span aria-hidden="true">↗</span></a>
+                        <a className="reserve-cta" href={reserve.contactUrl} target="_blank" rel="noopener noreferrer">{`${tc.ctas.talk} `}<span aria-hidden="true">↗</span></a>
+                        <a className="reserve-link" href={hasLocalizedVersion(reserve.minerGuideUrl) ? localizedPathFor(reserve.minerGuideUrl, lang) : reserve.minerGuideUrl}>{`${tc.ctas.guide} `}<span aria-hidden="true">→</span></a>
+                        <a className="reserve-link" href={reserve.policyUrl} target="_blank" rel="noopener noreferrer">{`${tc.ctas.policy} `}<span aria-hidden="true">↗</span></a>
                     </div>
                 </div>
             </section>
 
-            <section className="reserve-block reserve-fine-block" aria-label="Methodology">
+            <section className="reserve-block reserve-fine-block" aria-label={tc.fine.aria}>
                 <div className="reserve-shell">
                     <p className="reserve-fine">
-                        <span><b>Mechanism.</b> SN25 emits {whole(emission.alphaPerDay)} α a day: {pct(emission.ownerCut, 0)} to the subnet owner and the rest split evenly between validators and miners, so the miner allocation is {whole(minerPerDay)} α a day. From {shortDate(reserve.launch)}, momentum, the share used now to power the network, goes to providers as rewards. The reserve's recipient hotkeys receive the rest, miner emissions × (1 − momentum), so the reserve's share is not fixed. It falls as momentum grows. The page keeps momentum at its launch value until the chain shows one of at least 0.1%, then follows the chain.</span>
+                        <span><b>{tc.fine.mechanism.label}</b>{fill(` ${interpolate(tc.fine.mechanism.body, { min: f.pct(MIN_SEEN, 1) })}`, {
+                            emission: f.whole(emission.alphaPerDay),
+                            ownerShare: f.pct(emission.ownerCut, 0),
+                            minerAllocation: f.whole(minerPerDay),
+                            date: f.shortDate(reserve.launch),
+                        })}</span>
                         {snapshot && !live && (
-                            <span><b>{overdue ? 'Before the first receipt.' : 'Before launch.'}</b> At finalized block {whole(snapshot.block)} ({timeUtc(snapshot.time)}) {pct(snapshot.routing.burned, 0)} of the miner allocation was directed to the subnet owner hotkey and burned by the chain, and the reserve account held nothing. The projection holds momentum at {fromChain ? 'its value on chain now' : 'its launch value'} and assumes no program payments.</span>
+                            <span><b>{overdue ? tc.fine.beforeLaunch.labelOverdue : tc.fine.beforeLaunch.label}</b>{` ${interpolate(tc.fine.beforeLaunch.body[basis], { block: f.whole(snapshot.block), time: f.timeUtc(snapshot.time), share: f.pct(snapshot.routing.burned, 0) })}`}</span>
                         )}
                         {snapshot && live && (
-                            <span><b>Balance.</b> The reserve is α staked on SN25 under its recipient hotkeys, owned by coldkey {shortKey(reserve.address)}, read from finalized chain state (block {whole(snapshot.block)}, {timeUtc(snapshot.time)}); any free TAO is shown separately. Receipts and payments are the rises and falls between daily samples, from the recipients' registration{Number.isFinite(firstRegistration) ? ` at block ${whole(firstRegistration)}` : ''}; the projection continues from the latest balance at momentum's {fromChain ? 'on-chain' : 'launch'} value and assumes no program payments.</span>
+                            <span><b>{tc.fine.balance.label}</b>{` ${interpolate(tc.fine.balance.held, { coldkey: shortKey(reserve.address), block: f.whole(snapshot.block), time: f.timeUtc(snapshot.time) })} ${Number.isFinite(firstRegistration)
+                                ? interpolate(tc.fine.balance.flows[basis], { registered: f.whole(firstRegistration) })
+                                : tc.fine.balance.flows[`${basis}NoBlock`]}`}</span>
                         )}
                         {priceTao && (
-                            <span><b>Valuation.</b> TAO figures are a spot mark, not a realisable value: α at {priceTao.toFixed(6)} TAO, the SN25 pool's ratio of TAO in to α in at this block.{denom.usd
+                            <span><b>{tc.fine.valuation.label}</b>{` ${interpolate(tc.fine.valuation.tao, { price: f.fixed(priceTao, 6) })} ${denom.usd
                                 ? (denom.rate != null
-                                    ? ` USD figures are α times the live α price, ${fmtUsd(denom.rate)} from ${denom.sourceLabel} at ${timeUtc(denom.at)}: a spot mark too.`
-                                    : ' No α price has been read yet, so no USD figure is shown.')
-                                : ' No USD figure is shown while the display unit is α.'}</span>
+                                    ? interpolate(tc.fine.valuation.usd, { price: f.usd(denom.rate), source: denom.sourceLabel, time: f.timeUtc(denom.at) })
+                                    : tc.fine.valuation.noPrice)
+                                : tc.fine.valuation.inAlpha}`}</span>
                         )}
-                        <span><b>Sources.</b> The chain figures are read by your browser from Bittensor mainnet through its public RPC endpoints ({FINNEY_RPC.map(hostOf).join(', ')}; {FINNEY_ARCHIVE.map(hostOf).join(', ')} for history), so those hosts see the request. With USD selected, the α price is read from the network operators' stats feeds or CoinGecko's GeckoTerminal feed ({PRICE_HOSTS.join(', ')}). Nothing else is contacted. Account {reserve.accountId}.</span>
+                        <span><b>{tc.fine.sources.label}</b>{fill(` ${tc.fine.sources.body}`, {
+                            rpcHosts: listOf(FINNEY_RPC.map(hostOf)),
+                            archiveHosts: listOf(FINNEY_ARCHIVE.map(hostOf)),
+                            priceHosts: listOf(PRICE_HOSTS),
+                            account: reserve.accountId,
+                        })}</span>
                     </p>
                 </div>
             </section>

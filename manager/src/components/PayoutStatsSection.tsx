@@ -8,15 +8,14 @@ import {
 	Hash,
 	ExternalLink,
 	CheckCircle,
-	Clock,
 	TrendingUp,
 	Database,
 	Star,
-	Sparkles,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { fetchAccountPayments, fetchAccountPoints } from "../services/api";
 import type { AccountPayment, AccountPoint } from "../services/api";
+import { pastPayoutStatus, pastPayoutTotals } from "../services/pastPayouts";
 import toast from "react-hot-toast";
 
 const StatCard = ({
@@ -56,6 +55,11 @@ const formatNumber = (num: number): string => {
 	return num.toLocaleString("en-US");
 };
 
+/**
+ * The network's past USDC payouts, read-only. USDC provider payouts ended on
+ * November 12, 2026 (services/pastPayouts.ts): each payment reads paid or not
+ * paid, never pending, and nothing is estimated for one that was not paid.
+ */
 const PayoutStatsSection: React.FC = () => {
 	const { token } = useAuth();
 	const [payments, setPayments] = useState<AccountPayment[]>([]);
@@ -73,47 +77,6 @@ const PayoutStatsSection: React.FC = () => {
 		}
 		return map;
 	}, [points]);
-
-	/**
-	 * Typical gap between the gross payout the network books for a payment and
-	 * the tokens that actually land in the wallet, taken as the median over the
-	 * payments that already settled. It is a wallet/transfer fee, so it stays
-	 * roughly constant per payment rather than scaling with the amount — the
-	 * median keeps a one-off outlier from skewing the estimate. Only the most
-	 * recent payments are sampled, because the fee has changed over time and
-	 * old payouts would drag the estimate towards a fee that no longer applies.
-	 */
-	const settlementFee = useMemo(() => {
-		const FEE_SAMPLE_SIZE = 10;
-
-		const fees = payments
-			.filter((payment) => payment.token_amount && payment.payout_nano_cents)
-			.sort(
-				(a, b) =>
-					new Date(b.payment_time).getTime() -
-					new Date(a.payment_time).getTime(),
-			)
-			.slice(0, FEE_SAMPLE_SIZE)
-			.map(
-				(payment) =>
-					(payment.payout_nano_cents as number) / 1e9 -
-					payment.token_amount,
-			)
-			.filter((fee) => fee >= 0)
-			.sort((a, b) => a - b);
-
-		if (fees.length === 0) return 0;
-		return fees[Math.floor(fees.length / 2)];
-	}, [payments]);
-
-	/**
-	 * Estimated payout for a payment that has not settled yet. The network has
-	 * already booked the gross amount, so only the fee has to be predicted.
-	 */
-	const estimateFor = (payment: AccountPayment): number | null => {
-		if (payment.token_amount || !payment.payout_nano_cents) return null;
-		return Math.max(payment.payout_nano_cents / 1e9 - settlementFee, 0);
-	};
 
 	useEffect(() => {
 		if (!initialRenderRef.current || isLoading) {
@@ -151,14 +114,14 @@ const PayoutStatsSection: React.FC = () => {
 				setPoints(pointsResponse.account_points || []);
 				setLastUpdated(new Date().toISOString());
 				if (showToast) {
-					toast.success("Payout Stats updated successfully");
+					toast.success("Past USDC payouts updated");
 				}
 			}
 		} catch (err) {
 			const message =
 				err instanceof Error
 					? err.message
-					: "Failed to load payout data";
+					: "Failed to load the past USDC payouts";
 			setError(message);
 			if (showToast) {
 				toast.error(message);
@@ -188,36 +151,9 @@ const PayoutStatsSection: React.FC = () => {
 		}
 	};
 
-	const calculateTotals = () => {
-		const paymentTotals = payments.reduce(
-			(acc, payment) => ({
-				totalPayouts: acc.totalPayouts + payment.token_amount,
-				totalBytes: acc.totalBytes + payment.payout_byte_count,
-				completedPayments:
-					acc.completedPayments + (payment.completed ? 1 : 0),
-				pendingPayments:
-					acc.pendingPayments +
-					(!payment.completed && !payment.canceled ? 1 : 0),
-			}),
-			{
-				totalPayouts: 0,
-				totalBytes: 0,
-				completedPayments: 0,
-				pendingPayments: 0,
-			},
-		);
-
-		const totalPoints = points.reduce(
-			(acc, point) => acc + point.point_value / 1_000_000,
-			0,
-		);
-
-		return { ...paymentTotals, totalPoints };
-	};
-
-	const totals = calculateTotals();
-	const estimatedPending = payments.reduce(
-		(sum, payment) => sum + (estimateFor(payment) ?? 0),
+	const totals = pastPayoutTotals(payments);
+	const totalPoints = points.reduce(
+		(acc, point) => acc + point.point_value / 1_000_000,
 		0,
 	);
 
@@ -227,10 +163,12 @@ const PayoutStatsSection: React.FC = () => {
 				<div>
 					<h3 className="text-2xl font-bold text-ur-white flex items-center gap-3">
 						<CreditCard className="text-ur-green" size={24} />
-						Payout Statistics
+						Past USDC Payouts
 					</h3>
 					<p className="text-ur-gray mt-2">
-						Detailed history of all payouts and earnings
+						USDC provider payouts ended on November 12, 2026. This
+						is your network's USDC payout history; provider
+						earnings are paid through SN25.
 					</p>
 					{lastUpdated && (
 						<p className="text-sm text-ur-gray-dark mt-1">
@@ -248,7 +186,7 @@ const PayoutStatsSection: React.FC = () => {
 						size={16}
 						className={isLoading ? "animate-spin" : ""}
 					/>
-					Refresh Payouts
+					Refresh
 				</button>
 			</div>
 
@@ -260,7 +198,7 @@ const PayoutStatsSection: React.FC = () => {
 					/>
 					<div>
 						<h3 className="font-medium text-ur-coral">
-							Error loading payout data
+							Error loading the past USDC payouts
 						</h3>
 						<p className="text-ur-coral">{error}</p>
 					</div>
@@ -276,44 +214,34 @@ const PayoutStatsSection: React.FC = () => {
 				</div>
 			) : (
 				<div className="space-y-8">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 animate-staggerFadeUp" style={{ animationDelay: '0.2s' }}>
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 animate-staggerFadeUp" style={{ animationDelay: '0.2s' }}>
 						<StatCard
-							title="Total USDC Earned"
-							value={`$${totals.totalPayouts.toFixed(4)}`}
+							title="Total USDC Paid"
+							value={`$${totals.paidUsdc.toFixed(4)}`}
 							icon={DollarSign}
 							accent="bg-ur-green"
 						/>
 						<StatCard
-							title="Estimated Pending"
-							value={
-								estimatedPending > 0
-									? `~$${estimatedPending.toFixed(4)}`
-									: "—"
-							}
-							icon={Sparkles}
-							accent="bg-ur-pink"
-						/>
-						<StatCard
 							title="Total Points Earned"
-							value={formatNumber(totals.totalPoints)}
+							value={formatNumber(totalPoints)}
 							icon={Star}
 							accent="bg-ur-yellow-light"
 						/>
 						<StatCard
 							title="Total Data Paid"
-							value={formatBytes(totals.totalBytes)}
+							value={formatBytes(totals.paidBytes)}
 							icon={Database}
 							accent="bg-ur-blue-light"
 						/>
 						<StatCard
-							title="Completed Payments"
-							value={totals.completedPayments}
+							title="Paid Payouts"
+							value={totals.paidCount}
 							icon={CheckCircle}
 							accent="bg-ur-green"
 						/>
 						<StatCard
-							title="Total Payments"
-							value={payments.length}
+							title="Total Payouts"
+							value={totals.totalCount}
 							icon={TrendingUp}
 							accent="bg-ur-gray"
 						/>
@@ -328,14 +256,14 @@ const PayoutStatsSection: React.FC = () => {
 											size={20}
 											className="text-ur-green"
 										/>
-										Payment Timeline
+										USDC Payout History
 									</h3>
 									<p className="text-xs lg:text-sm text-ur-gray mt-1">
-										History of payouts and earnings
+										Past USDC payouts, read only
 									</p>
 								</div>
 								<div className="bg-ur-hover text-ur-white px-3 py-1 rounded-lg border border-ur-active text-xs lg:text-sm">
-									{payments.length} payments
+									{payments.length} payouts
 								</div>
 							</div>
 						</div>
@@ -352,11 +280,11 @@ const PayoutStatsSection: React.FC = () => {
 										/>
 									</div>
 									<h3 className="text-lg font-medium text-ur-white mb-2">
-										No Payments Found
+										No Past USDC Payouts
 									</h3>
 									<p className="text-ur-gray italic px-3">
-										No payout data available. Try refreshing
-										the data.
+										This network has no USDC payout
+										history.
 									</p>
 								</div>
 							) : (
@@ -395,52 +323,30 @@ const PayoutStatsSection: React.FC = () => {
 												<td className="px-6 py-4 whitespace-nowrap">
 													<span
 														className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-															payment.completed
+															pastPayoutStatus(payment) === "paid"
 																? "bg-ur-green/10 text-ur-green border border-ur-green"
-																: payment.canceled
-																	? "bg-ur-coral/10 text-ur-coral border border-ur-coral"
-																	: "bg-ur-yellow-light/10 text-ur-yellow-light border border-ur-yellow-light/40"
+																: "bg-ur-coral/10 text-ur-coral border border-ur-coral"
 														}`}
 													>
-														{payment.completed ? (
+														{pastPayoutStatus(payment) === "paid" ? (
 															<>
 																<CheckCircle
 																	size={12}
 																	className="mr-1"
 																/>
-																Completed
+																Paid
 															</>
-														) : payment.canceled ? (
-															"Canceled"
 														) : (
-															<>
-																<Clock
-																	size={12}
-																	className="mr-1"
-																/>
-																Pending
-															</>
+															"Not paid"
 														)}
 													</span>
 												</td>
 												<td className="px-6 py-4 whitespace-nowrap text-sm text-ur-green font-medium">
-													{payment.token_amount ? <>$
+													{pastPayoutStatus(payment) === "paid" && payment.token_amount ? <>$
 													{payment.token_amount.toFixed(
 														4,
 													)}{" "}
-													{payment.token_type}</> : (() => {
-														const estimate = estimateFor(payment);
-														return estimate !== null ? (
-															<span
-																className="text-ur-pink"
-																title="Estimated from the booked payout minus the typical fee on your previous payments"
-															>
-																~${estimate.toFixed(4)}
-															</span>
-														) : (
-															<>&mdash;</>
-														);
-													})()}
+													{payment.token_type}</> : <>&mdash;</>}
 												</td>
 												<td className="px-6 py-4 whitespace-nowrap text-sm text-ur-yellow-light font-medium">
 													{(() => {

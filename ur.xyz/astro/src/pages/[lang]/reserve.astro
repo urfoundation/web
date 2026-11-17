@@ -1,0 +1,12 @@
+---
+// /reserve, the Network Capacity Reserve, in the site's other languages: the same route as the English
+// page (components/routes/ReserveRoute.astro), built per language once the
+// `reserve` page group is localized.
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+import ReserveRoute from '../../components/routes/ReserveRoute.astro';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('reserve');
+}
+---
+<ReserveRoute lang={Astro.params.lang} />

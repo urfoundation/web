@@ -14,10 +14,18 @@
 // gigabit-class throughput) is imported whole: its introduction, what changed,
 // its evidence table and its closing bounds.
 //
+// The page is translated (react/src/i18n/pages/research-report/: its English is
+// derived from this data, its translations sit beside it). The import writes
+// only the data, so the translations stay as they are; the strings whose
+// English it changed are listed, by copy unit and key, and the gate
+// (tests/i18n-staleness.mjs) reports each one's translations as stale until
+// they are translated again and recorded with --accept.
+//
 // Usage (from ur.xyz):
 //   node scripts/research-report-import.mjs <report.md> react/src/data/research-report-2026-q3.json
 //   node scripts/research-report-import.mjs <report.md> <data.json> --check   exit 1 if the data is stale
 import { readFileSync, writeFileSync } from 'node:fs';
+import { changedCopy } from '../react/src/i18n/pages/research-report/english.js';
 
 // The report's evidence index (S1–S21), as what a reader can open: the suite
 // documents and server measurements are public on GitHub; the PERFVAR
@@ -203,12 +211,27 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         process.exit(2);
     }
     const before = readFileSync(dataPath, 'utf8');
-    const after = `${JSON.stringify(refresh(JSON.parse(before), readFileSync(reportPath, 'utf8')), null, 2)}\n`;
+    const refreshed = refresh(JSON.parse(before), readFileSync(reportPath, 'utf8'));
+    const after = `${JSON.stringify(refreshed, null, 2)}\n`;
+    // the translated strings whose English this changes
+    const stale = Object.entries(changedCopy(JSON.parse(before), refreshed));
+    const report = (verb) => {
+        for (const [unit, keys] of stale) {
+            console.log(`${unit}: ${keys.length} English string(s) ${verb}; their translations are stale until translated again:`);
+            for (const key of keys) console.log(`  ${key}`);
+            console.log(`  then, from react/: node tests/i18n-staleness.mjs --unit ${unit} --accept <lang> ${keys.join(' ')}`);
+        }
+    };
     if (flag === '--check') {
-        if (before !== after) { console.error(`${dataPath} is stale: run without --check to refresh it`); process.exit(1); }
+        if (before !== after) {
+            report('would change');
+            console.error(`${dataPath} is stale: run without --check to refresh it`);
+            process.exit(1);
+        }
         console.log(`${dataPath} matches the report`);
     } else {
         writeFileSync(dataPath, after);
         console.log(before === after ? `${dataPath} already matches the report` : `refreshed ${dataPath}`);
+        report('changed');
     }
 }

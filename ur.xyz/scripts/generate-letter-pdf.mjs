@@ -174,7 +174,7 @@ try {
                     border-top: 0.5px solid rgba(16,16,16,0.18);
                     display: flex;
                     justify-content: space-between;
-                    font-family: -apple-system, Segoe UI, sans-serif;
+                    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
                     font-size: 7pt;
                     letter-spacing: 0.08em;
                     text-transform: uppercase;

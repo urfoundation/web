@@ -1,0 +1,112 @@
+---
+// /ctf in any site language — capture the flag: reward slots in every country
+// (sn CAPTURETHEFLAG.md §9.2; the design is sn's design/ctf/design.html, the
+// build plan design/ctf/SEO.md §2 and §6). The English page (pages/ctf.astro)
+// and its translations (pages/[lang]/ctf.astro) both render this. The page's
+// words are the `ctf` copy unit (react/src/i18n/pages/ctf/), the countries'
+// names the `ctf/names` unit, the shell's (the disclaimer, nav and footer) the
+// site dictionary's.
+//
+// The page body is the React component the SPA renders for this route
+// (react/src/components/pages/Ctf.jsx), rendered to static HTML from the
+// epoch's snapshot (react/src/data/ctf-epoch.json, scripts/ctf-import.mjs),
+// so every figure is in the HTML that search engines and AI crawlers read.
+// Only the board hydrates (ctf/Board.jsx: the live bar's filters with their
+// view transitions, sorting and the search, the tips, tap to expand, Shuffle
+// and the visitor's country from /sn/ctf/here), with the page's language as a
+// prop. Its first render is this one, and nothing in it varies by build: Easy
+// wins is the epoch's draw and the card shows the biggest open pot, so the
+// page's fingerprint, and its sitemap <lastmod>, change only when the data
+// does. Until capture the flag starts, a note above everything else says when
+// (in the HTML, from the snapshot's prelaunch block) and counts down to it on
+// the visitor's clock (ctf/Countdown.jsx, a small island that brings its words
+// with it and hydrates when the browser is idle, within a second, so the page
+// preloads nothing for it); the build of a snapshot from after the start
+// leaves it out (model.js startNote).
+// The snapshot combines every network operator of the operator list
+// (scripts/ctf-import.mjs), so the Dataset's distribution is each operator's
+// GET /sn/ctf, and the page names its JSON as its alternate only while there
+// is one operator to name.
+import Base from '../../layouts/Base.astro';
+import DisclaimerStatic from '../DisclaimerStatic.astro';
+import NavIsland from '../../islands/NavIsland.jsx';
+import FooterStatic from '../FooterStatic.astro';
+import CtfPage from '@react/components/pages/Ctf.jsx';
+import Board from '@react/components/pages/ctf/Board.jsx';
+import Countdown from '@react/components/pages/ctf/Countdown.jsx';
+import { CTF } from '@react/components/pages/ctf/data.js';
+import { SITE, hubDescription, hubTitle, localModel, startNote } from '@react/components/pages/ctf/model.js';
+import { ctfCopy } from '@react/components/pages/ctf/i18n.js';
+import { pagePath } from '@react/components/pages/ctf/links.js';
+import { ctfCardAlt, ctfOgImage } from '@react/components/pages/ctf/og.js';
+import { epochBounds } from '@react/lib/epoch.js';
+import { getDict } from '../../lib/i18n.js';
+import { LASTMOD_TOKEN } from '../../lib/lastmod.js';
+
+import '@react/components/Nav.css';
+
+interface Props {
+    lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = await getDict(lang);
+const m = localModel(CTF, lang);
+// the islands' props: English is their default, so the English page's islands carry none, as before
+const islandLang = lang === 'en' ? {} : { lang };
+const copy = ctfCopy(lang);
+const url = `${SITE}${pagePath(lang, '/ctf')}`;
+const description = hubDescription(m);
+// the note until capture the flag starts: null once the snapshot is from after the start
+const note = startNote(m);
+// The data as a Dataset (Dataset Search), its distribution each operator's
+// JSON API; a translation's is the same data described in its language.
+const jsonLd = [{
+    '@type': 'Dataset',
+    '@id': `${url}#dataset`,
+    name: copy.dataset.name,
+    description: copy.dataset.description,
+    url,
+    inLanguage: lang,
+    ...(lang === 'en' ? {} : { translationOfWork: { '@id': `${SITE}/ctf#dataset` } }),
+    dateModified: LASTMOD_TOKEN,
+    isAccessibleForFree: true,
+    creator: { '@id': `${SITE}/#org` },
+    spatialCoverage: { '@type': 'Place', name: copy.dataset.coverage },
+    // from the first epoch's start, on the site's time basis, onwards
+    temporalCoverage: `${new Date(epochBounds(CTF.firstEpoch).startMs).toISOString().slice(0, 10)}/..`,
+    variableMeasured: copy.dataset.measured,
+    distribution: m.api.state.map((contentUrl) => ({ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl })),
+}];
+// the visitor's country comes from the first operator's API (the list always names one)
+const hereOrigin = new URL(m.api.here).origin;
+---
+<Base
+    title={hubTitle(lang)}
+    description={description}
+    breadcrumbName={copy.program}
+    lang={lang}
+    jsonLd={jsonLd}
+    alternate={m.api.state.length === 1 ? { href: m.api.state[0], type: 'application/json' } : null}
+    ogImage={ctfOgImage(m)}
+    ogImageAlt={ctfCardAlt(m)}
+>
+    {/* the board's first chain of requests is the visitor's country */}
+    <link slot="head" rel="preconnect" href={hereOrigin} crossorigin />
+
+    <div class="app">
+        <DisclaimerStatic t={t} />
+        <NavIsland activeRoute="ctf" lang={lang} client:idle={{ timeout: 1000 }} />
+
+        <main class="section-page">
+            {/* "Updated" states the sitemap's lastmod: the build fills the
+                token in once the page is fingerprinted (src/lib/lastmod.js) */}
+            <CtfPage lang={lang} updated={LASTMOD_TOKEN}>
+                {note && <Countdown slot="countdown" {...note} client:idle={{ timeout: 1000 }} />}
+                <Board slot="board" {...islandLang} client:idle={{ timeout: 1500 }} />
+            </CtfPage>
+        </main>
+
+        <FooterStatic t={t} lang={lang} />
+    </div>
+</Base>

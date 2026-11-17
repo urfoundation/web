@@ -4,7 +4,23 @@ description: Start mining on UR in a few steps. What a miner does, what you need
 
 # How to run a miner
 
+> **If `provider setup` or `provider service install` set up your miner's background service, update it by hand once.** Since release 2026.10.22, these miners haven't updated themselves, on Linux, macOS or Windows. The miner's updater accepted versions written like `2026.10.27-1083160450`, but releases are stamped `2026.10.27+1083160450`, so every release took itself for a development build:
+>
+> - `provider status` says "development build, never updates itself".
+> - `provider update`, and the automatic updates, refuse with "this is a development build … which never replaces itself with a release".
+> - The 10-minute check that rolls back a new version that doesn't come back connected never ran.
+>
+> The fix is in the first release after November 11, 2026, and your miner can't install it by itself. Once that release is out, download and unpack it as in [Manual download](/docs/miner/install#manual-download), and instead of installing it, run its update: `./linux/amd64/provider update` with your folder from the table (`sudo` in front for a system service), or on Windows `& "$env:TEMP\windows\$Arch\provider.exe" update`. Typing just `provider update` runs the miner you have, which still refuses. The update replaces the miner your service runs and restarts it.
+>
+> After that, updates are automatic again: spread over about 16 hours after each release, with the 10-minute connected check, a rollback, and a 7-day skip of a release that fails it. `provider status` then shows that updates are automatic, or that you're up to date.
+>
+> If you run the miner yourself, without that service, `provider update` refuses too: install the new release as in [Manual download](/docs/miner/install#manual-download) and restart the miner.
+>
+> Not affected: the Docker image, the apps, and miners an installer set up, which update through `urnet-tools`.
+
 A UR miner shares your internet connection as an exit for a network operator. Validators check that it really carries traffic, and Bittensor SN25 (netuid 25) pays rewards for that work in the subnet's α token, branded $UR.
+
+Prefer an app? URnetwork's apps are an easy alternative for mining from a phone or computer: install one from [ur.io](https://ur.io), and it mines in the background with URnetwork as its operator. This guide is for the miner program, which runs on Linux, macOS and Windows and can mine for any operator.
 
 This page gets you from nothing to a running miner. The rest of the miner guide goes deeper, one topic per page:
 
@@ -12,6 +28,7 @@ This page gets you from nothing to a running miner. The rest of the miner guide 
 | --- | --- |
 | [Install](/docs/miner/install) | The installers for Linux, macOS and Windows, a manual download, and building from source. |
 | [Run and monitor](/docs/miner/run) | Starting and stopping, running in the background, logs and the status page, backups. |
+| [Run an extender](/docs/miner/extender) | The ports to open for the miner's extender, firewalls and port forwarding, and letting it listen on port 443 on Linux. |
 | [Updates](/docs/miner/updates) | How the miner stays up to date, and how to control that. |
 | [Get paid](/docs/miner/rewards) | Setting your payout wallet, how rewards are counted, and claiming them. |
 | [Troubleshooting](/docs/miner/troubleshooting) | The common errors and what to do about each one. |
@@ -37,7 +54,8 @@ Most miners join an operator's **pool**. You don't need your own Bittensor regis
 ## What you need
 
 - **A Linux, macOS or Windows computer that stays online.** A home PC, a server or a Raspberry Pi 2 or newer all work. On Windows the miner runs while you're signed in.
-- **One stable public internet address per miner.** The miner also tries to listen on TCP port 443 and on UDP ports 443, 53 and 4053 for its extender. To run more than one exit from a host, see [Several exits on one host](/docs/miner/advanced#several-exits-on-one-host).
+- **One stable public internet address per miner.** To run more than one exit from a host, see [Several exits on one host](/docs/miner/advanced#several-exits-on-one-host).
+- **Open ports for the extender.** The miner also runs an extender, which earns a share of every contract it carries. It needs incoming TCP port 443; UDP ports 443 and 4053 are recommended, and UDP 53 is optional. On Linux it also needs permission to listen on port 443. See [Run an extender](/docs/miner/extender).
 - **An account with a network operator.** The miner uses the default operator, `bringyour.com`, unless you [choose another](/docs/miner/run#choose-an-operator). You'll get an **auth code** from your account to sign the miner in.
 - **A Bittensor wallet address (coldkey)** for your rewards. It's an ss58 address that starts with `5`. You can sign for it on another device; its secret never needs to be on the miner.
 

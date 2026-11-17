@@ -313,3 +313,27 @@
     .announcement-document-section { break-inside: avoid; }
     .announcement-document-title { font-size: 12pt; }
 }
+
+/* --- right to left (the Arabic translation) -------------------------------
+   The rules above are written left to right; these mirror what has a side.
+   Scoped to [dir="rtl"], so the English pages and their print are untouched.
+   The sheet's letterhead keeps the wordmark and the address at opposite
+   ends, so the address aligns to the end it now sits at. */
+[dir="rtl"] .announcement-back span { display: inline-block; transform: scaleX(-1); }
+[dir="rtl"] .announcement-back:hover span { transform: scaleX(-1) translateX(-3px); }
+[dir="rtl"] .announcement-summary-meta > p span + span::before { margin-right: 0; margin-left: 18px; }
+[dir="rtl"] .announcement-address { text-align: left; }
+[dir="rtl"] .announcement-paper p.announcement-date { text-align: right; }
+[dir="rtl"] .announcement-document-section ul,
+[dir="rtl"] .announcement-document-section ol { padding-right: 2.1rem; padding-left: 0; }
+[dir="rtl"] .announcement-document-section li { padding-right: 0.4rem; padding-left: 0; }
+[dir="rtl"] .announcement-paper--tokenholders .announcement-signoff p { text-align: right; }
+[dir="rtl"] .announcement-document-section blockquote { padding: 0 22px 0 0; }
+/* Arabic script takes no italic: the quotations and emphasis stand upright */
+[dir="rtl"] .announcement-paper em,
+[dir="rtl"] .announcement-document-section blockquote p { font-style: normal; }
+
+@media (max-width: 760px) {
+    [dir="rtl"] .announcement-address { text-align: right; }
+    [dir="rtl"] .announcement-document-title { text-align: right; }
+}

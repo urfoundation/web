@@ -38,9 +38,17 @@ Then open a new terminal, or run the `export PATH=…` line it prints. It runs o
 
 - installs `urnetwork` and `urnet-tools` into `~/.local/share/urnetwork-provider/bin` and adds that folder to your `PATH` in `~/.bashrc` (creating it if needed) and in `~/.zshrc` if you have one. Pass `-B` to leave them alone. If a new terminal still can't find `urnetwork`, run the `export PATH=…` line the installer printed;
 - runs the miner as a systemd user service, `urnetwork.service`, with an update timer, and turns on lingering so the service keeps running after you log out (if that needs an administrator, it prints the `sudo loginctl enable-linger` command to run);
-- in a shell without a systemd user session (a `sudo su` shell, many containers, WSL), installs anyway, without a background service or automatic updates, and tells you how to run the miner in the foreground. Run `urnet-tools update` yourself from time to time.
+- in a shell without a systemd user session (a `sudo su` shell, many containers, WSL), installs anyway, without a background service or automatic updates, and tells you how to run the miner in the foreground. Run `urnet-tools update` yourself from time to time. Run as root in such a shell, it installs a system service instead.
 
 `--interval 6h`, `daily`, `weekly` or `monthly` sets how often it checks for updates.
+
+A user service can't listen on TCP port 443, which the miner's [extender](/docs/miner/extender) needs. `--system` runs the miner as a system service instead, still as your user, with permission to listen on ports below 1024:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/urnetwork/connect/main/scripts/Provider_Install_Linux.sh | sh -s -- --system
+```
+
+Run it as yourself, not with `sudo`; it asks for your `sudo` password once. See [Let the miner listen on port 443](/docs/miner/extender#linux-let-the-miner-listen-on-port-443).
 
 Options go after `sh -s --`, for example `curl -fsSL … | sh -s -- --no-start`. Run it with `--help` for all of them.
 

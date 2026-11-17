@@ -21,7 +21,15 @@ export default {
         browseDocs:   'Dokumentation',
         search:       'Suche',
         ctaAria:    'Nutzungskosten — der aktuelle Netzwerkpreis',
-        denomAria:  'Preiswährung'
+        denomAria:  'Preiswährung',
+        // the pages of the page groups (react/src/i18n/pages/), linked from the nav
+        // and the footer in a language once their group is localized
+        about:       'Über uns',
+        build:       'Entwickeln',
+        investors:   'Investoren',
+        dashboard:   'Dashboard',
+        liveDashboard: 'Live-Dashboard',
+        ctf:         'Capture the Flag'
     },
 
     footer: {
@@ -46,7 +54,12 @@ export default {
         socialTelegram: 'UR-Subnet auf Telegram',
         socialDiscord:  'URnetwork-Discord',
         socialGithub:   'UR-Subnet auf GitHub',
-        productsAria:   'URnetwork-Produkte auf ur.io'
+        productsAria:   'URnetwork-Produkte auf ur.io',
+        // the page groups' pages, as the footer names them (see nav)
+        buildOnUr:     'Auf UR entwickeln',
+        reserve:       'Reserve',
+        mainnet:       'Mainnet',
+        investorCentre:  'Investorenbereich'
     },
 
     disclaimer: {
@@ -130,7 +143,23 @@ export default {
         usdUnavailable: 'Live-α-Preis nicht verfügbar — USD-Äquivalente ausgeblendet.',
         subscribe: 'Preisänderungen abonnieren (RSS)',
         rawFile:   'Rohe Preistabelle (price.yml)',
-        initialPeriod: 'Anfangsphase: Der veröffentlichte Tarif beträgt 0 α. Solange das Netzwerk gehärtet wird, werden keine Nachfrage-Einlagen von Betreibern erhoben; jedem Betreiber-Pool wird die gleiche Nachfrage zugerechnet, sodass allein die gemessene Qualität den Pool-Kanal steuert.'
+        initialPeriod: 'Anfangsphase: Der veröffentlichte Tarif beträgt 0 α. Solange das Netzwerk gehärtet wird, werden keine Nachfrage-Einlagen von Betreibern erhoben; jedem Betreiber-Pool wird die gleiche Nachfrage zugerechnet, sodass allein die gemessene Qualität den Pool-Kanal steuert.',
+        signedNote: 'Vom Subnet-Eigentümer signiert: Diese Tarife gelten ab Epoche {epoch}, mit einer Einlagen-Obergrenze von {cap} α pro Betreiber und Epoche. {before}',
+        signedEarlier: 'Frühere signierte Preise, die neuesten zuerst:',
+        colFromEpoch: 'Ab Epoche',
+        colCap: 'Obergrenze pro Epoche',
+        signedBefore:          'Für Epochen vor Epoche {epoch} gilt der bisherige Tarif.',
+        signedBeforeInitial:   'Bis zum Beginn von Epoche {epoch} gilt weiterhin der Tarif der Anfangsphase von 0 α.',
+        sourcingTitle:         'Beschaffungszusage',
+        sourcingPays:          'Ab der ersten bepreisten Epoche bezahlt Netzbetreiber 1 jede seiner Nachfrage-Einlagen von SN25 mit Alpha, das er mit seinen Einnahmen am offenen Markt gekauft hat. Alpha, das er auf anderem Weg erhalten hat, setzt er nicht ein.',
+        sourcingRoute:         'Jeder Kauf erfolgt On-Chain. USDC wird auf Solana über Jupiter gegen TAO getauscht, über LayerZero nach Bittensor übertragen und von der Einlagen-Wallet in SN25-Alpha gestakt:',
+        sourcingUsdcWallet:    'USDC-Wallet (Solana):',
+        sourcingDepositWallet: 'Einlagen-Wallet (Bittensor):',
+        sourcingCheck:         'Das kann jeder prüfen: Ab der ersten bepreisten Epoche übersteigt das Alpha, das die Einlagen-Wallet hinterlegt hat, nie das Alpha, das sie auf diesem Weg gekauft hat.',
+        sourcingCopy:          'Kopieren',
+        sourcingCopied:        'Kopiert',
+        sourcingCopiedStatus:  'In die Zwischenablage kopiert',
+        sourcingView:          'Auf {explorer} ansehen'
     },
 
     roadmap: {
@@ -246,14 +275,17 @@ operators: {
             date: '24. August bis 24. Oktober 2026',
             title: 'Forschungsbericht August–Oktober 2026',
             body: 'Die Forschung soll allen die beste Verschlüsselung und die beste Geschwindigkeit für den Alltag bieten, die dein Internet besser machen. Der Bericht zeigt auf einer Zeitleiste 39 gemessene Änderungen auf diesem Weg, wie weit jede Art von Verbesserung gekommen ist und wie die Forschung durchgeführt wurde.',
-            cta: 'Bericht lesen (auf Englisch)'
+            // the page in this language once it is translated, else the English page, which says so
+            cta: 'Bericht lesen',
+            ctaEnglish: 'Bericht lesen (auf Englisch)'
         },
         methodology: {
             tag: 'Methodik',
             topic: 'Drei Forschungsschleifen',
             title: 'Selbstverbessernde Forschungsschleifen',
             body: 'Wie das Labor, der offene Wettbewerb und die freiwilligen Feldknoten jeweils das Netzwerk verbessern und zugleich die Messung der nächsten Runde. Alle drei folgen einer Disziplin: eine eingefrorene Baseline, gemessenes Rauschen und jeder Versuch im Protokoll.',
-            cta: 'Methodik lesen (auf Englisch)',
+            cta: 'Methodik lesen',
+            ctaEnglish: 'Methodik lesen (auf Englisch)',
             loops: [
                 { name: 'Labor', detail: 'PERFVAR · bei jeder Änderung' },
                 { name: 'Wettbewerb', detail: 'Apex SN1 · wöchentlich' },
@@ -354,7 +386,23 @@ operators: {
             units: { days: 'Tage', hours: 'Stunden', minutes: 'Minuten', seconds: 'Sekunden' },
             startDate: 'Donnerstag, 29. Oktober · 00:00 Uhr UTC',
             startedDate: 'Gestartet am Donnerstag, 29. Oktober · 00:00 Uhr UTC',
-            imageAlt: 'Zwei Knoten, verbunden über Routen durch eine Barriere: der Apex-Sim-Latenz-Wettbewerb'
+            imageAlt: 'Zwei Knoten, verbunden über Routen durch eine Barriere: der Apex-Sim-Latenz-Wettbewerb',
+            results: {
+                progressLabel: 'Fortschritt des Wettbewerbs',
+                progress: '{done} von {total} Epochen abgeschlossen',
+                title: 'Nettoverbesserung seit dem Start',
+                comparison: 'Gewinner der Epoche {epoch} gegenüber der Start-Baseline',
+                asOf: 'Stand: {date}',
+                lower: '{value} % niedriger',
+                higher: '{value} % höher',
+                metrics: {
+                    p95CompletionS: { name: 'p95-Abschlusszeit vollständiger Anfragen', range: 'von {before} s auf {after} s' },
+                    medianThroughputMbps: { name: 'Median des Übertragungsdurchsatzes', range: 'von {before} auf {after} Mbit/s' }
+                },
+                caveat: 'Dies sind Ergebnisse der Benchmark-Auswertung gegenüber der Start-Baseline, keine Verbesserungen im ausgerollten Produkt.',
+                ttfb: 'Die Zeit bis zum ersten Byte hat sich nicht verbessert.',
+                link: 'Ergebnisse der Epoche {epoch} (JSON)'
+            }
         },
         anonymization: {
             title: 'Anonymisierung',

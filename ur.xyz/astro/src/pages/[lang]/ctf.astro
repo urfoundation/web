@@ -1,0 +1,15 @@
+---
+// /<lang>/ctf — capture the flag's hub in Russian, Arabic, Chinese, German and
+// Spanish: the English page's body (components/routes/CtfRoute.astro) in the
+// page's language, built once the ctf page group is localized
+// (react/src/i18n/pages/ctf/group.js).
+import CtfRoute from '../../components/routes/CtfRoute.astro';
+import { localizedStaticPaths } from '../../lib/route-localization.js';
+
+export function getStaticPaths() {
+    return localizedStaticPaths('ctf');
+}
+
+const { lang } = Astro.params;
+---
+<CtfRoute lang={lang} />

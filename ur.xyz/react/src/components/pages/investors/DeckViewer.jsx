@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { investorCentre } from '../../../data/investors';
+import { loadPageCopy } from '../../../i18n/page-copy.js';
+import { interpolate, plural } from '../../../i18n/format.js';
+import { rich } from './rich.jsx';
+import { TranslationNotice, docDate, groupCopy, pagePath } from './shared.jsx';
 import './DeckViewer.css';
 
 /**
@@ -27,6 +31,11 @@ import './DeckViewer.css';
  * state, so the server render (the Astro page hydrates this component) and
  * the first client render agree; the deep link in the hash, the keyboard and
  * fullscreen are applied in effects and handlers.
+ *
+ * The deck's text (each slide's title, headline, alt text and summary, and the
+ * controls) is react/src/i18n/pages/investors/deck/ in the page's language;
+ * the slides and the PDF are the English deck. On a right-to-left page the
+ * viewer and the filmstrip stay left to right, like the slides they show.
  */
 
 const { deck } = investorCentre;
@@ -37,20 +46,22 @@ const THUMB_WIDTH = 480;
 const pad = (n) => String(n).padStart(2, '0');
 const clamp = (n) => Math.min(Math.max(n, 1), total);
 const file = (n, width) => `${deck.slideBase}/${pad(n)}${width === deck.slideWidth ? '' : `-${width}`}.${deck.slideExt}`;
-const slides = Array.from({ length: total }, (_, i) => {
+const copy = await loadPageCopy('investors/deck');
+const slidesIn = (t) => Array.from({ length: total }, (_, i) => {
     const n = i + 1;
-    const text = deck.slides?.[i] || {};
+    const text = t.slides?.[i] || {};
     return {
         n,
-        title: text.title || `Slide ${n}`,
+        title: text.title || interpolate(t.untitledSlide, { n }),
         headline: text.headline || '',
         summary: text.summary || '',
-        alt: text.alt || `Slide ${n} of ${total}`,
+        alt: text.alt || interpolate(t.untitledAlt, { n, total }),
         src: file(n, deck.slideWidth),
         thumb: file(n, THUMB_WIDTH),
         srcSet: `${file(n, deck.slideSmallWidth)} ${deck.slideSmallWidth}w, ${file(n, deck.slideWidth)} ${deck.slideWidth}w`,
     };
 });
+const RTL = new Set(['ar']);
 // the stage's width (--deck-frame in DeckViewer.css), for picking a file
 const STAGE_SIZES = '(max-width: 767px) calc(100vw - 40px), (max-width: 1244px) calc(100vw - 64px), 1180px';
 
@@ -59,7 +70,14 @@ function slideFromHash() {
     return Number.isInteger(n) && n > 0 ? n : 1;
 }
 
-export default function DeckViewer() {
+export default function DeckViewer({ lang = 'en' }) {
+    const t = copy(lang);
+    const shared = groupCopy(lang);
+    const doc = shared.docs.deck;
+    const slides = slidesIn(t);
+    const english = lang === 'en';
+    // the viewer's own direction on a right-to-left page (see above)
+    const viewerDir = RTL.has(lang) ? 'ltr' : undefined;
     const [current, setCurrent] = useState(1);
     const stageRef = useRef(null);
     const stripRef = useRef(null);
@@ -129,18 +147,19 @@ export default function DeckViewer() {
     return (
         <div className="deck-page">
             <header className="deck-heading deck-frame">
-                <a className="deck-back" href="/investors"><span aria-hidden="true">←</span> Investor Centre</a>
+                <a className="deck-back" href={pagePath(lang, '/investors')}><span aria-hidden="true">←</span>{` ${shared.investorCentre}`}</a>
                 <div className="deck-title-row">
-                    <h1>{deck.title}</h1>
+                    <h1>{doc.title}</h1>
                     <div className="deck-meta">
-                        <time dateTime={deck.dateIso}>{deck.date}</time>
+                        <time dateTime={deck.dateIso} suppressHydrationWarning>{docDate(deck, lang)}</time>
                         <span aria-hidden="true">·</span>
-                        <span>{`${deck.slideCount} slides`}</span>
+                        <span>{interpolate(plural(lang, deck.slideCount, t.slideCount), { count: deck.slideCount })}</span>
                     </div>
                 </div>
+                <TranslationNotice lang={lang} text={shared.translation.deck} href={deck.href} />
             </header>
 
-            <div className="deck-frame">
+            <div className="deck-frame" dir={viewerDir}>
                 <div className="deck-viewport">
                     <div className="deck-stage" id="deck-stage" ref={stageRef}>
                         {/* The current slide on top, its neighbours loading or
@@ -166,18 +185,18 @@ export default function DeckViewer() {
                                 />
                             );
                         })}
-                        <button className="deck-hit deck-hit--prev" type="button" data-deck-prev="" aria-label="Previous slide" disabled={current === 1} onClick={() => show(current - 1)}></button>
-                        <button className="deck-hit deck-hit--next" type="button" data-deck-next="" aria-label="Next slide" disabled={current === total} onClick={() => show(current + 1)}></button>
+                        <button className="deck-hit deck-hit--prev" type="button" data-deck-prev="" aria-label={t.previous} disabled={current === 1} onClick={() => show(current - 1)}></button>
+                        <button className="deck-hit deck-hit--next" type="button" data-deck-next="" aria-label={t.next} disabled={current === total} onClick={() => show(current + 1)}></button>
                     </div>
                 </div>
 
                 <div className="deck-controls">
                     <div className="deck-bar">
-                        <button className="deck-arrow" type="button" data-deck-prev="" aria-label="Previous slide" disabled={current === 1} onClick={() => show(current - 1)}>
+                        <button className="deck-arrow" type="button" data-deck-prev="" aria-label={t.previous} disabled={current === 1} onClick={() => show(current - 1)}>
                             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" /></svg>
                         </button>
                         <span className="deck-count" data-deck-count="" aria-live="polite">{`${pad(current)} / ${pad(total)}`}</span>
-                        <button className="deck-arrow" type="button" data-deck-next="" aria-label="Next slide" disabled={current === total} onClick={() => show(current + 1)}>
+                        <button className="deck-arrow" type="button" data-deck-next="" aria-label={t.next} disabled={current === total} onClick={() => show(current + 1)}>
                             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" /></svg>
                         </button>
                         {/* Progress at a glance. The strip below is the way to
@@ -188,12 +207,12 @@ export default function DeckViewer() {
                             ))}
                         </div>
                         <span className="deck-bar-rule" aria-hidden="true"></span>
-                        <button className="deck-pill-button" type="button" data-deck-fullscreen="" aria-label="Fullscreen" onClick={toggleFullscreen}>
+                        <button className="deck-pill-button" type="button" data-deck-fullscreen="" aria-label={t.fullscreen} onClick={toggleFullscreen}>
                             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" /></svg>
                         </button>
-                        <a className="deck-pill-button deck-download" href={deck.pdfHref} download aria-label="Download PDF">
+                        <a className="deck-pill-button deck-download" href={deck.pdfHref} download aria-label={english ? shared.downloadPdf : shared.downloadPdfEnglish} hrefLang={english ? undefined : 'en'}>
                             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10" /></svg>
-                            <span>PDF</span>
+                            <span>{t.pdf}</span>
                         </a>
                     </div>
                 </div>
@@ -206,14 +225,14 @@ export default function DeckViewer() {
                 claiming tab semantics without them makes a screen reader
                 announce controls it cannot then resolve. */}
             <div className="deck-strip-shell">
-                <div className="deck-strip" role="group" aria-label="Jump to slide" ref={stripRef}>
+                <div className="deck-strip" role="group" aria-label={t.jumpAria} ref={stripRef} dir={viewerDir}>
                     {slides.map(s => (
                         <button
                             key={s.n}
                             className={s.n === current ? 'deck-thumb is-current' : 'deck-thumb'}
                             type="button"
                             data-deck-go={s.n}
-                            aria-label={`Slide ${s.n}: ${s.title}`}
+                            aria-label={interpolate(t.thumbAria, { n: s.n, title: s.title })}
                             aria-current={s.n === current ? 'true' : undefined}
                             onClick={() => show(s.n)}
                         >
@@ -224,7 +243,7 @@ export default function DeckViewer() {
                 </div>
 
                 <p className="deck-hint">
-                    <kbd>←</kbd> <kbd>→</kbd> to move <span aria-hidden="true">·</span> <kbd>F</kbd> fullscreen
+                    {rich(t.hint, { sep: (dot) => <span aria-hidden="true">{dot}</span> })}
                 </p>
             </div>
 
@@ -234,8 +253,8 @@ export default function DeckViewer() {
                 the page either way. */}
             <details className="deck-frame deck-outline">
                 <summary>
-                    <h2>In this deck</h2>
-                    <span className="deck-outline-hint">Every slide as text</span>
+                    <h2>{t.outlineHeading}</h2>
+                    <span className="deck-outline-hint">{t.outlineHint}</span>
                     <span className="deck-outline-chevron" aria-hidden="true"></span>
                 </summary>
                 <ol className="deck-outline-list">
@@ -250,7 +269,7 @@ export default function DeckViewer() {
             </details>
 
             <div className="deck-frame deck-outro">
-                <a className="deck-back" href="/investors"><span aria-hidden="true">←</span> Back to Investor Centre</a>
+                <a className="deck-back" href={pagePath(lang, '/investors')}><span aria-hidden="true">←</span>{` ${shared.backToCentre}`}</a>
             </div>
         </div>
     );

@@ -67,6 +67,18 @@
     transform: translateX(-3px);
 }
 
+/* Right to left the back arrows point the other way. The viewer and the
+   filmstrip keep their own left-to-right order (DeckViewer.jsx), so nothing
+   in them flips. */
+[dir="rtl"] .deck-back span {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .deck-back:hover span,
+[dir="rtl"] .deck-back:focus-visible span {
+    transform: scaleX(-1) translateX(-3px);
+}
+
 .deck-title-row {
     display: flex;
     flex-wrap: wrap;
@@ -448,7 +460,7 @@
 .deck-outline-chevron {
     width: 8px;
     height: 8px;
-    margin-left: auto;
+    margin-inline-start: auto;
     border-right: 1.5px solid var(--brand-ui);
     border-bottom: 1.5px solid var(--brand-ui);
     transform: translateY(-3px) rotate(45deg);

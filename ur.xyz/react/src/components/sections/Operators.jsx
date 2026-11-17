@@ -5,6 +5,7 @@ import OperatorsDirectory from '../OperatorsDirectory';
 import OperatorLogos from '../OperatorLogos';
 import { useLanguage } from '../../i18n';
 import { EXTERNAL, isExternal } from '../../lib/links';
+import { groupPageHref } from '../../../../astro/src/lib/route-localization.js';
 
 export default function Operators() {
     const { t, code } = useLanguage();
@@ -23,7 +24,7 @@ export default function Operators() {
                         <p className="card-body">{r.body}</p>
                         {r.href && (
                             // only an external link opens a new tab; a guide on this site opens in place
-                            <a href={r.href} className="card-link" {...(isExternal(r.href) ? EXTERNAL : {})}>
+                            <a href={groupPageHref(r.href, code) || r.href} className="card-link" {...(isExternal(r.href) ? EXTERNAL : {})}>
                                 {r.linkLabel}
                             </a>
                         )}

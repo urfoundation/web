@@ -5,6 +5,7 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { basePathFor, hasLocalizedVersion } from './src/lib/route-localization.js';
+import { assertNoUnfilledPlaceholders } from '../scripts/before-flip.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -45,6 +46,7 @@ function urXyzContent() {
                     path: path.relative(DOCS_DIR, abs).replace(/\\/g, '/'),
                     content: fs.readFileSync(abs, 'utf8')
                 }));
+                assertNoUnfilledPlaceholders(docs);
                 return `export default ${JSON.stringify(docs)};`;
             }
             return null;

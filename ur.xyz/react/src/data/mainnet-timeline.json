@@ -436,6 +436,16 @@
       ]
     },
     {
+      "id": "top200-binding-open",
+      "date": "2026-11-17",
+      "status": "done",
+      "title": "Top 200 fleet binding is open on SN25",
+      "detail": "A network projected to rank inside SN25's head of 200 top-level seats can claim its spot: register a hotkey on SN25, publish the fleet's manifest from it, which the network operator's commitment oracle mirrors to the coordinator on chain 964, and bind each device for up to 12 epochs, starting after the current epoch. The validator weights the head's selected fleets by score, not rank, while it steers its weights, and a bound device leaves the provider pool while its binding is active. Nothing changes for a provider that doesn't claim.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-17-top200-binding-open.md" }
+      ]
+    },
+    {
       "id": "capture-the-flag-presence-sampling",
       "date": "2026-11-20",
       "status": "planned",

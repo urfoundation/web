@@ -142,9 +142,11 @@ export const mainnetActions = {
 // in the order they were posted: a new notice goes at the end. The page shows
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
-// posted, the later first. So it shows the providers without UDP or IPv6,
-// offered for the traffic they carry as the next releases roll out, of
-// November 13, then the extender pool from epoch 8 and the extenders' share on
+// posted, the later first. So it shows Top 200 fleet binding open on SN25, of
+// November 17, then the share of extenders reached only over WebRTC, of
+// November 16, then the providers without UDP or IPv6, offered for the traffic
+// they carry as the next releases roll out, of November 13, then the extender
+// pool from epoch 8 and the extenders' share on
 // the contracts they can relay, both of November 12, then capture the flag from
 // epoch 8 and Pro data on each network's own cycle, both of November 11, then
 // epoch 3's delayed payout and its recovery, with the updates that followed,
@@ -245,6 +247,19 @@ const NOTICES = [
             "SN25 pool rewards are still split by completed usage, and the network operator's provider subsidy, which for traffic since the October 6 cutoff only counts toward the weekly points it awards, follows the same hops. There is nothing you need to do.",
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-16-webrtc-extender-relay-share.md' },
+    },
+    {
+        id: 'notice-top200-binding-open',
+        date: 'November 17, 2026',
+        title: 'Top 200 fleet binding is open on SN25. A network in the head can claim its spot.',
+        paragraphs: [
+            "Top-level miners can now claim a spot in SN25's head, its 200 top-level seats. The Top 200 page on ur.io and the current apps no longer say that claiming isn't open: they prompt a network projected to rank inside the head to claim its spot. Claiming is optional, and nothing changes for a provider that doesn't claim.",
+            "A claim has three steps. Register a hotkey on SN25: registering burns TAO from your coldkey, and the burn is not refunded. Publish the fleet's manifest from that hotkey: once the commitment is final, the network operator's commitment oracle mirrors it to the coordinator on chain 964 by itself. Then bind each device to the fleet, for up to 12 epochs, starting after the current epoch. The Top 200 page, the apps and the command-line guide walk through each step, and nothing in a claim asks for a recovery phrase.",
+            "The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights. A fleet is scored on the devices the validator measures, and at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured. Rewards are paid in alpha, whose value changes and can fall.",
+            "A bound device leaves the provider pool: while its binding is active at either boundary of an epoch, it earns no pool share for that epoch, whether or not its fleet earns. A UID with no emission can be replaced once its immunity ends, about 3 days after it registers, and a binding starts no earlier than the next epoch, so register in the 3 days before the epoch your binding starts.",
+            "A commitment older than 100,800 blocks (14 days) can't bind new devices, and commitments in the older format are not mirrored, so a fleet that published in that format, or more than 14 days ago, publishes again. Command-line writes need the provider release with the fleet storage command and the reviewed fleet runtime authority document for the chain's current runtime, 491, published in the sn repo with its SHA-256, and a new chain runtime needs a new document.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-17-top200-binding-open.md' },
     },
 ];
 

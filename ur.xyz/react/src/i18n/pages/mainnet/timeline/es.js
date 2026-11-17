@@ -286,6 +286,13 @@ export default {
                 'El aviso completo en el repositorio sn',
             ],
         },
+        'top200-binding-open': {
+            title: 'La vinculación de flotas del Top 200 está abierta en SN25',
+            detail: 'Una red cuya posición prevista está dentro del Top 200 de SN25, sus 200 puestos de nivel superior, puede reclamar su puesto: registrar un hotkey en SN25, publicar desde él el manifiesto de la flota, que el oráculo de compromisos del operador de red replica en el coordinador de la cadena 964, y vincular cada dispositivo por hasta 12 épocas, a partir de una época posterior a la actual. El validador pondera las flotas seleccionadas del Top 200 por puntuación, no por posición, mientras dirige sus pesos, y un dispositivo vinculado sale del pool de proveedores mientras su vinculación está activa. Nada cambia para un proveedor que no reclama.',
+            sources: [
+                'El aviso completo en el repositorio sn',
+            ],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Reclamaciones de la época 5',
             detail: 'La época 5 termina en el bloque 9.499.228, y las reclamaciones siguen a su período de impugnación de 14.400 bloques. La financiación recuperada de las épocas 1 y 3 no forma parte del pago de la época 5: su incorporación no se programó a tiempo (consulta el aviso de la época 3 arriba).',

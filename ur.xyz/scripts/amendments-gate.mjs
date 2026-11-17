@@ -46,6 +46,7 @@ const EXTENDER_CLAUSES = [
     'units egress prefix',
     'free and paid',
     'zeta 1',
+    'half by unit half by relay bytes',
 ];
 const CTF_CLAUSES = [
     'shares pool 4/10 ctf 1/10 head 5/10',

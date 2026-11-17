@@ -464,11 +464,13 @@ test('the extender amendment: the pool begins epoch 8, and the billing change is
     assert.match(pool.detail, / a provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one, and the share goes to the extender pool, while the contract's other hops keep theirs\. /);
     assert.match(pool.detail, / Only traffic that a data balance funded counts, never the network operator's own measurement and test traffic, and same-network credit earned before epoch 8 is kept\. /);
     // with no eligible extender, Z is dropped (decision 4)
-    assert.match(pool.detail, /so extenders earn at most half of a pool; with no eligible extender, it is dropped\. /);
+    assert.match(pool.detail, /so extenders earn at most half of a pool; with no eligible extender, it is dropped, and with none that relayed, all of it goes by block\. /);
+    // half by block and half by relay bytes, the subnet owner's decision of November 16 (sn WHITEPAPER.md §8.6.8, decision 17)
+    assert.match(pool.detail, / Each operator's pool spreads half of it evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, and the other half over the eligible extenders in proportion to the bytes each relayed in the epoch, as the subnet owner decided on November 16, /);
     // who counts: E1, E4, E5 and E3
     assert.match(pool.detail, / An extender is eligible when, at the end of the epoch, it is active with at least one address that passes the operator's five-minute challenge, has a payout wallet, is not bound to a top-level miner's fleet and is not on one of the operator's own networks, and records that share a provider client, an IPv4 address or an IPv6 \/64 count once\. /);
     // what is published (§8.6.4): the header's component, never an address, statement v2, and the shadow runs of epochs 6 and 7
-    assert.match(pool.detail, / each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(pool.detail, / each epoch's ledger header lists the pool's bytes, the census of the operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, the bytes each relayed, and their shares, /);
     assert.match(pool.detail, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\. /);
     // not a key milestone: on the summary, capture the flag marks epoch 8's first block (tests/mainnet-summary.test.mjs)
     assert.equal(pool.key, undefined);
@@ -645,7 +647,9 @@ test('the extender pool from epoch 8: a notice beside its milestone, with the ru
     assert.match(rule, / Same-network credit earned before epoch 8 is kept\.$/);
     // funded traffic only, never measurement; units, then extenders; the cap; an empty set drops the bytes; Q7
     assert.match(split, /^Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it\. /);
-    assert.match(split, / spread evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, /);
+    assert.match(split, / half of the pool's bytes is spread evenly over each \/29 IPv4 or \/48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, /);
+    // the other half by relay bytes (the subnet owner's decision of November 16, sn WHITEPAPER.md §8.6.8, decision 17)
+    assert.match(split, / and the other half goes to the eligible extenders in proportion to the bytes each relayed in the epoch, as the subnet owner decided on November 16; with none that relayed, all of it goes by block\. /);
     assert.match(split, / so extenders take at most half of a pool\. With no eligible extender, the bytes are dropped\. /);
     assert.match(split, / keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract\.$/);
     // who counts: E1, E4, E5, then E3
@@ -653,7 +657,7 @@ test('the extender pool from epoch 8: a notice beside its milestone, with the ru
     assert.match(who, / it has a payout wallet and is not bound to a top-level miner's fleet; and it is not on one of the network operator's own networks\. /);
     assert.match(who, / Records that share a provider client, an IPv4 address or an IPv6 \/64 count once\.$/);
     // what is published: the header's component, never an address, statement v2, and the shadow runs
-    assert.match(published, /^From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, and their shares, /);
+    assert.match(published, /^From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed \/29 or \/48 prefix hash and never by address, the bytes each relayed, and their shares, /);
     assert.match(published, / the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it\. /);
     assert.match(published, / Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid\.$/);
     // the signed entry, beside capture the flag's, where the milestone links it
@@ -693,10 +697,10 @@ test('providers without UDP or IPv6: a milestone and a notice as the next releas
     assert.match(milestone.detail, / Apps from before these releases keep the old selection\. /);
     // §1 non-goals: SN25 reads no URL outcome (qualityprobe/H3.md, "SN25")
     assert.match(milestone.detail, / SN25 scoring, weights and payouts read none of the quality probe's checks and do not change: pool rewards are still split by completed usage, so these providers earn more only through the traffic they will carry\.$/);
-    // in date order: after the milestones of November 12, and before Top 200 binding, posted later the same day
+    // in date order: after the milestones of November 12, and before epoch 5's claims
     const ids = events.map((e) => e.id);
     assert.equal(ids.indexOf(milestone.id), ids.indexOf('usdc-payouts-end') + 1);
-    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('top200-binding-open'));
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('epoch-5-claims-with-recovery'));
 
     const notice = mainnetNotices.find((n) => n.id === 'notice-providers-without-udp-or-ipv6');
     assert.ok(notice, 'the notice is listed');
@@ -723,14 +727,70 @@ test('providers without UDP or IPv6: a milestone and a notice as the next releas
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
+test('extenders reached only over WebRTC: a milestone and a notice as the next server release rolls it out, with SN25 rewards still split by completed usage', () => {
+    // the network operator's server change of November 16 (server ff4b49d56, the merge 6bef7cf29 of
+    // fix/extender-signaled-relay-tag-1116: model contractExtenderInsertSql), which the release of November 16
+    // does not carry: the note is worded to be true from the first server release after it, and says the
+    // change is rolling out, never that it is live
+    const milestone = events.find((e) => e.id === 'extender-webrtc-relay-share');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'in_progress');
+    assert.equal(milestone.approximate, undefined);
+    assert.equal(milestone.date, '2026-11-16');
+    assert.equal(whenText(parseWhen(milestone.date), { approxStart: isApproximate(milestone) }), 'Mon Nov 16');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-6');
+    assert.equal(milestone.key, undefined);
+    // in date order: after epoch 5's claims, before capture the flag's presence sampling
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('epoch-5-claims-with-recovery') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('top200-binding-open'));
+    // the full text in the sn repo, on its main branch (sn 5236bf40), named by the day the note was posted
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-16-webrtc-extender-relay-share.md';
+    assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
+    assert.equal(milestone.title, 'Extenders reached only over WebRTC earn their share only on contracts they relay');
+    assert.ok(milestone.detail.startsWith("Rolling out with the network operator's first server release after November 16: an extender that can be reached only over WebRTC is one of a contract's hops, and earns its share of the contract's usage, only when the contract's device also holds a connection to the platform that does not come through that extender. "));
+    // why the rule holds: the WebRTC carrier signals through the dialer's own connection (connect EXTENDER.md S8)
+    assert.match(milestone.detail, / A device reaches such an extender only by signaling it through its own connection to the platform, so every device it relays holds one, while a device behind the same router or carrier-grade NAT connects directly from the address it shares with the extender and holds none\. /);
+    assert.match(milestone.detail, / Those devices no longer make the extender a hop, so their providers are credited the whole of their contracts' usage, where the extender was credited a share of it\. /);
+    // the case that was measured on Main on November 16
+    assert.match(milestone.detail, / On November 16, one such extender was a hop on every contract of 84 devices of two other networks behind its address\. /);
+    assert.match(milestone.detail, / Extenders that can be reached over TCP, QUIC or DNS are judged as before, contracts created before the release keep their hops, and SN25 pool rewards are still split by completed usage\.$/);
+
+    const notice = mainnetNotices.find((n) => n.id === 'notice-extender-webrtc-relay-share');
+    assert.ok(notice, 'the notice is listed');
+    // posted the day of the milestone
+    assert.equal(notice.date, 'November 16, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 16));
+    assert.equal(notice.title, 'Extenders reached only over WebRTC earn their share only on contracts they relay. Devices that share their address are not relayed.');
+    assert.equal(notice.paragraphs.length, 5);
+    const [rule, why, effect, unchanged, sn25] = notice.paragraphs;
+    assert.ok(rule.startsWith("From the network operator's first server release after November 16, an extender that can be reached only over WebRTC is one of a contract's hops, and earns its share of the contract's usage, only when the contract's device also holds a connection to the platform that does not come through that extender. "));
+    assert.match(rule, / This follows the subnet owner's rule of November 11: only contracts actually relayed through an extender earn its share\.$/);
+    assert.match(why, /^WebRTC lets a host behind a home router or a carrier-grade NAT relay\. A device reaches such an extender only by signaling it through the device's own connection to the platform, /);
+    assert.match(why, / A device behind the same router or NAT as the extender holds none: it connects to the platform directly, from the address it shares with the extender\.$/);
+    assert.match(effect, /^So such a device no longer makes the extender a hop, and its provider is credited the whole of the contract's usage, where the extender was credited a share of it, usually half\. /);
+    assert.match(effect, / On November 16, one such extender was a hop on every contract of 84 devices of two other networks behind its address, none of which held a connection anywhere else\. /);
+    assert.match(effect, / A device the extender relays keeps it as one of its contracts' hops, as before\.$/);
+    assert.equal(unchanged, 'Extenders that can be reached over TCP, QUIC or DNS are judged as before. Contracts created before the release keep their hops.');
+    assert.match(sn25, /^SN25 pool rewards are still split by completed usage, /);
+    assert.match(sn25, / There is nothing you need to do\.$/);
+    // rolling out, never live, and the release of November 16 does not carry it: nothing says it is in effect,
+    // names a release day, or gives a figure of a reward
+    const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
+    assert.doesNotMatch(words, /\blive\b|\bnow (?:in effect|takes? effect|credited)\b|\breleases? of November\b|\bsince November 1[6-7]\b|\d\s?%|\$\s?\d|\bGB\b|\bMB\b|\d\s?α|\balpha\b/i);
+    // its full text is in the sn repo, as the milestone's is
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+});
+
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): Top 200 binding and the providers
-    // without UDP or IPv6, both of November 13, then the extender pool and the extenders' share, both of
-    // November 12, then capture the flag and Pro data, both of November 11, the later-posted first, then epoch 3's
-    // of October 31. The data lists them in the order they were posted, the other way round, so this order is the
-    // sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): Top 200 binding, of November 17,
+    // then the share of extenders reached only over WebRTC, of November 16, then the providers without UDP or
+    // IPv6, of November 13, then the extender pool and the extenders' share, both of November 12, then capture
+    // the flag and Pro data, both of November 11, the later-posted first, then epoch 3's of October 31. The data
+    // lists them in the order they were posted, the other way round, so this order is the sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
-        ['notice-top200-binding-open', 'November 13, 2026'],
+        ['notice-top200-binding-open', 'November 17, 2026'],
+        ['notice-extender-webrtc-relay-share', 'November 16, 2026'],
         ['notice-providers-without-udp-or-ipv6', 'November 13, 2026'],
         ['notice-extender-pool', 'November 12, 2026'],
         ['notice-extender-relay-share', 'November 12, 2026'],
@@ -957,25 +1017,25 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     const milestone = events.find((e) => e.id === 'top200-binding-open');
     assert.ok(milestone, 'the milestone is listed');
     assert.equal(milestone.status, 'done');
-    assert.equal(milestone.date, '2026-11-13');
+    assert.equal(milestone.date, '2026-11-17');
     assert.equal(milestone.key, undefined);
-    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-top200-binding-open.md';
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-17-top200-binding-open.md';
     assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
     assert.equal(milestone.title, 'Top 200 fleet binding is open on SN25');
     // the three steps, with the coordinator's limits (policy: maximumBindingValidityEpochs 12, a binding's first
     // epoch after the current one) and the oracle that mirrors a published manifest (sn commitmentoracle)
     assert.ok(milestone.detail.startsWith("A network projected to rank inside SN25's head of 200 top-level seats can claim its spot: register a hotkey on SN25, publish the fleet's manifest from it, which the network operator's commitment oracle mirrors to the coordinator on chain 964, and bind each device for up to 12 epochs, starting after the current epoch. "));
     assert.match(milestone.detail, / a bound device leaves the provider pool while its binding is active\. Nothing changes for a provider that doesn't claim\.$/);
-    // in date order: the last milestone of the day it was posted, before epoch 5's claims
+    // in date order: after the milestones of November 16, before capture the flag's presence sampling
     const ids = events.map((e) => e.id);
-    assert.equal(ids.indexOf(milestone.id), ids.indexOf('providers-without-udp-or-ipv6') + 1);
-    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('epoch-5-claims-with-recovery'));
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('extender-webrtc-relay-share') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-presence-sampling'));
 
     const notice = mainnetNotices.find((n) => n.id === 'notice-top200-binding-open');
     assert.ok(notice, 'the notice is listed');
     // posted the day of the milestone, and the full text in the sn repo is named by that day
-    assert.equal(notice.date, 'November 13, 2026');
-    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 13));
+    assert.equal(notice.date, 'November 17, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 17));
     assert.equal(notice.title, 'Top 200 fleet binding is open on SN25. A network in the head can claim its spot.');
     assert.equal(notice.paragraphs.length, 5);
     const [open, steps, pay, pool, publish] = notice.paragraphs;
@@ -992,7 +1052,9 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     assert.match(pool, / so register in the 3 days before the epoch your binding starts\.$/);
     // the coordinator's commitmentMaxAgeBlocks, and the oracle mirrors only tagged commitments
     assert.match(publish, /^A commitment older than 100,800 blocks \(14 days\) can't bind new devices, and commitments in the older format are not mirrored, /);
-    assert.match(publish, / and a new chain runtime needs a new document\.$/);
+    // the authority document is runtime 491's, the chain's runtime since block 9,520,960 (sn
+    // mainnet/fleet-runtime-authority/runtime-491.json, approved and published on sn main 8c14d437)
+    assert.match(publish, / the reviewed fleet runtime authority document for the chain's current runtime, 491, published in the sn repo with its SHA-256, and a new chain runtime needs a new document\.$/);
     // facts of the opening only: no reward figure, no share of emission, no calendar date in the text
     const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
     assert.doesNotMatch(words, /\d\s?%|\$\s?\d|\d\s?α|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/);

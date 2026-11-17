@@ -142,10 +142,11 @@ export const mainnetActions = {
 // in the order they were posted: a new notice goes at the end. The page shows
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
-// posted, the later first. So it shows Top 200 fleet binding open on SN25,
-// then the providers without UDP or IPv6, offered for the traffic they carry as
-// the next releases roll out, both of November 13, then the extender pool from
-// epoch 8 and the extenders' share on
+// posted, the later first. So it shows Top 200 fleet binding open on SN25, of
+// November 17, then the share of extenders reached only over WebRTC, of
+// November 16, then the providers without UDP or IPv6, offered for the traffic
+// they carry as the next releases roll out, of November 13, then the extender
+// pool from epoch 8 and the extenders' share on
 // the contracts they can relay, both of November 12, then capture the flag from
 // epoch 8 and Pro data on each network's own cycle, both of November 11, then
 // epoch 3's delayed payout and its recovery, with the updates that followed,
@@ -214,9 +215,9 @@ const NOTICES = [
         title: 'The extender pool starts with epoch 8. Bytes served within one network count for extenders, not providers.',
         paragraphs: [
             "From epoch 8, which starts at block 9,600,028 around November 27, 18:25 UTC, the part of each contract's usage that no provider earns counts for extenders instead, as the subnet owner approved on November 10. A provider, intermediary or extender on the network of the device that opened a contract is no longer credited its share of that contract, on the free plan or a paid one: the share goes to the extender pool, and the contract's other hops keep theirs. A share held by a platform endpoint the network operator registers, such as sidecar's edges, goes there too; sidecar has not shipped, so until it does, the pool's bytes come from same-network traffic alone. Same-network credit earned before epoch 8 is kept.",
-            "Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it. Each epoch, the pool's bytes are spread evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, and weighted beside the provider rows up to the epoch's eligible provider usage, so extenders take at most half of a pool. With no eligible extender, the bytes are dropped. An extender that carries a contract keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract.",
+            "Only contracts that a data balance funded count, on the free plan or a paid one, and never the network operator's own measurement and test traffic, which keeps paying the providers that carry it. Each epoch, half of the pool's bytes is spread evenly over each /29 IPv4 or /48 IPv6 block that holds an eligible extender, then evenly over the extenders in it, and the other half goes to the eligible extenders in proportion to the bytes each relayed in the epoch, as the subnet owner decided on November 16; with none that relayed, all of it goes by block. The bytes are weighted beside the provider rows up to the epoch's eligible provider usage, so extenders take at most half of a pool. With no eligible extender, the bytes are dropped. An extender that carries a contract keeps its own share of it, as one of the contract's n hops, unless it is on the network of the device that opened the contract.",
             "An extender counts when, at the end of the epoch, it is in the active pool, with at least one address that passes the network operator's five-minute challenge; it has a payout wallet and is not bound to a top-level miner's fleet; and it is not on one of the network operator's own networks. Records that share a provider client, an IPv4 address or an IPv6 /64 count once.",
-            "From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed /29 or /48 prefix hash and never by address, and their shares, and the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it. Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid.",
+            "From epoch 8, each epoch's ledger header lists the pool's bytes, the census of the network operator's extenders, by keyed /29 or /48 prefix hash and never by address, the bytes each relayed, and their shares, and the epoch's usage statement, version 2, adds the pool's two parts, its weight after the cap and the contracts and payer networks behind it. Epochs 6 and 7 run in shadow first: after each, the operator publishes an unsigned report of what the pool would have paid, which the validator's checks run on and which is never paid.",
             "The subnet owner signs the amendment entry that starts the pool during epoch 7, beside capture the flag's, and it takes effect once it is published at ur.xyz/amendments.yml before epoch 8 starts. Rewards are paid in alpha, whose value changes and can fall. An extender's share is paid to the payout wallet it already uses and claimed with its pool account, in the same claim flow. There is nothing you need to do.",
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-12-extender-pool.md' },
@@ -235,17 +236,30 @@ const NOTICES = [
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-providers-without-udp-or-ipv6.md' },
     },
     {
+        id: 'notice-extender-webrtc-relay-share',
+        date: 'November 16, 2026',
+        title: 'Extenders reached only over WebRTC earn their share only on contracts they relay. Devices that share their address are not relayed.',
+        paragraphs: [
+            "From the network operator's first server release after November 16, an extender that can be reached only over WebRTC is one of a contract's hops, and earns its share of the contract's usage, only when the contract's device also holds a connection to the platform that does not come through that extender. This follows the subnet owner's rule of November 11: only contracts actually relayed through an extender earn its share.",
+            "WebRTC lets a host behind a home router or a carrier-grade NAT relay. A device reaches such an extender only by signaling it through the device's own connection to the platform, so every device it relays holds a connection that does not come through it. A device behind the same router or NAT as the extender holds none: it connects to the platform directly, from the address it shares with the extender.",
+            "So such a device no longer makes the extender a hop, and its provider is credited the whole of the contract's usage, where the extender was credited a share of it, usually half. On November 16, one such extender was a hop on every contract of 84 devices of two other networks behind its address, none of which held a connection anywhere else. A device the extender relays keeps it as one of its contracts' hops, as before.",
+            "Extenders that can be reached over TCP, QUIC or DNS are judged as before. Contracts created before the release keep their hops.",
+            "SN25 pool rewards are still split by completed usage, and the network operator's provider subsidy, which for traffic since the October 6 cutoff only counts toward the weekly points it awards, follows the same hops. There is nothing you need to do.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-16-webrtc-extender-relay-share.md' },
+    },
+    {
         id: 'notice-top200-binding-open',
-        date: 'November 13, 2026',
+        date: 'November 17, 2026',
         title: 'Top 200 fleet binding is open on SN25. A network in the head can claim its spot.',
         paragraphs: [
             "Top-level miners can now claim a spot in SN25's head, its 200 top-level seats. The Top 200 page on ur.io and the current apps no longer say that claiming isn't open: they prompt a network projected to rank inside the head to claim its spot. Claiming is optional, and nothing changes for a provider that doesn't claim.",
             "A claim has three steps. Register a hotkey on SN25: registering burns TAO from your coldkey, and the burn is not refunded. Publish the fleet's manifest from that hotkey: once the commitment is final, the network operator's commitment oracle mirrors it to the coordinator on chain 964 by itself. Then bind each device to the fleet, for up to 12 epochs, starting after the current epoch. The Top 200 page, the apps and the command-line guide walk through each step, and nothing in a claim asks for a recovery phrase.",
             "The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights. A fleet is scored on the devices the validator measures, and at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured. Rewards are paid in alpha, whose value changes and can fall.",
             "A bound device leaves the provider pool: while its binding is active at either boundary of an epoch, it earns no pool share for that epoch, whether or not its fleet earns. A UID with no emission can be replaced once its immunity ends, about 3 days after it registers, and a binding starts no earlier than the next epoch, so register in the 3 days before the epoch your binding starts.",
-            "A commitment older than 100,800 blocks (14 days) can't bind new devices, and commitments in the older format are not mirrored, so a fleet that published in that format, or more than 14 days ago, publishes again. Command-line writes need the provider release with the fleet storage command and the reviewed fleet runtime authority document, published in the sn repo with its SHA-256, and a new chain runtime needs a new document.",
+            "A commitment older than 100,800 blocks (14 days) can't bind new devices, and commitments in the older format are not mirrored, so a fleet that published in that format, or more than 14 days ago, publishes again. Command-line writes need the provider release with the fleet storage command and the reviewed fleet runtime authority document for the chain's current runtime, 491, published in the sn repo with its SHA-256, and a new chain runtime needs a new document.",
         ],
-        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-13-top200-binding-open.md' },
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-17-top200-binding-open.md' },
     },
 ];
 

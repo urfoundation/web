@@ -31,6 +31,7 @@ import type {
   AccountPaymentsResponse,
   AccountPoint,
   AccountPointsResponse,
+  AccountEpochsResponse,
   NetworkReliabilityResponse,
   RedeemedTransferBalanceCodesResponse,
   RedeemTransferBalanceCodeResponse,
@@ -1048,6 +1049,61 @@ export const fetchAccountPoints = async (
 };
 
 /**
+ * The network's finalized epochs, newest first, each with the bytes it served
+ * behind the epoch's points, and running figures for the open epoch and the
+ * open weekly operator block (GET /account/epochs, the server's default list
+ * length). This replaces the unpaid bytes of GET /transfer/stats, which read 0
+ * since the USDC close-out (urnetwork/server#451). Only the response's shape is
+ * checked here; services/servedBytes.ts reads the entries.
+ * @param token - JWT authentication token
+ * @returns AccountEpochsResponse, or an empty list with an error
+ */
+export const fetchAccountEpochs = async (
+  token: string
+): Promise<AccountEpochsResponse> => {
+  try {
+    const response = await fetch(`${getApiBase()}/account/epochs`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "*/*",
+      },
+    });
+
+    if (!response.ok) {
+      return {
+        epochs: [],
+        error: {
+          message: `HTTP error! status: ${response.status}`,
+        },
+      };
+    }
+
+    const data = await safeJsonParse<AccountEpochsResponse>(response);
+    const isObject = (value: unknown) =>
+      typeof value === "object" && value !== null && !Array.isArray(value);
+
+    return {
+      epochs: Array.isArray(data.epochs) ? data.epochs : [],
+      current_epoch: isObject(data.current_epoch) ? data.current_epoch : undefined,
+      current_block: isObject(data.current_block) ? data.current_block : undefined,
+      error: data.error,
+    };
+  } catch (error) {
+    console.error("Fetch account epochs error:", error);
+    return {
+      epochs: [],
+      error: {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch account epochs",
+      },
+    };
+  }
+};
+
+/**
  * Get network reliability statistics
  * @param token - JWT authentication token
  * @returns NetworkReliabilityResponse with reliability window data or error
@@ -1975,6 +2031,7 @@ export type {
   AccountPaymentsResponse,
   AccountPoint,
   AccountPointsResponse,
+  AccountEpochsResponse,
   NetworkReliabilityResponse,
   AuthClientRequest,
   AuthClientResponse,

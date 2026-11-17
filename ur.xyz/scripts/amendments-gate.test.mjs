@@ -33,7 +33,7 @@ const LAUNCH = `sn: 25
 // EIP-55's own example, in its checksum form.
 const CARRY = '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed';
 const v1 = (from = 8, { chain = 964, sn = 25, no = 1 } = {}) =>
-    `UR settlement amendment v1: chain ${chain}, sn ${sn}, no ${no}, from epoch ${from}, intra-platform and intra-network extenders, units egress prefix, free and paid, zeta 1`;
+    `UR settlement amendment v1: chain ${chain}, sn ${sn}, no ${no}, from epoch ${from}, intra-platform and intra-network extenders, units egress prefix, free and paid, zeta 1, half by unit half by relay bytes`;
 const v2 = (from = 8, { chain = 964, sn = 25, no = 1, pool = 2 ** 32 + no, carry = CARRY } = {}) =>
     `UR settlement amendment v2: chain ${chain}, sn ${sn}, no ${no}, from epoch ${from}, capture the flag, ctf pool ${pool}, carry ${carry}, shares pool 4/10 ctf 1/10 head 5/10, head cedes to pool, slots 5 providers 5 extenders, countries iso 3166-1 249, presence half epoch, units egress prefix, draw drand quicknet 60s after census`;
 // A signature in the one form readers take, r ‖ s ‖ v with v 27 and s in the lower
@@ -115,7 +115,9 @@ const BROKEN = {
     'a version with a leading zero': [signed(entry(v1().replace(' v1:', ' v01:'))), /version 01 is not a line format/],
     'a changed term': [signed(entry(v1().replace('zeta 1', 'zeta 2'))), /clause 8 of a v1 line is "zeta 2", and it must be "zeta 1"/],
     'a changed share': [signed(entry(v2().replace('ctf 1/10', 'ctf 2/10'))), /clause 8 of a v2 line is "shares pool 4\/10 ctf 2\/10 head 5\/10"/],
-    'a dropped clause': [signed(entry(v1().replace(', free and paid', ''))), /a v1 line has 8 clauses after its version, separated by ", ", and this one has 7/],
+    'the old prefix-only allocation': [signed(entry(v1().replace(', half by unit half by relay bytes', ''))), /a v1 line has 9 clauses .* this one has 8/],
+    'a changed relay split': [signed(entry(v1().replace('half by unit half by relay bytes', 'all by relay bytes'))), /clause 9 of a v1 line is "all by relay bytes", and it must be "half by unit half by relay bytes"/],
+    'a dropped clause': [signed(entry(v1().replace(', free and paid', ''))), /a v1 line has 9 clauses after its version, separated by ", ", and this one has 8/],
     'a doubled clause': [signed(entry(v2().replace(', head cedes to pool', ', head cedes to pool, head cedes to pool'))), /a v2 line has 14 clauses .* this one has 15/],
     'clauses swapped': [signed(entry(v1().replace('free and paid, zeta 1', 'zeta 1, free and paid'))), /clause 7 of a v1 line is "zeta 1", and it must be "free and paid"/],
     'a doubled space': [signed(entry(v1().replace('from epoch 8', 'from epoch  8'))), /clause 4, "from epoch {2}8": " 8" is not a plain whole number/],

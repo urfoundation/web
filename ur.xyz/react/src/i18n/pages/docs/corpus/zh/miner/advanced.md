@@ -176,8 +176,13 @@ provider claim-daemon --config=/absolute/path/claim.yml \
 
 ### 成本与风险
 
-- **注册会销毁 α。** 集群的 coldkey 需要支付子网当前的注册销毁费用，而每一次新注册都会提高下一次的费用。`provider fleet register` 会在签名任何内容之前显示当前的销毁费用。
-- **UID 数量有限。** 子网已满时，新的注册会替换发行最低的 UID，前提是该 UID 的豁免期已经结束。掉出前 200 名的集群什么也赚不到，会被下一次注册替换，若想回来必须再次支付销毁费用。
+- **注册会销毁 TAO，且不予退还。** 集群的 coldkey 需要支付子网当前的注册销毁费用，最低为 0.0005 TAO。每一次新注册都会使它提高约四分之一，而它大约每 72 分钟减半。`provider fleet register` 会在签名任何内容之前显示当前的销毁费用。
+- **绑定需要支付 gas。** 每台设备约 263,640 gas，按 5 gwei 计约为 0.0013 TAO。
+- **UID 数量有限。** 子网已满时，新的注册会替换发行最低的 UID，前提是该 UID 的豁免期已经结束；发行相同时，替换注册最早的。掉出前 200 名的集群什么也赚不到，会按顺序被替换，若想回来必须再次支付销毁费用。
+- **请在绑定开始的周期之前 3 天内注册。** 绑定最早从下一个周期开始，最多可能还要等 7 天；而没有发行的 UID 在豁免期结束后（注册后约 3 天，即 21,600 个区块）就可能被替换。
+- **每个集群最多 7 台设备优先于其他设备接受测量。** 验证者只测量验证群组中的设备，一个集群在其中的份额是群组规模除以 200 个席位，群组为 1,500 时即 7 台设备。群组之外的已绑定设备没有头部分数，也已离开池，因此没有任何收益。请绑定 7 台，除非其他设备已在接受测量。
+- **之前发布过的集群可能需要重新发布。** 旧格式的承诺不会被镜像到协调器，超过 14 天（100,800 个区块）的镜像也无法绑定。之后添加设备的集群出于同样的原因也要重新发布。
+- **头部 UID 只在验证者调整权重时才有收益，并按其分数而非排名分配。** 所有入选的集群共享一个通道：第 8 个周期之前为矿工发行的 3%，从第 8 个周期起为 5%。
 - **一次只能在一个层级。** 绑定到头部集群的设备在绑定有效期间不会获得池份额。如果集群失去其 UID，其设备会重新在其运营商的池中获得收益。设备已经获得的池奖励仍然可以领取。
 - **绑定是公开的。** 绑定会公开哪些设备属于你的 hotkey，因而也会公开它们所出口的网络前缀。池中的设备不会以这种方式与你关联。
 
@@ -187,10 +192,10 @@ provider claim-daemon --config=/absolute/path/claim.yml \
 
 1. **编写集群清单。** 清单列出网络的链 ID、netuid 和协调器、一个集群 ID、集群 hotkey、一个代数（generation），以及每台设备的客户端 ID 和公钥。`provider fleet init` 会根据矿工的文件生成清单，`provider fleet manifest --manifest=<path>` 会对其进行检查。
 2. **注册 UID。** 使用清单、hotkey 和 coldkey 的 seed 文件以及 `--substrate` 端点运行 `provider fleet register`。不加 `--apply` 时它是一次试运行，会报出当前的销毁费用和手续费。加上 `--apply` 即可签名并广播，同时用 `--burn_limit_rao` 和 `--fee_limit_rao` 作为上限：链会拒绝任何销毁超过你上限的注册。
-3. **发布清单。** `provider fleet publish` 会从集群 hotkey 把清单的哈希写到链上。
+3. **发布清单。** `provider fleet publish` 会从集群 hotkey 把清单的哈希写到链上。承诺预言机会在其最终确定后将其镜像到协调器，在此之前绑定会被回退。
 4. **把每台设备绑定到 hotkey。** 每份绑定都同时由设备的密钥和集群 hotkey 签名，因此没有人能认领不是自己运行的设备。绑定最早从下一个周期开始，并覆盖你选择的周期范围（`--valid_from_epoch`、`--valid_to_epoch`）。可以任选其一：
    - 为每台设备运行 `provider fleet sign`，它只读取本地文件，然后把它的输出粘贴到 ur.io 的 Top 200 页面，并从你自己的 EVM 钱包提交该页面准备好的交易；或者
    - 为每台设备运行 `provider fleet bind`，它会使用 EVM relayer 密钥和 `--rpc` 端点自行提交绑定。
 5. **检查并维护。** `provider fleet status` 显示设备的绑定和 UID。`provider fleet revoke` 会从某个未来周期起移除一台设备。新设备用同样的方法绑定，并在绑定的最后一个周期之前重新绑定。
 
-在主网上，`register`、`publish`、`bind`、`status` 和 `revoke` 还需要网络经过审核的集群运行时授权文件（`--mainnet-runtime-authority` 及其 `--mainnet-runtime-authority-sha256`），写入操作还需要一份持久卷声明（`--durable-volumes` 和 `--durable-volumes-sha256`）。所有选项请参阅[集群授权与恢复合约](https://github.com/urfoundation/sn/blob/main/miner/FLEET-MAINNET-RUNTIME.md)和 `provider fleet --help`。头部层级和池层级如何评分，请参阅[白皮书](https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md)的第 8.4 节和第 11.4 节。
+在主网上，`register`、`publish`、`bind`、`status` 和 `revoke` 还需要网络经过审核的集群运行时授权文件（`--mainnet-runtime-authority` 及其 `--mainnet-runtime-authority-sha256`），写入操作还需要一份持久卷声明（`--durable-volumes` 和 `--durable-volumes-sha256`），由 `provider fleet storage` 在执行写入的机器上准备（[为主网写入准备存储](https://github.com/urfoundation/sn/blob/main/miner/FLEET-MAINNET-RUNTIME.md#preparing-storage-for-mainnet-writes)）。当前的[授权文件](https://raw.githubusercontent.com/urfoundation/sn/main/mainnet/fleet-runtime-authority/runtime-491.json)的 SHA-256 为 `0d16e120c0b3575e1daf6c221374f12d3fc6de85f03b12693e3f1a42243b0df3`。按顺序列出的全部命令，请参阅[通过命令行获取前 200 名席位](https://ur.io/docs/top200-claim-btcli)。所有选项请参阅[集群授权与恢复合约](https://github.com/urfoundation/sn/blob/main/miner/FLEET-MAINNET-RUNTIME.md)和 `provider fleet --help`。头部层级和池层级如何评分，请参阅[白皮书](https://github.com/urfoundation/sn/blob/main/WHITEPAPER.md)的第 8.4 节和第 11.4 节。

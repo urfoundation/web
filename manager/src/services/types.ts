@@ -623,6 +623,65 @@ export interface AccountPointsResponse {
 }
 
 /**
+ * One finalized epoch of GET /account/epochs: the points the network earned in
+ * the epoch's window, and the bytes it served behind them. Both count the
+ * weekly operator blocks (Sunday 00:00 UTC to the next) that end in the window.
+ */
+export interface AccountEpoch {
+  epoch: number;
+  start_millis: number;
+  end_millis: number;
+  points: number;
+  /** the network's share of the epoch's pool in basis points (0 = none) */
+  share_bps: number;
+  served_byte_count: number;
+}
+
+/**
+ * The open epoch of GET /account/epochs: the bytes served so far that count
+ * toward it, by the rule of the finalized epochs.
+ */
+export interface AccountCurrentEpoch {
+  epoch: number;
+  start_millis: number;
+  /** projected: the epoch is still open */
+  end_millis: number;
+  served_byte_count: number;
+  /** the traffic is counted through this time */
+  as_of_millis: number;
+}
+
+/**
+ * The open weekly operator block of GET /account/epochs and the bytes served in
+ * it so far. Once it ends it counts in `epoch`, the epoch whose window holds its
+ * end; while that is the open epoch, these bytes are already part of the open
+ * epoch's figure.
+ */
+export interface AccountCurrentBlock {
+  block_number: number;
+  start_millis: number;
+  end_millis: number;
+  served_byte_count: number;
+  /** the traffic is counted through this time */
+  as_of_millis: number;
+  epoch: number;
+}
+
+/**
+ * Response from GET /account/epochs
+ */
+export interface AccountEpochsResponse {
+  /** finalized epochs, newest first (empty on error) */
+  epochs: AccountEpoch[];
+  /** absent while the server can't place the open epoch */
+  current_epoch?: AccountCurrentEpoch;
+  /** absent while the server can't place the open epoch */
+  current_block?: AccountCurrentBlock;
+  /** Error information if request failed */
+  error?: { message: string };
+}
+
+/**
  * Country multiplier for reliability calculations
  */
 export interface CountryMultiplier {

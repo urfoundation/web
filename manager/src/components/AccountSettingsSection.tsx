@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Settings, Key, Copy, Clock, Users, AlertCircle, CheckCircle, Shield, Lock, CreditCard, ExternalLink, Server, ChevronDown, ChevronUp, MapPin, Wifi, Eye, EyeOff, Network, Download, Smartphone, Trash2, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { createAuthCode, fetchNetworkUser, createAuthClient } from '../services/api';
+import { createAuthCode, fetchNetworkUser, createAuthClient, createCustomerPortal } from '../services/api';
 import type { CreateAuthCodeResponse, AuthClientResponse } from '../services/api';
+import { subscriptionPortalOutcome } from '../services/subscriptionPortal';
 import type { Location } from '../services/types';
 import toast from 'react-hot-toast';
 import PasswordResetModal from './PasswordResetModal';
@@ -63,6 +64,9 @@ const AccountSettingsSection: React.FC = () => {
   const [enableWg, setEnableWg] = useState(false);
   const [showWgPrivateKey, setShowWgPrivateKey] = useState(false);
 
+  const [isOpeningPortal, setIsOpeningPortal] = useState(false);
+  const [portalNotice, setPortalNotice] = useState<string | null>(null);
+
   const hasAdvancedLocation = !!(locationClientId || locationId || locationGroupId || bestAvailable || locationName || locationType);
 
   useEffect(() => {
@@ -86,6 +90,45 @@ const AccountSettingsSection: React.FC = () => {
 
     loadUserEmail();
   }, [token]);
+
+  // The billing portal of this network's own Stripe customer: the server makes
+  // a session on each press (its link expires minutes after it is made), and
+  // says when the network has no Stripe customer (services/subscriptionPortal.ts).
+  const handleOpenSubscriptionPortal = async () => {
+    if (!token || isOpeningPortal) return;
+
+    setIsOpeningPortal(true);
+    setPortalNotice(null);
+    // opened during the press so a popup blocker lets it through, then pointed
+    // at the session once the server has made it
+    const portalWindow = window.open('', '_blank');
+    if (portalWindow) {
+      portalWindow.opener = null;
+    }
+
+    try {
+      const outcome = subscriptionPortalOutcome(await createCustomerPortal(token));
+      if (outcome.kind === 'open') {
+        if (portalWindow) {
+          portalWindow.location.href = outcome.url;
+        } else {
+          window.location.assign(outcome.url);
+        }
+        return;
+      }
+      portalWindow?.close();
+      if (outcome.kind === 'no_customer') {
+        setPortalNotice(outcome.message);
+      } else {
+        toast.error(outcome.message);
+      }
+    } catch {
+      portalWindow?.close();
+      toast.error('Could not open the billing portal. Please try again.');
+    } finally {
+      setIsOpeningPortal(false);
+    }
+  };
 
   const handleGenerateAuthCode = async () => {
     if (!token) return;
@@ -164,6 +207,7 @@ const AccountSettingsSection: React.FC = () => {
         device_spec?: string;
         derived_client_id?: string;
         proxy_config?: {
+          enable_wg?: boolean;
           lock_caller_ip?: boolean;
           lock_ip_list?: string[];
           https_require_auth?: boolean;
@@ -1435,16 +1479,22 @@ const AccountSettingsSection: React.FC = () => {
             Access your subscription portal to manage your billing details, update payment methods, view invoices, and modify your subscription plan.
           </p>
 
-          <a
-            href="https://pay.ur.io/p/login/00g16I4Mag2O240aEE"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-ur-green hover:bg-ur-green/90 text-ur-black border border-ur-green transform hover:scale-[1.02]"
+          <button
+            type="button"
+            onClick={handleOpenSubscriptionPortal}
+            disabled={isOpeningPortal}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-ur-green hover:bg-ur-green/90 text-ur-black border border-ur-green transform hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <CreditCard size={18} />
-            Open Subscription Portal
+            {isOpeningPortal ? 'Opening Subscription Portal…' : 'Open Subscription Portal'}
             <ExternalLink size={16} />
-          </a>
+          </button>
+
+          {portalNotice && (
+            <p role="status" className="text-ur-gray text-sm mt-4">
+              {portalNotice}
+            </p>
+          )}
         </div>
       </div>
 

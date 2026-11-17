@@ -19,6 +19,7 @@ import type {
   ProviderLocationsResponse,
   PasswordLoginResponse,
   CreateAuthCodeResponse,
+  CustomerPortalResponse,
   PasswordResetResponse,
   LocationSpec,
   LocationGroup,
@@ -901,6 +902,81 @@ export const createAuthCode = async (
           error instanceof Error
             ? error.message
             : "Failed to create authentication code",
+      },
+    };
+  }
+};
+
+/** An answer to POST /stripe/customer-portal that can't be read. The body holds a sign-in link, so none of it is quoted. */
+const CUSTOMER_PORTAL_ANSWER_UNREADABLE =
+  "Could not read the billing portal answer. Please try again.";
+
+/**
+ * Ask for a billing portal session for the signed-in network's own Stripe
+ * customer (POST /stripe/customer-portal), the way ur.io and the apps open the
+ * portal. The link signs the customer in and expires minutes after it is made,
+ * so it is asked for on each press, and it never reaches a log line or a
+ * message. A network with no Stripe customer is answered with the error code
+ * "no_customer".
+ * @param token - JWT authentication token
+ * @returns CustomerPortalResponse with the session link or the reason there is none
+ */
+export const createCustomerPortal = async (
+  token: string
+): Promise<CustomerPortalResponse> => {
+  try {
+    const response = await fetch(`${getApiBase()}/stripe/customer-portal`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (!response.ok) {
+      return {
+        error: {
+          message: `HTTP error! status: ${response.status}`,
+        },
+      };
+    }
+
+    let data: unknown;
+    try {
+      const text = await response.text();
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return { error: { message: CUSTOMER_PORTAL_ANSWER_UNREADABLE } };
+      }
+      data = text.trim() === "" ? {} : JSON.parse(text);
+    } catch {
+      return { error: { message: CUSTOMER_PORTAL_ANSWER_UNREADABLE } };
+    }
+
+    const answer = (
+      typeof data === "object" && data !== null ? data : {}
+    ) as Record<string, unknown>;
+    let error: CustomerPortalResponse["error"];
+    if (typeof answer.error === "object" && answer.error !== null) {
+      const { code, message } = answer.error as Record<string, unknown>;
+      error = { message: typeof message === "string" ? message : "" };
+      if (typeof code === "string") {
+        error.code = code;
+      }
+    }
+    return {
+      url: typeof answer.url === "string" ? answer.url : undefined,
+      error,
+    };
+  } catch (error) {
+    console.error("Create customer portal error:", error);
+    return {
+      error: {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to open the billing portal",
       },
     };
   }
@@ -2026,6 +2102,7 @@ export type {
   NetworkUser,
   NetworkUserResponse,
   CreateAuthCodeResponse,
+  CustomerPortalResponse,
   PasswordResetResponse,
   AccountPayment,
   AccountPaymentsResponse,

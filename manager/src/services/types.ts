@@ -583,6 +583,22 @@ export interface CreateAuthCodeResponse {
 }
 
 /**
+ * Response from POST /stripe/customer-portal: a billing portal session for the
+ * signed-in network's own Stripe customer. The link signs the customer in and
+ * expires minutes after it is made.
+ */
+export interface CustomerPortalResponse {
+  /** The portal session link (present on success) */
+  url?: string;
+  /** Why no session was made */
+  error?: {
+    /** The server's code: "no_customer" when the network has no Stripe customer, "store_unavailable" when Stripe failed */
+    code?: string;
+    message: string;
+  };
+}
+
+/**
  * Response from requesting a password reset
  */
 export interface PasswordResetResponse {

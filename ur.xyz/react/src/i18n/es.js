@@ -77,19 +77,28 @@ export default {
         exitFullscreen: 'Salir de pantalla completa'
     },
 
+    // the guides a role page lists under its explanation (RoleGuide.jsx)
+    roleGuides: {
+        title: 'Las guías',
+        miner: 'Cómo ejecutar un minero',
+        rewards: 'Cobra por minar',
+        validator: 'Cómo ejecutar un validador',
+        operator: 'Cómo convertirte en operador de red',
+        litepaper: 'El litepaper'
+    },
     homepage: {
-        intro: 'La subred UR es una red de privacidad construida sobre Bittensor. La subred recompensa a quienes contribuyen a ella. Los operadores ejecutan servidores y depositan alpha por el tráfico que atienden. Los mineros transportan tráfico cifrado y reciben emisiones. Los validadores vuelven a medir la red, verifican su precisión y reciben emisiones.',
+        intro: 'UR (SN25) es una red de privacidad de código abierto construida sobre Bittensor. La subred recompensa a quienes contribuyen a ella. Los operadores ejecutan servidores y depositan alpha por el tráfico que atienden. Los mineros transportan tráfico cifrado y reciben emisiones. Los validadores vuelven a medir la red, verifican su precisión y reciben emisiones.',
         diagramAria: 'Cómo funciona la red UR',
         rolesEyebrow: 'Participa en la red',
         rolesTitle: 'Tres roles. Una red medida.',
         roles: {
             operators: { name: 'Operadores', body: 'Los operadores ejecutan los servidores de privacidad y el endpoint de verificación. Depositan según el tráfico que ya han atendido, firman conjuntamente cada ruta medida y confirman la lista de pagos que divide las recompensas entre sus mineros. Los depósitos pasan a una reserva y los operadores nunca custodian fondos ajenos.', explore: 'Explorar Operadores' },
-            miners: { name: 'Mineros', body: 'Los mineros transportan el tráfico. Ejecutan nodos que enrutan tráfico cifrado para uno o más operadores y reciben emisiones de la subred por el tráfico que transportan y, en las flotas principales, por las IPs enrutables que mantienen disponibles.', explore: 'Explorar Mineros' },
+            miners: { name: 'Mineros', body: 'Los mineros transportan el tráfico. Ejecutan nodos que enrutan tráfico cifrado para uno o más operadores y reciben emisiones de la subred por el tráfico que transportan y, en las flotas principales, por las IPs enrutables que mantienen disponibles.', bodyLink: 'Cómo minar SN25', explore: 'Explorar Mineros' },
             validators: { name: 'Validadores', body: 'Los validadores vuelven a medir la red. Ejecutan el protocolo de verificación de rutas y puntúan cada pool de operador según la demanda y la calidad medida. Reciben emisiones de la subred por puntuar con precisión.', explore: 'Explorar Validadores' }
         },
         whitepaperCta: 'Para más detalles, lee el litepaper',
-        metaTitle: 'UR | La red de privacidad descentralizada en Bittensor SN25',
-        metaDescription: 'UR es una red de privacidad descentralizada en Bittensor SN25: los mineros llevan tráfico cifrado, los validadores lo miden y los operadores traen la demanda.'
+        metaTitle: 'UR (SN25): red de privacidad descentralizada en Bittensor',
+        metaDescription: 'UR es una red de privacidad descentralizada en Bittensor SN25: los mineros llevan tráfico cifrado, los validadores lo miden y los operadores aportan demanda.'
     },
 
     diagram: {
@@ -211,8 +220,37 @@ operators: {
         title:   'Los operadores que ejecutan la red.',
         intro:   'Los operadores de red ejecutan los servidores de privacidad y el punto de verificación. Un operador deposita en la subred como una señal respaldada por ingresos de demanda real, ejecuta el protocolo de verificación de enrutamiento que co-firma cada ruta medida, y registra la lista de pagos que reparte sus recompensas entre los mineros asociados a él. Los operadores informan del uso que siguen las recompensas, pero nunca custodian los fondos de nadie más.',
         cta: 'Conviértete en operador de red',
-        metaTitle: 'Operadores de red: servidores de privacidad UR en SN25 — UR',
-        metaDescription: 'Los operadores ejecutan servidores de privacidad UR y el endpoint /verify, depositan alpha como señal de demanda real e informan del uso por el que se paga a sus mineros.',
+        metaTitle: 'Operadores de red UR: servidores de privacidad en SN25 | UR',
+        metaDescription: 'Los operadores ejecutan servidores de privacidad UR y /verify, depositan alpha como señal de demanda respaldada por ingresos y reportan el uso de sus mineros.',
+        guide: {
+            title: '¿Qué ejecuta un operador de red?',
+            items: [
+                {
+                    title: '¿Qué ejecutas?',
+                    body: 'Un ejecutable de operador que sirve los servicios de API y Connect a los que se conectan usuarios y mineros, el endpoint /verify que recorren los validadores y el pipeline de épocas que liquida las recompensas de tus mineros. Lo respaldan PostgreSQL, Redis, el almacenamiento de artefactos y un ingreso TLS público.'
+                },
+                {
+                    title: '¿Qué necesitas?',
+                    body: 'Un host Linux y tu propio dominio, PostgreSQL, Redis y almacenamiento local duradero de artefactos, las claves y firmantes del operador, sondas de salida y un feed público de estadísticas (stats.json) para que el directorio de operadores pueda listarte.',
+                    link: {
+                        label: 'Cómo se unen los mineros al pool de un operador',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: '¿De dónde viene el dinero?',
+                    body: 'Un operador aporta sus propios usuarios y productos y deposita alpha como señal de demanda real respaldada por ingresos; no se debe ningún depósito mientras la tarifa publicada sea 0. En cada época confirma la lista de pagos que reparte su pool entre sus mineros, que reclaman directamente del vault de liquidación: el operador nunca guarda el alpha de nadie más. Las apps de ur.io son los productos de un operador.',
+                    link: {
+                        label: 'Mira las apps de ur.io',
+                        href: 'https://ur.io/products'
+                    }
+                },
+                {
+                    title: '¿Cómo empiezas?',
+                    body: 'Durante la fase de lanzamiento, la admisión de operadores la controla el dueño de la subred, así que el primer paso es una conversación con él: registra tus identidades y te da tu id de operador. Luego la guía del operador recorre el build, la configuración y la primera época.'
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Ejecutar los servidores', body: 'Los operadores ejecutan los servidores de privacidad y el punto /verify que co-firma cada ruta medida: la capa de coordinación entre los usuarios y los mineros que transportan el tráfico.' },
             { tag: '02', title: 'Señalar demanda real',    body: 'A los operadores se les factura en alpha en proporción a su uso real. Cada depósito pasa a una reserva y paga el uso auditado que los validadores ponderan cuando puntúan los pools.' },
@@ -227,7 +265,8 @@ operators: {
     },
 
     miners: {
-        eyebrow: 'Mineros',
+        eyebrow: 'Cómo minar Bittensor SN25',
+        breadcrumb: 'Mineros',
         title:   'Los mineros que convierten las subredes IP en la internet cifrada.',
         intro:   'Los mineros compiten por poner a disposición de la red la mayor cantidad de subredes IPv4 /29 e IPv6 /48, cada una enrutable en todo momento para el tráfico de entrada o de salida. En otras palabras, los mineros convierten la internet pública en una red privada y anónima que cualquiera puede usar. Cada minero transporta tanto el tráfico de entrada como el de salida, ejecuta un modelo de seguridad seguro por defecto, solo enruta tráfico cifrado y recibe pago de la emisión de la subred por el tráfico que transporta y la capacidad enrutable que aporta. Las flotas con la mayor cobertura de subredes distintas y enrutables son promovidas a mineros de nivel superior y ganan más: todo en espacio de usuario, en hardware que ya posees.',
         both:    'Un minero es a la vez extensor y proveedor: cada minero asume al mismo tiempo el rol de entrada y el de salida. Se configura automáticamente para el sistema en el que se ejecuta.',
@@ -236,8 +275,62 @@ operators: {
         globeLabels: { provider: 'proveedor', extender: 'extensor', miner: 'minero' },
         simCaption: 'Los mineros compiten por la mayor cantidad de IPs únicas disponibles de forma confiable en la red. Los mejores mineros ascienden a su propio slot de UID.',
         cta: 'Conviértete en minero',
-        metaTitle: 'Mineros: lleva tráfico cifrado y gana emisiones de SN25 — UR',
-        metaDescription: 'Los mineros de UR mantienen enrutables subredes IPv4 /29 e IPv6 /48 para tráfico cifrado en Bittensor SN25 y ganan emisiones por el tráfico que transportan y su cobertura.',
+        metaTitle: 'Cómo minar en Bittensor SN25: mineros de UR | UR',
+        metaDescription: 'Cómo minar Bittensor SN25 como minero de UR: qué ejecutas, el hardware, la instalación en Linux, macOS y Windows, cómo se fijan las recompensas y soluciones.',
+        guide: {
+            title: '¿Cómo empiezas a minar en SN25?',
+            compared: { label: 'Comparado con', links: [{ label: 'Mysterium', href: '/docs/compare/mysterium' }, { label: 'Grass', href: '/docs/compare/grass' }, { label: 'Sentinel', href: '/docs/compare/sentinel' }, { label: 'Orchid', href: '/docs/compare/orchid' }, { label: 'todas las redes para compartir ancho de banda', href: '/docs/compare' }] },
+            items: [
+                {
+                    title: '¿Qué ejecutas?',
+                    body: 'Ejecutas el programa minero, provider, en una computadora que se mantiene en línea. Cada minero es a la vez provider, una salida para el tráfico, y extender, un punto de entrada, y se configura solo para el sistema en el que corre. La mayoría de los mineros se unen al pool de un operador de red, así que no necesitas un registro propio en Bittensor. En un teléfono o una computadora, una app de URnetwork puede minar en segundo plano, con URnetwork como operador.',
+                    link: {
+                        label: 'Descarga una app de URnetwork',
+                        href: 'https://ur.io/install'
+                    }
+                },
+                {
+                    title: '¿Qué hardware necesitas?',
+                    body: 'Una computadora que siga en línea: sirven un PC de casa, un servidor o una Raspberry Pi 2 o más nueva. Cada versión incluye el minero para Linux en Intel, AMD y ARM de 64 y 32 bits (no una Pi Zero ni una Pi 1), para macOS en Apple silicon e Intel (el instalador necesita macOS 12 o posterior) y para Windows en Intel o AMD de 64 bits y en ARM64. Cada minero necesita una dirección pública de internet estable. Su extensor necesita el puerto TCP 443 entrante; se recomiendan los puertos UDP 443 y 4053.',
+                    link: {
+                        label: 'Ver las versiones de build',
+                        href: 'https://github.com/urnetwork/build/releases'
+                    }
+                },
+                {
+                    title: '¿De dónde vienen las recompensas?',
+                    body: 'De la emisión de mineros de la subred, no de un precio fijo por byte. En el pool de un operador, la parte de un dispositivo sigue el tráfico que completó y la confiabilidad con que lo midieron los validadores, y el tráfico pagado y el gratuito del mismo tamaño ganan el mismo crédito. El momentum, la parte de la emisión de mineros que se paga ahora, es del 10%; el resto va a la Network Capacity Reserve. La política publicada y los archivos de pago de tu operador muestran lo que realmente se paga.',
+                    link: {
+                        label: 'Cómo se cuentan las recompensas',
+                        href: '/docs/miner/rewards#how-rewards-are-counted'
+                    }
+                },
+                {
+                    title: '¿Cómo empiezas?',
+                    body: 'Crea una cuenta con un operador de red (el minero usa bringyour.com si no eliges otro) y obtén un código de autenticación. Instala el minero (el instalador de tu sistema lo ejecuta en segundo plano y lo mantiene al día), ejecuta provider setup, que lo conecta y fija la coldkey de Bittensor a la que se pagan tus recompensas, y revísalo con provider status.',
+                    link: {
+                        label: 'Pasos de instalación para Linux, macOS y Windows',
+                        href: '/docs/miner/install'
+                    }
+                },
+                {
+                    title: '¿Y si algo falla?',
+                    body: 'Pregunta primero al minero: provider status y provider doctor informan de lo que ve. La página de solución de problemas reúne los mensajes habituales, desde errores al iniciar sesión y un minero rechazado una y otra vez hasta un extensor que no puede usar el puerto TCP 443 y una prueba de reclamo que aún no está lista, con qué hacer en cada caso.',
+                    link: {
+                        label: 'Solución de problemas del minero',
+                        href: '/docs/miner/troubleshooting'
+                    }
+                },
+                {
+                    title: '¿Cómo se mide a un minero?',
+                    body: 'Los validadores recorren cadenas de mineros y guardan un registro firmado de cada salto completado, así que a un minero se le puntúa por el tráfico que realmente llevó. El enrutamiento y el emparejamiento de la red solo cambian cuando un cambio supera el ruido medido de su instrumento, y cada intento, incluidos los rechazados, se publica.',
+                    link: {
+                        label: 'Lee la metodología de investigación',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Salida',               body: 'Como salida, un minero es una IP de salida de la red compartida. Rechaza el tráfico que entra en conflicto con directrices regulatorias comunes como CFAA y DMCA, bloquea IPs maliciosas conocidas y solo enruta tráfico cifrado, protegiendo tanto a los mineros como a los usuarios.' },
             { tag: '02', title: 'Entrada',              body: 'Como entrada (extensor), un minero crea puntos de entrada que mejoran la accesibilidad en todo el mundo, usando TLS de N capas, suplantación de SNI y reenvío de confianza. Un subconjunto rotativo se expone en cada ciclo, y los clientes reintentan automáticamente los puntos de entrada que funcionaron antes.' },
@@ -253,8 +346,58 @@ operators: {
         intro:   'Los validadores son independientes. Cada uno hace staking de su propio UR y ejecuta el protocolo de verificación de enrutamiento, recorriendo continuamente cadenas de mineros asignadas por los operadores para probar el tránsito en tiempo real y medir qué mineros son los eslabones más débiles. Esa medición es la señal central por la que paga la red, y los validadores ganan dividendos nativos por producirla con precisión.',
         simCaption: 'Los validadores sondean la superficie de IPs disponible y clasifican a los mineros por confiabilidad.',
         cta: 'Conviértete en validador',
-        metaTitle: 'Validadores: mide la red UR y gana dividendos de SN25 — UR',
+        metaTitle: 'Validadores de UR SN25: mide la red y gana | UR',
         metaDescription: 'Los validadores de UR hacen staking de su UR, recorren cadenas de mineros para probar el tránsito y ganan dividendos de Bittensor por puntuar con precisión.',
+        guide: {
+            title: '¿Cómo ejecutas un validador en SN25?',
+            items: [
+                {
+                    title: '¿Qué ejecutas?',
+                    body: 'Un proceso validator en Bittensor SN25 (netuid 25). Recorre rastros de /verify por los mineros de cada operador, guarda la evidencia firmada y envía los pesos de mineros resultantes mediante el commit-reveal nativo de Bittensor.',
+                    link: {
+                        label: 'Qué ejecutan los mineros que mide',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: '¿Qué necesitas?',
+                    body: 'Un host Linux con almacenamiento persistente y acceso continuo a la API de cada operador configurado, una coldkey de Bittensor con fondos para registro, staking y comisiones, una hotkey de SN25 registrada con stake suficiente para un permiso de validador, y una configuración de producción aprobada del proceso de bootstrap del despliegue.'
+                },
+                {
+                    title: '¿De dónde vienen las recompensas?',
+                    body: 'Los validadores ganan dividendos nativos de Bittensor por una puntuación precisa y alineada con el consenso. Son distintos de las recompensas de mineros que se reclaman del vault de liquidación de UR, y no existe un comando validator claim.'
+                },
+                {
+                    title: '¿Cómo empiezas?',
+                    body: 'Descarga el validador de la página de versiones de build (binarios para Linux y macOS) o compílalo desde el código fuente, crea sus claves de servicio, regístrate y haz stake en SN25, autentícate con cada operador, luego aprovisiona la configuración y ejecútalo. La guía del validador recorre cada paso.'
+                }
+            ]
+        },
+        scoring: {
+            title: '¿En qué se distingue la puntuación de SN25?',
+            items: [
+                {
+                    title: 'Prueba de tránsito, no autodeclaraciones',
+                    body: 'Un validador recorre cadenas de mineros asignadas por los operadores y guarda un registro firmado y autoverificable de cada salto completado, así que una puntuación se basa en tráfico que de verdad se transportó, y cualquiera puede comprobar la prueba.'
+                },
+                {
+                    title: 'Pools por demanda y calidad, flotas por amplitud',
+                    body: 'En cada ciclo, un validador puntúa el pool de cada operador por demanda y calidad medida, y ordena las flotas principales por cuántas IP de salida distintas y enrutables sirven, no por volumen de tráfico. Mientras la tarifa publicada sea 0, cada pool recibe la misma demanda, así que solo la calidad medida dirige el canal de pools.'
+                },
+                {
+                    title: 'Copiar no da nada',
+                    body: 'Las puntuaciones se envían con commit-reveal, que oculta las de cada validador hasta que caducan, así que un validador tiene que recorrer rastros reales. El Yuma Consensus de Bittensor convierte las puntuaciones independientes en emisión para los mineros.'
+                },
+                {
+                    title: 'Cambios medidos, resultados publicados',
+                    body: 'El enrutamiento y el emparejamiento de la red se mejoran bajo una sola disciplina: un cambio cuenta solo si supera el ruido medido de su instrumento, y cada intento se publica, también los rechazados.',
+                    link: {
+                        label: 'Lee la metodología de investigación',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Recorrer las rutas',       body: 'Los validadores recorren cadenas de mineros asignadas por los operadores y recopilan un registro firmado y autoverificable de cada salto completado: prueba criptográfica del tránsito en tiempo real que cualquiera puede comprobar.' },
             { tag: '02', title: 'Puntuar la red',           body: 'En cada ciclo, un validador puntúa el pool de cada operador según la demanda y la calidad medida, y clasifica las principales flotas por amplitud de IPs enrutables, todo bajo commit-reveal. El Yuma Consensus de Bittensor convierte esas puntuaciones independientes en emisión para los mineros.' },
@@ -266,8 +409,9 @@ operators: {
     research: {
         eyebrow: 'Investigación',
         title:   'Algoritmos abiertos, datos abiertos.',
-        metaTitle: 'Investigación: algoritmos, datos y auditorías abiertos — UR',
+        metaTitle: 'Investigación: algoritmos, datos y auditorías abiertos | UR',
         metaDescription: 'Investigación abierta de UR: algoritmos de enrutamiento, matching, transferencia y recompensas con código y datos anónimos, el concurso Apex SN1 y auditorías.',
+        minersLink: 'Ejecuta un minero de UR en SN25: qué necesita y cómo se le paga',
         intro:   'El protocolo es un sistema nativo descentralizado, multi-IP y multi-transporte diseñado para escalar a millones de mineros por operador de red. Cada área algorítmica a continuación se publica con su código fuente y, cuando corresponde, conjuntos de datos anonimizados para análisis independiente.',
         // the card for the research report (an English page, so the link says so)
         report: {

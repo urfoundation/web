@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Advanced UR mining. Mine every listed operator with one hotkey, run several exits on one host, automate or separate claims, and claim your own miner UID as a head-tier fleet.
+description: Advanced UR mining: mine every listed operator with one hotkey, run several exits on one host, automate or split claims, and claim a head-tier miner UID.
 ---
 
 # Advanced mining

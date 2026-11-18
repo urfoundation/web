@@ -11,7 +11,7 @@
 export default {
     meta: {
         // the page's <title>: at most 60 characters
-        title: 'Build on UR | Network Operator opportunities',
+        title: 'Build on UR: Network Operator opportunities | UR',
         // the meta description: at most 175 characters
         description: 'Build products on UR as a Network Operator using shared residential capacity, measured service quality, and the SN25 incentive layer.',
         // the page's name in the breadcrumb trail

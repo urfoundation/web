@@ -76,18 +76,27 @@ export default {
         exitFullscreen: '退出全屏'
     },
 
+    // the guides a role page lists under its explanation (RoleGuide.jsx)
+    roleGuides: {
+        title: '指南',
+        miner: '如何运行矿工',
+        rewards: '领取挖矿报酬',
+        validator: '如何运行验证者',
+        operator: '如何成为网络运营商',
+        litepaper: '轻量白皮书'
+    },
     homepage: {
-        intro: 'UR 子网是构建在 Bittensor 上的隐私网络。子网会奖励为其做出贡献的人。运营商运行服务器，并为其所服务的流量存入 alpha。矿工承载加密流量并获得发行奖励。验证者重新测量网络、验证准确性并获得发行奖励。',
+        intro: 'UR (SN25) 是构建在 Bittensor 上的开源隐私网络。子网会奖励为其做出贡献的人。运营商运行服务器，并为其所服务的流量存入 alpha。矿工承载加密流量并获得发行奖励。验证者重新测量网络、验证准确性并获得发行奖励。',
         diagramAria: 'UR 网络的工作方式',
         rolesEyebrow: '参与网络',
         rolesTitle: '三种角色。一个可测量的网络。',
         roles: {
             operators: { name: '运营商', body: '运营商运行隐私服务器和验证端点。他们根据已服务的流量存入资金，共同签署每条测量路径，并提交将奖励分配给旗下矿工的支付清单。存款进入储备，运营商从不托管他人的资金。', explore: '了解运营商' },
-            miners: { name: '矿工', body: '矿工承载流量。他们运行节点，为一个或多个运营商路由加密流量，并按其承载的流量从子网发行中获得奖励；顶级集群还会因其保持可用的可路由 IP 而获得奖励。', explore: '了解矿工' },
+            miners: { name: '矿工', body: '矿工承载流量。他们运行节点，为一个或多个运营商路由加密流量，并按其承载的流量从子网发行中获得奖励；顶级集群还会因其保持可用的可路由 IP 而获得奖励。', bodyLink: '如何挖矿 SN25', explore: '了解矿工' },
             validators: { name: '验证者', body: '验证者重新测量网络。他们运行路由验证协议，并按需求和实测质量为每个运营商池评分。准确评分可获得子网发行奖励。', explore: '了解验证者' }
         },
         whitepaperCta: '阅读 Litepaper 了解更多详情',
-        metaTitle: 'UR | Bittensor SN25 上的去中心化隐私网络',
+        metaTitle: 'UR (SN25)：Bittensor 上的去中心化隐私网络',
         metaDescription: 'UR 是 Bittensor SN25 上开源的去中心化隐私网络：矿工承载加密流量，验证者对其进行测量，运营商带来需求。'
     },
 
@@ -209,8 +218,37 @@ operators: {
         title:   '运行网络的运营商。',
         intro:   '网络运营商运行隐私服务器和验证端点。运营商作为一种有收入支撑的真实需求信号向子网存入资金，运行路由验证协议、为每一条被测量的路径共同签名，并提交支付清单，将其奖励在附属于它的各矿工之间进行分配。运营商报告奖励分配所依据的用量，但从不持有任何他人的资金。',
         cta: '成为网络运营商',
-        metaTitle: '网络运营商：在 SN25 上运行 UR 隐私服务器 — UR',
-        metaDescription: '网络运营商运行 UR 隐私服务器和 /verify 端点，存入 alpha 作为有收入支撑的需求信号，并报告其矿工获得报酬所依据的用量。',
+        metaTitle: 'UR 网络运营商：在 SN25 上运行隐私服务器 | UR',
+        metaDescription: '网络运营商运行 UR 隐私服务器和 /verify 端点，存入 alpha 作为有收入支撑的需求信号，并报告其矿工的用量。',
+        guide: {
+            title: '网络运营商要运行什么？',
+            items: [
+                {
+                    title: '你要运行什么？',
+                    body: '一个运营商可执行文件，提供用户和矿工接入的 API 与 Connect 服务、验证者行走的 /verify 端点，以及结算矿工奖励的纪元流水线。它由 PostgreSQL、Redis、产物存储和公网 TLS 入口支撑。'
+                },
+                {
+                    title: '需要什么？',
+                    body: '一台 Linux 主机和你自己的域名，PostgreSQL、Redis 和本地持久产物存储，运营商密钥和签名者，出口探测，以及一个公开的统计源（stats.json），以便运营商目录收录你。',
+                    link: {
+                        label: '矿工如何加入运营商的矿池',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: '钱从哪里来？',
+                    body: '运营商带来自己的用户和产品，并存入 alpha，作为由收入支撑的真实需求信号；在公布费率为 0 期间无需存款。每个纪元，它提交把矿池分给其矿工的支付列表，矿工直接从结算金库领取：运营商从不持有他人的 alpha。ur.io 的应用就是一个运营商的产品。',
+                    link: {
+                        label: '查看 ur.io 的应用',
+                        href: 'https://ur.io/products'
+                    }
+                },
+                {
+                    title: '如何开始？',
+                    body: '在启动阶段，运营商准入由子网所有者把关，所以第一步是与子网所有者沟通：他会注册你的身份并给你运营商 id。之后，运营商指南会带你完成构建、配置和第一个纪元。'
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: '运行服务器',       body: '运营商运行隐私服务器和为每一条被测量的路径共同签名的 /verify 端点——它是用户与承载流量的矿工之间的协调层。' },
             { tag: '02', title: '发出真实需求信号', body: '运营商按其真实使用量以 alpha 计费。每一笔存入都会进入储备，用于支付经审计的使用量，验证者在为各池评分时会将该使用量计入权重。' },
@@ -225,7 +263,8 @@ operators: {
     },
 
     miners: {
-        eyebrow: '矿工',
+        eyebrow: '如何在 Bittensor SN25 上挖矿',
+        breadcrumb: '矿工',
         title:   '将 IP 子网转化为加密互联网的矿工。',
         intro:   '矿工们竞相在网络上提供尽可能多的 IPv4 /29 与 IPv6 /48 子网——每个子网在任何时刻都可用于入口或出口流量的路由。换句话说，矿工把公共互联网转变为人人都能使用的匿名私有网络。每个矿工同时承载入口与出口流量，运行默认安全的安全模型，仅路由加密流量，并因其承载的流量与贡献的可路由容量而从子网发行中获得报酬。覆盖最多不同可路由子网的集群会被晋升为顶级矿工并赚取更多——一切都在用户空间中、在你已拥有的硬件上运行。',
         both:    '矿工既是扩展器也是提供者：每个矿工同时承担入口和出口两种角色。它会根据所运行的系统自动完成配置。',
@@ -234,8 +273,62 @@ operators: {
         globeLabels: { provider: '提供者', extender: '扩展器', miner: '矿工' },
         simCaption: '矿工竞相在网络上稳定提供最多的独立 IP。顶级矿工会晋升到属于自己的 UID 槽位。',
         cta: '成为矿工',
-        metaTitle: '矿工：承载加密流量，赚取 SN25 发行奖励 — UR',
-        metaDescription: 'UR 矿工让 IPv4 /29 与 IPv6 /48 子网在 Bittensor SN25 上可路由，承载加密流量，并凭其承载的流量与覆盖赚取发行奖励。',
+        metaTitle: '如何在 Bittensor SN25 上挖矿：UR 矿工 | UR',
+        metaDescription: '如何作为 UR 矿工在 Bittensor SN25 上挖矿：运行什么、硬件要求、Linux、macOS 与 Windows 安装步骤、奖励如何确定，以及故障排查。',
+        guide: {
+            title: '如何开始在 SN25 上挖矿？',
+            compared: { label: '对比', links: [{ label: 'Mysterium', href: '/docs/compare/mysterium' }, { label: 'Grass', href: '/docs/compare/grass' }, { label: 'Sentinel', href: '/docs/compare/sentinel' }, { label: 'Orchid', href: '/docs/compare/orchid' }, { label: '所有带宽共享网络', href: '/docs/compare' }] },
+            items: [
+                {
+                    title: '你要运行什么？',
+                    body: '你在一台保持在线的电脑上运行矿工程序 provider。每个矿工既是提供者（流量的出口），也是扩展器（入口点），并会根据所在系统自动完成配置。大多数矿工加入某个网络运营商的矿池，因此不需要自己在 Bittensor 上注册。在手机或电脑上，也可以改用 URnetwork 应用在后台挖矿，由 URnetwork 担任运营商。',
+                    link: {
+                        label: '获取 URnetwork 应用',
+                        href: 'https://ur.io/install'
+                    }
+                },
+                {
+                    title: '需要什么硬件？',
+                    body: '一台保持在线的电脑：家用电脑、服务器或 Raspberry Pi 2 及更新机型都可以。每个版本都包含适用于以下系统的矿工：64 位和 32 位 Intel、AMD 与 ARM 上的 Linux（不支持 Pi Zero 或 Pi 1），Apple 芯片和 Intel 上的 macOS（安装程序需要 macOS 12 或更高版本），以及 64 位 Intel 或 AMD 和 ARM64 上的 Windows。每个矿工需要一个稳定的公网地址。其扩展器需要开放入站 TCP 443 端口；建议开放 UDP 443 和 4053 端口。',
+                    link: {
+                        label: '查看构建版本',
+                        href: 'https://github.com/urnetwork/build/releases'
+                    }
+                },
+                {
+                    title: '奖励从哪里来？',
+                    body: '来自子网的矿工发行，而不是按字节计的固定价格。在运营商的矿池中，一台设备的份额取决于它完成的流量以及验证者测得的可靠程度；同样大小的付费流量和免费流量获得相同的积分。Momentum 是现在发放的矿工发行份额，为 10%；其余部分进入 Network Capacity Reserve。实际发放多少，以你的运营商公布的政策和支付文件为准。',
+                    link: {
+                        label: '奖励如何计算',
+                        href: '/docs/miner/rewards#how-rewards-are-counted'
+                    }
+                },
+                {
+                    title: '如何开始？',
+                    body: '在一个网络运营商处创建账户（若不另选，矿工默认使用 bringyour.com）并获取授权码。安装矿工（适用于你系统的安装程序会在后台运行它并保持更新），运行 provider setup，它会登录并设置接收奖励的 Bittensor coldkey，然后用 provider status 查看运行情况。',
+                    link: {
+                        label: 'Linux、macOS 和 Windows 的安装步骤',
+                        href: '/docs/miner/install'
+                    }
+                },
+                {
+                    title: '出了问题怎么办？',
+                    body: '先问矿工本身：provider status 和 provider doctor 会报告它看到的情况。故障排查页面列出了常见提示，从登录错误、矿工反复被拒绝，到扩展器无法绑定 TCP 443 端口、领取证明尚未就绪，并说明每种情况该怎么做。',
+                    link: {
+                        label: '矿工故障排查',
+                        href: '/docs/miner/troubleshooting'
+                    }
+                },
+                {
+                    title: '矿工如何被衡量？',
+                    body: '验证者沿矿工链路行走，并为每个完成的跳点保存签名记录，因此矿工的评分基于它实际承载的流量。网络的路由与匹配只有在某项改动超过其测量工具的实测噪声时才会改变，而每一次尝试，包括被否决的，都会公开。',
+                    link: {
+                        label: '阅读研究方法',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: '出口',             body: '作为出口，矿工是共享网络的出口 IP。它拒绝与 CFAA、DMCA 等常见监管方向相冲突的流量，阻止已知的恶意 IP，并且只路由加密流量——从而同时保护矿工与用户。' },
             { tag: '02', title: '入口',             body: '作为入口（扩展器），矿工创建入口点，改善全球范围的可达性——使用 N 层 TLS、SNI 伪装以及可信转发。每个周期会曝光一个轮换的子集，客户端会自动重试之前有效的入口点。' },
@@ -251,8 +344,58 @@ operators: {
         intro:   '验证者是独立的。每个验证者质押自己的 UR，运行路由验证协议——持续遍历由运营商指定的矿工链，以证明实时中转并衡量哪些矿工是最薄弱的环节。这一衡量正是网络付费购买的核心信号，验证者因准确地产生这一衡量而赚取原生分红。',
         simCaption: '验证者探测可用的 IP 覆盖面，并按可靠性为矿工排名。',
         cta: '成为验证者',
-        metaTitle: '验证者：测量 UR 网络，赚取 SN25 分红 — UR',
+        metaTitle: 'UR SN25 验证者：测量网络并获得收益 | UR',
         metaDescription: 'UR 验证者质押自己的 UR，遍历运营商指定的矿工链以证明实时中转，并因准确评分赚取 Bittensor 分红。',
+        guide: {
+            title: '如何在 SN25 上运行验证者？',
+            items: [
+                {
+                    title: '你要运行什么？',
+                    body: '在 Bittensor SN25（netuid 25）上运行一个 validator 进程。它经由每个运营商的矿工走 /verify 路径，保存签名证据，并通过 Bittensor 原生的 commit-reveal 提交由此得出的矿工权重。',
+                    link: {
+                        label: '它所衡量的矿工运行什么',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: '需要什么？',
+                    body: '一台带持久存储、能持续访问每个已配置运营商 API 的 Linux 主机，一个有资金支付注册、质押和手续费的 Bittensor coldkey，一个已注册且质押足以获得验证者许可的 SN25 hotkey，以及部署引导流程给出的已批准生产配置。'
+                },
+                {
+                    title: '奖励从哪里来？',
+                    body: '验证者因准确、与共识一致的评分获得 Bittensor 原生分红。它与从 UR 结算金库领取的矿工奖励是分开的，也没有 validator claim 命令。'
+                },
+                {
+                    title: '如何开始？',
+                    body: '从 build 发布页下载验证者（提供 Linux 和 macOS 二进制文件）或从源代码构建，创建服务密钥，在 SN25 上注册并质押，向每个运营商完成认证，然后准备好配置并运行。验证者指南会逐步说明。'
+                }
+            ]
+        },
+        scoring: {
+            title: 'SN25 的评分有何不同？',
+            items: [
+                {
+                    title: '传输证明，而非自我申报',
+                    body: '验证者沿运营商分配的矿工链路行走，并为每个完成的跳保存一份签名、可自证的记录，因此评分依据的是真正承载过的流量，任何人都可以核验证明。'
+                },
+                {
+                    title: '矿池看需求和质量，集群看覆盖广度',
+                    body: '每个周期，验证者按需求和测得的质量为每个运营商的矿池评分，并按其服务的不同、可路由出口 IP 数量（而不是流量大小）为头部集群排名。在公布费率为 0 期间，每个矿池获得相同的需求，因此只有测得的质量引导矿池通道。'
+                },
+                {
+                    title: '抄袭毫无收益',
+                    body: '评分通过 commit-reveal 提交，在评分过时之前隐藏每个验证者的评分，所以验证者必须真正走完路径。Bittensor 的 Yuma 共识把这些独立评分转化为矿工发行。'
+                },
+                {
+                    title: '经过测量的改动，公开的结果',
+                    body: '网络的路由和匹配按同一套纪律改进：一项改动只有超过其测量工具的实测噪声才算数，每次尝试都会公开，包括被否决的。',
+                    link: {
+                        label: '阅读研究方法',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: '遍历路由',       body: '验证者遍历由运营商指定的矿工链，并为每一个已完成的跳收集一份带签名、自证明的记录——这是任何人都可以核查的实时中转的密码学证明。' },
             { tag: '02', title: '为网络评分',     body: '每个周期，验证者按需求与实测质量为每个运营商的池评分，并按可路由 IP 广度对顶级集群排名——全部在提交-揭示（commit-reveal）机制下进行。Bittensor 的 Yuma Consensus 将这些独立的评分转化为矿工发行。' },
@@ -264,8 +407,9 @@ operators: {
     research: {
         eyebrow: '研究',
         title:   '开放算法，开放数据。',
-        metaTitle: '研究：开放的算法、数据与审计 — UR',
+        metaTitle: '研究：开放的算法、数据与审计 | UR',
         metaDescription: '公开的 UR 研究：路由、匹配、传输与奖励算法及其源代码和匿名数据，Apex SN1 延迟竞赛，以及审计。',
+        minersLink: '在 SN25 上运行 UR 矿工：需要什么，如何获得报酬',
         intro:   '协议是一个去中心化原生、多 IP、多传输的系统，旨在扩展到每个网络运营商数百万矿工的规模。下面的每个算法领域都发布了其源代码，以及（如适用）用于独立分析的匿名数据集。',
         // the card for the research report (an English page, so the link says so)
         report: {

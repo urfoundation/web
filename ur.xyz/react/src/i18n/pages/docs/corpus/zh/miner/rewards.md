@@ -5,7 +5,7 @@ description: 在 UR 上挖矿获得报酬。设置矿工收益所对应的收款
 
 # 挖矿获得报酬
 
-你的矿工会因其承载的流量获得收益。本页介绍获得报酬的三个部分：告诉运营商向哪个 Bittensor 钱包付款（[设置收款钱包](#set-your-payout-wallet)）、[奖励如何计算](#how-rewards-are-counted)，以及[领取奖励](#claim-your-rewards)。
+你的矿工会因其承载的流量获得收益。本页介绍获得报酬的三个部分：告诉运营商向哪个 Bittensor 钱包付款（[设置收款钱包](#set-your-payout-wallet)）、[奖励如何计算](#how-rewards-are-counted)，以及[领取奖励](#claim-your-rewards)。想了解这个角色的全貌，请看[SN25 挖矿如何运作](/miners)。
 
 如果你使用了安装程序，凡是本页写 `provider` 的地方都请输入 `urnetwork`。
 

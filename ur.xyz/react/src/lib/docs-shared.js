@@ -13,7 +13,7 @@ export const HIDDEN_DOC_SLUGS = new Set([]);
 // The corpus, in the order the sidebar, the landing and the llms files list
 // it: the three role guides, then the litepaper. A document not named here is
 // listed after them, so a new document is never silently missing.
-export const DOC_ORDER = Object.freeze(['miner', 'validator', 'operator', 'litepaper']);
+export const DOC_ORDER = Object.freeze(['miner', 'validator', 'operator', 'litepaper', 'compare']);
 
 // A role guide split over several pages: the guide itself (its README, the
 // overview and quick start) and its chapters, docs/<guide>/<chapter>.md, in
@@ -25,7 +25,19 @@ export const DOC_CHAPTERS = Object.freeze({
         label: 'Miner guide',
         chapters: Object.freeze(['install', 'run', 'extender', 'updates', 'rewards', 'troubleshooting', 'advanced', 'reference']),
     }),
+    // A UR miner beside other bandwidth-sharing networks, mechanisms only
+    // (owner decision 2026-11-18: no earnings figures for anyone): the list
+    // page (docs/compare/README.md) and one page per network.
+    compare: Object.freeze({
+        label: 'Compared with',
+        chapters: Object.freeze(['mysterium', 'grass', 'sentinel', 'orchid']),
+    }),
 });
+
+// Documents llms-full.txt does not embed (llms.txt still lists them): the
+// comparison pages are not part of the mechanism an agent needs in one fetch,
+// and llms-full.txt has a size budget (seo-audit.mjs).
+export const LLMS_FULL_EXCLUDED = new Set(['compare']);
 
 /** The chapter slugs of a guide, in reading order: "miner/install", … (none for a single-page guide). */
 export function chapterSlugs(guide) {
@@ -53,6 +65,11 @@ export const DOC_PUBLISHED = Object.freeze({
     operator: '2026-09-26',
     litepaper: '2026-08-18',
     'support/delete': '2026-04-16',
+    compare: '2026-11-18',
+    'compare/mysterium': '2026-11-18',
+    'compare/grass': '2026-11-18',
+    'compare/sentinel': '2026-11-18',
+    'compare/orchid': '2026-11-18',
 });
 
 // Published (the page, its /<lang>/docs stub and its markdown twin) but listed

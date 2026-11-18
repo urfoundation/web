@@ -1,7 +1,7 @@
 // /build in Arabic: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: 'ابنِ على UR | فرص مشغّلي الشبكة',
+        title: 'ابنِ على UR: فرص مشغّلي الشبكة | UR',
         description: 'ابنِ منتجات على UR بصفتك مشغّل شبكة، مستفيدًا من السعة السكنية المشتركة وجودة الخدمة المُقاسة وطبقة الحوافز في SN25.',
         breadcrumb: 'ابنِ على UR',
     },

@@ -20,7 +20,7 @@ const description = sentenceClamp(t.homepage.metaDescription || t.homepage.intro
 // No VideoObject: the launch film opens in an overlay that mounts on demand,
 // so the page's HTML carries no <video> for the markup to describe.
 ---
-<Base title={title} description={description} lang="en">
+<Base title={title} description={description} lang="en" alternate={{ href: '/index.md', type: 'text/markdown' }}>
     {/* the stored-language redirect (a visitor who chose another language
         reads this page in it) is in Base's head */}
     <div class="app">
@@ -36,7 +36,7 @@ const description = sentenceClamp(t.homepage.metaDescription || t.homepage.intro
         </main>
 
         <FooterStatic t={t} lang="en" />
-        <LaunchVideoIsland lang="en" client:load />
+        <LaunchVideoIsland lang="en" client:idle />
     </div>
 </Base>
 

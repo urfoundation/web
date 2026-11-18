@@ -5,7 +5,7 @@ description: Bezahlt werden fürs Mining auf UR: die Auszahlungs-Wallet deines M
 
 # Für das Mining bezahlt werden
 
-Dein Miner verdient für den Verkehr, den er trägt. Diese Seite behandelt die drei Teile des Bezahltwerdens: dem Betreiber mitteilen, an welche Bittensor-Wallet er zahlen soll ([lege deine Auszahlungs-Wallet fest](#set-your-payout-wallet)), [wie Belohnungen gezählt werden](#how-rewards-are-counted) und [sie beanspruchen](#claim-your-rewards).
+Dein Miner verdient für den Verkehr, den er trägt. Diese Seite behandelt die drei Teile des Bezahltwerdens: dem Betreiber mitteilen, an welche Bittensor-Wallet er zahlen soll ([lege deine Auszahlungs-Wallet fest](#set-your-payout-wallet)), [wie Belohnungen gezählt werden](#how-rewards-are-counted) und [sie beanspruchen](#claim-your-rewards). Wie die Rolle zusammenpasst, zeigt [wie Mining auf SN25 funktioniert](/miners).
 
 Wenn du einen Installer benutzt hast, tippe `urnetwork` überall, wo diese Seite `provider` sagt.
 

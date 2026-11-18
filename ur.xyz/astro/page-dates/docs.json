@@ -2,388 +2,508 @@
   "about": "The day each page of the ur.xyz page group docs (react/src/i18n/pages/docs/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
     "/ar/docs": {
-      "fingerprint": "2ba217a26e9f8877",
-      "lastmod": "2026-11-12"
+      "fingerprint": "77499809a632cac6",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/docs/compare": {
+      "fingerprint": "934838f333d50dbe",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/docs/compare/grass": {
+      "fingerprint": "e599f522cef91619",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/docs/compare/mysterium": {
+      "fingerprint": "53b5cf56a4feead2",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/docs/compare/orchid": {
+      "fingerprint": "b5b351e5d57db844",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/docs/compare/sentinel": {
+      "fingerprint": "30cc6161bf57b609",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/litepaper": {
-      "fingerprint": "66381779034f6d27",
-      "lastmod": "2026-11-12"
+      "fingerprint": "251e538384cef6e1",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner": {
-      "fingerprint": "6bd03a926806fb80",
-      "lastmod": "2026-11-12"
+      "fingerprint": "19ff8faa4a2ada72",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/advanced": {
-      "fingerprint": "19dfdc7fcc47ff33",
-      "lastmod": "2026-11-16"
+      "fingerprint": "e82f7f6b0e702ee5",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/extender": {
-      "fingerprint": "afeee33de2ec6bea",
-      "lastmod": "2026-11-12"
+      "fingerprint": "58c83ee82c6b9d8d",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/install": {
-      "fingerprint": "de5bf789f840a383",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f4fbea3e0969206b",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/reference": {
-      "fingerprint": "6852633ed4fc29d9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "97858586822cd760",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/rewards": {
-      "fingerprint": "36de38acf73088fa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "23714549d8a59258",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/run": {
-      "fingerprint": "13fac483cd7ef8a7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7ba93a97608ebff5",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/troubleshooting": {
-      "fingerprint": "6b4a782f07bacfc8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "910bd4ab41f331ee",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/miner/updates": {
-      "fingerprint": "4b5b3af48d9efb41",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9b58c2a5ee62b67b",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/operator": {
-      "fingerprint": "49094832acf29ee9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7947f51e378db739",
+      "lastmod": "2026-11-18"
     },
     "/ar/docs/validator": {
-      "fingerprint": "b1508c8dd4ccaff3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7c713588b9039a46",
+      "lastmod": "2026-11-18"
     },
     "/ar/privacy": {
-      "fingerprint": "be3651217b58bd6a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "73ce5223fe3add25",
+      "lastmod": "2026-11-18"
     },
     "/ar/terms": {
-      "fingerprint": "ce9ad2278312579e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4ff0a1611c9220e2",
+      "lastmod": "2026-11-18"
     },
     "/ar/vdp": {
-      "fingerprint": "73dad45b8af2e52c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ba81e9948b4edd90",
+      "lastmod": "2026-11-18"
     },
     "/de/docs": {
-      "fingerprint": "4a07fa0016ed2957",
-      "lastmod": "2026-11-12"
+      "fingerprint": "71ae87dae928a7f9",
+      "lastmod": "2026-11-18"
+    },
+    "/de/docs/compare": {
+      "fingerprint": "dd1f8ba8122372ba",
+      "lastmod": "2026-11-18"
+    },
+    "/de/docs/compare/grass": {
+      "fingerprint": "cec55ce71b8effd0",
+      "lastmod": "2026-11-18"
+    },
+    "/de/docs/compare/mysterium": {
+      "fingerprint": "fc4528087b21c3bf",
+      "lastmod": "2026-11-18"
+    },
+    "/de/docs/compare/orchid": {
+      "fingerprint": "7a2b7fa46c48c3b8",
+      "lastmod": "2026-11-18"
+    },
+    "/de/docs/compare/sentinel": {
+      "fingerprint": "1ffe8f5c8c76ed1c",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/litepaper": {
-      "fingerprint": "1f3201c73060abf4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d0fac4e29472fe59",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner": {
-      "fingerprint": "8494642f0c724a4f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8596d84c65bb94fb",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/advanced": {
-      "fingerprint": "76d3b34ea6f216d3",
-      "lastmod": "2026-11-16"
+      "fingerprint": "45f705fa194a8d52",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/extender": {
-      "fingerprint": "afbed17874b1e4d7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c5d336c7e9534d1c",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/install": {
-      "fingerprint": "d9a7ed689395f06c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "35e4da86cdd36b87",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/reference": {
-      "fingerprint": "96b4179d80679f65",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4a1c8dbe40316c3e",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/rewards": {
-      "fingerprint": "6891c67d269dd25b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8d7ecfbd367a022c",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/run": {
-      "fingerprint": "38af6ac9800c13dc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d41f8eed9f7b1b0b",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/troubleshooting": {
-      "fingerprint": "63aded27aa4fc26a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cff1abfc8ef1fa9f",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/miner/updates": {
-      "fingerprint": "b900094ab24fb8a2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "87c00c414b2d4984",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/operator": {
-      "fingerprint": "32bb6bc93e5fbc95",
-      "lastmod": "2026-11-12"
+      "fingerprint": "156b5c6b49f98b38",
+      "lastmod": "2026-11-18"
     },
     "/de/docs/validator": {
-      "fingerprint": "d65a6e4daf60b05d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9c67115a000c47a9",
+      "lastmod": "2026-11-18"
     },
     "/de/privacy": {
-      "fingerprint": "b329e8741478d041",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f082fd7119d59a24",
+      "lastmod": "2026-11-18"
     },
     "/de/terms": {
-      "fingerprint": "c99180cdb7441be8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e81f4c3f799ca4b7",
+      "lastmod": "2026-11-18"
     },
     "/de/vdp": {
-      "fingerprint": "12bc80e9afd6f253",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ef9f00c5fcea1eb",
+      "lastmod": "2026-11-18"
     },
     "/docs": {
-      "fingerprint": "a3d7bdb86b8ded9a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2220ab52a89771ad",
+      "lastmod": "2026-11-18"
+    },
+    "/docs/compare": {
+      "fingerprint": "9e5fe7ccbd21d25b",
+      "lastmod": "2026-11-18"
+    },
+    "/docs/compare/grass": {
+      "fingerprint": "1cab341d615a1e6e",
+      "lastmod": "2026-11-18"
+    },
+    "/docs/compare/mysterium": {
+      "fingerprint": "5abfcb4f3ecf4a68",
+      "lastmod": "2026-11-18"
+    },
+    "/docs/compare/orchid": {
+      "fingerprint": "a9e81415cea38e76",
+      "lastmod": "2026-11-18"
+    },
+    "/docs/compare/sentinel": {
+      "fingerprint": "8f457a757e6e978b",
+      "lastmod": "2026-11-18"
     },
     "/docs/litepaper": {
-      "fingerprint": "6f93e7c8693999ba",
-      "lastmod": "2026-11-11"
+      "fingerprint": "2e0b72db1c61e23c",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner": {
-      "fingerprint": "7a07b449df5bdf7f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d46d3944f6e40e2c",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/advanced": {
-      "fingerprint": "8e19487629b534e7",
-      "lastmod": "2026-11-16"
+      "fingerprint": "e85a0a97a4f9f2bd",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/extender": {
-      "fingerprint": "d208ac65be8504e7",
-      "lastmod": "2026-11-11"
+      "fingerprint": "52381440e15099d7",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/install": {
-      "fingerprint": "adfcfcf4bb98af5e",
-      "lastmod": "2026-11-11"
+      "fingerprint": "1800698a070b6f4a",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/reference": {
-      "fingerprint": "ebc58c128914af33",
-      "lastmod": "2026-10-22"
+      "fingerprint": "51498a54fd7f5266",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/rewards": {
-      "fingerprint": "a80cef42fcdff894",
-      "lastmod": "2026-10-22"
+      "fingerprint": "afb546b2dc11b291",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/run": {
-      "fingerprint": "4e57ccc199e1f0cc",
-      "lastmod": "2026-11-11"
+      "fingerprint": "2533a007d244b7eb",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/troubleshooting": {
-      "fingerprint": "721a54b1eae13b70",
-      "lastmod": "2026-11-11"
+      "fingerprint": "ffcb96785a081207",
+      "lastmod": "2026-11-18"
     },
     "/docs/miner/updates": {
-      "fingerprint": "7ff3e36f70b5498e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "08cb23ef9298aa5c",
+      "lastmod": "2026-11-18"
     },
     "/docs/operator": {
-      "fingerprint": "04eb81f9993dee65",
-      "lastmod": "2026-11-12"
+      "fingerprint": "584503568552f78a",
+      "lastmod": "2026-11-18"
     },
     "/docs/validator": {
-      "fingerprint": "379ef84ea8d1a11b",
-      "lastmod": "2026-10-07"
+      "fingerprint": "c87918e2bcab2b51",
+      "lastmod": "2026-11-18"
     },
     "/es/docs": {
-      "fingerprint": "6f4a8126fd0325d4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e74e327cf011ea9c",
+      "lastmod": "2026-11-18"
+    },
+    "/es/docs/compare": {
+      "fingerprint": "49df8652630c3655",
+      "lastmod": "2026-11-18"
+    },
+    "/es/docs/compare/grass": {
+      "fingerprint": "56c21caaa2a5b664",
+      "lastmod": "2026-11-18"
+    },
+    "/es/docs/compare/mysterium": {
+      "fingerprint": "b348d3183aaa9f47",
+      "lastmod": "2026-11-18"
+    },
+    "/es/docs/compare/orchid": {
+      "fingerprint": "7488378e5eeadc69",
+      "lastmod": "2026-11-18"
+    },
+    "/es/docs/compare/sentinel": {
+      "fingerprint": "e4ce4f7548e4f1bf",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/litepaper": {
-      "fingerprint": "832b382f7dc37571",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2f5b7245f38c6bc4",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner": {
-      "fingerprint": "c9b4bc9926ade3a7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2e0cf3574a848c34",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/advanced": {
-      "fingerprint": "028f8baea808dea1",
-      "lastmod": "2026-11-16"
+      "fingerprint": "73c90b143a073658",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/extender": {
-      "fingerprint": "5f69dbddf59feaf7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a1e45383e3ca1b57",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/install": {
-      "fingerprint": "67ad79f8538ad11c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "289acc3500b53f60",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/reference": {
-      "fingerprint": "ecbc2cfa7e818087",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f49fc404925b5700",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/rewards": {
-      "fingerprint": "c1e60e8356b6b0e4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b6491712b8ff12d1",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/run": {
-      "fingerprint": "acabf616ef2db0be",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e1cb38b6b9d40b58",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/troubleshooting": {
-      "fingerprint": "2d094c0db1f49c2a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d0ca35d322bf2872",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/miner/updates": {
-      "fingerprint": "651075a365750443",
-      "lastmod": "2026-11-12"
+      "fingerprint": "052e85fa160f30a5",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/operator": {
-      "fingerprint": "f47998009f8aa2b4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8170b7712a032935",
+      "lastmod": "2026-11-18"
     },
     "/es/docs/validator": {
-      "fingerprint": "8f7a314c4f1dc135",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a973d49b3d7d8b3a",
+      "lastmod": "2026-11-18"
     },
     "/es/privacy": {
-      "fingerprint": "a99c9a78c1a2c873",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bef7adf2d2749444",
+      "lastmod": "2026-11-18"
     },
     "/es/terms": {
-      "fingerprint": "2bcdec39bd92cb19",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2ca4e4a5d794c533",
+      "lastmod": "2026-11-18"
     },
     "/es/vdp": {
-      "fingerprint": "1e9524053065f431",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fccb932d444b9532",
+      "lastmod": "2026-11-18"
     },
     "/privacy": {
-      "fingerprint": "a14ca6884f5119cc",
-      "lastmod": "2026-09-25"
+      "fingerprint": "26d1dc350715ec28",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs": {
-      "fingerprint": "8260151ab5667b4b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "db03d9ed36e86c11",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/docs/compare": {
+      "fingerprint": "9e8c462cc2e111cc",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/docs/compare/grass": {
+      "fingerprint": "98fd1743ac7a309e",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/docs/compare/mysterium": {
+      "fingerprint": "4c4bb56d498e8de3",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/docs/compare/orchid": {
+      "fingerprint": "f8230921953949ab",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/docs/compare/sentinel": {
+      "fingerprint": "469f883ae5e641de",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/litepaper": {
-      "fingerprint": "ea629b67831ceac3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8e09a522e5d863ed",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner": {
-      "fingerprint": "674f213fe1900c51",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c4bff935cbec0db1",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/advanced": {
-      "fingerprint": "160140552cd23d50",
-      "lastmod": "2026-11-16"
+      "fingerprint": "44894800c8ec49b1",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/extender": {
-      "fingerprint": "74a50593733da30d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cc77d4d3e0f7349a",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/install": {
-      "fingerprint": "8583ecd4f2aacc87",
-      "lastmod": "2026-11-12"
+      "fingerprint": "667862b83f6c72ab",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/reference": {
-      "fingerprint": "ad676c0133338f06",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b6ab69cca5d10a92",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/rewards": {
-      "fingerprint": "7d6f91f344136b78",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ffe6a85d37f5a3d4",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/run": {
-      "fingerprint": "995938b490df626a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "72d4bef689aad67d",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/troubleshooting": {
-      "fingerprint": "00a97c7dbd52b5f6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "36925cbcdb7fcc01",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/miner/updates": {
-      "fingerprint": "450d145ed5553b35",
-      "lastmod": "2026-11-12"
+      "fingerprint": "784cb72bf4247936",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/operator": {
-      "fingerprint": "dd75e204a08d25f4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a0203dd354a5e65e",
+      "lastmod": "2026-11-18"
     },
     "/ru/docs/validator": {
-      "fingerprint": "b66d742eef9494b8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2dd69b9912999b08",
+      "lastmod": "2026-11-18"
     },
     "/ru/privacy": {
-      "fingerprint": "50e3088de9fcd75d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8eaa6d2b9166317a",
+      "lastmod": "2026-11-18"
     },
     "/ru/terms": {
-      "fingerprint": "ce8c7d4f2c92f12d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1e39f9aed7a60d37",
+      "lastmod": "2026-11-18"
     },
     "/ru/vdp": {
-      "fingerprint": "110b6e21e4c7725b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e5f7741dd586604d",
+      "lastmod": "2026-11-18"
     },
     "/terms": {
-      "fingerprint": "5c68c785434f7066",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b3dc6bd68022c247",
+      "lastmod": "2026-11-18"
     },
     "/vdp": {
-      "fingerprint": "c5ed84b60e9ab960",
-      "lastmod": "2026-08-14"
+      "fingerprint": "d14185f481f2d21d",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs": {
-      "fingerprint": "738d48ecbc0dc806",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3a0bc44fc219e2cb",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/docs/compare": {
+      "fingerprint": "da9719466930ee74",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/docs/compare/grass": {
+      "fingerprint": "e2b924f43964333d",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/docs/compare/mysterium": {
+      "fingerprint": "5080abf5b4200ea4",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/docs/compare/orchid": {
+      "fingerprint": "18cb7a32de701b50",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/docs/compare/sentinel": {
+      "fingerprint": "90a5d1c153a0e6c8",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/litepaper": {
-      "fingerprint": "834100f322e052cc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fa609d7b66ab28ef",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner": {
-      "fingerprint": "d3c6e092678b8580",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9622b5e2fd3b0880",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/advanced": {
-      "fingerprint": "ffb3a6faccf0cb40",
-      "lastmod": "2026-11-16"
+      "fingerprint": "91d8e9a33eaddd7f",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/extender": {
-      "fingerprint": "3c72342a0c08cf80",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4cdf7705f0228050",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/install": {
-      "fingerprint": "998a0230d8a98692",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3687ed608fa020ab",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/reference": {
-      "fingerprint": "f4a800ab45836c9c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "792ce5c1835e3d00",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/rewards": {
-      "fingerprint": "4f41397a24971d6d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "20d75fbcc15c1f67",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/run": {
-      "fingerprint": "6d14c91cd44af2ba",
-      "lastmod": "2026-11-12"
+      "fingerprint": "89d18145d8ea4164",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/troubleshooting": {
-      "fingerprint": "a58a10809a8b7b8d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f575042936fda3f4",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/miner/updates": {
-      "fingerprint": "ef9087333ea69d0b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e5bd4036fceda798",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/operator": {
-      "fingerprint": "c6682bce17a4316c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b2805f5e3d9842d2",
+      "lastmod": "2026-11-18"
     },
     "/zh/docs/validator": {
-      "fingerprint": "d6bc24c800a73c16",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8ad1b9bd18371734",
+      "lastmod": "2026-11-18"
     },
     "/zh/privacy": {
-      "fingerprint": "49e6e8a13dcdcfb4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bfc6fa4bfc9c1234",
+      "lastmod": "2026-11-18"
     },
     "/zh/terms": {
-      "fingerprint": "8cee7702fdb26376",
-      "lastmod": "2026-11-12"
+      "fingerprint": "50000e0dbc7f4096",
+      "lastmod": "2026-11-18"
     },
     "/zh/vdp": {
-      "fingerprint": "60df8d0b3b65c156",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bba236085c5e2e14",
+      "lastmod": "2026-11-18"
     }
   }
 }

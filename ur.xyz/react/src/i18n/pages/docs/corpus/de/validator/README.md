@@ -10,9 +10,9 @@ Validatoren verdienen **native Bittensor-Dividenden**. Sie sind getrennt von den
 
 Dieser Leitfaden behandelt einen SN25-Validator. Ein **Root-Validator auf netuid 0** hat eine eigene Registrierung, einen eigenen Betrieb und eigene Korb-Claims; eine Registrierung auf Root startet keine UR-Validierung. Die anderen Rollen von UR beschreiben der [Miner-Leitfaden](/docs/miner) und der [Leitfaden für Netzbetreiber](/docs/operator).
 
-## Bevor du beginnst
+## Was brauchst du, bevor du beginnst?
 
-Bereite diese Eingaben für die Bereitstellung vor, der du beitreten willst:
+Du brauchst einen Linux-Host, einen gedeckten Bittensor-Coldkey, einen registrierten SN25-Hotkey mit Validator-Permit und eine bereitgestellte schema-3-Produktionskonfiguration für das Deployment, dem du beitreten willst:
 
 - Einen Linux-Host, persistenten Speicher und ununterbrochenen Zugang zur HTTPS-API und zum WSS-Transport jedes konfigurierten Betreibers, dazu die RPC-Endpunkte der Bereitstellung: EVM über HTTP(S) und nativ über WS(S). Die Prüfungen der dauerhaften Volumes im Mainnet verlangen Linux, auch wenn sich das Binary ebenso für macOS bauen lässt.
 - Eine Bittensor-Coldkey-Wallet mit Mitteln für Registrierung, Staking und Transaktionsgebühren. Bewahre sie auf dem Rechner auf, den du für Wallet-Vorgänge nutzt. Der laufende Validator braucht seinen Hotkey und die Client-Schlüssel pro Betreiber, nicht den Coldkey.
@@ -28,7 +28,7 @@ Lade einen Release-Build des Validators herunter oder baue ihn aus dem Quellcode
 
 ### Ein Release herunterladen
 
-Der Validator wird als `urnetwork-validator-<version>.tar.gz` auf der [Release-Seite von build](https://github.com/urnetwork/build/releases) ausgeliefert. Das Archiv enthält ein Binary pro Plattform unter `<os>/<arch>/validator`, für Linux und macOS. Ein Mainnet-Validator betreibt das Linux-Binary, `linux/amd64` oder `linux/arm64` (siehe [Bevor du beginnst](#before-you-start)):
+Der Validator wird als `urnetwork-validator-<version>.tar.gz` auf der [Release-Seite von build](https://github.com/urnetwork/build/releases) ausgeliefert. Das Archiv enthält ein Binary pro Plattform unter `<os>/<arch>/validator`, für Linux und macOS. Ein Mainnet-Validator betreibt das Linux-Binary, `linux/amd64` oder `linux/arm64` (siehe [Bevor du beginnst](#what-do-you-need-before-you-start)):
 
 ```bash
 VERSION=2026.10.6-1065506180   # the latest tag on the releases page, without the leading v

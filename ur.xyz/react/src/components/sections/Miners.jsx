@@ -3,6 +3,7 @@ import Section from '../Section';
 import NetworkDiagram from '../NetworkDiagram';
 import MinerSim from '../MinerSim';
 import MinerGlobeIntro from '../MinerGlobeIntro';
+import RoleGuide, { roleGuideBlock } from '../RoleGuide';
 import { useLanguage } from '../../i18n';
 import { EXTERNAL, isExternal } from '../../lib/links';
 import { groupPageHref } from '../../../../astro/src/lib/route-localization.js';
@@ -32,6 +33,7 @@ export default function Miners() {
                     </div>
                 ))}
             </div>
+            <RoleGuide block={roleGuideBlock(t, 'miners')} id="miners-guide" lang={code} />
             <MinerSim />
         </Section>
     );

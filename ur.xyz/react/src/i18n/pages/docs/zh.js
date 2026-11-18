@@ -2,10 +2,10 @@ export default {
     page: {
         eyebrow: '文档',
         updated: '更新于',
-        title: '{title} — UR 文档',
+        title: '{title} | UR',
     },
     index: {
-        title: 'UR 文档 | 矿工、验证者和网络运营商指南',
+        title: '矿工、验证者和网络运营商指南 | UR',
         description: '如何在 Bittensor SN25 上运行矿工或验证者并成为网络运营商：每个角色一份指南，外加 UR Litepaper。每份文档也以 markdown 格式提供。',
         breadcrumb: '文档',
         name: 'UR 文档',
@@ -21,6 +21,7 @@ export default {
         groups: {
             docs: '文档',
             miner: '矿工指南',
+            compare: '对比',
             legal: '法律',
         },
     },

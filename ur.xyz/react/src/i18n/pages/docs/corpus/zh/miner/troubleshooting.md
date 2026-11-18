@@ -5,7 +5,7 @@ description: 解决 UR 矿工的常见问题。登录错误、立即停止或不
 
 # 矿工故障排除
 
-在下面找到你看到的消息，或最接近的症状。如果你使用了安装程序，凡是本页写 `provider` 的地方都请输入 `urnetwork`。仍然解决不了？请到[我们的 Discord](https://discord.gg/urnetwork) 提问，并附上你运行的命令及其输出。永远不要公开你的授权码、seed 文件或 `~/.urnetwork` 中的任何内容。
+在下面找到你看到的消息，或最接近的症状。如果你使用了安装程序，凡是本页写 `provider` 的地方都请输入 `urnetwork`。仍然解决不了？请到[我们的 Discord](https://discord.gg/urnetwork) 提问，并附上你运行的命令及其输出。永远不要公开你的授权码、seed 文件或 `~/.urnetwork` 中的任何内容。刚开始挖矿？[运行 UR 节点](/miners)从矿工运行什么、需要什么讲起。
 
 ## 安装
 

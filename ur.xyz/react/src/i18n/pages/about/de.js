@@ -1,7 +1,7 @@
 // /about in German: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "Über UR | Die Menschen hinter dem Datenschutznetzwerk",
+        title: "Über UR: Die Menschen hinter dem Datenschutznetzwerk | UR",
         description: "UR ist ein Open-Source-Protokoll für private Internetanwendungen auf einem globalen Netzwerk unabhängiger Bandbreitenanbieter. Lerne die zentralen Mitwirkenden kennen.",
         breadcrumb: "Über uns",
     },

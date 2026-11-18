@@ -29,6 +29,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { DOC_PAGE_PATHS, HIDDEN_DOC_SLUGS, slugFor, splitFrontMatter } from "../react/src/lib/docs-shared.js";
 import { absoluteLinks, publishedImages } from "./agent-markdown.mjs";
+import { roleTwins } from "./role-twins.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -113,6 +114,18 @@ for (const { rel, slug, body } of published) {
   docIndex.push(slug);
 }
 console.log(`mirrored ${docIndex.length} docs into docs-md/ and wrote ${pageTwins.join(", ")}`);
+
+// ── the home page's and the role pages' twins ──
+// /index.md, /miners.md, /validators.md and /operators.md: the English copy
+// of those pages (react/src/i18n/en.js, which the pages render), as markdown,
+// so an agent reads the explanation without the page's scripts. Each page
+// links its twin with <link rel="alternate" type="text/markdown">.
+{
+  const { default: en } = await import(pathToFileURL(path.join(ROOT, "react", "src", "i18n", "en.js")).href);
+  const twins = roleTwins(en);
+  for (const [file, md] of Object.entries(twins)) writeFileSync(path.join(PUBLIC, file), md);
+  console.log(`wrote ${Object.keys(twins).map((f) => `/${f}`).join(", ")}`);
+}
 
 // The retired API explorer and its stale public specification remain in the
 // source history, but are not part of the published ur.xyz surface.

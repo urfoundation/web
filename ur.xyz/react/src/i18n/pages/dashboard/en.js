@@ -11,7 +11,7 @@
 export default {
     meta: {
         // the page's <title>, also its og:title, twitter:title and og:image:alt: at most 60 characters
-        title: 'UR Stats',
+        title: 'UR (SN25) Live Network Stats and Payouts | UR',
         // the meta description (also og:description and twitter:description): at most 175 characters
         description: 'Live URnetwork and SN25 stats: users, providers online, data carried, epochs, payouts and the Network Capacity Reserve, read from Grafana and Bittensor mainnet.',
     },

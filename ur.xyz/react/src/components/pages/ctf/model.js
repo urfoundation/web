@@ -218,6 +218,12 @@ export function buildModel(snap) {
             seenDays: c.seen_days,
             lastSeen: c.last_seen,
             peak: c.peak,
+            peakDay: c.peak_day ?? null,
+            firstSeen: c.first_seen ?? null,
+            // its count on the presence day and each of the eight weeks before it, oldest first
+            weekly: c.weekly ?? null,
+            // its place among the countries with any provider online that day (onlineRanks)
+            onlineRank: null,
             p,
             x,
             pots,
@@ -233,6 +239,7 @@ export function buildModel(snap) {
     });
     const az = countries.slice().sort(byFolded);
     az.forEach((c, i) => { c.rank = i; });
+    const counted = onlineRanks(countries);
     const byCode = new Map(countries.map((c) => [c.code, c]));
     const nfc = snap.totals.not_fully_captured;
     return {
@@ -270,9 +277,48 @@ export function buildModel(snap) {
         },
         totals: { flagsHeld: snap.totals.flags_held, flagsTotal: COUNTRY_COUNT * (operators.length || 1), openP: nfc ? nfc.providers : null, openX: nfc ? nfc.extenders : null },
         presence: snap.presence,
+        // the countries with any provider online on the presence day, most first, and all their providers
+        counted,
+        countedTotal: counted.reduce((sum, c) => sum + c.online, 0),
         countries,
         byCode,
         az,
+    };
+}
+
+/**
+ * The countries with any provider online on the presence day, most first,
+ * each given its place among them: 1 + the countries with more, so a tie
+ * shares a place.
+ */
+function onlineRanks(countries) {
+    const counted = countries.filter((c) => c.online > 0).sort(byOnline);
+    counted.forEach((c) => { c.onlineRank = 1 + counted.filter((o) => o.online > c.online).length; });
+    return counted;
+}
+
+/**
+ * What the network's dashboard says of a country over the presence window,
+ * for its page's own section (CtfCountry.jsx): null without the counts or
+ * where it never counted a provider there. Its place on the
+ * presence day (with any online), its counts a week and four weeks before,
+ * the weekly counts the history has, and the countries next to it in the
+ * count (two either side). Figures only; the page words them.
+ */
+export function networkFacts(m, c) {
+    if (!m.presence || c.online === null || !c.seenDays || !c.weekly) return null;
+    const days = (k) => new Date(Date.parse(`${m.presence.day}T00:00:00Z`) - k * 7 * 86_400_000).toISOString().slice(0, 10);
+    const last = c.weekly.length - 1;
+    const weeks = c.weekly.map((n, i) => ({ day: days(last - i), n })).filter((w) => w.n !== null);
+    const at = c.onlineRank ? m.counted.findIndex((o) => o.code === c.code) : -1;
+    const near = at < 0 ? [] : m.counted.slice(Math.max(0, at - 2), at + 3).filter((o) => o.code !== c.code).map((o) => m.byCode.get(o.code));
+    return {
+        rank: c.onlineRank,
+        of: m.counted.length,
+        week: last >= 1 ? c.weekly[last - 1] : null,
+        month: last >= 4 ? c.weekly[last - 4] : null,
+        weeks,
+        near,
     };
 }
 
@@ -461,7 +507,9 @@ export function countryDescription(m, c, updated) {
         }[m.phase]();
         const day = m.presence ? f.dayName(m.presence.day) : null;
         const seen = !m.presence || c.online === null ? null : c.online > 0 ? f.count(t.seen, c.online, { day }) : say(t.seenNone, { day });
-        forms = [join(m, [begin, seen]), begin];
+        // with its place among the countries with any provider online that day, where it fits
+        const ranked = m.presence && c.onlineRank ? f.count(t.seenRank, c.online, { day, rank: f.int(c.onlineRank), of: f.int(m.counted.length) }) : null;
+        forms = [ranked && join(m, [begin, ranked]), join(m, [begin, seen]), begin].filter(Boolean);
     }
     return (forms.find((d) => d.length <= DESCRIPTION_MAX) || forms[forms.length - 1]).replace(A_DAY, updated);
 }

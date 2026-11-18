@@ -24,7 +24,7 @@ const litepaper = groupPageHref('/docs/litepaper', lang) || '/docs/litepaper';
                 <article class="role-card">
                     <p class="role-number">{String(index + 1).padStart(2, '0')}</p>
                     <h3>{role.name}</h3>
-                    <p>{role.body}</p>
+                    <p>{role.body}{role.bodyLink && <> <a class="role-body-link" href={`${prefix}/${route}`}>{role.bodyLink}</a></>}</p>
                     <a href={`${prefix}/${route}`}>{role.explore} <span aria-hidden="true">{arrow}</span></a>
                 </article>
             );
@@ -50,6 +50,7 @@ const litepaper = groupPageHref('/docs/litepaper', lang) || '/docs/litepaper';
     .role-card a,
     .roles-cta { color: var(--brand-white); text-decoration: none; }
     .role-card a { margin-top: auto; padding-top: 32px; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .role-card a.role-body-link { margin: 0; padding: 0; font-size: inherit; letter-spacing: normal; text-transform: none; text-decoration: underline; text-underline-offset: 3px; }
     .role-card a span,
     .roles-cta span { color: var(--brand-ur); }
     .roles-cta { display: inline-block; margin-top: 56px; padding-bottom: 8px; font-size: clamp(1.25rem, 2.4vw, 2rem); letter-spacing: -0.025em; border-bottom: 1px solid rgba(237, 143, 255, 0.55); }

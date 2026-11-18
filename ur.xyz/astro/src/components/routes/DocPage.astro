@@ -97,6 +97,46 @@ const jsonLd = [{
         }
         : { translationOfWork: { '@id': `https://ur.xyz/docs/${slug}#article` } }),
 }];
+
+// The programs the miner and validator guides install, as the guides
+// describe their releases (docs/miner/install.md, docs/validator/README.md):
+// one tarball per release on the build releases page, with a binary per
+// platform. One node per program, on its English guide's URL, which the
+// translations reference.
+const RELEASES = 'https://github.com/urnetwork/build/releases';
+const SOFTWARE = {
+    miner: {
+        name: 'UR miner (provider)',
+        operatingSystem: 'Linux, macOS, Windows',
+        description: 'The UR miner for Bittensor SN25: it carries encrypted traffic for a network operator as a provider and an extender. Released as urnetwork-provider-<version>.tar.gz with a binary for each platform.',
+    },
+    validator: {
+        name: 'UR validator',
+        operatingSystem: 'Linux, macOS',
+        description: 'The UR validator for Bittensor SN25 (netuid 25): it measures providers through /verify trails and submits miner weights through native commit-reveal. Released as urnetwork-validator-<version>.tar.gz with a binary for Linux and macOS.',
+    },
+};
+const software = SOFTWARE[slug];
+if (software) {
+    const id = `https://ur.xyz/docs/${slug}#software`;
+    // the guide is about the program; the English page carries the program's node
+    jsonLd[0].about = { '@id': id };
+    if (english) {
+        jsonLd.push({
+            '@type': 'SoftwareApplication',
+            '@id': id,
+            name: software.name,
+            description: software.description,
+            applicationCategory: 'UtilitiesApplication',
+            operatingSystem: software.operatingSystem,
+            downloadUrl: RELEASES,
+            installUrl: url,
+            url,
+            isAccessibleForFree: true,
+            publisher: { '@id': 'https://ur.xyz/#org' },
+        });
+    }
+}
 ---
 <Base
     title={meta.title || interpolate(words.page.title, { title })}

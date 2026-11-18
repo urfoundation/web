@@ -69,7 +69,7 @@ import {
 import { PLACEHOLDER_CODE, countryIndexing, countryIndexingProblems, ownContent, placeholderModel } from '../src/components/pages/ctf/indexing.js';
 import { CTF_LOCAL_NOTES } from '../src/data/ctf-local-notes.js';
 import { ctfCardAlt, ctfOgImage } from '../src/components/pages/ctf/og.js';
-import { ctfNames, formats } from '../src/components/pages/ctf/i18n.js';
+import { ctfCopy, ctfNames, formats } from '../src/components/pages/ctf/i18n.js';
 import { ctaLink, pagePath } from '../src/components/pages/ctf/links.js';
 import group from '../src/i18n/pages/ctf/group.js';
 import { buildPath, parseRoute } from '../src/router.js';
@@ -155,11 +155,13 @@ test('the pre-launch import reads the server\'s country table and the dashboard\
     const history = { countries: { '2026-11-09': { AD: 2, CD: 0 }, '2026-11-10': { AD: 1, US: 9 } } };
     const presence = presenceFrom(history, '2026-11-10');
     assert.deepEqual(presence.meta, { source: 'https://ur.xyz/dashboard', day: '2026-11-10', days: 2 });
-    assert.deepEqual(presence.byCode.ad, { online: 1, seen_days: 2, last_seen: '2026-11-10', peak: 2 });
-    assert.deepEqual(presence.byCode.cd, { online: 0, seen_days: 0, last_seen: null, peak: 0 });
+    const weeks = (last) => [null, null, null, null, null, null, null, null, last];
+    assert.deepEqual(presence.byCode.ad, { online: 1, seen_days: 2, last_seen: '2026-11-10', peak: 2, peak_day: '2026-11-09', first_seen: '2026-11-09', weekly: weeks(1) });
+    assert.deepEqual(presence.byCode.cd, { online: 0, seen_days: 0, last_seen: null, peak: 0, peak_day: null, first_seen: null, weekly: weeks(0) });
     const s = prelaunch({ names, presence, now: Date.UTC(2026, 10, 11), bounds: { startBlock: 9_600_028, endBlock: 9_650_428, startMs: Date.UTC(2026, 10, 27, 18, 25, 24), endMs: Date.UTC(2026, 11, 4, 18, 25, 24) }, operators: [OP, OP2] });
     assert.equal(s.countries.find((c) => c.code === 'cd').online, 0);
     assert.equal(s.countries.find((c) => c.code === 'ci').seen_days, 0);
+    assert.deepEqual(s.countries.find((c) => c.code === 'ci').weekly, weeks(0));
     assert.equal(s.prelaunch.starts_at, '2026-11-27T18:25:24Z');
     // every listed operator takes part from the start; none has been read
     assert.deepEqual(s.operators.map((o) => [o.domain, o.status, o.no]), [[OP.domain, 'prelaunch', null], [OP2.domain, 'prelaunch', null]]);
@@ -300,7 +302,7 @@ test('with one operator the aggregate is that operator\'s figures, and it keeps 
         });
         const left = SNAPSHOT.operators.filter((o) => o.status === 'left_out').map((o) => ({ op: { domain: o.domain, api_url: o.api_url }, reason: o.reason, no: o.no }));
         const all = aggregate([...kept, ...left].sort((a, b) => SNAPSHOT.operators.findIndex((o) => o.domain === a.op.domain) - SNAPSHOT.operators.findIndex((o) => o.domain === b.op.domain)), null);
-        const strip = (s) => ({ ...s, countries: s.countries.map(({ online, seen_days, last_seen, peak, ...c }) => c), presence: null });
+        const strip = (s) => ({ ...s, countries: s.countries.map(({ online, seen_days, last_seen, peak, peak_day, first_seen, weekly, ...c }) => c), presence: null });
         assert.deepEqual(strip(all), strip(SNAPSHOT), 'the committed aggregate is its operators\' snapshots added up');
     }
 });
@@ -839,4 +841,19 @@ test('the seo-audit holds the built pages to the decision, and reads the figures
     const problems = countryIndexingProblems(hidden, hiddenDecision, hidden.countries.map((c) => ({ lang: 'en', code: c.code, noindex: hiddenDecision.decided.get(c.code).noindex })));
     assert.equal(problems.length, 1);
     assert.match(problems[0], /^\/ctf\/ad, \/ctf\/ae, \/ctf\/af and \d+ more: read the same but for the country's name, though the figures they print differ \(a page leaves out its own figures\)$/);
+});
+
+test('the questions that read the same in every country are answered once, on the hub, and every country page links them', () => {
+    const src = fs.readFileSync(new URL('../src/components/pages/CtfCountry.jsx', import.meta.url), 'utf8');
+    for (const lang of ['en', 'ru', 'ar', 'zh', 'de', 'es']) {
+        const t = ctfCopy(lang);
+        // the country pages keep only what is their country's: earnings, the role to run and a local note
+        for (const key of ['passiveQ', 'passiveA', 'remoteQ', 'remoteA']) assert.equal(t.countryFaq[key], undefined, `${lang} countryFaq.${key}`);
+        // the hub answers getting paid with no country in it
+        assert.equal(t.hubFaq.paidQ, t.countryFaq.paidQ, lang);
+        assert.ok(t.hubFaq.paidA && !/\{[a-z]+\}/i.test(t.hubFaq.paidA), `${lang} hubFaq.paidA names no place`);
+        assert.ok(t.country.moreFaq, lang);
+    }
+    assert.match(src, /#faq`\}>\{ctfCopy\(m\.lang\)\.country\.moreFaq\} \{RTL\.has\(m\.lang\) \? '←' : '→'\}/, 'each country page links the hub\'s questions, its arrow the way the page reads');
+    assert.match(src, /\.\.\.\(noted \? \[\[t\.paidQ/, 'a country page answers getting paid only with its local note');
 });

@@ -34,7 +34,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOC_ORDER, DOC_PAGE_PATHS, HIDDEN_DOC_SLUGS, UNLISTED_DOC_SLUGS, slugFor, splitFrontMatter, withChapters } from '../react/src/lib/docs-shared.js';
+import { DOC_ORDER, DOC_PAGE_PATHS, LLMS_FULL_EXCLUDED, HIDDEN_DOC_SLUGS, UNLISTED_DOC_SLUGS, slugFor, splitFrontMatter, withChapters } from '../react/src/lib/docs-shared.js';
 import { investorCentre } from '../react/src/data/investors.js';
 import { pageFacts, SITEMAP_FILES } from '../astro/scripts/page-dates.mjs';
 import { absoluteLinks } from './agent-markdown.mjs';
@@ -207,7 +207,10 @@ export function buildLlms(distDir) {
         .map(([u, p]) => {
             const label = u === '/' ? 'Home' : pageName(p.html, p.title);
             const pdf = pdfFor[u] ? ` ([PDF](${SITE}${pdfFor[u]}))` : '';
-            return `- [${label}](${SITE}${u === '/' ? '/' : u})${pdf}: ${p.description}`;
+            // the home page's and the role pages' markdown twins (/index.md, /miners.md, …)
+            const twinFile = u === '/' ? 'index.md' : `${u.slice(1)}.md`;
+            const twin = existsSync(path.join(distDir, twinFile)) ? ` ([markdown](${SITE}/${twinFile}))` : '';
+            return `- [${label}](${SITE}${u === '/' ? '/' : u})${pdf}${twin}: ${p.description}`;
         });
     // the documents in the sidebar's order (DOC_ORDER, each guide followed by its
     // chapters, then any other alphabetically); an unlisted document is served
@@ -274,7 +277,7 @@ ${optionalLines.join('\n')}
     // their order, each followed by its chapters, then the investor materials
     // as published
     const docs = docsIndex();
-    const embedded = ['litepaper', ...withChapters(DOC_ORDER.filter((slug) => slug !== 'litepaper'))]
+    const embedded = ['litepaper', ...withChapters(DOC_ORDER.filter((slug) => slug !== 'litepaper' && !LLMS_FULL_EXCLUDED.has(slug)))]
         .map((slug) => docs.find((d) => d.slug === slug))
         .filter(Boolean)
         .map((doc) => {

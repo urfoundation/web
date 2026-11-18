@@ -4,7 +4,7 @@
 export default {
     meta: {
         // the page's <title>: at most 60 characters (the page is never indexed)
-        title: 'Page not found — UR',
+        title: 'Page not found | UR',
         // the meta description: at most 175 characters
         description: 'This page does not exist.',
     },

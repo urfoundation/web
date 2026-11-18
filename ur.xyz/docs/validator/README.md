@@ -10,9 +10,9 @@ Validators earn **native Bittensor dividends**. These are separate from the prov
 
 This guide covers an SN25 validator. A **root validator on netuid 0** has separate registration, operation and basket claims; registering on root does not start UR validation. See the [miner guide](/docs/miner) and [network operator guide](/docs/operator) for the other UR roles.
 
-## Before you start
+## What do you need before you start?
 
-Prepare these inputs for the deployment you intend to join:
+You need a Linux host, a funded Bittensor coldkey, a registered SN25 hotkey with a validator permit, and a provisioned schema-3 production configuration for the deployment you intend to join:
 
 - A Linux host, persistent storage, and continuous access to each configured operator's HTTPS API and WSS transport, plus the deployment's EVM HTTP(S) and native WS(S) RPC endpoints. The mainnet durable-volume checks require Linux even though the binary can also be built for macOS.
 - A Bittensor coldkey wallet with funds for registration, staking and transaction fees. Keep it on the machine used for wallet operations. The running validator needs its hotkey and per-operator client keys, not the coldkey.
@@ -28,7 +28,7 @@ Download a release build of the validator, or build it from source.
 
 ### Download a release
 
-The validator ships as `urnetwork-validator-<version>.tar.gz` on the [build releases page](https://github.com/urnetwork/build/releases). The tarball holds one binary per platform at `<os>/<arch>/validator`, for Linux and macOS. A mainnet validator runs the Linux binary, `linux/amd64` or `linux/arm64` (see [Before you start](#before-you-start)):
+The validator ships as `urnetwork-validator-<version>.tar.gz` on the [build releases page](https://github.com/urnetwork/build/releases). The tarball holds one binary per platform at `<os>/<arch>/validator`, for Linux and macOS. A mainnet validator runs the Linux binary, `linux/amd64` or `linux/arm64` (see [Before you start](#what-do-you-need-before-you-start)):
 
 ```bash
 VERSION=2026.10.6-1065506180   # the latest tag on the releases page, without the leading v

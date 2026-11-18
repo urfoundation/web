@@ -4,7 +4,7 @@ description: 用一个二进制文件运行 URnetwork 运营商，为 main 环�
 
 # 如何成为网络运营商
 
-网络运营商运行 UR 隐私网络的服务器：供用户和矿工接入的 API 和 Connect 服务、验证者遍历的 `/verify` 端点，以及在 **Bittensor SN25（netuid 25）**上为其矿工结算奖励的周期流水线。运营商带来自己的用户和产品（ur.io 的各款应用就属于其中一个运营商），存入 α 作为有收入支撑的真实需求信号，并在每个结算周期提交 Merkle 支付清单，把自己的池分配给旗下矿工。它报告分配所依据的使用量，但从不持有任何他人的 α：不可变的结算金库拥有该池，每个矿工都直接从中领取。
+网络运营商运行 UR 隐私网络的服务器：供用户和矿工接入的 API 和 Connect 服务、验证者遍历的 `/verify` 端点，以及在 **Bittensor SN25（netuid 25）**上为其矿工结算奖励的周期流水线。运营商带来自己的用户和产品（[ur.io 的各款应用](https://ur.io/products)就属于其中一个运营商），存入 α 作为有收入支撑的真实需求信号，并在每个结算周期提交 Merkle 支付清单，把自己的池分配给旗下矿工。它报告分配所依据的使用量，但从不持有任何他人的 α：不可变的结算金库拥有该池，每个矿工都直接从中领取。
 
 [`server/cli/all/main.go`](https://github.com/urnetwork/server/blob/main/cli/all/main.go) 入口点同时运行 API、Connect 和生产 taskworker。你只需部署一个运营商可执行文件；PostgreSQL、Redis、工件存储和公网 TLS 入口仍然是后端服务。机制请阅读 [Litepaper](/docs/litepaper)；其他角色请参阅[如何运行矿工](/docs/miner)和[如何运行验证者](/docs/validator)。
 
@@ -541,7 +541,7 @@ bringyourctl st finalize --epoch=<epoch>
 
 手动指定 `--alpha_rao` 的存款仍受 `deposit_epoch_cap_rao` 限制。自愿信念（`addConviction`，同一条单向路径，它会提高你的档位，但不计为需求）没有对应的服务器任务；它是由你的存款签名者发出的一笔交易。
 
-## 你如何被衡量和获得报酬
+## 网络运营商如何被衡量和获得报酬？
 
 运营商的池发行属于它的矿工，结算金库依据运营商的根支付已实现的捕获金额。提供者获得的是 **momentum**：原生矿工分配中当下用于驱动网络的那部分份额，在运营商池和头部集群之间分配。启动时 momentum 为 10%。[Network Capacity Reserve](/reserve)，即 `ur-reserve` 2-of-3 multisig，获得其余部分：矿工发行 × (1 − momentum)。它的份额并不固定；随着 momentum 增长，它获得的会更少。这些是受原生共识和运行时行为约束的路由目标，而不是有保证的固定支付。原生储备与不可变的存款接收合约以及结算金库中的领取余额是分开的。请参阅[原生储备分配](https://github.com/urfoundation/sn/blob/main/mainnet/TREASURY-EMISSIONS.md)。你作为运营商的收入来自你自己的业务；子网向矿工支付的是承载这些流量的报酬。
 

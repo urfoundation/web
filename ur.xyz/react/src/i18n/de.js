@@ -77,18 +77,27 @@ export default {
         exitFullscreen: 'Vollbild beenden'
     },
 
+    // the guides a role page lists under its explanation (RoleGuide.jsx)
+    roleGuides: {
+        title: 'Die Anleitungen',
+        miner: 'Einen Miner betreiben',
+        rewards: 'Für das Mining bezahlt werden',
+        validator: 'Einen Validator betreiben',
+        operator: 'Netzbetreiber werden',
+        litepaper: 'Das Litepaper'
+    },
     homepage: {
-        intro: 'Das UR-Subnet ist ein auf Bittensor aufgebautes Datenschutznetzwerk. Das Subnet belohnt Menschen, die dazu beitragen. Betreiber führen Server aus und hinterlegen Alpha für den Datenverkehr, den sie bedienen. Miner transportieren verschlüsselten Datenverkehr und erhalten Emissionen. Validatoren vermessen das Netzwerk erneut, prüfen die Genauigkeit und erhalten Emissionen.',
+        intro: 'UR (SN25) ist ein quelloffenes, auf Bittensor aufgebautes Datenschutznetzwerk. Das Subnet belohnt Menschen, die dazu beitragen. Betreiber führen Server aus und hinterlegen Alpha für den Datenverkehr, den sie bedienen. Miner transportieren verschlüsselten Datenverkehr und erhalten Emissionen. Validatoren vermessen das Netzwerk erneut, prüfen die Genauigkeit und erhalten Emissionen.',
         diagramAria: 'So funktioniert das UR-Netzwerk',
         rolesEyebrow: 'Am Netzwerk teilnehmen',
         rolesTitle: 'Drei Rollen. Ein vermessenes Netzwerk.',
         roles: {
             operators: { name: 'Betreiber', body: 'Betreiber führen die Datenschutzserver und den Verifizierungsendpunkt aus. Sie hinterlegen Einlagen für den bereits bedienten Datenverkehr, signieren jeden vermessenen Pfad mit und bestätigen die Auszahlungsliste, die Belohnungen unter ihren Minern aufteilt. Einlagen fließen in eine Reserve; Betreiber verwahren niemals fremde Mittel.', explore: 'Betreiber entdecken' },
-            miners: { name: 'Miner', body: 'Miner transportieren den Datenverkehr. Sie betreiben Nodes, die verschlüsselten Datenverkehr für einen oder mehrere Betreiber routen, und werden aus den Subnet-Emissionen für den transportierten Datenverkehr bezahlt und, in den Top-Flotten, für die routbaren IPs, die sie verfügbar halten.', explore: 'Miner entdecken' },
+            miners: { name: 'Miner', body: 'Miner transportieren den Datenverkehr. Sie betreiben Nodes, die verschlüsselten Datenverkehr für einen oder mehrere Betreiber routen, und werden aus den Subnet-Emissionen für den transportierten Datenverkehr bezahlt und, in den Top-Flotten, für die routbaren IPs, die sie verfügbar halten.', bodyLink: 'So minst du SN25', explore: 'Miner entdecken' },
             validators: { name: 'Validatoren', body: 'Validatoren vermessen das Netzwerk erneut. Sie führen das Routing-Verifizierungsprotokoll aus und bewerten jeden Betreiber-Pool nach Nachfrage und gemessener Qualität. Für genaue Bewertungen erhalten sie Subnet-Emissionen.', explore: 'Validatoren entdecken' }
         },
         whitepaperCta: 'Weitere Details stehen im Litepaper',
-        metaTitle: 'UR | Das dezentrale Datenschutznetzwerk auf Bittensor SN25',
+        metaTitle: 'UR (SN25): Dezentrales Datenschutznetzwerk auf Bittensor',
         metaDescription: 'UR ist ein offenes, dezentrales Datenschutznetz auf Bittensor SN25: Miner tragen verschlüsselten Verkehr, Validatoren messen ihn, Betreiber bringen Nachfrage.'
     },
 
@@ -211,8 +220,37 @@ operators: {
         title:   'Die Betreiber, die das Netzwerk betreiben.',
         intro:   'Netzbetreiber betreiben die Datenschutzserver und den Verifizierungsendpunkt. Ein Betreiber zahlt als umsatzgedecktes Signal echter Nachfrage in das Subnet ein, führt das Routing-Verifizierungsprotokoll aus, das jeden gemessenen Pfad mitsigniert, und legt die Auszahlungsliste fest, die seine Belohnungen auf die ihm zugeordneten Miner aufteilt. Betreiber melden die Nutzung, nach der sich die Belohnungen richten, verwahren aber niemals fremde Gelder.',
         cta: 'Netzbetreiber werden',
-        metaTitle: 'Netzbetreiber: UR-Datenschutzserver auf SN25 betreiben — UR',
-        metaDescription: 'Netzbetreiber betreiben UR-Datenschutzserver und den /verify-Endpunkt, hinterlegen Alpha als umsatzgedecktes Nachfragesignal und melden die Nutzung für die Miner-Vergütung.',
+        metaTitle: 'UR-Netzbetreiber: Datenschutzserver auf SN25 | UR',
+        metaDescription: 'Netzbetreiber betreiben UR-Datenschutzserver und /verify, hinterlegen Alpha als umsatzgedecktes Nachfragesignal und melden die Nutzung ihrer Miner.',
+        guide: {
+            title: 'Was betreibt ein Netzbetreiber?',
+            items: [
+                {
+                    title: 'Was betreibst du?',
+                    body: 'Eine Betreiber-Programmdatei, die die API- und Connect-Dienste bereitstellt, mit denen sich Nutzer und Miner verbinden, den /verify-Endpunkt, den Validatoren durchlaufen, und die Epochen-Pipeline, die die Belohnungen deiner Miner abrechnet. PostgreSQL, Redis, Artefaktspeicher und öffentlicher TLS-Ingress stützen sie.'
+                },
+                {
+                    title: 'Was brauchst du?',
+                    body: 'Einen Linux-Host und deine eigene Domain, PostgreSQL, Redis und lokalen dauerhaften Artefaktspeicher, die Betreiberschlüssel und Signierer, Egress-Proben und einen öffentlichen Statistik-Feed (stats.json), damit dich das Betreiberverzeichnis listen kann.',
+                    link: {
+                        label: 'Wie Miner dem Pool eines Betreibers beitreten',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: 'Woher kommt das Geld?',
+                    body: 'Ein Betreiber bringt eigene Nutzer und Produkte mit und hinterlegt Alpha als umsatzgedecktes Signal echter Nachfrage; solange der veröffentlichte Satz 0 ist, ist keine Einzahlung fällig. In jeder Epoche legt er die Auszahlungsliste fest, die seinen Pool auf seine Miner aufteilt, und die Miner rufen direkt aus dem Settlement-Vault ab: Der Betreiber hält nie das Alpha anderer. Die Apps von ur.io sind die Produkte eines Betreibers.',
+                    link: {
+                        label: 'Die Apps von ur.io ansehen',
+                        href: 'https://ur.io/products'
+                    }
+                },
+                {
+                    title: 'Wie fängst du an?',
+                    body: 'In der Startphase wird die Zulassung von Betreibern vom Subnet-Eigentümer kontrolliert. Der erste Schritt ist also ein Gespräch mit ihm; er registriert deine Identitäten und gibt dir deine Betreiber-ID. Die Betreiber-Anleitung führt dann durch den Build, die Konfiguration und die erste Epoche.'
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Die Server betreiben',    body: 'Betreiber betreiben die Datenschutzserver und den /verify-Endpunkt, der jeden gemessenen Pfad mitsigniert — die Koordinationsschicht zwischen Nutzern und den Minern, die den Verkehr tragen.' },
             { tag: '02', title: 'Echte Nachfrage signalisieren',  body: 'Betreibern wird Alpha in Höhe ihrer tatsächlichen Nutzung berechnet. Jede Einzahlung fließt in eine Reserve und bezahlt die geprüfte Nutzung, die Validatoren gewichten, wenn sie die Pools bewerten.' },
@@ -227,7 +265,8 @@ operators: {
     },
 
     miners: {
-        eyebrow: 'Miner',
+        eyebrow: 'So minst du Bittensor SN25',
+        breadcrumb: 'Miner',
         title:   'Die Miner, die IP-Subnetze in das verschlüsselte Internet verwandeln.',
         intro:   'Miner konkurrieren darum, möglichst viele IPv4-/29- und IPv6-/48-Subnetze im Netzwerk verfügbar zu machen — jedes davon jederzeit routbar für Ingress- oder Egress-Verkehr. Mit anderen Worten: Miner verwandeln das öffentliche Internet in ein anonymes privates Netzwerk, das jeder nutzen kann. Jeder Miner trägt sowohl Ingress- als auch Egress-Verkehr, betreibt ein standardmäßig sicheres Sicherheitsmodell, leitet nur verschlüsselten Verkehr weiter und wird aus der Subnet-Emission für den transportierten Verkehr und die routbare Kapazität bezahlt, die er beisteuert. Die Flotten mit der größten Abdeckung an verschiedenen, routbaren Subnetzen werden zu Top-Level-Minern befördert und verdienen mehr — alles im User-Space, auf Hardware, die du bereits besitzt.',
         both:    'Ein Miner ist zugleich Extender und Provider: Jeder Miner übernimmt die Ingress- und die Egress-Rolle gleichzeitig. Er konfiguriert sich automatisch für das System, auf dem er läuft.',
@@ -236,8 +275,62 @@ operators: {
         globeLabels: { provider: 'Provider', extender: 'Extender', miner: 'Miner' },
         simCaption: 'Miner konkurrieren um die meisten einzigartigen IPs, die zuverlässig im Netzwerk verfügbar sind. Top-Miner werden in einen eigenen UID-Slot befördert.',
         cta: 'Miner werden',
-        metaTitle: 'Miner: Verkehr verschlüsselt tragen, Emission verdienen — UR',
-        metaDescription: 'UR-Miner halten IPv4-/29- und IPv6-/48-Subnetze auf Bittensor SN25 für verschlüsselten Verkehr routbar und verdienen Emission für transportierten Verkehr und Abdeckung.',
+        metaTitle: 'Mining auf Bittensor SN25: UR-Miner werden | UR',
+        metaDescription: 'So minst du Bittensor SN25 als UR-Miner: was du betreibst, die Hardware, Installation für Linux, macOS und Windows, wie Belohnungen entstehen, Fehlerhilfe.',
+        guide: {
+            title: 'Wie fängst du mit dem Mining auf SN25 an?',
+            compared: { label: 'Im Vergleich mit', links: [{ label: 'Mysterium', href: '/docs/compare/mysterium' }, { label: 'Grass', href: '/docs/compare/grass' }, { label: 'Sentinel', href: '/docs/compare/sentinel' }, { label: 'Orchid', href: '/docs/compare/orchid' }, { label: 'alle Netzwerke zum Teilen von Bandbreite', href: '/docs/compare' }] },
+            items: [
+                {
+                    title: 'Was betreibst du?',
+                    body: 'Du betreibst das Miner-Programm provider auf einem Computer, der online bleibt. Jeder Miner ist zugleich Provider, ein Ausgang für Verkehr, und Extender, ein Zugangspunkt, und er richtet sich selbst für sein System ein. Die meisten Miner treten dem Pool eines Netzbetreibers bei, eine eigene Bittensor-Registrierung brauchst du also nicht. Auf einem Telefon oder Computer kann stattdessen eine URnetwork-App im Hintergrund minen, mit URnetwork als Betreiber.',
+                    link: {
+                        label: 'Eine URnetwork-App holen',
+                        href: 'https://ur.io/install'
+                    }
+                },
+                {
+                    title: 'Welche Hardware brauchst du?',
+                    body: 'Einen Computer, der online bleibt: Ein Heim-PC, ein Server oder ein Raspberry Pi 2 oder neuer funktionieren. Jedes Release enthält den Miner für Linux auf 64- und 32-Bit-Intel, -AMD und -ARM (kein Pi Zero oder Pi 1), für macOS auf Apple Silicon und Intel (der Installer braucht macOS 12 oder neuer) und für Windows auf 64-Bit-Intel oder -AMD und auf ARM64. Jeder Miner braucht eine stabile öffentliche Internetadresse. Sein Extender braucht eingehenden TCP-Port 443; UDP-Ports 443 und 4053 werden empfohlen.',
+                    link: {
+                        label: 'Die Build-Releases ansehen',
+                        href: 'https://github.com/urnetwork/build/releases'
+                    }
+                },
+                {
+                    title: 'Woher kommen die Belohnungen?',
+                    body: 'Aus der Miner-Emission des Subnets, nicht aus einem festen Preis pro Byte. Im Pool eines Betreibers richtet sich der Anteil eines Geräts nach dem Verkehr, den es abgeschlossen hat, und danach, wie zuverlässig die Validatoren es gemessen haben; bezahlter und kostenloser Verkehr gleicher Größe bringt dieselbe Gutschrift. Momentum, der jetzt ausgezahlte Anteil der Miner-Emission, beträgt 10%; der Rest geht an die Network Capacity Reserve. Was tatsächlich ausgezahlt wird, zeigen die veröffentlichte Richtlinie und die Auszahlungsdateien deines Betreibers.',
+                    link: {
+                        label: 'Wie Belohnungen gezählt werden',
+                        href: '/docs/miner/rewards#how-rewards-are-counted'
+                    }
+                },
+                {
+                    title: 'Wie fängst du an?',
+                    body: 'Lege ein Konto bei einem Netzbetreiber an (der Miner nutzt bringyour.com, wenn du keinen anderen wählst) und hol dir einen Auth-Code. Installiere den Miner (der Installer für dein System betreibt ihn im Hintergrund und hält ihn aktuell), führe provider setup aus, das ihn anmeldet und den Bittensor-Coldkey festlegt, an den deine Belohnungen gehen, und prüfe ihn mit provider status.',
+                    link: {
+                        label: 'Installationsschritte für Linux, macOS und Windows',
+                        href: '/docs/miner/install'
+                    }
+                },
+                {
+                    title: 'Was, wenn etwas schiefgeht?',
+                    body: 'Frag zuerst den Miner: provider status und provider doctor melden, was er sieht. Die Seite zur Fehlerbehebung listet die häufigen Meldungen, von Anmeldefehlern und einem Miner, der immer wieder abgewiesen wird, bis zu einem Extender, der TCP-Port 443 nicht binden kann, und einem Claim-Nachweis, der noch nicht bereit ist, jeweils mit dem, was zu tun ist.',
+                    link: {
+                        label: 'Fehlerbehebung für Miner',
+                        href: '/docs/miner/troubleshooting'
+                    }
+                },
+                {
+                    title: 'Wie wird ein Miner gemessen?',
+                    body: 'Validatoren durchlaufen Miner-Ketten und bewahren für jeden abgeschlossenen Hop einen signierten Nachweis, sodass ein Miner nach Verkehr bewertet wird, den er wirklich getragen hat. Routing und Matching des Netzwerks ändern sich nur, wenn eine Änderung das gemessene Rauschen ihres Messinstruments übertrifft, und jeder Versuch, auch jeder verworfene, wird veröffentlicht.',
+                    link: {
+                        label: 'Die Forschungsmethodik lesen',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Egress',              body: 'Als Egress ist ein Miner eine Exit-IP des gemeinsamen Netzwerks. Er lehnt Verkehr ab, der gängigen Regulierungsrichtlinien wie CFAA und DMCA widerspricht, blockiert bekannte bösartige IPs und leitet nur verschlüsselten Verkehr weiter — was sowohl Miner als auch Nutzer schützt.' },
             { tag: '02', title: 'Ingress',             body: 'Als Ingress (Extender) schafft ein Miner Einstiegspunkte, die die Erreichbarkeit weltweit verbessern — mittels N-Schicht-TLS, SNI-Spoofing und vertrauenswürdiger Weiterleitung. Eine rotierende Teilmenge wird in jedem Zyklus exponiert, und Clients versuchen automatisch erneut die Einstiegspunkte, die zuvor funktioniert haben.' },
@@ -253,8 +346,58 @@ operators: {
         intro:   'Validatoren sind unabhängig. Jeder setzt sein eigenes UR ein und führt das Routing-Verifizierungsprotokoll aus — dabei durchläuft er fortlaufend vom Betreiber zugewiesene Ketten von Minern, um Echtzeit-Transit nachzuweisen und zu messen, welche Miner die schwächsten Glieder sind. Diese Messung ist das zentrale Signal, für das das Netzwerk zahlt, und Validatoren verdienen native Dividenden dafür, sie genau zu erzeugen.',
         simCaption: 'Validatoren testen die verfügbare IP-Fläche und stufen Miner nach Zuverlässigkeit ein.',
         cta: 'Validator werden',
-        metaTitle: 'Validatoren: Netzwerk vermessen, Dividenden verdienen — UR',
-        metaDescription: 'UR-Validatoren setzen eigenes UR ein, durchlaufen zugewiesene Miner-Ketten, belegen Echtzeit-Transit und verdienen Bittensor-Dividenden für genaue Bewertung.',
+        metaTitle: 'UR-SN25-Validatoren: Netzwerk messen, verdienen | UR',
+        metaDescription: 'UR-Validatoren setzen eigenes UR ein, durchlaufen zugewiesene Miner-Ketten, belegen Echtzeit-Transit und verdienen Bittensor-Dividenden für genaue Wertung.',
+        guide: {
+            title: 'Wie betreibst du einen Validator auf SN25?',
+            items: [
+                {
+                    title: 'Was betreibst du?',
+                    body: 'Einen validator-Prozess auf Bittensor SN25 (netuid 25). Er durchläuft /verify-Trails durch die Miner jedes Betreibers, bewahrt die signierten Nachweise auf und reicht die daraus folgenden Miner-Gewichte über das native Commit-Reveal von Bittensor ein.',
+                    link: {
+                        label: 'Was die Miner betreiben, die er misst',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: 'Was brauchst du?',
+                    body: 'Einen Linux-Host mit dauerhaftem Speicher und ständigem Zugang zur API jedes konfigurierten Betreibers, einen Bittensor-Coldkey mit Mitteln für Registrierung, Staking und Gebühren, einen registrierten SN25-Hotkey mit genug Stake für eine Validator-Berechtigung und eine freigegebene Produktionskonfiguration aus dem Bootstrap-Prozess des Deployments.'
+                },
+                {
+                    title: 'Woher kommen die Belohnungen?',
+                    body: 'Validatoren verdienen native Bittensor-Dividenden für genaue, konsensgerechte Bewertung. Sie sind getrennt von den Miner-Belohnungen, die aus dem Settlement-Vault von UR abgerufen werden, und es gibt keinen Befehl validator claim.'
+                },
+                {
+                    title: 'Wie fängst du an?',
+                    body: 'Lade den Validator von der Build-Release-Seite herunter (Binärdateien für Linux und macOS) oder baue ihn aus dem Quellcode, erstelle seine Dienstschlüssel, registriere und stake auf SN25, authentifiziere dich bei jedem Betreiber, stelle dann die Konfiguration bereit und starte ihn. Die Validator-Anleitung geht jeden Schritt durch.'
+                }
+            ]
+        },
+        scoring: {
+            title: 'Was ist an der Bewertung von SN25 anders?',
+            items: [
+                {
+                    title: 'Transitnachweis statt Selbstauskunft',
+                    body: 'Ein Validator durchläuft von Betreibern zugewiesene Miner-Ketten und bewahrt für jeden abgeschlossenen Hop einen signierten, selbstbeweisenden Datensatz auf. Eine Bewertung beruht also auf Verkehr, der wirklich getragen wurde, und jeder kann den Nachweis prüfen.'
+                },
+                {
+                    title: 'Pools nach Nachfrage und Qualität, Flotten nach Breite',
+                    body: 'In jedem Zyklus bewertet ein Validator den Pool jedes Betreibers nach Nachfrage und gemessener Qualität und reiht die Top-Flotten danach, wie viele verschiedene, routbare Exit-IPs sie bedienen, nicht nach Verkehrsmenge. Solange der veröffentlichte Satz 0 ist, erhält jeder Pool die gleiche Nachfrage, sodass allein die gemessene Qualität den Pool-Kanal steuert.'
+                },
+                {
+                    title: 'Kopieren bringt nichts',
+                    body: 'Bewertungen werden per Commit-Reveal eingereicht, das die Bewertungen jedes Validators verbirgt, bis sie veraltet sind; ein Validator muss also echte Trails laufen. Der Yuma-Konsens von Bittensor macht aus den unabhängigen Bewertungen die Miner-Emission.'
+                },
+                {
+                    title: 'Gemessene Änderungen, veröffentlichte Ergebnisse',
+                    body: 'Routing und Matching des Netzwerks werden nach einer Disziplin verbessert: Eine Änderung zählt nur, wenn sie das gemessene Rauschen ihres Instruments schlägt, und jeder Versuch wird veröffentlicht, auch die verworfenen.',
+                    link: {
+                        label: 'Die Forschungsmethodik lesen',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Die Routen durchlaufen',        body: 'Validatoren durchlaufen vom Betreiber zugewiesene Ketten von Minern und sammeln eine signierte, selbstbeweisende Aufzeichnung jedes abgeschlossenen Hops — kryptografischer Beweis von Echtzeit-Transit, den jeder überprüfen kann.' },
             { tag: '02', title: 'Das Netzwerk bewerten',      body: 'In jedem Zyklus bewertet ein Validator den Pool jedes Betreibers nach Nachfrage und gemessener Qualität und stuft die Top-Flotten nach routbarer IP-Breite ein — alles unter Commit-Reveal. Bittensors Yuma Consensus verwandelt diese unabhängigen Bewertungen in Miner-Emission.' },
@@ -266,8 +409,9 @@ operators: {
     research: {
         eyebrow: 'Forschung',
         title:   'Offene Algorithmen, offene Daten.',
-        metaTitle: 'Forschung: Offene Algorithmen, Daten und Audits — UR',
+        metaTitle: 'Forschung: Offene Algorithmen, Daten und Audits | UR',
         metaDescription: 'Offene UR-Forschung: Routing-, Zuordnungs-, Übertragungs- und Belohnungsalgorithmen mit Quellcode und anonymen Daten, der Apex-SN1-Wettbewerb und Audits.',
+        minersLink: 'Einen UR-Miner auf SN25 betreiben: was er braucht und wie er bezahlt wird',
         intro:   'Das Protokoll ist ein dezentral-natives Multi-IP-, Multi-Transport-System, das auf Millionen von Minern pro Netzbetreiber skalieren soll. Jeder Algorithmenbereich unten ist mit seinem Quellcode und, wo zutreffend, mit anonymisierten Datensätzen für unabhängige Analyse veröffentlicht.',
         // the card for the research report (an English page, so the link says so)
         report: {

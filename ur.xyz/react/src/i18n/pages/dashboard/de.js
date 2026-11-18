@@ -3,7 +3,7 @@
 // Tage, as /reserve writes them). The CSS changes no letter case.
 export default {
     meta: {
-        title: 'UR-Statistiken',
+        title: 'UR (SN25): Live-Netzwerkstatistik und Auszahlungen | UR',
         description: 'URnetwork und SN25 live: Nutzer, Provider online, übertragene Daten, Epochen, Auszahlungen und die Network Capacity Reserve, gelesen aus Grafana und dem Bittensor-Mainnet.',
     },
 

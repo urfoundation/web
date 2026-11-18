@@ -183,7 +183,7 @@ async function main() {
         {
             const { page, close } = await open(browser, `${base}/ctf/ke`, false);
             check(/Earn crypto in Kenya/.test(await page.textContent('h1').catch(() => '')), '/ctf/ke without JavaScript leads with its plain-words heading');
-            check((await page.locator('.ctf-faq details').count()) === 6 && /Kenya/.test(await page.textContent('.ctf-intro').catch(() => '')), '/ctf/ke without JavaScript answers its questions with its own figures');
+            check((await page.locator('.ctf-faq details').count()) === 2 && (await page.locator('.ctf-faq-more a[href="/ctf#faq"]').count()) === 1 && /Kenya/.test(await page.textContent('.ctf-me-msg').catch(() => '')), '/ctf/ke without JavaScript answers its own questions with its own figures and links the hub\'s');
             await close();
         }
         {

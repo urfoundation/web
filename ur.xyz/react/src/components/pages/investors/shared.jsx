@@ -94,7 +94,7 @@ export function AnnouncementSummary({ lang, doc, heading, compact = false }) {
             <div className="announcement-summary-meta">
                 <div className="announcement-issuer">
                     <span className="announcement-issuer__mark" aria-hidden="true">
-                        <img src="/favicon.svg" alt="" />
+                        <img src="/favicon.svg" alt="" width="256" height="256" />
                     </span>
                     <span>
                         <strong>UR Foundation</strong>
@@ -117,7 +117,7 @@ export function Letterhead({ lang }) {
     const { letterhead } = groupCopy(lang);
     return (
         <header className="announcement-letterhead">
-            <img className="announcement-wordmark" src="/ur.svg" alt="UR" />
+            <img className="announcement-wordmark" src="/ur.svg" alt="UR" width="474" height="265" />
             <address className="announcement-address">
                 <strong>{letterhead.foundation}</strong>
                 {letterhead.subnet}<br />

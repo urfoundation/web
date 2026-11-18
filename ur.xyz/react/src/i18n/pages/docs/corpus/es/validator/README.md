@@ -10,9 +10,9 @@ Los validadores ganan **dividendos nativos de Bittensor**. Son independientes de
 
 Esta guía trata de un validador de SN25. Un **validador de root en netuid 0** tiene registro, operación y reclamaciones de canasta propios; registrarse en root no inicia la validación de UR. Consulta la [guía del minero](/docs/miner) y la [guía del operador de red](/docs/operator) para los otros roles de UR.
 
-## Antes de empezar
+## ¿Qué necesitas antes de empezar?
 
-Prepara estos elementos para el despliegue al que te vas a unir:
+Necesitas un host Linux, una coldkey de Bittensor con fondos, una hotkey de SN25 registrada con permiso de validador y una configuración de producción schema-3 preparada para el despliegue al que quieres unirte:
 
 - Un host Linux, almacenamiento persistente y acceso continuo a la API HTTPS y al transporte WSS de cada operador configurado, además de los endpoints RPC del despliegue: EVM por HTTP(S) y nativo por WS(S). Las comprobaciones de volúmenes duraderos de mainnet requieren Linux, aunque el binario también se puede compilar para macOS.
 - Una wallet coldkey de Bittensor con fondos para el registro, el stake y las comisiones de las transacciones. Mantenla en la máquina que usas para las operaciones de la wallet. El validador en ejecución necesita su hotkey y las claves de cliente de cada operador, no la coldkey.
@@ -28,7 +28,7 @@ Descarga una compilación publicada del validador o compílalo desde el código 
 
 ### Descargar una versión
 
-El validador se distribuye como `urnetwork-validator-<version>.tar.gz` en la [página de versiones de build](https://github.com/urnetwork/build/releases). El archivo contiene un binario por plataforma en `<os>/<arch>/validator`, para Linux y macOS. Un validador de mainnet ejecuta el binario de Linux, `linux/amd64` o `linux/arm64` (consulta [Antes de empezar](#before-you-start)):
+El validador se distribuye como `urnetwork-validator-<version>.tar.gz` en la [página de versiones de build](https://github.com/urnetwork/build/releases). El archivo contiene un binario por plataforma en `<os>/<arch>/validator`, para Linux y macOS. Un validador de mainnet ejecuta el binario de Linux, `linux/amd64` o `linux/arm64` (consulta [Antes de empezar](#what-do-you-need-before-you-start)):
 
 ```bash
 VERSION=2026.10.6-1065506180   # the latest tag on the releases page, without the leading v

@@ -2,10 +2,10 @@ export default {
     page: {
         eyebrow: 'Documentación',
         updated: 'Actualizado',
-        title: '{title} — Documentación de UR',
+        title: '{title} | UR',
     },
     index: {
-        title: 'Documentación de UR | Guías de minero, validador y operador',
+        title: 'Guías de minero, validador y operador de red | UR',
         description: 'Cómo ejecutar un minero o un validador en Bittensor SN25 y convertirte en operador de red, una guía por rol, más el litepaper de UR. Cada uno también en markdown.',
         breadcrumb: 'Documentación',
         name: 'Documentación de UR',
@@ -21,6 +21,7 @@ export default {
         groups: {
             docs: 'Documentación',
             miner: 'Guía del minero',
+            compare: 'Comparativas',
             legal: 'Legal',
         },
     },

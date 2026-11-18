@@ -7,7 +7,7 @@ import { contributors } from '../../../data/contributors.js';
 export default {
     meta: {
         // the page's <title>: at most 60 characters
-        title: 'About UR | The people building the privacy network',
+        title: 'About UR: The people building the privacy network | UR',
         // the meta description: at most 175 characters
         description: 'UR is an open-source protocol for private internet applications on a global network of independent bandwidth providers. Meet its core contributors.',
         // the page's name in the breadcrumb trail

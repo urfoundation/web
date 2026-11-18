@@ -12,7 +12,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DOC_ORDER, DOC_PAGE_PATHS, UNLISTED_DOC_SLUGS, slugFor, splitFrontMatter } from "../../react/src/lib/docs-shared.js";
+import { DOC_ORDER, DOC_PAGE_PATHS, LLMS_FULL_EXCLUDED, UNLISTED_DOC_SLUGS, slugFor, splitFrontMatter } from "../../react/src/lib/docs-shared.js";
 import { contentDay, investorLetterMetadata } from "./pdf-freshness.mjs";
 import { reserve } from "../../react/src/data/reserve.js";
 import { LOCALIZED_GROUPS, NON_EN_SITE_LANG_CODES, NOT_FOUND_PATH, PAGE_GROUPS, SITE_LANG_CODES, basePathFor, groupForPath, hasLocalizedVersion, langForPath } from "../src/lib/route-localization.js";
@@ -890,7 +890,7 @@ for (const rel of ["llms.txt", "llms-full.txt", "litepaper.md"]) {
 {
   const fullPath = path.join(DIST, "llms-full.txt");
   const full = existsSync(fullPath) ? readFileSync(fullPath, "utf8") : "";
-  for (const slug of DOC_ORDER) {
+  for (const slug of DOC_ORDER.filter((s) => !LLMS_FULL_EXCLUDED.has(s))) {
     const page = pages.get(`/docs/${slug}`);
     if (!page || !full) continue;
     const modified = (page.html.match(/"dateModified":"([^"]+)"/) || [])[1];
@@ -939,11 +939,22 @@ for (const rel of ["llms.txt", "llms-full.txt", "litepaper.md"]) {
 
 auditRobots();
 
+// ── page weight: Googlebot reads only the first 2 MB of an HTML file ──
+// Warn (not fail) at half that, so a page that grows with its data (the /ctf
+// hub lists every country) is noticed long before it is cut off.
+const PAGE_WARN_BYTES = 1024 * 1024;
+const warnings = [];
+for (const p of pages.values()) {
+  const bytes = Buffer.byteLength(p.html, "utf8");
+  if (bytes > PAGE_WARN_BYTES) warnings.push(`${p.urlPath}: ${(bytes / 1024 / 1024).toFixed(2)} MB of HTML, over the ${PAGE_WARN_BYTES / 1024 / 1024} MB warning line (Googlebot stops at 2 MB)`);
+}
+
 // ── report ──
 const indexable = canonicalSelf.length;
 console.log(
   `seo-audit: ${htmlFiles.length} pages (${indexable} canonical-self), ${files.length} files scanned`,
 );
+for (const w of warnings) console.warn(`seo-audit: warning: ${w}`);
 if (errors.length) {
   console.error(`\nseo-audit: ${errors.length} problem(s):`);
   const MAX = 60;

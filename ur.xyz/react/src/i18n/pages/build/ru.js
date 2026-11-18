@@ -1,7 +1,7 @@
 // /build in Russian: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: 'Создавайте на UR | Возможности для сетевых операторов',
+        title: 'Создавайте на UR: возможности для сетевых операторов | UR',
         description: 'Создавайте продукты на UR как сетевой оператор: общая резидентная ёмкость, измеряемое качество сервиса и слой стимулов SN25.',
         breadcrumb: 'Создавайте на UR',
     },

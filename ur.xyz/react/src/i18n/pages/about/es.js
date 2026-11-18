@@ -1,7 +1,7 @@
 // /about in Spanish: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "Acerca de UR | Las personas detrás de la red de privacidad",
+        title: "Acerca de UR: quiénes construyen la red de privacidad | UR",
         description: "UR es un protocolo de código abierto para aplicaciones de internet privadas en una red global de proveedores independientes de ancho de banda. Conoce a su equipo principal.",
         breadcrumb: "Acerca de",
     },

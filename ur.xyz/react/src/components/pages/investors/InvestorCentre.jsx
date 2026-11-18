@@ -231,11 +231,11 @@ export default function InvestorCentre({ lang = 'en' }) {
                             {`${t.dashboard} `}<span aria-hidden="true">↗</span>
                         </a>
                         <a className="network-brand network-brand--tmc" href={research.taoMarketCap} target="_blank" rel="noopener noreferrer">
-                            <img src="/investors/taomarketcap.svg" alt="TaoMarketCap" />
+                            <img src="/investors/taomarketcap.svg" alt="TaoMarketCap" width="283" height="25" />
                             <span aria-hidden="true">↗</span>
                         </a>
                         <a className="network-brand network-brand--taostats" href={research.taostats} target="_blank" rel="noopener noreferrer">
-                            <img src="/investors/taostats.svg" alt="taostats" />
+                            <img src="/investors/taostats.svg" alt="taostats" width="915" height="137" />
                             <span aria-hidden="true">↗</span>
                         </a>
                     </nav>

@@ -11,11 +11,11 @@ export default {
         eyebrow: 'Docs',
         updated: 'Updated',
         // the <title> of a document without one of its own
-        title: '{title} — UR Docs',
+        title: '{title} | UR',
     },
     // the docs landing, /docs
     index: {
-        title: 'UR Docs | Miner, validator and network operator guides',
+        title: 'Miner, Validator and Network Operator Guides | UR',
         description: 'How to run a miner or a validator on Bittensor SN25 and become a network operator, one guide per role, plus the UR litepaper. Each is also served as markdown.',
         breadcrumb: 'Docs',
         name: 'UR documentation',
@@ -36,6 +36,7 @@ export default {
         groups: {
             docs: 'Docs',
             miner: 'Miner guide',
+            compare: 'Compared with',
             legal: 'Legal',
         },
     },

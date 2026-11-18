@@ -1,0 +1,64 @@
+/* the static explanation on a role page (RoleGuide.jsx) */
+.role-guide {
+    margin-top: 56px;
+}
+
+.role-guide-title {
+    font-size: 1.35rem;
+    color: var(--brand-white);
+    font-weight: 500;
+    margin: 0 0 20px;
+    letter-spacing: 0.01em;
+}
+
+.role-guide-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px 32px;
+}
+
+.role-guide-item h3,
+.role-guide-guides h3 {
+    font-size: 1rem;
+    color: var(--brand-white);
+    font-weight: 500;
+    margin: 0 0 8px;
+}
+
+.role-guide-item p {
+    font-size: 0.92rem;
+    color: var(--brand-ui);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.role-guide a {
+    color: var(--brand-ur);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+}
+
+.role-guide a:hover {
+    border-bottom-color: var(--brand-ur);
+}
+
+.role-guide-guides {
+    margin-top: 28px;
+}
+
+.role-guide-guides ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: 0.92rem;
+}
+
+.role-guide-compared {
+    margin: 24px 0 0;
+    font-size: 0.92rem;
+    color: var(--brand-ui);
+    line-height: 1.6;
+}

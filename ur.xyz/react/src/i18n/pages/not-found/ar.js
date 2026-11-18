@@ -1,7 +1,7 @@
 // The not-found page in Arabic: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "الصفحة غير موجودة — UR",
+        title: "الصفحة غير موجودة | UR",
         description: "هذه الصفحة غير موجودة.",
     },
     title: "هذه الصفحة غير موجودة.",

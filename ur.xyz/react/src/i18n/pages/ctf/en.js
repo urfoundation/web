@@ -96,6 +96,8 @@ export default {
         // {count}: the providers online there that day
         seen: { one: '{count} provider was online there on {day}.', other: '{count} providers were online there on {day}.' },
         seenNone: 'No provider was online there on {day}.',
+        // {count}: the providers online there that day; {rank} its place among the {of} countries with any
+        seenRank: { one: '{count} provider was online there on {day}, No. {rank} of {of} countries.', other: '{count} providers were online there on {day}, No. {rank} of {of} countries.' },
     },
 
     hub: {
@@ -162,8 +164,10 @@ export default {
         earnA: "{worth}, and a winner in a country with a pot also takes a fifth of that pot. Amounts change every epoch with the network's emission and with how many people run in each country, and alpha's price moves. Nothing is guaranteed.",
         passiveQ: 'Is it passive income, or a job?',
         passiveA: 'Neither, quite. A miner, or the app, runs in the background on a computer or phone you already have, but it earns only while it stays online. It is not a job, with no employer, hours or wage, and not an investment, with no fixed return.',
+        paidQ: 'How do I get paid?',
+        paidA: 'Winnings go to the payout wallet your miner or app already uses, in your operator\'s capture the flag pool, and you claim them with your pool earnings. Local law where you live applies to what you earn and how you cash it out.',
         rolesQ: 'What is the difference between a provider and an extender?',
-        rolesA: 'A provider shares your internet connection with the people who use the network. An extender is a relay for people who cannot reach the network directly, for example behind censorship. The miner and the desktop app run both by default, and one device can win in both roles. An extender works only where the internet can reach your computer on TCP port 443: <ext>Run an extender</ext> says how to open it.',
+        rolesA: 'A provider shares your internet connection with the people who use the network. An extender is a relay for people who cannot reach the network directly, for example behind censorship. The miner and the desktop app run both by default, and one device can win in both roles. An extender works only where the internet can reach your computer on TCP port 443: <ext>Run an extender</ext> says how to open it, and <miners>mining on SN25</miners> covers the rest of what a miner needs.',
         fairQ: 'How is the draw kept fair?',
         fairA: 'When the epoch ends, each network operator commits the list of its eligible miners on chain. A drand round published after that commitment then picks the winners, so nobody, the operator included, can choose them. Every draw can be checked against its census and its round.',
         agentsQ: 'Can my AI assistant read this data?',
@@ -525,10 +529,28 @@ export default {
         disclaimer: ' Rewards are paid in alpha, the token of Bittensor subnet 25, and are not guaranteed.',
         more: 'More countries',
         all: 'All 249 countries',
+        // the link to the hub's questions, which are the same in every country
+        moreFaq: 'More questions',
         // a neighbour's figure: its pots after a draw, its providers online before
         aroundPots: '{amount} α in pots',
         // {count}: the providers online
         aroundOnline: { one: '{count} provider online', other: '{count} providers online' },
+    },
+
+    // a country page's own section: what the network's dashboard counted there over the window
+    network: {
+        title: '{The} on the network',
+        // {providers} is presence.providers; {rank} its place among the {of} countries with any provider online that day; {total} (presence.providers) all their providers
+        rank: "At the end of {day}, the network's dashboard counted {providers} online in {the}: <b>No. {rank} of {of}</b> among the countries where it counted any, which together had {total}.",
+        // {week} and {month} are presence.providers
+        change: 'A week earlier it counted {week} there, and four weeks earlier {month}.',
+        changeWeek: 'A week earlier it counted {week} there.',
+        // {count}: the days of the window; {seen} the days with any, {first} the first of them, {peak} (presence.providers) the most, on {peakDay}
+        window: { one: 'Over the last {count} day, it counted providers there on {seen}, the first on {first}; the most at the end of a day was {peak}, on {peakDay}.', other: 'Over the last {count} days, it counted providers there on {seen}, the first on {first}; the most at the end of a day was {peak}, on {peakDay}.' },
+        caption: 'Providers online in {the} at the end of each week',
+        day: 'Day',
+        online: 'Providers online',
+        near: 'Next to it in that count:',
     },
 
     countryFaq: {
@@ -548,10 +570,6 @@ export default {
         xNone: 'no extender entered',
         pEntries: { one: '{won} of {count} provider entry won a slot', other: '{won} of {count} provider entries won a slot' },
         xEntries: { one: '{won} of {count} extender entry won a slot', other: '{won} of {count} extender entries won a slot' },
-        passiveQ: 'Is it passive income?',
-        passiveA: "Partly. A miner, or the app, runs in the background on a computer or phone you already have, but it earns only while it stays online, and what you win depends on how many others run in {the} and on alpha's price. It is not an investment and has no fixed return.",
-        remoteQ: 'Is it remote work in {the}?',
-        remoteA: 'No. Capture the flag is not a job: there is no employer, no hours and no wage. It can run alongside remote work or any other job, on the internet connection you already have.',
         roleQ: 'Provider or extender: which should I run in {the}?',
         // with more than one operator, {pct}, {pp} and {xp} are the chance at each operator, a list (`ops`)
         roleBoth: 'Either. Both roles have open slots in {the}, so a newcomer in either role wins by default. The miner and the desktop app run both.',

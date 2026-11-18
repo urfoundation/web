@@ -402,6 +402,16 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
 .ctf-page .ctf-faq summary:focus-visible { outline: 2px solid var(--ctf-ink); outline-offset: 2px; border-radius: 6px; }
 .ctf-page .ctf-faq details p { margin: 0 0 16px; color: var(--ctf-soft); font-size: 14px; line-height: 1.6; }
 .ctf-page .ctf-faq details p b { color: var(--ctf-ink); font-weight: 400; }
+
+/* a country page's own section: the dashboard's counts there (CtfCountry.jsx CountryNetwork) */
+.ctf-page .ctf-net-text { margin: 0 0 16px; max-width: 72ch; color: var(--ctf-soft); font-size: 15px; line-height: 1.6; }
+.ctf-page .ctf-net-text b { color: var(--ctf-ink); font-weight: 400; }
+.ctf-page .ctf-net-table { width: 100%; max-width: 420px; border-collapse: collapse; font: 400 13px/1.4 var(--code-font); font-variant-numeric: tabular-nums; }
+.ctf-page .ctf-net-table caption { caption-side: top; text-align: start; padding: 0 0 8px; color: var(--ctf-faint); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.ctf-page .ctf-net-table th { text-align: start; font-weight: 400; color: var(--ctf-muted); padding: 6px 8px; border-bottom: 1px solid var(--ctf-line2); }
+.ctf-page .ctf-net-table td { padding: 6px 8px; border-bottom: 1px solid var(--ctf-line); color: var(--ctf-soft); }
+.ctf-page .ctf-net-table th:last-child, .ctf-page .ctf-net-table td:last-child { text-align: end; }
+.ctf-page .ctf-net-near { margin: 16px 0 0; color: var(--ctf-muted); font-size: 14px; line-height: 1.6; }
 .ctf-page .ctf-faq code { font: 400 12.5px/1 var(--code-font); color: var(--ctf-ink); }
 
 /* a country page: the countries before and after it, and the way back */
@@ -550,3 +560,9 @@ html.ctf-vt-on::view-transition-old(root), html.ctf-vt-on::view-transition-new(r
 .ctf-page .ctf-multi .ctf-cell .ctf-cpips, .ctf-page .ctf-multi .ctf-cell.ctf-expanded .ctf-cpips { display: none; }
 .ctf-page .ctf-multi .ctf-cell .ctf-rcount, .ctf-page .ctf-multi .ctf-cell.ctf-expanded .ctf-rcount { display: inline; margin-inline-start: 1px; font: 400 10.5px/1 var(--code-font); color: var(--ctf-soft); }
 .ctf-page .ctf-role-ops { display: block; margin-top: 3px; color: var(--ctf-muted); }
+
+/* a country page's link to how the draw works, which the hub tells once */
+.ctf-how-link { text-align: center; }
+
+/* a country page's link to the questions the hub answers for every country */
+.ctf-page .ctf-faq-more { margin: 12px 0 0; font-size: 14px; }

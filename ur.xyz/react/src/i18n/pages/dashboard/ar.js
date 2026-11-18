@@ -2,7 +2,7 @@
 // Arrows that point along the line are turned for right-to-left reading (→ ←, ← →, ↗ ↖).
 export default {
     meta: {
-        title: "إحصاءات UR",
+        title: "UR (SN25): إحصاءات الشبكة والمدفوعات مباشرةً | UR",
         description: "إحصاءات URnetwork وSN25 المباشرة: المستخدمون والمزوّدون المتصلون والبيانات المنقولة والحقب والدفعات وNetwork Capacity Reserve، مقروءة من Grafana والشبكة الرئيسية لـ Bittensor.",
     },
 

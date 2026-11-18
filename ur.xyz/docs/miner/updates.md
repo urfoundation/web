@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Keep the UR miner up to date. How the installers and the miner's own service update it automatically, how to check, change or turn off updates, and stay on one version.
+description: Keep the UR miner up to date: how installers and its own service update it, how to check, change or turn off updates, and how to stay on one version.
 ---
 
 # Keep the miner up to date

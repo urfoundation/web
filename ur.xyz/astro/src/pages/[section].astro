@@ -10,6 +10,7 @@ import OperatorLogos from '@react/components/OperatorLogos.jsx';
 import MinerSim from '@react/components/MinerSim.jsx';
 import MinerGlobeIntro from '@react/components/MinerGlobeIntro.jsx';
 import ValidatorSim from '@react/components/ValidatorSim.jsx';
+import RoleGuide, { roleGuideBlock } from '@react/components/RoleGuide.jsx';
 import OperatorsDirectoryIsland from '../islands/OperatorsDirectoryIsland.jsx';
 import { ResearchCompetition, ResearchReportCard, ResearchMethodologyCard, ResearchAreas, ResearchNotes, ResearchFoot, competitionPhase } from '@react/components/ResearchExtras.jsx';
 import { RESEARCH_DEEP_LINK_SCRIPT, researchCollectionJsonLd } from '@react/components/research-areas.js';
@@ -38,11 +39,12 @@ const jsonLd = section === 'research'
     : [];
 ---
 <Base
-    title={sectionData.metaTitle || `${sectionData.title} — UR`}
+    title={sectionData.metaTitle || `${sectionData.title} | UR`}
     description={description}
-    breadcrumbName={sectionData.eyebrow}
+    breadcrumbName={sectionData.breadcrumb || sectionData.eyebrow}
     lang="en"
     jsonLd={jsonLd}
+    alternate={ROLE_SECTIONS.includes(section) ? { href: `/${section}.md`, type: 'text/markdown' } : null}
 >
     {/* the stored-language redirect (a visitor who chose another language
         reads this page in it) is in Base's head */}
@@ -58,6 +60,7 @@ const jsonLd = section === 'research'
                 {section === 'research' && <ResearchCompetition client:load copy={t.research.competition} lang="en" initialPhase={competitionPhase(Date.now())} />}
                 {section === 'miners' && <MinerGlobeIntro client:load alt={sectionData.globeAlt} labels={sectionData.globeLabels} />}
                 <p>{sectionData.intro}</p>
+                {section === 'research' && sectionData.minersLink && <p><a href={'/miners'}>{sectionData.minersLink}</a></p>}
                 {section === 'research' && <ResearchReportCard t={t} />}
                 {section === 'research' && <ResearchMethodologyCard t={t} />}
                 {section === 'miners' && <p>{sectionData.both}</p>}
@@ -72,6 +75,8 @@ const jsonLd = section === 'research'
                     ? <ResearchAreas t={t} />
                     : <CardGrid items={items} />}
                 {section === 'research' && <ResearchNotes t={t} />}
+                {ROLE_SECTIONS.includes(section) && <RoleGuide block={roleGuideBlock(t, section)} id={`${section}-guide`} lang="en" />}
+                {section === 'validators' && <RoleGuide block={sectionData.scoring} id="validators-scoring" lang="en" />}
                 {section === 'operators' && <OperatorsDirectoryIsland lang="en" client:visible />}
                 {section === 'miners' && <MinerSim client:visible caption={sectionData.simCaption} />}
                 {section === 'validators' && <ValidatorSim client:visible caption={sectionData.simCaption} />}

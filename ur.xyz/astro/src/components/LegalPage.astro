@@ -46,7 +46,7 @@ const meta = t.legal[doc];
 // the document as markdown, for agents (scripts/generate-agent-assets.mjs)
 const twin = english ? { href: `/${doc}.md`, type: 'text/markdown' } : null;
 ---
-<Base title={`${meta.title || d.title} — UR`} description={meta.body} lang={lang} alternate={twin}>
+<Base title={`${meta.title || d.title} | UR`} description={meta.body} lang={lang} alternate={twin}>
     <div class="app">
         <DisclaimerStatic t={t} />
         <NavIsland lang={lang} client:idle={{ timeout: 1000 }} />

@@ -5,7 +5,7 @@ description: Fix common UR miner problems. Sign-in errors, a miner that stops st
 
 # Miner troubleshooting
 
-Find the message you're seeing, or the closest symptom, below. If you used an installer, type `urnetwork` wherever this page says `provider`. Still stuck? Ask [on our Discord](https://discord.gg/urnetwork), with the command you ran and what it printed. Never post your auth code, seed files or anything from `~/.urnetwork`.
+Find the message you're seeing, or the closest symptom, below. If you used an installer, type `urnetwork` wherever this page says `provider`. Still stuck? Ask [on our Discord](https://discord.gg/urnetwork), with the command you ran and what it printed. Never post your auth code, seed files or anything from `~/.urnetwork`. New to mining? [Run a UR node](/miners) starts with what a miner runs and needs.
 
 ## Installing
 

@@ -74,7 +74,7 @@ export function HowItWorks({ m }) {
 }
 
 /** Questions, as visible HTML (no FAQPage markup: Google dropped that rich result; SEO.md §2.4). */
-export function Questions({ title, items }) {
+export function Questions({ title, items, more = null }) {
     return (
         <section id="faq" className="ctf-sec ctf-faq-sec" aria-labelledby="ctf-faq-h">
             <h2 id="ctf-faq-h" className="ctf-h2">{title}</h2>
@@ -86,6 +86,7 @@ export function Questions({ title, items }) {
                     </details>
                 ))}
             </div>
+            {more && <p className="ctf-faq-more">{more}</p>}
         </section>
     );
 }
@@ -112,6 +113,7 @@ function HubQuestions({ m }) {
     const live = m.phase !== 'prelaunch';
     const links = {
         ext: (kids) => <a href={pagePath(m.lang, EXTENDER_URL)}>{kids}</a>,
+        miners: (kids) => <a href={pagePath(m.lang, '/miners')}>{kids}</a>,
         api: (kids) => <a href={apiHref(m)}>{kids}</a>,
         spec: (kids) => <a href={OPERATOR_YML}>{kids}</a>,
         list: (kids) => <a href={OPERATORS_PATH}>{kids}</a>,
@@ -125,6 +127,7 @@ function HubQuestions({ m }) {
                 [t.winQ, m.drawn ? t.winDrawn : t.winOpen],
                 [t.earnQ, rich(t.earnA, { worth: slotWorth(m) })],
                 [t.passiveQ, t.passiveA],
+                [t.paidQ, t.paidA],
                 [t.rolesQ, rich(t.rolesA, {}, links)],
                 [t.fairQ, t.fairA],
                 [t.agentsQ, rich(t.agentsA, { lead: live ? t.agentsLive : interpolate(t.agentsSoon, { first: m.firstEpoch }) }, links)],

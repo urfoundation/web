@@ -2,10 +2,10 @@ export default {
     page: {
         eyebrow: 'الوثائق',
         updated: 'آخر تحديث',
-        title: '{title} — وثائق UR',
+        title: '{title} | UR',
     },
     index: {
-        title: 'وثائق UR | أدلة المُعدِّن والمُصادِق ومشغّل الشبكة',
+        title: 'أدلة المُعدِّن والمُصادِق ومشغّل الشبكة | UR',
         description: 'كيف تشغّل مُعدِّنًا أو مُصادِقًا على Bittensor SN25 وتصبح مشغّل شبكة، بدليل لكل دور، إضافة إلى الورقة المختصرة لـ UR. كلٌّ منها متاح أيضًا بصيغة markdown.',
         breadcrumb: 'الوثائق',
         name: 'وثائق UR',
@@ -21,6 +21,7 @@ export default {
         groups: {
             docs: 'الوثائق',
             miner: 'دليل المُعدِّن',
+            compare: 'مقارنات',
             legal: 'قانوني',
         },
     },

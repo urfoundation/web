@@ -10,9 +10,9 @@ UR 验证者运行在 **Bittensor SN25，netuid 25** 上。当前的 [`sn/valida
 
 本指南介绍的是 SN25 验证者。**netuid 0 上的根验证者**有单独的注册、运行和篮子领取流程；在根网络上注册并不会启动 UR 验证。UR 的其他角色请参阅[矿工指南](/docs/miner)和[网络运营商指南](/docs/operator)。
 
-## 开始之前
+## 开始之前需要准备什么？
 
-为你打算加入的部署准备以下输入：
+你需要一台 Linux 主机、一个有资金的 Bittensor coldkey、一个已注册并持有验证者许可的 SN25 hotkey，以及为你打算加入的部署准备好的 schema-3 生产配置：
 
 - 一台 Linux 主机、持久存储，以及对每个已配置运营商的 HTTPS API 和 WSS 传输的持续访问，外加该部署的 EVM HTTP(S) 和原生 WS(S) RPC 端点。主网的持久卷检查需要 Linux，尽管该二进制文件也可以为 macOS 构建。
 - 一个 Bittensor coldkey 钱包，其中有用于注册、质押和交易手续费的资金。请把它保存在用于钱包操作的机器上。运行中的验证者需要其 hotkey 和每个运营商的客户端密钥，而不需要 coldkey。
@@ -28,7 +28,7 @@ UR 验证者运行在 **Bittensor SN25，netuid 25** 上。当前的 [`sn/valida
 
 ### 下载发布版本
 
-验证者以 `urnetwork-validator-<version>.tar.gz` 的形式发布在 [build 版本发布页面](https://github.com/urnetwork/build/releases)上。该压缩包为每个平台包含一个二进制文件，位于 `<os>/<arch>/validator`，适用于 Linux 和 macOS。主网验证者运行 Linux 二进制文件，即 `linux/amd64` 或 `linux/arm64`（请参阅[开始之前](#before-you-start)）：
+验证者以 `urnetwork-validator-<version>.tar.gz` 的形式发布在 [build 版本发布页面](https://github.com/urnetwork/build/releases)上。该压缩包为每个平台包含一个二进制文件，位于 `<os>/<arch>/validator`，适用于 Linux 和 macOS。主网验证者运行 Linux 二进制文件，即 `linux/amd64` 或 `linux/arm64`（请参阅[开始之前](#what-do-you-need-before-you-start)）：
 
 ```bash
 VERSION=2026.10.6-1065506180   # the latest tag on the releases page, without the leading v

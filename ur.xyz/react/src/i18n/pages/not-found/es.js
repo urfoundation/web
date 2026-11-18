@@ -1,7 +1,7 @@
 // The not-found page in Spanish: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "Página no encontrada — UR",
+        title: "Página no encontrada | UR",
         description: "Esta página no existe.",
     },
     title: "Esta página no existe.",

@@ -3,7 +3,7 @@
 // Text in capitals stays in capitals; "01 /", "02 /" … stay as they are.
 export default {
     meta: {
-        title: 'Auf UR entwickeln | Chancen für Netzbetreiber',
+        title: 'Auf UR entwickeln: Chancen für Netzbetreiber | UR',
         description: 'Entwickle als Netzbetreiber Produkte auf UR: mit gemeinsam genutzter Kapazität aus Privatanschlüssen, gemessener Dienstqualität und der Anreizschicht von SN25.',
         breadcrumb: 'Auf UR entwickeln',
     },

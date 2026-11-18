@@ -2,3388 +2,3532 @@
   "about": "The day each page of the ur.xyz page group ctf (react/src/i18n/pages/ctf/group.js), in every language, last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
     "/ar/ctf": {
-      "fingerprint": "51723835550eb858",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f4eed88daa4b39cf",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ad": {
-      "fingerprint": "345d9e0764277cfb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a4cffa6b924016c5",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ae": {
-      "fingerprint": "5526b1d9d97adeaa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ee1983d8ec2086bf",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/af": {
-      "fingerprint": "28dff53f40463b59",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3a4a7dcad94501e3",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ag": {
-      "fingerprint": "24af31d221f45efc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9dcf2976ead40536",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/al": {
-      "fingerprint": "43a8d2ac5e63519c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fa96150ee6b917f4",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/am": {
-      "fingerprint": "8162850b82b25663",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bdbb927330e7606a",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ar": {
-      "fingerprint": "695934d258e9c911",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1fcf9a1fe4540124",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/at": {
-      "fingerprint": "c442c9f064e8d74c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8a04008827ab8727",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/au": {
-      "fingerprint": "bcd3d7a05dae42f8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "73d5f25007847508",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/ctf/az": {
+      "fingerprint": "f360b22c6f69e1bd",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ba": {
-      "fingerprint": "023eb63746f3e3e6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b13dcba99af8ba07",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bd": {
-      "fingerprint": "34474a390eaf5932",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e3eef274bc78a215",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/be": {
-      "fingerprint": "cf6dafff2402a162",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4b0e42ce12b165f7",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bg": {
-      "fingerprint": "189998003296286c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b9c0a74168be8939",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bh": {
-      "fingerprint": "48480d5e6de7577e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eca38a10e1516343",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bi": {
-      "fingerprint": "ac320eaea682466a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d3c56d35ceb09193",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bm": {
-      "fingerprint": "3dc7d7d25d4e9bc5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8d3fbfb4b5dd6337",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bo": {
-      "fingerprint": "80cd2f5dd564e45b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9e7bad8a9f2cc05e",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/br": {
-      "fingerprint": "14cfb8c7e00fe3fa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4c7475c0f940555b",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bs": {
-      "fingerprint": "3f3985b18f8bb92b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c86fa669d74cdb9c",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/bw": {
-      "fingerprint": "94eef071753cbb75",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b3ec804381718569",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/by": {
-      "fingerprint": "a7eded5f8482bd6b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dec3e728cdf75899",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ca": {
-      "fingerprint": "7541a4843288ccbe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1aafb4079e4afe68",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/cd": {
-      "fingerprint": "c23149dc58a48655",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8a2125079e06e1d8",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ch": {
-      "fingerprint": "0f32cf1e881554df",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c22b39db9003fc8a",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/cl": {
-      "fingerprint": "459981e37cfa89b1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1a75a736759358f3",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/cm": {
-      "fingerprint": "2ec010135f13cecb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0bb293e027724407",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/cn": {
-      "fingerprint": "140c2e5e68895287",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b88f79c46a0e34d9",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/co": {
-      "fingerprint": "8519963c3605cf7c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a6f271a6ea5508af",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/cr": {
-      "fingerprint": "f07530bc13ea386e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7f1444b4809c096a",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/ctf/cu": {
+      "fingerprint": "d2c3663cc2b4e47b",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/cy": {
-      "fingerprint": "099b49cf152c9409",
-      "lastmod": "2026-11-12"
+      "fingerprint": "014a04bc2a08a550",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/cz": {
-      "fingerprint": "a81a4e454fcfad70",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dc095afde1087961",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/de": {
-      "fingerprint": "b518567730c5ab46",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b7766b62ae8670d3",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/dk": {
-      "fingerprint": "48e3249bf855d09a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5d67b18ca68c6a91",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/do": {
-      "fingerprint": "e915f39067917b41",
-      "lastmod": "2026-11-12"
+      "fingerprint": "06223b13914704ff",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/dz": {
-      "fingerprint": "3e4f3d53fe041970",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f9887d4d36bece37",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ec": {
-      "fingerprint": "a90b40ef65479b5f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8c0f2c3f44ac3d81",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ee": {
-      "fingerprint": "c804aeec69969962",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b474af9924a00603",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/eg": {
-      "fingerprint": "fa355e38de54c953",
-      "lastmod": "2026-11-12"
+      "fingerprint": "812ec198067d51d4",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/es": {
-      "fingerprint": "77647b8c3c8f655d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e08a083789469c87",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/et": {
-      "fingerprint": "1ab4359ba403b55a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eef9e630c551f2a8",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/fi": {
-      "fingerprint": "2cb5633b0c1dc93c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d7049470ad61f5b5",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/fm": {
-      "fingerprint": "3197238de76826cc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ab71919a8d928d0e",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/fr": {
-      "fingerprint": "e37dd06238e51cb7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a9ef6b5fdd98190d",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/gb": {
-      "fingerprint": "acb63cc08fe093d3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5b61f95afd99a342",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/gd": {
-      "fingerprint": "a0e3590bb581d1b1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e4ccc8a5efccafa1",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ge": {
-      "fingerprint": "6319b068bd02b271",
-      "lastmod": "2026-11-12"
+      "fingerprint": "33e1d99a64d302a9",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/gf": {
-      "fingerprint": "a3287d364243ca23",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bf8ccac2fb37285a",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/gh": {
-      "fingerprint": "562c8f58141f7b26",
-      "lastmod": "2026-11-12"
+      "fingerprint": "791d3bb77c30a8c9",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/gr": {
-      "fingerprint": "343559e24e096954",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6d13c050c381a997",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/gt": {
-      "fingerprint": "6ae3a204615c6af4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7909652af4acb904",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/hk": {
-      "fingerprint": "3b99eb15d2705a50",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3b1c7ade0393099f",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/hn": {
-      "fingerprint": "c8b292919192db59",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8e8e02c9a6a6fd46",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/hr": {
-      "fingerprint": "9ec02ea88d192375",
-      "lastmod": "2026-11-12"
+      "fingerprint": "512fe79bfd0b0621",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/hu": {
-      "fingerprint": "ba59f3b8c03100e1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4b745ea44f17eb78",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/id": {
-      "fingerprint": "30e12bca434201f8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ecec4d1356859975",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ie": {
-      "fingerprint": "dc59e98815a44e0c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4fccf646ad6dcbc4",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/il": {
-      "fingerprint": "dc8806fb2947edaa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5bbd91c15d75edf0",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/im": {
-      "fingerprint": "86293f2fbd69c114",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a7b20f388c4ffd7f",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/in": {
-      "fingerprint": "cf177191b504535d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ce626aa8d107292c",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/iq": {
-      "fingerprint": "084d5f5b869a811b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d05ecf5dceb3bf4d",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ir": {
-      "fingerprint": "2a727a03abea9583",
-      "lastmod": "2026-11-12"
+      "fingerprint": "62f99c5b47a2df30",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/is": {
-      "fingerprint": "ece2bb9b4685b9d1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c54d6b0e4bcad383",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/it": {
-      "fingerprint": "25e238e7e97088f0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "43cfa1c448ccad82",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/jm": {
-      "fingerprint": "87981d855dbbfe31",
-      "lastmod": "2026-11-12"
+      "fingerprint": "29d1cbcdce631b4d",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/jo": {
-      "fingerprint": "4c4902d4c5d19545",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9d0ab24261ee3765",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/jp": {
-      "fingerprint": "6ed09ea98614b9c2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7d06604d2d990cf6",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/ctf/ke": {
+      "fingerprint": "9a974352445182d7",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/kg": {
-      "fingerprint": "897a77475a26e32b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4392ffc06c603369",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/kh": {
-      "fingerprint": "8774b1e656b9384f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cb17267e106d6ea7",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ki": {
-      "fingerprint": "c3667855205d3f76",
-      "lastmod": "2026-11-12"
+      "fingerprint": "07c1f3ad9c78b5b1",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/kr": {
-      "fingerprint": "1bac0a5575c406bf",
-      "lastmod": "2026-11-12"
+      "fingerprint": "aef6120ec586aa7e",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/kw": {
-      "fingerprint": "2e0aabbb6506d335",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a45e3e7b1f21fb67",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ky": {
-      "fingerprint": "a7ad7fe03eac3b8d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ac4010c5c3a8c854",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/kz": {
-      "fingerprint": "f980a23725d3ddc4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "039bf69ee9921d97",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/la": {
-      "fingerprint": "d5c4ffb089c2e56f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "443d52123a938ad0",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/lb": {
-      "fingerprint": "946201026fcf5241",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a9c78838d7b37ecc",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/ctf/li": {
+      "fingerprint": "3f5b17bf8614595f",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/lk": {
-      "fingerprint": "f0a2469607d61e2d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "93258e5ad6b026df",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/lt": {
-      "fingerprint": "3fed41877eedf13c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "54d6dabdeb6ca5c1",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/lu": {
-      "fingerprint": "facc9fab2cf01931",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9ba073ab7a44a29b",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/lv": {
-      "fingerprint": "7e1dfbe82a95ee38",
-      "lastmod": "2026-11-12"
+      "fingerprint": "62dd552134208743",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ly": {
-      "fingerprint": "96ad44b4d2d17540",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7fcdacfc8326c70e",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ma": {
-      "fingerprint": "e215b2d8a6360167",
-      "lastmod": "2026-11-12"
+      "fingerprint": "650157ee76b00f2a",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/md": {
-      "fingerprint": "9d55e4b859105231",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3bbb413f35603a7d",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/me": {
-      "fingerprint": "bafa1f4a64a8d810",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2caf0df0cb572b78",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mg": {
-      "fingerprint": "471fb679c87c38ff",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b6bac655c95d189b",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mh": {
-      "fingerprint": "8b2f0a54e719455e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c3d20502763ffb5f",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mk": {
-      "fingerprint": "ad953a76cf82d68e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2fe45d532b570a54",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ml": {
-      "fingerprint": "1009fa10e508e9cd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7a4bb51db7c6e193",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mm": {
-      "fingerprint": "f4bbb9edcffa9295",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8318e4075c7b63d6",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mn": {
-      "fingerprint": "eeea5b594a937697",
-      "lastmod": "2026-11-12"
+      "fingerprint": "75dc49fa788f62de",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mo": {
-      "fingerprint": "7df5a27ebab34dbb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0a4cb54f20c9f1c3",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mr": {
-      "fingerprint": "630f1cf46cf2c92b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8e536f36c15567f4",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mt": {
-      "fingerprint": "e9f6ddfe2634a79a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "11d375ce3c8e60c0",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mv": {
-      "fingerprint": "3af1ef53623470b5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b5e1e79ccd8a7a01",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mx": {
-      "fingerprint": "a3c0aa54c5f42168",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d66e2fc31d67e38c",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/my": {
-      "fingerprint": "b6531ae310952888",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6c1342fa803e5f4c",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/mz": {
-      "fingerprint": "7a455b4ab3341356",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d9f638117d9ee5f4",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ng": {
-      "fingerprint": "52278a8439aa2848",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eb5e24db3ecfc6b8",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/nl": {
-      "fingerprint": "f79e334044393ad3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fb48fe95701f2d36",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/no": {
-      "fingerprint": "c5dec48bd4c9a80b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0e8bca72e0856455",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/np": {
-      "fingerprint": "38980546e1d25857",
-      "lastmod": "2026-11-12"
+      "fingerprint": "82f7790bef901f2e",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/nz": {
-      "fingerprint": "4970fe4621355cf3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "78eb780e5b09b78e",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/ctf/om": {
+      "fingerprint": "dfe33a385a40bf6e",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/pa": {
-      "fingerprint": "8440311afd975bb3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a38f2bf08e4e33be",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/pe": {
-      "fingerprint": "e027f99979345106",
-      "lastmod": "2026-11-12"
+      "fingerprint": "95c1b41611e1b8b8",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/pf": {
-      "fingerprint": "a1e69b7c4b23af0c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "92c180582e166358",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ph": {
-      "fingerprint": "885561dfcc556ce6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a7c006024d0ca841",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/pk": {
-      "fingerprint": "8e9657ac73fffbb0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5c679648e5b9b850",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/pl": {
-      "fingerprint": "dd96a3fd1d05a37b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e002594d4b10add6",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/pr": {
-      "fingerprint": "f30585aca0e49d11",
-      "lastmod": "2026-11-12"
+      "fingerprint": "18825488b4f56bb9",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ps": {
-      "fingerprint": "963d3f0c33d6c6e2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c8d63afcebd5244a",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/pt": {
-      "fingerprint": "2b806921c8262f6a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "89b562b6230cce15",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/py": {
-      "fingerprint": "ffbcb3ed2433160a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4a1d221d6ac99c37",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/qa": {
-      "fingerprint": "b2ba57b4e7d9b136",
-      "lastmod": "2026-11-12"
+      "fingerprint": "306b7252a6a94eb5",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ro": {
-      "fingerprint": "51d195bd480e8095",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7ed69d73f4f329ed",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/rs": {
-      "fingerprint": "9b1307e280c6cc9c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fc2e5f36668f78ed",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ru": {
-      "fingerprint": "565c08486419c70a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b2b3efb92ba4a28f",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/sa": {
-      "fingerprint": "0fa52639ce548dfe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "af89140993407a8a",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/sc": {
-      "fingerprint": "44273d25dda30f25",
-      "lastmod": "2026-11-12"
+      "fingerprint": "90ff59ef7fd29dc5",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/se": {
-      "fingerprint": "3641930225878ece",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cb43df89d8cc68e6",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/sg": {
-      "fingerprint": "e818665f030ac09b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "41d8949b18bc0849",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/si": {
-      "fingerprint": "713214a86456401a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dab90cec308eab06",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/sk": {
-      "fingerprint": "27a17799469a2680",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ce0aaa82d523f453",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/sm": {
-      "fingerprint": "c91993283f3fae10",
-      "lastmod": "2026-11-12"
+      "fingerprint": "866ab2a77471a77b",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/sv": {
-      "fingerprint": "f37c8889701bea99",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2d6dde7bfa51c150",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/sy": {
-      "fingerprint": "a5022951527a26bd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1b38e8024a86fc5d",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/th": {
-      "fingerprint": "835b54e7fb52688b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "72af62f64cc57d48",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/tn": {
-      "fingerprint": "d80fed55f4817a48",
-      "lastmod": "2026-11-12"
+      "fingerprint": "af296384cc16c36a",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/tr": {
-      "fingerprint": "9e4abb3d902bfef1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a440118ff33703be",
+      "lastmod": "2026-11-18"
+    },
+    "/ar/ctf/tt": {
+      "fingerprint": "ec4c2783ad8c4487",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/tw": {
-      "fingerprint": "9c94ebf7ac7a0a20",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d48a670e9bddc6a9",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/tz": {
-      "fingerprint": "9f697eb085161b8d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "571cd882a68e18ab",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ua": {
-      "fingerprint": "9c2247476ca03c5d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d41e830dd04bf4bd",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ug": {
-      "fingerprint": "da0d8674cb4820c9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a4b985aa013c7b90",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/us": {
-      "fingerprint": "b5ca85dbdfbabed2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "36b48285bc79aaa8",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/uy": {
-      "fingerprint": "5980ed3175daeeb3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a8973d1353f3c936",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/uz": {
-      "fingerprint": "278b11262a97a863",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1f56adc83eb152d2",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ve": {
-      "fingerprint": "18cb4881f224c7bc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c310e8f542b83d6d",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/vg": {
-      "fingerprint": "e14dc736459ee315",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ddd893681208dc0",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/vn": {
-      "fingerprint": "ea15937ab4920139",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ca7b79cc14afeeae",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/ye": {
-      "fingerprint": "aea0fe86310e47cd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "32fd9c4beaff5c91",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/za": {
-      "fingerprint": "10ab86cdbe90fb51",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9c4cf41e4aab6d08",
+      "lastmod": "2026-11-18"
     },
     "/ar/ctf/zw": {
-      "fingerprint": "26631e6da6ad0124",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d50a17ef98effe1b",
+      "lastmod": "2026-11-18"
     },
     "/ctf": {
-      "fingerprint": "b9d3fd0070d9858a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b23509223d882e3f",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ad": {
-      "fingerprint": "601b82690bb9c26d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "355b40e52c447c1a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ae": {
-      "fingerprint": "17bcfef1c79c6d50",
-      "lastmod": "2026-11-12"
+      "fingerprint": "86704bfaf84ae266",
+      "lastmod": "2026-11-18"
     },
     "/ctf/af": {
-      "fingerprint": "5e4b80b14949356e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7dc1250cbbbfac37",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ag": {
-      "fingerprint": "cc01199cbf8e476d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e6cd66d029864293",
+      "lastmod": "2026-11-18"
     },
     "/ctf/al": {
-      "fingerprint": "1e7c129483317b96",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ea77f501db8e402d",
+      "lastmod": "2026-11-18"
     },
     "/ctf/am": {
-      "fingerprint": "80f26b75c7b4e591",
-      "lastmod": "2026-11-12"
+      "fingerprint": "98b395372399c1ce",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ar": {
-      "fingerprint": "a6e2e0510e6c9485",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7fb63a636c4f6246",
+      "lastmod": "2026-11-18"
     },
     "/ctf/at": {
-      "fingerprint": "ca7a3669faa95b82",
-      "lastmod": "2026-11-12"
+      "fingerprint": "13dfc8d6322e1dd2",
+      "lastmod": "2026-11-18"
     },
     "/ctf/au": {
-      "fingerprint": "7f657847c7fe29ac",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ce696d6cee92f594",
+      "lastmod": "2026-11-18"
+    },
+    "/ctf/az": {
+      "fingerprint": "2cefbce6e1b81cba",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ba": {
-      "fingerprint": "f4b59489819f622e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3799cb26ccd79917",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bd": {
-      "fingerprint": "1be3b7a67acff190",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a98412966b82a489",
+      "lastmod": "2026-11-18"
     },
     "/ctf/be": {
-      "fingerprint": "d25247f308ba8762",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c4f85591f4d041fd",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bg": {
-      "fingerprint": "abfb11a24eed1584",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8513d710d570444d",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bh": {
-      "fingerprint": "2445c7b351fec42f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "becaf8da07a4f767",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bi": {
-      "fingerprint": "98d667a16b3902a8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8498a1a44c9b723b",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bm": {
-      "fingerprint": "eff44e7671e0e06f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d37aa1cbbfe5a76d",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bo": {
-      "fingerprint": "5561b3baea0cab4d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5f8d1728271878af",
+      "lastmod": "2026-11-18"
     },
     "/ctf/br": {
-      "fingerprint": "1f4677fa45b10c26",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ec4a69f5bf475d84",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bs": {
-      "fingerprint": "cdf8dbe9c50102a7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "585aba37aa0b6276",
+      "lastmod": "2026-11-18"
     },
     "/ctf/bw": {
-      "fingerprint": "cdb69f4e55699742",
-      "lastmod": "2026-11-12"
+      "fingerprint": "62ef33f3054ef409",
+      "lastmod": "2026-11-18"
     },
     "/ctf/by": {
-      "fingerprint": "569264305a51a6a6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ea9d1d9eca949b0e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ca": {
-      "fingerprint": "1a0f34790359f556",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5f9a041ff1b8aebe",
+      "lastmod": "2026-11-18"
     },
     "/ctf/cd": {
-      "fingerprint": "e40892f2fe64b5fe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eeff8c9628914746",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ch": {
-      "fingerprint": "d71ea0e19a10e8ff",
-      "lastmod": "2026-11-12"
+      "fingerprint": "74b08e532ca1103d",
+      "lastmod": "2026-11-18"
     },
     "/ctf/cl": {
-      "fingerprint": "5afd377df97f20f8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4b4c05574298d885",
+      "lastmod": "2026-11-18"
     },
     "/ctf/cm": {
-      "fingerprint": "ba84e6d0903e40cb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a35163d6464ebb52",
+      "lastmod": "2026-11-18"
     },
     "/ctf/cn": {
-      "fingerprint": "25950ee8f70acde4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ab1549afd94fd121",
+      "lastmod": "2026-11-18"
     },
     "/ctf/co": {
-      "fingerprint": "46302f53e288cbb3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9b3639859cb25f6c",
+      "lastmod": "2026-11-18"
     },
     "/ctf/cr": {
-      "fingerprint": "7d0a1beeb19f6e20",
-      "lastmod": "2026-11-12"
+      "fingerprint": "43a632913b45d551",
+      "lastmod": "2026-11-18"
+    },
+    "/ctf/cu": {
+      "fingerprint": "b1b7c72cb569477c",
+      "lastmod": "2026-11-18"
     },
     "/ctf/cy": {
-      "fingerprint": "a9457c729b644152",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b9e70b1086c508da",
+      "lastmod": "2026-11-18"
     },
     "/ctf/cz": {
-      "fingerprint": "1c6f55cc3670fda4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "737d131e43c7ce96",
+      "lastmod": "2026-11-18"
     },
     "/ctf/de": {
-      "fingerprint": "4891006e0fff2106",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5cf540eb519f6a26",
+      "lastmod": "2026-11-18"
     },
     "/ctf/dk": {
-      "fingerprint": "f28c09579508a063",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c669415355640871",
+      "lastmod": "2026-11-18"
     },
     "/ctf/do": {
-      "fingerprint": "0a07e35e0a30a94c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5c8371287c0f3467",
+      "lastmod": "2026-11-18"
     },
     "/ctf/dz": {
-      "fingerprint": "bc443e689cb72c1b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3c722bff6126d0d3",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ec": {
-      "fingerprint": "b6ecf53de34de0e9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b095e5b3e2fb493e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ee": {
-      "fingerprint": "71ab61c4e314ea69",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2acd8c5371845d3b",
+      "lastmod": "2026-11-18"
     },
     "/ctf/eg": {
-      "fingerprint": "73f2efbdbb053c9a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ac5bbcc5f98dc553",
+      "lastmod": "2026-11-18"
     },
     "/ctf/es": {
-      "fingerprint": "6010ddd9e85887c0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bbf0331d1eca0a68",
+      "lastmod": "2026-11-18"
     },
     "/ctf/et": {
-      "fingerprint": "1fe4aa90bce69acd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c5b807cf5b35a1db",
+      "lastmod": "2026-11-18"
     },
     "/ctf/fi": {
-      "fingerprint": "10671746d4a15482",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5c580fe408a4b0c3",
+      "lastmod": "2026-11-18"
     },
     "/ctf/fm": {
-      "fingerprint": "ed3fded13dba34f7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d00bdb82bee54855",
+      "lastmod": "2026-11-18"
     },
     "/ctf/fr": {
-      "fingerprint": "1d59c6bc16b10fd9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d00b76b027b4a0a9",
+      "lastmod": "2026-11-18"
     },
     "/ctf/gb": {
-      "fingerprint": "5afa12b439cc8ac5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f5e3b9c45d874856",
+      "lastmod": "2026-11-18"
     },
     "/ctf/gd": {
-      "fingerprint": "654e68cf40730cfe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8ca9d38944082c4b",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ge": {
-      "fingerprint": "bcdc492cccf33ae7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "edda9f77b97f3528",
+      "lastmod": "2026-11-18"
     },
     "/ctf/gf": {
-      "fingerprint": "d6c9e3e6b560cf59",
-      "lastmod": "2026-11-12"
+      "fingerprint": "80183d1c2124aca5",
+      "lastmod": "2026-11-18"
     },
     "/ctf/gh": {
-      "fingerprint": "8a7041c0e5a5a23f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "722630ea6b449d4f",
+      "lastmod": "2026-11-18"
     },
     "/ctf/gr": {
-      "fingerprint": "f65f6966694b6e23",
-      "lastmod": "2026-11-12"
+      "fingerprint": "20dc57835d0ec66e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/gt": {
-      "fingerprint": "4c8584bbb5f1e0bd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ca08550d4fea7a8e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/hk": {
-      "fingerprint": "d57e8716dcf1e870",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fd5f51e051ad30c5",
+      "lastmod": "2026-11-18"
     },
     "/ctf/hn": {
-      "fingerprint": "38549389cd2b8925",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9f0b7fad49cc5b5e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/hr": {
-      "fingerprint": "8e90c0b99ef4c1e7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d6e3cfcafecb335f",
+      "lastmod": "2026-11-18"
     },
     "/ctf/hu": {
-      "fingerprint": "70e6a0cf4fd9d4e4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b9d357a2c6965d85",
+      "lastmod": "2026-11-18"
     },
     "/ctf/id": {
-      "fingerprint": "30f66daf3663bf12",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b34cd7ee6c421372",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ie": {
-      "fingerprint": "e3048f37ace36251",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4dcfd05d0e787b2e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/il": {
-      "fingerprint": "19bea22e37cd8977",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5d4edbae5e7c6fd3",
+      "lastmod": "2026-11-18"
     },
     "/ctf/im": {
-      "fingerprint": "487fc342233687e9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "308e2bde1069c55c",
+      "lastmod": "2026-11-18"
     },
     "/ctf/in": {
-      "fingerprint": "f5fe4b09a1d56ac5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dbcefce578bc4ea6",
+      "lastmod": "2026-11-18"
     },
     "/ctf/iq": {
-      "fingerprint": "2bfc9a85ca3475d7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "55fdf958c2a92237",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ir": {
-      "fingerprint": "09195f27c917b5ff",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1a569273ce29fc4d",
+      "lastmod": "2026-11-18"
     },
     "/ctf/is": {
-      "fingerprint": "b3e884f8eed37423",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9fab189930e2065b",
+      "lastmod": "2026-11-18"
     },
     "/ctf/it": {
-      "fingerprint": "496dab42b6b3f006",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ddbc7e80e89f29a8",
+      "lastmod": "2026-11-18"
     },
     "/ctf/jm": {
-      "fingerprint": "783b1a606ce13e64",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cc3055a8d6219c4e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/jo": {
-      "fingerprint": "6910efad7c21928a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c73ff8f2195b968e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/jp": {
-      "fingerprint": "f1f39f870b1b182a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8e243dca4bf686ad",
+      "lastmod": "2026-11-18"
+    },
+    "/ctf/ke": {
+      "fingerprint": "3b992444c40eaf38",
+      "lastmod": "2026-11-18"
     },
     "/ctf/kg": {
-      "fingerprint": "60227d550290aae2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "590d92001b9754f8",
+      "lastmod": "2026-11-18"
     },
     "/ctf/kh": {
-      "fingerprint": "2e6150153e31e9cb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e2d36613df8183c3",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ki": {
-      "fingerprint": "201e6184c1486d36",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4ef66766aa088c76",
+      "lastmod": "2026-11-18"
     },
     "/ctf/kr": {
-      "fingerprint": "640e5a98239c892e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "911f1d0d19d7e7c8",
+      "lastmod": "2026-11-18"
     },
     "/ctf/kw": {
-      "fingerprint": "dda55726533d7847",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8a013f4d3b0345c5",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ky": {
-      "fingerprint": "3e3293dd22e65502",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b0791c25955b69ca",
+      "lastmod": "2026-11-18"
     },
     "/ctf/kz": {
-      "fingerprint": "d97aa93d5753b2ea",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a3ab2a589da8637a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/la": {
-      "fingerprint": "a55a10b6358bb8ff",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4eb3d835969cd73b",
+      "lastmod": "2026-11-18"
     },
     "/ctf/lb": {
-      "fingerprint": "8fbac21bb55799bf",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f8b4ad16cbdc110a",
+      "lastmod": "2026-11-18"
+    },
+    "/ctf/li": {
+      "fingerprint": "a85b0788efb565af",
+      "lastmod": "2026-11-18"
     },
     "/ctf/lk": {
-      "fingerprint": "9d878c0a07f80243",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a897f9ed3bc34b71",
+      "lastmod": "2026-11-18"
     },
     "/ctf/lt": {
-      "fingerprint": "ada30b5a2eeaa247",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7e77adaaa65d0944",
+      "lastmod": "2026-11-18"
     },
     "/ctf/lu": {
-      "fingerprint": "55ff600107695230",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6fd6f66036e8be2c",
+      "lastmod": "2026-11-18"
     },
     "/ctf/lv": {
-      "fingerprint": "6b3746b8aae1ae39",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ccb7d82486cf1dae",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ly": {
-      "fingerprint": "4921c4eb48cb5743",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6a64b46ce27609de",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ma": {
-      "fingerprint": "261ff5b92b53c33a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "28b1415fcc2a716c",
+      "lastmod": "2026-11-18"
     },
     "/ctf/md": {
-      "fingerprint": "ca2e1a161e15e5f8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7b37eca2662cf848",
+      "lastmod": "2026-11-18"
     },
     "/ctf/me": {
-      "fingerprint": "21de3732a51eee47",
-      "lastmod": "2026-11-12"
+      "fingerprint": "49eea8f60b170e0e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mg": {
-      "fingerprint": "ee80fbd284fb7bff",
-      "lastmod": "2026-11-12"
+      "fingerprint": "66ff4e99b07ed244",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mh": {
-      "fingerprint": "5d06f7097d2e21fb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "17d3dade31ff99d6",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mk": {
-      "fingerprint": "156ccf524d0edf54",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fefdca91ca8f7a61",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ml": {
-      "fingerprint": "1fc0fc772aafe870",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2551aae1d853f16a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mm": {
-      "fingerprint": "ad131b23e6e83486",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5ecb01d2784ae979",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mn": {
-      "fingerprint": "e6ca03e4f93f4b64",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b72d840b340a1b5e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mo": {
-      "fingerprint": "8fe3d7e503bca0bb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3694ccfa5ef9fd22",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mr": {
-      "fingerprint": "cdabd7a5ebd85d97",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f4de04e378c75527",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mt": {
-      "fingerprint": "f0cc27b0512d220d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "99fb53a44d372076",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mv": {
-      "fingerprint": "dbd8e35881a88f1e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7d37ed9e244cfec3",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mx": {
-      "fingerprint": "ad1c3c5663906127",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b8dca8d9c9eb72e9",
+      "lastmod": "2026-11-18"
     },
     "/ctf/my": {
-      "fingerprint": "e02966be028dc712",
-      "lastmod": "2026-11-12"
+      "fingerprint": "41e3e82093c4b5d9",
+      "lastmod": "2026-11-18"
     },
     "/ctf/mz": {
-      "fingerprint": "b4860ed16f1b7204",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0117cdaef689190c",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ng": {
-      "fingerprint": "f10b8b5470dc9a02",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fcc6fa04f784c0d2",
+      "lastmod": "2026-11-18"
     },
     "/ctf/nl": {
-      "fingerprint": "2c9cbca9a2b5ced1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8c48594f3c9713c9",
+      "lastmod": "2026-11-18"
     },
     "/ctf/no": {
-      "fingerprint": "df090a54335b17bc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e2807f5ea63da57e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/np": {
-      "fingerprint": "1ab034aec8e2f09f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e2a8c486e32c7a5e",
+      "lastmod": "2026-11-18"
     },
     "/ctf/nz": {
-      "fingerprint": "c1a244b7e0b39c29",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c609811f4bbf8d99",
+      "lastmod": "2026-11-18"
+    },
+    "/ctf/om": {
+      "fingerprint": "436888320af618ea",
+      "lastmod": "2026-11-18"
     },
     "/ctf/pa": {
-      "fingerprint": "3f1b992e00e086d1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "60f839e102f04c0a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/pe": {
-      "fingerprint": "d5c3cbeef34bead5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "26109bc34fa19f93",
+      "lastmod": "2026-11-18"
     },
     "/ctf/pf": {
-      "fingerprint": "82035c5eb1e6626c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "01a26f4afc7e4943",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ph": {
-      "fingerprint": "79399ec5bb632f39",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a6395616dfec41e1",
+      "lastmod": "2026-11-18"
     },
     "/ctf/pk": {
-      "fingerprint": "893da81f204951df",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e253b5c4bcdddd8b",
+      "lastmod": "2026-11-18"
     },
     "/ctf/pl": {
-      "fingerprint": "20585e46d020641a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8e0a662670911b94",
+      "lastmod": "2026-11-18"
     },
     "/ctf/pr": {
-      "fingerprint": "1ce950f29841a2fe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4c5e958a062d7a16",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ps": {
-      "fingerprint": "50c146c378f3fc87",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ee2ec0fcbb303fb",
+      "lastmod": "2026-11-18"
     },
     "/ctf/pt": {
-      "fingerprint": "f72111c9c6139ff6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e3d0042764892999",
+      "lastmod": "2026-11-18"
     },
     "/ctf/py": {
-      "fingerprint": "41d760749ba3e74a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "645e1228185d27c0",
+      "lastmod": "2026-11-18"
     },
     "/ctf/qa": {
-      "fingerprint": "cf5e0be3467749c9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "90ec1c3dbcb478ce",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ro": {
-      "fingerprint": "940a74e580be663a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8f029298415632f0",
+      "lastmod": "2026-11-18"
     },
     "/ctf/rs": {
-      "fingerprint": "92a2a3b8dc209676",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9a30cb9d5d01404f",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ru": {
-      "fingerprint": "aa3d38cca3d1d256",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9681d723a4df730a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/sa": {
-      "fingerprint": "191ba9da630830bf",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1de4be12e2512950",
+      "lastmod": "2026-11-18"
     },
     "/ctf/sc": {
-      "fingerprint": "0c05f35defbb9b76",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e2d447f166681f58",
+      "lastmod": "2026-11-18"
     },
     "/ctf/se": {
-      "fingerprint": "10e751b342f985a3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a79fbe1d1d8354ed",
+      "lastmod": "2026-11-18"
     },
     "/ctf/sg": {
-      "fingerprint": "dff0ea28417f2c3c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fb1614f8f00f9594",
+      "lastmod": "2026-11-18"
     },
     "/ctf/si": {
-      "fingerprint": "b227d78ab36a6e46",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c487e6d2270af1f5",
+      "lastmod": "2026-11-18"
     },
     "/ctf/sk": {
-      "fingerprint": "081e6f15bb86559d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bdc99c6d18188c3a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/sm": {
-      "fingerprint": "d06f96dc3a87b13a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f026887bd6384974",
+      "lastmod": "2026-11-18"
     },
     "/ctf/sv": {
-      "fingerprint": "c44598b11c986d0a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "52a90e03abcb080a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/sy": {
-      "fingerprint": "fa3cb03886c1608f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7a1fd1fdfcf4201f",
+      "lastmod": "2026-11-18"
     },
     "/ctf/th": {
-      "fingerprint": "e5018e60f2fd3061",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ac3ba9ae2b02ce89",
+      "lastmod": "2026-11-18"
     },
     "/ctf/tn": {
-      "fingerprint": "013809e94962572e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "024e8941e2339256",
+      "lastmod": "2026-11-18"
     },
     "/ctf/tr": {
-      "fingerprint": "b6a60e48f5754600",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dfaafe02a1bfdb98",
+      "lastmod": "2026-11-18"
+    },
+    "/ctf/tt": {
+      "fingerprint": "cfeac23a9582b73d",
+      "lastmod": "2026-11-18"
     },
     "/ctf/tw": {
-      "fingerprint": "e4b4bfa1063d4f32",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e8609eca81c69a24",
+      "lastmod": "2026-11-18"
     },
     "/ctf/tz": {
-      "fingerprint": "f33f238cd153d8b4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0478aba5fa06e0ac",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ua": {
-      "fingerprint": "c658978b49e260cd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "38f027eacf9d21a2",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ug": {
-      "fingerprint": "16a36787227f50d4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "40135cb61c1226de",
+      "lastmod": "2026-11-18"
     },
     "/ctf/us": {
-      "fingerprint": "847a06eef97186c6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1f24791052f7105b",
+      "lastmod": "2026-11-18"
     },
     "/ctf/uy": {
-      "fingerprint": "4fe633e2c4b763f8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ace37ccdf891de31",
+      "lastmod": "2026-11-18"
     },
     "/ctf/uz": {
-      "fingerprint": "35972fc9bdbdbe3a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "45bd7551a49c77a0",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ve": {
-      "fingerprint": "48ed0685fd46bd3c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "18f87721e8317f6d",
+      "lastmod": "2026-11-18"
     },
     "/ctf/vg": {
-      "fingerprint": "e36c7c9052f1ea12",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ebcb15fe8120a962",
+      "lastmod": "2026-11-18"
     },
     "/ctf/vn": {
-      "fingerprint": "b42992d43071c53c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6a57197ce2e18046",
+      "lastmod": "2026-11-18"
     },
     "/ctf/ye": {
-      "fingerprint": "3cd8bbfcb7710f2a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d15f1079607d1822",
+      "lastmod": "2026-11-18"
     },
     "/ctf/za": {
-      "fingerprint": "c2d45ccb12e65f92",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a3d24fe3fa2aa05a",
+      "lastmod": "2026-11-18"
     },
     "/ctf/zw": {
-      "fingerprint": "da27195274efbb6c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "441d1d83877e2c27",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf": {
-      "fingerprint": "9ff01107c3d8192a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "72aa1d5f56ddf67b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ad": {
-      "fingerprint": "cc7cca6821f11510",
-      "lastmod": "2026-11-12"
+      "fingerprint": "16fab72a480cfdc4",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ae": {
-      "fingerprint": "79d616c961b8d119",
-      "lastmod": "2026-11-12"
+      "fingerprint": "db4742baaae9fb15",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/af": {
-      "fingerprint": "c69a1882414feb89",
-      "lastmod": "2026-11-12"
+      "fingerprint": "57d39a1c3e5481c7",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ag": {
-      "fingerprint": "6b37f8bf0c6da0b8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9f18cb932994518d",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/al": {
-      "fingerprint": "9ed6a57fcee6d992",
-      "lastmod": "2026-11-12"
+      "fingerprint": "06bbe336ebd9044d",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/am": {
-      "fingerprint": "24aa618731cc37f4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "99f5687c77efd54b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ar": {
-      "fingerprint": "4da47049b586cf3e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ad0c65ce3faf875",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/at": {
-      "fingerprint": "f0a46cc902141243",
-      "lastmod": "2026-11-12"
+      "fingerprint": "35542cf720737264",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/au": {
-      "fingerprint": "c1d396c48335048c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "69c745164e3a15b6",
+      "lastmod": "2026-11-18"
+    },
+    "/de/ctf/az": {
+      "fingerprint": "9f0d312061e83a8a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ba": {
-      "fingerprint": "9291521f8967cd18",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9f42d0ff42e1bb62",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bd": {
-      "fingerprint": "82f6a6cadbd78e57",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9ae1d3f714adf5a9",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/be": {
-      "fingerprint": "a8fa564fe12272ea",
-      "lastmod": "2026-11-12"
+      "fingerprint": "47412633832e3af5",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bg": {
-      "fingerprint": "fc8fe64f8cedda3a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d006c4f269398bdc",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bh": {
-      "fingerprint": "61271b49ae887a91",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e288b2b484b66a4c",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bi": {
-      "fingerprint": "6fa8f9031917e317",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8ac20385d71591ff",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bm": {
-      "fingerprint": "1b16922860ea954a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6d000dfea1d5a187",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bo": {
-      "fingerprint": "f47be6329337ec1f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "48a7408513d0cd87",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/br": {
-      "fingerprint": "accdb7c6ad7ad5df",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e75de64c0bea9440",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bs": {
-      "fingerprint": "9d7b0f4f28f95ec3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "37d6f5673853058b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/bw": {
-      "fingerprint": "3989e4e4a65f3e55",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d1b1ecd3d1fb388b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/by": {
-      "fingerprint": "ede22aa6408183ba",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2dcf10cc011422c2",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ca": {
-      "fingerprint": "3714ac816a922d28",
-      "lastmod": "2026-11-12"
+      "fingerprint": "06b8e93ea86eb0a7",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/cd": {
-      "fingerprint": "404b0499b721f760",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9d44855155398e0a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ch": {
-      "fingerprint": "4ab9874db6df7992",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c9cd9180de3b110f",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/cl": {
-      "fingerprint": "d5944be7ac75875c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a9d263c501d7b1af",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/cm": {
-      "fingerprint": "87d85fe3e1c3bb98",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b44cca0445cc202f",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/cn": {
-      "fingerprint": "4e35212d59d665d7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "474f41248aeda108",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/co": {
-      "fingerprint": "81e6cafb64884329",
-      "lastmod": "2026-11-12"
+      "fingerprint": "46ed26c2327a0815",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/cr": {
-      "fingerprint": "275aa1d58210d1a5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "da2986ea7e3cba87",
+      "lastmod": "2026-11-18"
+    },
+    "/de/ctf/cu": {
+      "fingerprint": "68563cdf088d648f",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/cy": {
-      "fingerprint": "a425c3b8591dfb71",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d6f841684650264f",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/cz": {
-      "fingerprint": "c4d452580a0c4bb0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4063157cfe42ee07",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/de": {
-      "fingerprint": "8ef673d3df861f23",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1d87a11f72de6a53",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/dk": {
-      "fingerprint": "4bfc9b8ad3730851",
-      "lastmod": "2026-11-12"
+      "fingerprint": "64eb708e0f4a13e1",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/do": {
-      "fingerprint": "ea97e325023df1fc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0d77f2a4c0671823",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/dz": {
-      "fingerprint": "4e20b0bcbd42ab72",
-      "lastmod": "2026-11-12"
+      "fingerprint": "388e4ec40cf519f5",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ec": {
-      "fingerprint": "e76e49ecaef78842",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7daeffd0b5084fbc",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ee": {
-      "fingerprint": "da71a5dd0a6727e4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cc700aefacda4ee6",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/eg": {
-      "fingerprint": "75e38bb23ddb6138",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a4ead2c9d65b1281",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/es": {
-      "fingerprint": "61a026362e4caa09",
-      "lastmod": "2026-11-12"
+      "fingerprint": "14ee7487c794bd6f",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/et": {
-      "fingerprint": "00ae331c7d193053",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8f481f843fe88c38",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/fi": {
-      "fingerprint": "847f64716e9ee63d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eb3893325d370904",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/fm": {
-      "fingerprint": "7f13a3b35eb721cd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ff7725a07336c853",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/fr": {
-      "fingerprint": "38f0b17e2ead1b36",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e4f2e8fce09d3350",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/gb": {
-      "fingerprint": "5096bdf86a3a683f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8ada2b5037e050cf",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/gd": {
-      "fingerprint": "15d66a05189ce1f3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "76d3397b7dd4461c",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ge": {
-      "fingerprint": "828618aef2dc591c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3bc40a15f64cfa93",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/gf": {
-      "fingerprint": "781cdfe32b43cca0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6240de0a9dfb0029",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/gh": {
-      "fingerprint": "12142c068f332bb1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f9b7091ae4967460",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/gr": {
-      "fingerprint": "5acc3f06492a5203",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ebb946d152305f26",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/gt": {
-      "fingerprint": "b75c051ffaf8796d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8f7a44caff1f60de",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/hk": {
-      "fingerprint": "0471ea41e6739813",
-      "lastmod": "2026-11-12"
+      "fingerprint": "826c28fa2ffc786b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/hn": {
-      "fingerprint": "97dab134ae027b26",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9de33a9353a36388",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/hr": {
-      "fingerprint": "2aa578496c635f6a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "74b0289d3b2b7a36",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/hu": {
-      "fingerprint": "7a4754f84636f5d7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6a877f083c31dd20",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/id": {
-      "fingerprint": "9a7be419b0b4a27f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0bcea54a255adb7a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ie": {
-      "fingerprint": "bf8a0245835ea720",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5856192206ccd123",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/il": {
-      "fingerprint": "2d0eaa82c36ed2a8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "43375931c3bee11b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/im": {
-      "fingerprint": "a69c2ad0a29a38d8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d067995ef39ed75d",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/in": {
-      "fingerprint": "02fc43036dd02c90",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3f3e198430bad73e",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/iq": {
-      "fingerprint": "f55897a4963bcb76",
-      "lastmod": "2026-11-12"
+      "fingerprint": "98b4aed9102dddba",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ir": {
-      "fingerprint": "3400f61a120f831d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "56b6c5f9d4b1a852",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/is": {
-      "fingerprint": "0ae5e73e24b374b9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1b1282521fa01d4b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/it": {
-      "fingerprint": "0310aa03ea20260c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4519d52f83323ac6",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/jm": {
-      "fingerprint": "693eba59df402b23",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4044af310d2b75d8",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/jo": {
-      "fingerprint": "bcb5ca4c3962c431",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9d2e2cba4efb2c75",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/jp": {
-      "fingerprint": "756002cff1966fb7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8d90f333bb8472dc",
+      "lastmod": "2026-11-18"
+    },
+    "/de/ctf/ke": {
+      "fingerprint": "bbfe8be41588d97b",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/kg": {
-      "fingerprint": "fbb097e84761c82a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d45306cceb27e2d2",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/kh": {
-      "fingerprint": "ea81432bf6a74d3d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6b50bbc370be7de2",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ki": {
-      "fingerprint": "a0c94bc785f540e5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b63bc1a2933a1da8",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/kr": {
-      "fingerprint": "0583d8603aaea22c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "65a64911cfa5ffc3",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/kw": {
-      "fingerprint": "056ff40355efc216",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9f44ebe37784e1f5",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ky": {
-      "fingerprint": "0ddb8faa88135424",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ba4b70a3d7f4f66a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/kz": {
-      "fingerprint": "13959692406ee32e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7a01bcb112f27da1",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/la": {
-      "fingerprint": "c8b204780442c1b8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3fd195771e66e6a0",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/lb": {
-      "fingerprint": "ee2986682526a55b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "45bc8bf6b5c16d35",
+      "lastmod": "2026-11-18"
+    },
+    "/de/ctf/li": {
+      "fingerprint": "ad9f5eeb620647da",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/lk": {
-      "fingerprint": "a6c02f29167f1363",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4b43bdae166bd7b8",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/lt": {
-      "fingerprint": "2d86c7b19c35623c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8420f1642737357d",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/lu": {
-      "fingerprint": "b17dc3c34f09a0a7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "62b0ca47aa931f2a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/lv": {
-      "fingerprint": "26043a63dca60a31",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ab489f92a1915607",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ly": {
-      "fingerprint": "b463ddf42d5d505a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fa0bfbab90961228",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ma": {
-      "fingerprint": "ac2c2a2762e60c69",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b2ef26e1594367f1",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/md": {
-      "fingerprint": "21848cadeb604acb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "38f8ac023dc1e520",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/me": {
-      "fingerprint": "3ea3d3994ab47a9e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e80f3acddf3883bf",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mg": {
-      "fingerprint": "f4248aeeeec80f8d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "32621b282a40252c",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mh": {
-      "fingerprint": "3e42f6acee58cc96",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c7b19b7f8a0771be",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mk": {
-      "fingerprint": "c2a0a2734f1d23be",
-      "lastmod": "2026-11-12"
+      "fingerprint": "09f96a546597a251",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ml": {
-      "fingerprint": "2b8e22fd48964c9d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ef17cc12a7583f13",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mm": {
-      "fingerprint": "ee116fbd953c6a58",
-      "lastmod": "2026-11-12"
+      "fingerprint": "96fc977f625acaf8",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mn": {
-      "fingerprint": "6f14c8cb18bfcf8e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e1faef3f57501dbf",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mo": {
-      "fingerprint": "fa7fab3dcb476a9d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4f1b774d6d99f03e",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mr": {
-      "fingerprint": "6c58c07386360443",
-      "lastmod": "2026-11-12"
+      "fingerprint": "69280a8162a58f60",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mt": {
-      "fingerprint": "ab88da5e07e0da6c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "caa922560bcb5138",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mv": {
-      "fingerprint": "7e51ef243234fcbb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c2f137375d79d3d4",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mx": {
-      "fingerprint": "90f3c0cdfc1b7a78",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2a4de5bdc02a3499",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/my": {
-      "fingerprint": "bf60ffabfa860759",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ec70e762e1cbce81",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/mz": {
-      "fingerprint": "189b0e9dfd14646f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2342b4a77243732a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ng": {
-      "fingerprint": "44702f03d7c45aba",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e282d4f0ad89a32c",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/nl": {
-      "fingerprint": "cc1683cdc518796e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e1a8442dc7d222bd",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/no": {
-      "fingerprint": "1380107e7691959b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "94d25ffde12e56fe",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/np": {
-      "fingerprint": "59e7b092f6502c5c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d8e71b4c846c3bee",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/nz": {
-      "fingerprint": "b10749008f1c72e0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5f2f17717fb18b44",
+      "lastmod": "2026-11-18"
+    },
+    "/de/ctf/om": {
+      "fingerprint": "e11f39b31e4680f9",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/pa": {
-      "fingerprint": "1146f2c105e07b68",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5089257a40847f26",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/pe": {
-      "fingerprint": "a01dcc0747ed6fc4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "262ab303b313045d",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/pf": {
-      "fingerprint": "cec38a1ddb991b7d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "045a9200f2db912a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ph": {
-      "fingerprint": "4ab4c5e2cb60ebcd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c671c8ece8f68ea9",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/pk": {
-      "fingerprint": "215e44a5042ee22c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "27cbb4b236803644",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/pl": {
-      "fingerprint": "a9082a1d51d34511",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4c37eddcb5a7d845",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/pr": {
-      "fingerprint": "385a6b41708e53e3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5d02cb8e4a6a9fbd",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ps": {
-      "fingerprint": "c9044983b0bef77f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dba4642a9bde025c",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/pt": {
-      "fingerprint": "b26e7662e10d2236",
-      "lastmod": "2026-11-12"
+      "fingerprint": "656f0fb33d3a72af",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/py": {
-      "fingerprint": "d15d605204be8f61",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dcf0d4a403e3999d",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/qa": {
-      "fingerprint": "2220ec9458878d66",
-      "lastmod": "2026-11-12"
+      "fingerprint": "70ce7197e56038c7",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ro": {
-      "fingerprint": "c654383e3fc70041",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bd568676d13460e4",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/rs": {
-      "fingerprint": "d4fdb0fd45a6402a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8ece94d2e04e5807",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ru": {
-      "fingerprint": "ca195b1d778ae720",
-      "lastmod": "2026-11-12"
+      "fingerprint": "710ea1c6443b0d56",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/sa": {
-      "fingerprint": "9702f533d0777792",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a9aee2a30462da61",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/sc": {
-      "fingerprint": "ac9db08acc490c0c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9a63bc2b49b65e96",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/se": {
-      "fingerprint": "74704a6ca41406da",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e26d9353e84623e9",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/sg": {
-      "fingerprint": "20572e1b4335953a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e5e089a0172d586a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/si": {
-      "fingerprint": "1fa224539c7fa2f1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6e5cf471ff4bbd78",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/sk": {
-      "fingerprint": "da49a066e2d335b4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cf08e1ff44f8b148",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/sm": {
-      "fingerprint": "42f4c3c12cfdb0e9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "db6f404139236c89",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/sv": {
-      "fingerprint": "7dd3e12e488365aa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "49e7fec0016f0528",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/sy": {
-      "fingerprint": "78444871fd5df642",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e6a16a35c1f1f6c8",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/th": {
-      "fingerprint": "9e0f4493424b38e6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5e9b1f0abf3b44fd",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/tn": {
-      "fingerprint": "4279d32de130fee8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ac389aa2d73ed9a",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/tr": {
-      "fingerprint": "aff012a8f3441c13",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e487f9e0d72cc4d2",
+      "lastmod": "2026-11-18"
+    },
+    "/de/ctf/tt": {
+      "fingerprint": "221d3b3e34f5081f",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/tw": {
-      "fingerprint": "2612ac30ed20998c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ee4c5b8ba96fdcf",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/tz": {
-      "fingerprint": "0718d70d64970b0a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a7138d15b639a1f5",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ua": {
-      "fingerprint": "9a890406a2b7ba10",
-      "lastmod": "2026-11-12"
+      "fingerprint": "12b95cb60a3dfcaa",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ug": {
-      "fingerprint": "8c1110a26201dd96",
-      "lastmod": "2026-11-12"
+      "fingerprint": "083f676431e9f7de",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/us": {
-      "fingerprint": "40bf7b4b534b1bbb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b839bd06a3d25fea",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/uy": {
-      "fingerprint": "94e4eba691beca55",
-      "lastmod": "2026-11-12"
+      "fingerprint": "420ee5b7b38fe3ce",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/uz": {
-      "fingerprint": "1f84244795e67164",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a4305244f44624c4",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ve": {
-      "fingerprint": "22a638bcb51f5df0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "423d8bd5a37c833f",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/vg": {
-      "fingerprint": "c5fa6dc66d075fab",
-      "lastmod": "2026-11-12"
+      "fingerprint": "80fe2cabaf2eba31",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/vn": {
-      "fingerprint": "059c2482eafa7ca9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "59c80e5f944d1e67",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/ye": {
-      "fingerprint": "c0056f11dbc35735",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6da5ec5033ce7bd6",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/za": {
-      "fingerprint": "357c456f15c3105f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4da7f605ca0c2107",
+      "lastmod": "2026-11-18"
     },
     "/de/ctf/zw": {
-      "fingerprint": "80ad6b8b7241ba44",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2c09f34397eac45c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf": {
-      "fingerprint": "1c1701bfba74e162",
-      "lastmod": "2026-11-12"
+      "fingerprint": "92715ed7dcdf50b6",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ad": {
-      "fingerprint": "2372d01cce5a0fbe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fbff181deb66c4ac",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ae": {
-      "fingerprint": "4dc3990c4b0aa371",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3b76100a5fc64894",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/af": {
-      "fingerprint": "d2c768245b443931",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3732982471505b25",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ag": {
-      "fingerprint": "8401a1e12b7c79ca",
-      "lastmod": "2026-11-12"
+      "fingerprint": "92c2c0bb97fbc70a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/al": {
-      "fingerprint": "1cc94089d7d0978b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "db146b02f73d505d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/am": {
-      "fingerprint": "a1ee68ac14f56a12",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4f0db2ae73090630",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ar": {
-      "fingerprint": "dd0921d0f87975c3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8a7f811756e90c2b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/at": {
-      "fingerprint": "514ed017d04b817e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "636333580df99c4a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/au": {
-      "fingerprint": "cb8d220e356dbdd2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8b1c307244915650",
+      "lastmod": "2026-11-18"
+    },
+    "/es/ctf/az": {
+      "fingerprint": "586e16467a66f962",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ba": {
-      "fingerprint": "55bea85ef5ad6be6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9145478f5ef859ca",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bd": {
-      "fingerprint": "aa92fd93dfda37e4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b938ba581a879804",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/be": {
-      "fingerprint": "fc8a558b28bc45e6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9273b232e9bc5eff",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bg": {
-      "fingerprint": "8bfd7b0224e28892",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8bba386b522e2a83",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bh": {
-      "fingerprint": "669e310b817c27ea",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0bd4b36f267bb47a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bi": {
-      "fingerprint": "424892681e09aead",
-      "lastmod": "2026-11-12"
+      "fingerprint": "47c20133dc434bd0",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bm": {
-      "fingerprint": "07170ed232acd76c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "97ece476bc875dd6",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bo": {
-      "fingerprint": "a0eb078f3f23b8a7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "599e76f854636661",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/br": {
-      "fingerprint": "72292baf8be51890",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b7cc1908d5d4b76b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bs": {
-      "fingerprint": "2f91f8d2cadfbdb0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1624a3af3b40773f",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/bw": {
-      "fingerprint": "cebd224ed68f9ecc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9143647a22af553c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/by": {
-      "fingerprint": "71c46ee8d167b528",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e457952b4f00d96b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ca": {
-      "fingerprint": "4da178d9b94ea78f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "07ebcb4bd8b1aa04",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/cd": {
-      "fingerprint": "bff4779d505d6198",
-      "lastmod": "2026-11-12"
+      "fingerprint": "02a4e8aa7ec0a150",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ch": {
-      "fingerprint": "7c301c4d3690c7d2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6c2e1047fc9c9b50",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/cl": {
-      "fingerprint": "5eb6dd13ee376468",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8f63534416ee3fcb",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/cm": {
-      "fingerprint": "a0a5e2029a97dcb8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "38ab51734bda07c0",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/cn": {
-      "fingerprint": "942eb6eba4c506e5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "493c30e426f12253",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/co": {
-      "fingerprint": "4f7d2e6642786847",
-      "lastmod": "2026-11-12"
+      "fingerprint": "883bea3a3786ee0e",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/cr": {
-      "fingerprint": "297e0e3297ba4a13",
-      "lastmod": "2026-11-12"
+      "fingerprint": "de1f5d2e972656b2",
+      "lastmod": "2026-11-18"
+    },
+    "/es/ctf/cu": {
+      "fingerprint": "9fa4c67b23a0d891",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/cy": {
-      "fingerprint": "63af9a6cf603f3b0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9f0990cae822b8cd",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/cz": {
-      "fingerprint": "eb1ffb4e3371f009",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ade5f5d7e9fda7fb",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/de": {
-      "fingerprint": "92a5074bfc5f8f1e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c238de8f8b48ccfb",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/dk": {
-      "fingerprint": "84277f70e47ca10d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cde056cd3381801c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/do": {
-      "fingerprint": "17c062edd00eb8eb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bce6a43c73691adf",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/dz": {
-      "fingerprint": "fa94e66b3cd1e8d9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c50cd24bcb40cc4b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ec": {
-      "fingerprint": "c96f1a13120f1f21",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8d9a437ab409002f",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ee": {
-      "fingerprint": "bfc07cfac4e93e50",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ae3a2955b55ff7d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/eg": {
-      "fingerprint": "bce1b3e362ff59fc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "85e378f54a5d56a9",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/es": {
-      "fingerprint": "9948b4c7aeb9f6eb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1d379a8b4a43b43e",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/et": {
-      "fingerprint": "e156b21ae7245930",
-      "lastmod": "2026-11-12"
+      "fingerprint": "42a6fb0e929a9a19",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/fi": {
-      "fingerprint": "3e0dbcc223fe1ff9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6f3503e87fdd650f",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/fm": {
-      "fingerprint": "ac3c14d91c6ad482",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6e713d603f90e7a1",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/fr": {
-      "fingerprint": "fadf50a80dc1fb37",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8624152c26119e82",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/gb": {
-      "fingerprint": "b9cc345bb4894143",
-      "lastmod": "2026-11-12"
+      "fingerprint": "96937dca622e583a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/gd": {
-      "fingerprint": "23926f39a6e9c21c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bd944494c15d7f4b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ge": {
-      "fingerprint": "72d95b5041b33777",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3d4452abd0113975",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/gf": {
-      "fingerprint": "47231ccb175c987e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "deffcd24dfcfd769",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/gh": {
-      "fingerprint": "2583ae8d0aceafd1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "458764660f7918fe",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/gr": {
-      "fingerprint": "b811956d6aecd19e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ef989c8cb060e54b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/gt": {
-      "fingerprint": "5ca4b265f5d57e8b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "33d18c6bb86a28e9",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/hk": {
-      "fingerprint": "356a791984496132",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7cbc73a0b5d4fb8a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/hn": {
-      "fingerprint": "c22f1b93c3a65b94",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a893af2968545001",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/hr": {
-      "fingerprint": "9f03067dfb341663",
-      "lastmod": "2026-11-12"
+      "fingerprint": "58ec578ea734f39d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/hu": {
-      "fingerprint": "d48016f075962847",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d582f07e1bf936e4",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/id": {
-      "fingerprint": "703c009a93a59f5d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bbb790d85fee14c8",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ie": {
-      "fingerprint": "0e0fd1b14ff11922",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9e068e1e092d4b6d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/il": {
-      "fingerprint": "b789a3077a3ca69a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ee2c5def737deb4f",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/im": {
-      "fingerprint": "0651ec53c56eaf1e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5cc1452d73009f76",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/in": {
-      "fingerprint": "a1a42c0fe334018e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f21c78a982f3dd9d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/iq": {
-      "fingerprint": "838bcd5ba959d8f0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "83d36f2e739a1317",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ir": {
-      "fingerprint": "daf67400624453af",
-      "lastmod": "2026-11-12"
+      "fingerprint": "30767f5d1c9c4f6e",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/is": {
-      "fingerprint": "7685a0cb99a8fb9c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7828164b5bbe3fd2",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/it": {
-      "fingerprint": "8ea3cfbaf6a9411f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5c7dd5eb7e3d4e45",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/jm": {
-      "fingerprint": "5a51c7b5fbd8de5d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8842299c3c43a36d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/jo": {
-      "fingerprint": "d6f3e8370a47a537",
-      "lastmod": "2026-11-12"
+      "fingerprint": "90315f16a2d2e527",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/jp": {
-      "fingerprint": "5912b593ebbe9cd1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3c3c748a40f49cda",
+      "lastmod": "2026-11-18"
+    },
+    "/es/ctf/ke": {
+      "fingerprint": "342dc087509815d6",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/kg": {
-      "fingerprint": "fe28f24a34e2b798",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f1fdcd3a986a859d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/kh": {
-      "fingerprint": "1b80a2d933ac820c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fe3c6e70ad246ff6",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ki": {
-      "fingerprint": "bbcec916a9a9f7cd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7e656719820bfe42",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/kr": {
-      "fingerprint": "eb7b6386945a20c9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f71e57838f2310f6",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/kw": {
-      "fingerprint": "49a81ef80af08512",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2c0993094c6479ba",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ky": {
-      "fingerprint": "48b0c04020de6c15",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bb0f1da586efe8e2",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/kz": {
-      "fingerprint": "4945238cad17c81a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8f02242945d00701",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/la": {
-      "fingerprint": "9bd10b0a812a96e2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "197b6d03514842ce",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/lb": {
-      "fingerprint": "215bd5be334c82fe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "32d9fdc40cb2dfd9",
+      "lastmod": "2026-11-18"
+    },
+    "/es/ctf/li": {
+      "fingerprint": "bff0b8514b4a3654",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/lk": {
-      "fingerprint": "468ed9f6d012f0bd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2331956940b1419d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/lt": {
-      "fingerprint": "ef77def7b9f08022",
-      "lastmod": "2026-11-12"
+      "fingerprint": "64630cc9553792d3",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/lu": {
-      "fingerprint": "2fe8147ecf3cceb9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "347738628442f4a7",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/lv": {
-      "fingerprint": "d0e1fdf313112cf0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2521d4985a2f7362",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ly": {
-      "fingerprint": "d28333ff2187d43e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b9ab603f846c009d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ma": {
-      "fingerprint": "764d7e184a62693b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3b9dffcc701c70ac",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/md": {
-      "fingerprint": "2a2f8f6b9ba898e5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cd9acccf45be20d7",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/me": {
-      "fingerprint": "703c6e927bd2d055",
-      "lastmod": "2026-11-12"
+      "fingerprint": "481988224724dd9a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mg": {
-      "fingerprint": "e96bfb497d36787d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a4f86926bd6a1138",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mh": {
-      "fingerprint": "91afabe015e6c7a0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "efd5c37d96472150",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mk": {
-      "fingerprint": "e6ed5207270a8d58",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ad3665847fcb05e5",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ml": {
-      "fingerprint": "6574385356d8a88b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e6eda6e0dcb73b4c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mm": {
-      "fingerprint": "a54db4c40bba21d3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "74173b98dcc5e3a7",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mn": {
-      "fingerprint": "8ad946ca669d8348",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1e2635e02cfc649c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mo": {
-      "fingerprint": "302f630be6f2db54",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2014e7f82e6043ba",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mr": {
-      "fingerprint": "ea2d51f72510cc2b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "39de936e4a3f251a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mt": {
-      "fingerprint": "5a08b4fd04addff9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e3637f63d5407e4a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mv": {
-      "fingerprint": "39db39051d4659ff",
-      "lastmod": "2026-11-12"
+      "fingerprint": "689d618c894a419b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mx": {
-      "fingerprint": "6aea4c5f0cb920e2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e81f07e27c5c8653",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/my": {
-      "fingerprint": "53c4559c1c261188",
-      "lastmod": "2026-11-12"
+      "fingerprint": "af72e9be4055d1e2",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/mz": {
-      "fingerprint": "1f0fa3b495694dd4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "65c7e4e4f0fcc710",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ng": {
-      "fingerprint": "f49929d0169cd997",
-      "lastmod": "2026-11-12"
+      "fingerprint": "301dd165c2a84533",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/nl": {
-      "fingerprint": "f7110d4ae1c2ae88",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b43452a0e252ec91",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/no": {
-      "fingerprint": "5457ec378e7fd04a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7e36d8ced336a2c6",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/np": {
-      "fingerprint": "d4af16ea104df05b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ad9c31e75ccdabea",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/nz": {
-      "fingerprint": "cdfdee4ea7cd05e0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "aee4fb9b400d001b",
+      "lastmod": "2026-11-18"
+    },
+    "/es/ctf/om": {
+      "fingerprint": "7c0eaf5f227af69c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/pa": {
-      "fingerprint": "7c84e43bf6ba2780",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d038855c216c1728",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/pe": {
-      "fingerprint": "c208a7baaaeee50a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c71b961402e05b79",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/pf": {
-      "fingerprint": "a6a8b1ba31ebeb99",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9f6a3adbdd9d5c0a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ph": {
-      "fingerprint": "2c228194164f2298",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7e1477f3198180c8",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/pk": {
-      "fingerprint": "d6043702ad50fe2f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e5fb132f2708120c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/pl": {
-      "fingerprint": "2bd007524ac5df8b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d7319559e1ec4639",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/pr": {
-      "fingerprint": "81c286ad79a6c796",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2f1fc4b97f8f40d3",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ps": {
-      "fingerprint": "593a3a4a34eb2466",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8a6dea4cfa004327",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/pt": {
-      "fingerprint": "2272ccbee7c077be",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5e5440072f6ec867",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/py": {
-      "fingerprint": "ebc913c208273425",
-      "lastmod": "2026-11-12"
+      "fingerprint": "38a261f9b17f0966",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/qa": {
-      "fingerprint": "1fa7e2d647762bbb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d911993390b5c16b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ro": {
-      "fingerprint": "e27acf3197e1dc05",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f9a3058e96ad31b4",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/rs": {
-      "fingerprint": "1a835bd7c309c472",
-      "lastmod": "2026-11-12"
+      "fingerprint": "80350b4ccacfa051",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ru": {
-      "fingerprint": "fb2f55b39ec626ce",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fa32df4a5a68206b",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/sa": {
-      "fingerprint": "accce64e186aa6d5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "033a2063d73ac758",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/sc": {
-      "fingerprint": "713673fa6161d3e7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4281af6bf4630523",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/se": {
-      "fingerprint": "f562be02d3745877",
-      "lastmod": "2026-11-12"
+      "fingerprint": "83c825b1b966e0b9",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/sg": {
-      "fingerprint": "c41c8b27f8a93a33",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cfc174f0a0aa124a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/si": {
-      "fingerprint": "4f14b65f786a84cc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "496fcf17f4d969a5",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/sk": {
-      "fingerprint": "856769c3765ee9e1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1f2f9bb332030568",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/sm": {
-      "fingerprint": "129383067cf748ef",
-      "lastmod": "2026-11-12"
+      "fingerprint": "58c08fd527cf4389",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/sv": {
-      "fingerprint": "fb73e1b5ff61f8ee",
-      "lastmod": "2026-11-12"
+      "fingerprint": "de1cef28b7e0c48a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/sy": {
-      "fingerprint": "a18b4e910024428b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6b4a10edbd58d4a0",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/th": {
-      "fingerprint": "d5f0b9cd17105111",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8632519237c87210",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/tn": {
-      "fingerprint": "fd3f4aa55de1e8c4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4e1616c05f16168d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/tr": {
-      "fingerprint": "3b28f499997cd1e2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e37a0412e52e934d",
+      "lastmod": "2026-11-18"
+    },
+    "/es/ctf/tt": {
+      "fingerprint": "525afa082c7b605a",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/tw": {
-      "fingerprint": "924d33ca2c6b2d9c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "066180074b9331d5",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/tz": {
-      "fingerprint": "90e16dfccab66a73",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d0e1aa174390a0c8",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ua": {
-      "fingerprint": "75a5fc5352854eb4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "35a91af449ad21de",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ug": {
-      "fingerprint": "8997f51afc7b6b1f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b0a3ee0d87eb915d",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/us": {
-      "fingerprint": "92336027a895b289",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a027ceec5fe332fd",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/uy": {
-      "fingerprint": "6695426f640f92d2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "26326bc83aa7dee5",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/uz": {
-      "fingerprint": "db8f409cec8bec9a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "beb5f0ca73f444fa",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ve": {
-      "fingerprint": "b095e2bd329ce52f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "01f80a12658bd62c",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/vg": {
-      "fingerprint": "7a9dac3543998136",
-      "lastmod": "2026-11-12"
+      "fingerprint": "39acf42e9ae51de8",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/vn": {
-      "fingerprint": "36c3009b53cbc8f7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3bc1e25da6afe0ba",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/ye": {
-      "fingerprint": "4c0112bc38de7cbd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a95e3f58c0383873",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/za": {
-      "fingerprint": "9c248695d7a32bb4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c2f3d0a23aab2d9f",
+      "lastmod": "2026-11-18"
     },
     "/es/ctf/zw": {
-      "fingerprint": "87a792caa7239db3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5306670d2b3c3a51",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf": {
-      "fingerprint": "ec603e650f85f1e8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "245f29ae319d1e77",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ad": {
-      "fingerprint": "b57b4c5fa8789827",
-      "lastmod": "2026-11-12"
+      "fingerprint": "07bb9c2aa87c7644",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ae": {
-      "fingerprint": "68c8e62bfd9c4a51",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6d82b6a801c9f504",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/af": {
-      "fingerprint": "94a3cfee3decc105",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c630a6992d190991",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ag": {
-      "fingerprint": "a238c43afc6d3915",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fba111496067875d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/al": {
-      "fingerprint": "92f27199851d66bb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8fd912eb17c91754",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/am": {
-      "fingerprint": "59b76617cdf70ee6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "51ecf0317c85b014",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ar": {
-      "fingerprint": "2c032581f4a12a0c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "534fad46ff61b6c0",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/at": {
-      "fingerprint": "7d9a6c469fc62079",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b55f0702d18e6e4b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/au": {
-      "fingerprint": "46ad0f9872b1585c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0e8f51338a3b5b94",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/ctf/az": {
+      "fingerprint": "4c4b3c7f6a35ef0c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ba": {
-      "fingerprint": "a1e753d1f0d46597",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4254666f27f89930",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bd": {
-      "fingerprint": "a4254b40f43a1d1e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a049b19cc7a544da",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/be": {
-      "fingerprint": "d693b9a5046b9c92",
-      "lastmod": "2026-11-12"
+      "fingerprint": "280ffab8f7feacef",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bg": {
-      "fingerprint": "ac1fc0aa31ad4616",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cb113b0dbc70a757",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bh": {
-      "fingerprint": "3f3cd96e9eb593d6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "218f1421e7f2c69c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bi": {
-      "fingerprint": "67a83ff983b5d5d5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "49da0876fbbc8bcb",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bm": {
-      "fingerprint": "e8d5b1ea5f3588e1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "08be9b3fbebae893",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bo": {
-      "fingerprint": "76f8f2d1fbbea563",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6b7090500cd2dc5e",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/br": {
-      "fingerprint": "5d89161b8ff9567a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c14b39c474037f6b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bs": {
-      "fingerprint": "3be828c82386098f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1820f44dab7aa8ce",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/bw": {
-      "fingerprint": "8dcf60f0bb7d0f47",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d71045de3f1c49a7",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/by": {
-      "fingerprint": "254facca1161f73a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "527329a32a007f78",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ca": {
-      "fingerprint": "1cd77f7186d3a795",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bd0ea89709a899da",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/cd": {
-      "fingerprint": "ea0f711d10a9b739",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3fd09561e6b7b294",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ch": {
-      "fingerprint": "9016e22d9812aabf",
-      "lastmod": "2026-11-12"
+      "fingerprint": "39efd6ae2f02b524",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/cl": {
-      "fingerprint": "279ff81087dd03b3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7b0460708e7dbcb2",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/cm": {
-      "fingerprint": "b307acc004187ac5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b8e7fd8a5e08049e",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/cn": {
-      "fingerprint": "4355701e1e04865d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "33a32612beb6c5c5",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/co": {
-      "fingerprint": "a93b3f8a8be9db81",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0ed6aeb7a623fcd1",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/cr": {
-      "fingerprint": "13b4979a854ad2f2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e99960a08e123829",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/ctf/cu": {
+      "fingerprint": "e5745ea399b2840c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/cy": {
-      "fingerprint": "002b6563029bd557",
-      "lastmod": "2026-11-12"
+      "fingerprint": "17e3f1a5fee4d67d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/cz": {
-      "fingerprint": "41ebf19781e3d627",
-      "lastmod": "2026-11-12"
+      "fingerprint": "27ea0800198c001c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/de": {
-      "fingerprint": "96f5b0b2894a9992",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c1d664945afe54dd",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/dk": {
-      "fingerprint": "b5e7a00a09187a9b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9b854724b5b1fdf0",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/do": {
-      "fingerprint": "3296ae44d31cb817",
-      "lastmod": "2026-11-12"
+      "fingerprint": "38da1ed2f6377088",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/dz": {
-      "fingerprint": "41fd038a4bdc4398",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8b5af6c35b67a338",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ec": {
-      "fingerprint": "e7617654daf2107e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "af13a46be50bc163",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ee": {
-      "fingerprint": "53280207f1ff7a3b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "499d44dd40c3c724",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/eg": {
-      "fingerprint": "3e6f42a0e29b6016",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e09af72475c64771",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/es": {
-      "fingerprint": "e5eec52062ba460c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "973292abcf54010d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/et": {
-      "fingerprint": "49d010dbd1f79c81",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6aaa6d7ad8a73b4f",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/fi": {
-      "fingerprint": "6b63140a5b43c066",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bf9a07ba2fc321f0",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/fm": {
-      "fingerprint": "929190d76e96d696",
-      "lastmod": "2026-11-12"
+      "fingerprint": "029b44bf170b70d3",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/fr": {
-      "fingerprint": "f7b123643bc9770c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2f1c3e762b17d86b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/gb": {
-      "fingerprint": "37a90584b1c00346",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5798e6cdd5113b51",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/gd": {
-      "fingerprint": "6bd7acd596be5ece",
-      "lastmod": "2026-11-12"
+      "fingerprint": "56942986eea242eb",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ge": {
-      "fingerprint": "a69310978216a98d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e0a6ac2c03f4aade",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/gf": {
-      "fingerprint": "9f64f7a644172c74",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cc5e2f4fc53b786b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/gh": {
-      "fingerprint": "3104f65e636a0bbc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "09d31fffb11f547a",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/gr": {
-      "fingerprint": "68fb8d6e5ac8dff5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7c2d2ba702a12cd5",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/gt": {
-      "fingerprint": "c43def0fe78b3317",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bdc8c29be7031eb5",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/hk": {
-      "fingerprint": "7fe3295d9e2af33e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a01a4482d9da75f8",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/hn": {
-      "fingerprint": "227f7ec1254945b1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "213ff73d3c4681e6",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/hr": {
-      "fingerprint": "cc7d6d6157d7afe3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9c06f9339ac7ae74",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/hu": {
-      "fingerprint": "48742abe2e4c9617",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d0cd8911d16be323",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/id": {
-      "fingerprint": "76c04362739e6c8a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e6e9cf0043d5bda9",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ie": {
-      "fingerprint": "f012392eae12e31e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d9e7c74f0a6b231c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/il": {
-      "fingerprint": "7d59338780962692",
-      "lastmod": "2026-11-12"
+      "fingerprint": "60ec48b9acf26db5",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/im": {
-      "fingerprint": "2e337aef84758671",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4f62ce77efb56613",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/in": {
-      "fingerprint": "5e62cbd5d4c497fc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bbfc35341c56e528",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/iq": {
-      "fingerprint": "f572ab0ce36a68ee",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f68e2dd6730b4c5d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ir": {
-      "fingerprint": "df71f1bd067fb822",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1005a1063019af8e",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/is": {
-      "fingerprint": "dc20035bf7a46c47",
-      "lastmod": "2026-11-12"
+      "fingerprint": "176fe219a925a1b1",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/it": {
-      "fingerprint": "f962b1592ba402f1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e1d861fe9dc42c9d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/jm": {
-      "fingerprint": "5936b19dfb063a2e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d027bdca74c63470",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/jo": {
-      "fingerprint": "1aba376312d6ec45",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c3a1ed7f387ea37f",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/jp": {
-      "fingerprint": "9323dd67d9b6afcb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fda1efabf7569a94",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/ctf/ke": {
+      "fingerprint": "e164c60d526b7eb8",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/kg": {
-      "fingerprint": "21a49dab6a6b2fd3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "05a19ca0e52f8b5a",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/kh": {
-      "fingerprint": "be30a56e5dc16e66",
-      "lastmod": "2026-11-12"
+      "fingerprint": "94e6ca552fdcd02c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ki": {
-      "fingerprint": "cb5ab74f49c145f5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4000976267e4aee0",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/kr": {
-      "fingerprint": "8c21ddf182edfab3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3bc8361f13c56296",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/kw": {
-      "fingerprint": "98339dd1f80cdb9c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f585b30146f63f60",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ky": {
-      "fingerprint": "f8833f15ce42f799",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b03d5b39cd53c488",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/kz": {
-      "fingerprint": "2c6c79b219804e64",
-      "lastmod": "2026-11-12"
+      "fingerprint": "355566e87228a477",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/la": {
-      "fingerprint": "7fd20a788a4f77f3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8f00b6f6cb81140c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/lb": {
-      "fingerprint": "99076e4b932fbbc8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a71118e512013892",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/ctf/li": {
+      "fingerprint": "7fbdf1f1110ba65a",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/lk": {
-      "fingerprint": "dc3417d797b56965",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c1de404875d7f105",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/lt": {
-      "fingerprint": "09257b86f354716f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "143e37071fa23d86",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/lu": {
-      "fingerprint": "63b35dd104179c02",
-      "lastmod": "2026-11-12"
+      "fingerprint": "281ddd0a3b67edb7",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/lv": {
-      "fingerprint": "7601fdff38451237",
-      "lastmod": "2026-11-12"
+      "fingerprint": "92608d5766c3dc1f",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ly": {
-      "fingerprint": "e10bbacdbcca6099",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9c0b352bc8a7d21b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ma": {
-      "fingerprint": "23cc629f862f8d8c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6f330763ddc083c3",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/md": {
-      "fingerprint": "7a6ee147068b63b6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3fbe83b60c0b1fd3",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/me": {
-      "fingerprint": "abc81dcc2e731ee4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "378a81149e6a843e",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mg": {
-      "fingerprint": "dd4852f1f3df707f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "75697be614d05d6d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mh": {
-      "fingerprint": "a8fca7687139efbc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "16f3bdc709f4bf6a",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mk": {
-      "fingerprint": "276622d83605f74e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "70c89ce1ca1f0a0d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ml": {
-      "fingerprint": "0c9df1ee81055e42",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7dbbde9cbee23e79",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mm": {
-      "fingerprint": "ddb4446cf3708f02",
-      "lastmod": "2026-11-12"
+      "fingerprint": "fadfd3bcb70eb50b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mn": {
-      "fingerprint": "1aa538a00b8d540b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "86c26d5230a71b9c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mo": {
-      "fingerprint": "f0108797359cdb11",
-      "lastmod": "2026-11-12"
+      "fingerprint": "74fe082af004e7b7",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mr": {
-      "fingerprint": "2ea221cdae405064",
-      "lastmod": "2026-11-12"
+      "fingerprint": "478ea8eb4a26173c",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mt": {
-      "fingerprint": "8918b9a1c26559d8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f9f27fd286167586",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mv": {
-      "fingerprint": "3436bd561502db6e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e90f6360442b4ef8",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mx": {
-      "fingerprint": "61e6797cb29c2097",
-      "lastmod": "2026-11-12"
+      "fingerprint": "96621dcd1be06db0",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/my": {
-      "fingerprint": "2323c737a4511985",
-      "lastmod": "2026-11-12"
+      "fingerprint": "79e12ce10a868312",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/mz": {
-      "fingerprint": "b669e93c20a1d70e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "19c1550158cc861b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ng": {
-      "fingerprint": "1fe557d6bea0488c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "aa4b1c37501db700",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/nl": {
-      "fingerprint": "f91c0516a0a00387",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a2c0deaddb8c24ac",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/no": {
-      "fingerprint": "98b8b1629a67ea17",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c28dbb5ef150f83a",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/np": {
-      "fingerprint": "e9a7ce15ba2efe71",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d5ba527501e52ec0",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/nz": {
-      "fingerprint": "8876b4b97030fc17",
-      "lastmod": "2026-11-12"
+      "fingerprint": "24c0635be46cd31d",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/ctf/om": {
+      "fingerprint": "73abae42da672387",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/pa": {
-      "fingerprint": "d510fe68e64406cb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d9c8c328160da3c4",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/pe": {
-      "fingerprint": "92ba2724bfa6a18d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0320f9c305dd5323",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/pf": {
-      "fingerprint": "b91737f542c816f4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d683b0057b4462c1",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ph": {
-      "fingerprint": "008b837f65a4c989",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1c8806a960da893a",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/pk": {
-      "fingerprint": "f9ce780306ae9e7a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5b1de9f4fbbaeb21",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/pl": {
-      "fingerprint": "cdeb335b1b8541a0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9c7a7ae5e32b2f2b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/pr": {
-      "fingerprint": "240bb9ce05fd60fc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0183bdae8608797d",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ps": {
-      "fingerprint": "bc905b63803f5869",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5a16ce2593aa8f84",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/pt": {
-      "fingerprint": "f4db076f54592649",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eadda12400358b2e",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/py": {
-      "fingerprint": "0cb1fd24ea8d50d1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eb05f4b09dc681eb",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/qa": {
-      "fingerprint": "52d9e6e1996dc66a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "27154bb6f3a8d6c9",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ro": {
-      "fingerprint": "eac3630a00529064",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c494d1169880af35",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/rs": {
-      "fingerprint": "0eb57db8f1fbde0d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "208bda9eb9e50c4b",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ru": {
-      "fingerprint": "e1e7c531ad468ac9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "50121a60ab8576e8",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/sa": {
-      "fingerprint": "6457eaf8de32ee42",
-      "lastmod": "2026-11-12"
+      "fingerprint": "323ff77324c2cda8",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/sc": {
-      "fingerprint": "28dbdc4e3fe010a0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4fd4c2609e481428",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/se": {
-      "fingerprint": "b8d7a9f563761e7a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "08a400438c310696",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/sg": {
-      "fingerprint": "b62adf6d8bd81373",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0f510d0049ebd500",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/si": {
-      "fingerprint": "9606612d15c3605c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0122bd22f4b27a43",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/sk": {
-      "fingerprint": "05dc8cce8afd2a1d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eee6f41213e7cce1",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/sm": {
-      "fingerprint": "141905cbb8a33131",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5169da4b73653d89",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/sv": {
-      "fingerprint": "1461b467ee0c8dce",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a9c73d8ca5680dfc",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/sy": {
-      "fingerprint": "948adeabce9699cf",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2eacd11260559148",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/th": {
-      "fingerprint": "0fda7bc37cb009fc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "21dd535b9000b181",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/tn": {
-      "fingerprint": "2535695b43442bd2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9b017ec0102e7e9e",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/tr": {
-      "fingerprint": "40dea4dac9e7a9e0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eb30e23cee93534c",
+      "lastmod": "2026-11-18"
+    },
+    "/ru/ctf/tt": {
+      "fingerprint": "3c0c360cab8fdcd9",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/tw": {
-      "fingerprint": "a43b919c34e9b13f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "21e299467df5cadf",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/tz": {
-      "fingerprint": "27f5fed2216b9575",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f3431d8f53f03b46",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ua": {
-      "fingerprint": "fdebb37d88170541",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bd3b2c7084ac961f",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ug": {
-      "fingerprint": "d616e2880101041b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ef24ca139ab55f3a",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/us": {
-      "fingerprint": "3357f221fa1cc102",
-      "lastmod": "2026-11-12"
+      "fingerprint": "561994075de5ffe1",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/uy": {
-      "fingerprint": "0e6b91e71fcad686",
-      "lastmod": "2026-11-12"
+      "fingerprint": "066a055e807c50c1",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/uz": {
-      "fingerprint": "fd47e3009914fc15",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8b3bef37d69effb1",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ve": {
-      "fingerprint": "c57bcabfe52a244f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c01b642dec89dcf8",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/vg": {
-      "fingerprint": "0f3db1273ea037a0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "134789ffcc21f1fb",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/vn": {
-      "fingerprint": "80915e2b1b3924a2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "568c480bb39827bf",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/ye": {
-      "fingerprint": "1a7f19d4cab0ec40",
-      "lastmod": "2026-11-12"
+      "fingerprint": "061d26eb0ecdaa53",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/za": {
-      "fingerprint": "1f4c98a3f362f40c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d44df67f3bf8a295",
+      "lastmod": "2026-11-18"
     },
     "/ru/ctf/zw": {
-      "fingerprint": "02dfbb3fdeeba71f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ad4c7ba0168b6cee",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf": {
-      "fingerprint": "55fbfd312afe3ea7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "10b6555401686b28",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ad": {
-      "fingerprint": "0050368d4a0b64b1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "df15d0773410c886",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ae": {
-      "fingerprint": "64977dc37525a73f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3d70f5ec76e2fa3e",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/af": {
-      "fingerprint": "2571fed4f3bf350d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b4d5dbc473de78b0",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ag": {
-      "fingerprint": "5a94640c29efbb5f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4999ae3870402325",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/al": {
-      "fingerprint": "239b2df7ddb0c2bf",
-      "lastmod": "2026-11-12"
+      "fingerprint": "e847131cd1f06c7f",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/am": {
-      "fingerprint": "c594c1bc95e71e86",
-      "lastmod": "2026-11-12"
+      "fingerprint": "3f385130f5e3634a",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ar": {
-      "fingerprint": "4d287c52ba0af885",
-      "lastmod": "2026-11-12"
+      "fingerprint": "41ed604ace749fcc",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/at": {
-      "fingerprint": "e4d5389d6cb8cc60",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2bcfdfdeebc7ff00",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/au": {
-      "fingerprint": "a6b6111938cbb03a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1872a4dbb78d1dcd",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/ctf/az": {
+      "fingerprint": "20f73d2e6021dd91",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ba": {
-      "fingerprint": "03c45b51ddda5214",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cd8229530cf423d6",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bd": {
-      "fingerprint": "660218778270a354",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4c202648f4511e8a",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/be": {
-      "fingerprint": "374a7d72d3f6864c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6052af618c5a2692",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bg": {
-      "fingerprint": "867f349360256350",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7f4e969165aa3f0c",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bh": {
-      "fingerprint": "b20c2e770b576d1a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ea50ef9d5b1defe0",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bi": {
-      "fingerprint": "adce99b186d496f5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1ecd8b0b864bbc5a",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bm": {
-      "fingerprint": "4d22c67b75dc4a4c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "db6dcaacd688e8ca",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bo": {
-      "fingerprint": "3f25004e3b4ed881",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8d08af2e4ace803b",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/br": {
-      "fingerprint": "dfb5ce5d0371032f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "47f034fca3a0b88d",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bs": {
-      "fingerprint": "674ca6fd4b4f2644",
-      "lastmod": "2026-11-12"
+      "fingerprint": "76d981308e09f71b",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/bw": {
-      "fingerprint": "136e8e04ed565aa0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a06c8381563d5fbd",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/by": {
-      "fingerprint": "6f4ace26058e7b67",
-      "lastmod": "2026-11-12"
+      "fingerprint": "970aaed4b8189cdb",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ca": {
-      "fingerprint": "f0c6fb15c70db966",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1238997eaf3c5151",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/cd": {
-      "fingerprint": "10ae1ed514a718ec",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1edc55f7dcb13a45",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ch": {
-      "fingerprint": "604a67b63f091114",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2e924876fc9b13bd",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/cl": {
-      "fingerprint": "c58031313a8226bd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1641ebbce54b0c69",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/cm": {
-      "fingerprint": "7d2fc75636cc8e19",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1b75d0493bb06bea",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/cn": {
-      "fingerprint": "e8e3d2cf84fa317d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7c1f2c8daf63fe5b",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/co": {
-      "fingerprint": "e9d36a3e1a2e3114",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8542e19639c14362",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/cr": {
-      "fingerprint": "a26d1f524f6b43a5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6adceea0eaa3c673",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/ctf/cu": {
+      "fingerprint": "6db053f6898b4c0c",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/cy": {
-      "fingerprint": "95e76c4acd4e99a8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "52ae1bb2a0eafdec",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/cz": {
-      "fingerprint": "35efbaa0500716a7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "39af202a51bd94d3",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/de": {
-      "fingerprint": "4d17dd2208e524a6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "aa99287c831ecb14",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/dk": {
-      "fingerprint": "a05c31b4c0e355fa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cfc2ed2560ae43d5",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/do": {
-      "fingerprint": "87497d07231c3e7c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c2c92d28aad00ec2",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/dz": {
-      "fingerprint": "67cac36c5b22254c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "107c1e3ea1670545",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ec": {
-      "fingerprint": "a29dde51799fb8c6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ca3917a174b16de9",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ee": {
-      "fingerprint": "33cdeecf37120b5d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6fec5160a23f83ed",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/eg": {
-      "fingerprint": "b20f780bcd4dd72e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "36c85d7ef3159c63",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/es": {
-      "fingerprint": "dc9ba483af4ea96b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5c9f0043873116cb",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/et": {
-      "fingerprint": "0bc511e1696a572c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9b642555a5a05012",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/fi": {
-      "fingerprint": "fafd078abb8ad9ac",
-      "lastmod": "2026-11-12"
+      "fingerprint": "73a0eb05d4e74b12",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/fm": {
-      "fingerprint": "d7f268e85d6187ad",
-      "lastmod": "2026-11-12"
+      "fingerprint": "72536d7ee4660b7f",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/fr": {
-      "fingerprint": "dedf3c5e58b490df",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a9aed0d0a20aedc3",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/gb": {
-      "fingerprint": "25aa3e53a8da0b2c",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8164933d13685c12",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/gd": {
-      "fingerprint": "280041d502750145",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2694fcf83fc0b776",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ge": {
-      "fingerprint": "6f44b259d17757c3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a2333d9a3ed9250a",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/gf": {
-      "fingerprint": "4d968dda7ba15e0d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eed5df228b2a3966",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/gh": {
-      "fingerprint": "f85ea3602f804483",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0801b0cb73d75587",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/gr": {
-      "fingerprint": "8dbfbcad9e19c6ba",
-      "lastmod": "2026-11-12"
+      "fingerprint": "201557cfb12b4e3e",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/gt": {
-      "fingerprint": "666266f97c9747fd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "845aee5ee054bcad",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/hk": {
-      "fingerprint": "896ff6fdd69f27e4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "60c871bfa935325b",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/hn": {
-      "fingerprint": "2994817b4c211b78",
-      "lastmod": "2026-11-12"
+      "fingerprint": "729634e50bb96044",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/hr": {
-      "fingerprint": "5b05c1a4b7227f6a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b712c335cb219b64",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/hu": {
-      "fingerprint": "45d7bc460b4d6228",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4a053abef865f797",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/id": {
-      "fingerprint": "80de2b3d64d3f2b2",
-      "lastmod": "2026-11-12"
+      "fingerprint": "023173b5be3020b9",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ie": {
-      "fingerprint": "493252d6ad073880",
-      "lastmod": "2026-11-12"
+      "fingerprint": "03a6e7b073b1aacc",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/il": {
-      "fingerprint": "34611f1ba82bd194",
-      "lastmod": "2026-11-12"
+      "fingerprint": "25a6d0bc4eef60b2",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/im": {
-      "fingerprint": "6379847398a4c362",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bc859585df277fe2",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/in": {
-      "fingerprint": "b2f002a49b413994",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9e18691ace38650c",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/iq": {
-      "fingerprint": "87f09831bd16681f",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5330d3fcbc9a3eeb",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ir": {
-      "fingerprint": "92aafa93017d3e83",
-      "lastmod": "2026-11-12"
+      "fingerprint": "91768c6a03bdaf29",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/is": {
-      "fingerprint": "50ea575a452a9eb4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "47ae0662e052a129",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/it": {
-      "fingerprint": "77f81e349d54f748",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4d2b3efdcc1fb61a",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/jm": {
-      "fingerprint": "28162c9277b9b492",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9a59af0e3905535a",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/jo": {
-      "fingerprint": "4870171ee6562afb",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6e3f12d9f71ec5e9",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/jp": {
-      "fingerprint": "a233d11573fdfd9a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f50b06cc77c0e1ef",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/ctf/ke": {
+      "fingerprint": "d196d5f921bd9e26",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/kg": {
-      "fingerprint": "30b070034ba5d6f0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f109be5e86c5a0b3",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/kh": {
-      "fingerprint": "d57c99c3d8df996e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "247648da96330d02",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ki": {
-      "fingerprint": "1264104ad5399b66",
-      "lastmod": "2026-11-12"
+      "fingerprint": "65c4333474f09d28",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/kr": {
-      "fingerprint": "8da6fb8de97ca36e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "65dd74f8eb26ad89",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/kw": {
-      "fingerprint": "cd38ceee286e03d8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "889e7e48e56d659d",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ky": {
-      "fingerprint": "3dead585d55f911e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "071b62d61f7f4103",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/kz": {
-      "fingerprint": "d93fcc2efdfdb53e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0d72c1a29e6eceea",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/la": {
-      "fingerprint": "ec82d961ac542fc1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "94da2b35b613f524",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/lb": {
-      "fingerprint": "754c579bac31da66",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9e0e12fbc974d30f",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/ctf/li": {
+      "fingerprint": "12da33c1c2b3ad2d",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/lk": {
-      "fingerprint": "04e283b97fe7c256",
-      "lastmod": "2026-11-12"
+      "fingerprint": "83b378ac946a4a17",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/lt": {
-      "fingerprint": "242fe453ff3e34a0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8053956927c48102",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/lu": {
-      "fingerprint": "6797963e2064c0aa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5192d56d7965f600",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/lv": {
-      "fingerprint": "2b50dc44e90794aa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "66206d3c9b1d9af7",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ly": {
-      "fingerprint": "922d6f2dae31f535",
-      "lastmod": "2026-11-12"
+      "fingerprint": "02fe336b5cc69886",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ma": {
-      "fingerprint": "75bf130e8a615e87",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2338f65403475acc",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/md": {
-      "fingerprint": "422fa95dab6a0b4d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "6972c0a838bb8f2b",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/me": {
-      "fingerprint": "8e8ff7433410d95a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a8f90dc850343f2c",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mg": {
-      "fingerprint": "4ed1fac87a88956e",
-      "lastmod": "2026-11-12"
+      "fingerprint": "15fec362a4bd1268",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mh": {
-      "fingerprint": "c73dfaf8b2f23808",
-      "lastmod": "2026-11-12"
+      "fingerprint": "5437de1bc29a9bec",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mk": {
-      "fingerprint": "759dc2e86253ee6a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4ff242274b3fe6dd",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ml": {
-      "fingerprint": "a01c37bcc7aba6e1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9b654b2ef5750961",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mm": {
-      "fingerprint": "21598a8b4783af12",
-      "lastmod": "2026-11-12"
+      "fingerprint": "77eda7372049ab16",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mn": {
-      "fingerprint": "7d22f369607364e9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cf32bd24de2dc2ff",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mo": {
-      "fingerprint": "d71d8086ae6dc64d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1e72868abcd5177d",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mr": {
-      "fingerprint": "2b860453d38becc4",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0a3170e3e81f8a54",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mt": {
-      "fingerprint": "343440653a5ad46a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "936ba0189eb7e6f4",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mv": {
-      "fingerprint": "269322ff0e91b25d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7bc547101d6ebd36",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mx": {
-      "fingerprint": "92fd1196860040fa",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9c9d6cec9b294be4",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/my": {
-      "fingerprint": "23d4a84b95b9ab05",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f3fa31b6f8a1032a",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/mz": {
-      "fingerprint": "8741cbccd3fc67e5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "05790905f93a341b",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ng": {
-      "fingerprint": "2585321913a48a97",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0cfb652a840c70dc",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/nl": {
-      "fingerprint": "92de524629f668a7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "27ae6c187600ad93",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/no": {
-      "fingerprint": "a010bf6dc0e28335",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0c8a55c98a8b8100",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/np": {
-      "fingerprint": "c286f7b724458abc",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b89a197e1ed44ef1",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/nz": {
-      "fingerprint": "8b3a5648993c8c51",
-      "lastmod": "2026-11-12"
+      "fingerprint": "58ec3944b42d0cb8",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/ctf/om": {
+      "fingerprint": "d5e263a3eefb2aeb",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/pa": {
-      "fingerprint": "186097416188660d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c8fb6be47ec6a020",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/pe": {
-      "fingerprint": "d7bc3c8418ee3543",
-      "lastmod": "2026-11-12"
+      "fingerprint": "04b2d1e4f1834daf",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/pf": {
-      "fingerprint": "d8d293056716411b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "57a9989090b1adc7",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ph": {
-      "fingerprint": "90eed781a60bd59a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "946ce687dd9a44c6",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/pk": {
-      "fingerprint": "05800558ac9b5164",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d06a9c8770329339",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/pl": {
-      "fingerprint": "4c6c723fecdc8da1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a87c1a78ec46e700",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/pr": {
-      "fingerprint": "180ec28368f2b39a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a56b51f98466e862",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ps": {
-      "fingerprint": "e0aeb192fa2ab411",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a0cd63f955098160",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/pt": {
-      "fingerprint": "ef2fcea76dc377e8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "1f595e38772a7f34",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/py": {
-      "fingerprint": "824ae959560bc809",
-      "lastmod": "2026-11-12"
+      "fingerprint": "912fac2ed98a89a7",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/qa": {
-      "fingerprint": "7cb0c832a60c4283",
-      "lastmod": "2026-11-12"
+      "fingerprint": "80790b1eab84bb87",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ro": {
-      "fingerprint": "a46e88a65dddc70b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "75b2e61d7a1b6663",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/rs": {
-      "fingerprint": "1ad5a7d2618da390",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f31621da038cb1b5",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ru": {
-      "fingerprint": "a72eb7a0e56f77b7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4d13529b924c0d6b",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/sa": {
-      "fingerprint": "ffe3f0919542934a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "10b997af2a7562e0",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/sc": {
-      "fingerprint": "02096350a5f478cf",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f77d3fe39ede4923",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/se": {
-      "fingerprint": "315527615dd0062a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "9874d9b310e02402",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/sg": {
-      "fingerprint": "6932e2247b355b8d",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d9837f52a40c60fa",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/si": {
-      "fingerprint": "d222a39a9a72dd89",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a6c3c7e75d1a5d78",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/sk": {
-      "fingerprint": "f687ce526b30e416",
-      "lastmod": "2026-11-12"
+      "fingerprint": "eac3054c0b43d152",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/sm": {
-      "fingerprint": "21f16d23d487abbd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "995e0d91cd5d52cb",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/sv": {
-      "fingerprint": "8ea614adb71952c7",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c0f8da53dcef65e6",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/sy": {
-      "fingerprint": "4cdc191c191038b1",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d379aa91daa8d3dc",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/th": {
-      "fingerprint": "12110c4feb0699d8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "ff0b79a401be89ef",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/tn": {
-      "fingerprint": "0444ee33fcf52cf9",
-      "lastmod": "2026-11-12"
+      "fingerprint": "0d8ae56d775618c8",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/tr": {
-      "fingerprint": "6681a972474fc3d0",
-      "lastmod": "2026-11-12"
+      "fingerprint": "4d280babd2e433f6",
+      "lastmod": "2026-11-18"
+    },
+    "/zh/ctf/tt": {
+      "fingerprint": "22619427d68e7bad",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/tw": {
-      "fingerprint": "e85e9d7ba36534a3",
-      "lastmod": "2026-11-12"
+      "fingerprint": "b56b0606eb10328f",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/tz": {
-      "fingerprint": "35b1957d63466661",
-      "lastmod": "2026-11-12"
+      "fingerprint": "dee8c4da99f9b99f",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ua": {
-      "fingerprint": "ea28705a449f5ef8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "c39786dcbe6ea214",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ug": {
-      "fingerprint": "83445139d0fed36a",
-      "lastmod": "2026-11-12"
+      "fingerprint": "51eacc7de0af50a4",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/us": {
-      "fingerprint": "006dfe4b9c07a682",
-      "lastmod": "2026-11-12"
+      "fingerprint": "2b928b8aa98b38cc",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/uy": {
-      "fingerprint": "021a74f7167d5ffe",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a7dff5cca8a18cf6",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/uz": {
-      "fingerprint": "60bafbdcc8f1cfbd",
-      "lastmod": "2026-11-12"
+      "fingerprint": "422b8c3521be7e80",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ve": {
-      "fingerprint": "17c54af68fae7f64",
-      "lastmod": "2026-11-12"
+      "fingerprint": "d98e367b44a06406",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/vg": {
-      "fingerprint": "faae64d2ad44864b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a6bda0a5de193d9c",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/vn": {
-      "fingerprint": "37041b58b66c0ace",
-      "lastmod": "2026-11-12"
+      "fingerprint": "f2d1c816aad679d5",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/ye": {
-      "fingerprint": "e599404c306f1e84",
-      "lastmod": "2026-11-12"
+      "fingerprint": "a06e71e4c5203666",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/za": {
-      "fingerprint": "6f0eebfa60266a60",
-      "lastmod": "2026-11-12"
+      "fingerprint": "bba640055519c937",
+      "lastmod": "2026-11-18"
     },
     "/zh/ctf/zw": {
-      "fingerprint": "dd785a798aa7c5e6",
-      "lastmod": "2026-11-12"
+      "fingerprint": "02904d0c4e06af31",
+      "lastmod": "2026-11-18"
     }
   }
 }

@@ -68,6 +68,10 @@ export default {
             other: 'Am {day} waren dort {count} Provider online.',
         },
         seenNone: 'Am {day} war dort kein Provider online.',
+        seenRank: {
+            one: 'Am {day} war dort {count} Provider online, Platz {rank} von {of} Ländern.',
+            other: 'Am {day} waren dort {count} Provider online, Platz {rank} von {of} Ländern.',
+        },
     },
 
     hub: {
@@ -122,8 +126,10 @@ export default {
         earnA: '{worth}, und ein Gewinner in einem Land mit Topf erhält außerdem ein Fünftel dieses Topfes. Die Beträge ändern sich jede Epoche mit der Emission des Netzwerks und damit, wie viele Leute in jedem Land mitmachen, und der Preis von Alpha schwankt. Nichts ist garantiert.',
         passiveQ: 'Ist es passives Einkommen oder ein Job?',
         passiveA: 'Eigentlich weder noch. Ein Miner oder die App läuft im Hintergrund auf einem Computer oder Handy, das du schon hast, verdient aber nur, solange das Gerät online bleibt. Es ist kein Job, ohne Arbeitgeber, Arbeitszeiten oder Lohn, und keine Geldanlage, ohne feste Rendite.',
+        paidQ: 'Wie werde ich bezahlt?',
+        paidA: 'Belohnungen gehen an die Auszahlungs-Wallet, die dein Miner oder deine App bereits verwendet, im Capture-the-Flag-Pool deines Betreibers, und du löst sie zusammen mit deinen Pool-Einnahmen ein. Für das, was du verdienst und wie du es auszahlst, gilt das Recht deines Wohnorts.',
         rolesQ: 'Was ist der Unterschied zwischen einem Provider und einem Extender?',
-        rolesA: 'Ein Provider teilt deine Internetverbindung mit den Menschen, die das Netzwerk nutzen. Ein Extender ist ein Relay für Menschen, die das Netzwerk nicht direkt erreichen können, etwa wegen Zensur. Der Miner und die Desktop-App betreiben standardmäßig beide, und ein Gerät kann in beiden Rollen gewinnen. Ein Extender funktioniert nur, wenn das Internet deinen Computer auf TCP-Port 443 erreichen kann: <ext>Einen Extender betreiben</ext> erklärt, wie du diesen Port öffnest.',
+        rolesA: 'Ein Provider teilt deine Internetverbindung mit den Menschen, die das Netzwerk nutzen. Ein Extender ist ein Relay für Menschen, die das Netzwerk nicht direkt erreichen können, etwa wegen Zensur. Der Miner und die Desktop-App betreiben standardmäßig beide, und ein Gerät kann in beiden Rollen gewinnen. Ein Extender funktioniert nur, wenn das Internet deinen Computer auf TCP-Port 443 erreichen kann: <ext>Einen Extender betreiben</ext> erklärt, wie du diesen Port öffnest und <miners>Mining auf SN25</miners> erklärt, was ein Miner sonst noch braucht.',
         fairQ: 'Wie bleibt die Zufallsauswahl fair?',
         fairA: 'Wenn die Epoche endet, schreibt jeder Netzbetreiber die Liste seiner berechtigten Miner on-chain fest. Eine drand-Runde, die nach dieser Festschreibung veröffentlicht wird, bestimmt dann die Gewinner, sodass niemand sie auswählen kann, auch nicht der Betreiber. Jede Zufallsauswahl lässt sich anhand ihrer Teilnehmerliste und ihrer Runde prüfen.',
         agentsQ: 'Kann mein KI-Assistent diese Daten lesen?',
@@ -493,8 +499,25 @@ export default {
         disclaimer: ' Belohnungen werden in Alpha ausgezahlt, dem Token von Bittensor-Subnet 25, und sind nicht garantiert.',
         more: 'Weitere Länder',
         all: 'Alle 249 Länder',
+        // the link to the hub's questions, which are the same in every country
+        moreFaq: 'Weitere Fragen',
         aroundPots: '{amount} α in den Töpfen',
         aroundOnline: { one: '{count} Provider online', other: '{count} Provider online' },
+    },
+
+    network: {
+        title: '{name} im Netzwerk',
+        rank: 'Zum Ende des {day} zählte das Dashboard des Netzwerks {in} {providers} online: <b>Platz {rank} von {of}</b> unter den Ländern, in denen es welche zählte, die zusammen {total} hatten.',
+        change: 'Eine Woche zuvor zählte es dort {week}, vier Wochen zuvor {month}.',
+        changeWeek: 'Eine Woche zuvor zählte es dort {week}.',
+        window: {
+            one: 'In den letzten {count} Tag zählte es dort an {seen} Tagen Provider, zuerst am {first}; die meisten zum Ende eines Tages waren {peak}, am {peakDay}.',
+            other: 'In den letzten {count} Tagen zählte es dort an {seen} Tagen Provider, zuerst am {first}; die meisten zum Ende eines Tages waren {peak}, am {peakDay}.',
+        },
+        caption: 'Provider online {in} zum Ende jeder Woche',
+        day: 'Tag',
+        online: 'Provider online',
+        near: 'In dieser Zählung daneben:',
     },
 
     countryFaq: {
@@ -517,10 +540,6 @@ export default {
             one: '{won} von {count} Extender-Teilnehmer gewann einen Slot',
             other: '{won} von {count} Extender-Teilnehmern gewannen einen Slot',
         },
-        passiveQ: 'Ist es passives Einkommen?',
-        passiveA: 'Teilweise. Ein Miner oder die App läuft im Hintergrund auf einem Computer oder Handy, das du schon hast, verdient aber nur, solange das Gerät online bleibt, und was du gewinnst, hängt davon ab, wie viele andere {in} mitmachen, und vom Preis von Alpha. Es ist keine Geldanlage und hat keine feste Rendite.',
-        remoteQ: 'Ist es Remote-Arbeit {in}?',
-        remoteA: 'Nein. Capture the Flag ist kein Job: Es gibt keinen Arbeitgeber, keine Arbeitszeiten und keinen Lohn. Es kann neben Remote-Arbeit oder jedem anderen Job laufen, über die Internetverbindung, die du schon hast.',
         roleQ: 'Provider oder Extender: Was sollte ich {in} betreiben?',
         roleBoth: 'Beides geht. Beide Rollen haben {in} offene Slots, also gewinnt ein Neuling in jeder der beiden Rollen ohne Zufallsauswahl. Der Miner und die Desktop-App betreiben beide.',
         roleX: 'Einen Extender. Seine Slots {in} wurden letzte Epoche nicht alle vergeben, also gewinnt ein neuer Extender ohne Zufallsauswahl. Alle Provider-Slots wurden vergeben, also ist ein neuer Provider auf die Zufallsauswahl angewiesen: etwa <b>{pct}</b>.',

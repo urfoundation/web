@@ -11,7 +11,7 @@
 // (no en.js there, so they are not copy units), checked against the English by
 // corpus.mjs and corpus.test.mjs.
 export default {
-    paths: ['/docs', '/docs/*', '/docs/miner/*', '/docs/support/*', '/terms', '/privacy', '/vdp'],
+    paths: ['/docs', '/docs/*', '/docs/miner/*', '/docs/compare/*', '/docs/support/*', '/terms', '/privacy', '/vdp'],
     localized: true,
     // Left in English on purpose on the translated pages: Bittensor's terms that
     // every language keeps in Latin script (the translators' glossary; Spanish keeps
@@ -24,5 +24,7 @@ export default {
         'Bittensor SN25 (netuid 25)', 'Bittensor SN25, netuid 25', 'whitepaper',
         "This device isn't signed in yet", 'This is the first start on this device',
         'powershell',
+        // the networks the comparison pages name (docs/compare/)
+        'Mysterium', 'Grass', 'Sentinel', 'Orchid', 'Honeygain', 'Pawns.app', 'IPRoyal',
     ],
 };

@@ -26,7 +26,10 @@ export default function LandingOverview() {
                             <article className="role-card" key={route}>
                                 <p className="role-number">{String(index + 1).padStart(2, '0')}</p>
                                 <h3>{role.name}</h3>
-                                <p>{role.body}</p>
+                                <p>
+                                    {role.body}
+                                    {role.bodyLink && <>{' '}<a className="role-body-link" href={buildPath({ name: route, slug: null }, code)}>{role.bodyLink}</a></>}
+                                </p>
                                 <a href={buildPath({ name: route, slug: null }, code)}>
                                     {role.explore} <span aria-hidden="true">{arrow}</span>
                                 </a>

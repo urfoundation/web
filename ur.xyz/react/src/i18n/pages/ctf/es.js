@@ -74,6 +74,11 @@ export default {
             other: 'El {day} había {count} proveedores en línea allí.',
         },
         seenNone: 'El {day} no había ningún proveedor en línea allí.',
+        seenRank: {
+            one: 'El {day} había {count} proveedor en línea allí, el n.º {rank} de {of} países.',
+            many: 'El {day} había {count} proveedores en línea allí, el n.º {rank} de {of} países.',
+            other: 'El {day} había {count} proveedores en línea allí, el n.º {rank} de {of} países.',
+        },
     },
 
     hub: {
@@ -128,8 +133,10 @@ export default {
         earnA: '{worth}, y un ganador en un país con fondo se lleva además una quinta parte de ese fondo. Los importes cambian cada época con la emisión de la red y con cuántas personas participan en cada país, y el precio del alpha varía. Nada está garantizado.',
         passiveQ: '¿Son ingresos pasivos o un trabajo?',
         passiveA: 'No exactamente ninguna de las dos. El programa minero o la app funciona en segundo plano en una computadora o un teléfono que ya tienes, pero solo gana mientras sigue en línea. No es un trabajo (no hay empleador, horario ni sueldo) ni una inversión (no hay rendimiento fijo).',
+        paidQ: '¿Cómo cobro?',
+        paidA: 'Lo que ganes va a la wallet de pago que tu programa minero o tu app ya usa, en el pool de Captura la bandera de tu operador, y lo reclamas junto con tus ganancias del pool. Lo que ganes y cómo lo retires está sujeto a la ley del lugar donde vives.',
         rolesQ: '¿Qué diferencia hay entre un proveedor y un extensor?',
-        rolesA: 'Un proveedor comparte tu conexión a internet con las personas que usan la red. Un extensor es un relé para quienes no pueden llegar a la red directamente, por ejemplo, por la censura. El programa minero y la app de escritorio ejecutan ambos por defecto, y un mismo dispositivo puede ganar en los dos roles. Un extensor solo funciona si internet puede llegar a tu computadora por el puerto TCP 443: <ext>Ejecutar un extensor</ext> explica cómo abrir ese puerto.',
+        rolesA: 'Un proveedor comparte tu conexión a internet con las personas que usan la red. Un extensor es un relé para quienes no pueden llegar a la red directamente, por ejemplo, por la censura. El programa minero y la app de escritorio ejecutan ambos por defecto, y un mismo dispositivo puede ganar en los dos roles. Un extensor solo funciona si internet puede llegar a tu computadora por el puerto TCP 443: <ext>Ejecutar un extensor</ext> explica cómo abrir ese puerto, y <miners>minar en SN25</miners> cubre el resto de lo que necesita un minero.',
         fairQ: '¿Cómo se garantiza que la selección aleatoria sea justa?',
         fairA: 'Cuando termina la época, cada operador de red registra on-chain la lista de sus mineros elegibles. Después, una ronda de drand publicada tras ese registro elige a los ganadores, así que nadie, ni siquiera el operador, puede escogerlos. Cada selección aleatoria puede comprobarse con su censo y su ronda.',
         agentsQ: '¿Puede mi asistente de IA leer estos datos?',
@@ -528,8 +535,26 @@ export default {
         disclaimer: ' Las recompensas se pagan en alpha, el token de la subred 25 de Bittensor, y no están garantizadas.',
         more: 'Más países',
         all: 'Los 249 países',
+        // the link to the hub's questions, which are the same in every country
+        moreFaq: 'Más preguntas',
         aroundPots: '{amount} α en fondos',
         aroundOnline: { one: '{count} proveedor en línea', many: '{count} proveedores en línea', other: '{count} proveedores en línea' },
+    },
+
+    network: {
+        title: '{name} en la red',
+        rank: 'Al final del {day}, el panel de la red contó {providers} en línea {in}: <b>el n.º {rank} de {of}</b> entre los países donde contó alguno, que en total tenían {total}.',
+        change: 'Una semana antes contó {week} allí, y cuatro semanas antes, {month}.',
+        changeWeek: 'Una semana antes contó {week} allí.',
+        window: {
+            one: 'En el último {count} día, contó proveedores allí en {seen}, el primero el {first}; el máximo al final de un día fue {peak}, el {peakDay}.',
+            many: 'En los últimos {count} días, contó proveedores allí en {seen}, el primero el {first}; el máximo al final de un día fue {peak}, el {peakDay}.',
+            other: 'En los últimos {count} días, contó proveedores allí en {seen}, el primero el {first}; el máximo al final de un día fue {peak}, el {peakDay}.',
+        },
+        caption: 'Proveedores en línea {in} al final de cada semana',
+        day: 'Día',
+        online: 'Proveedores en línea',
+        near: 'Junto a él en ese recuento:',
     },
 
     countryFaq: {
@@ -554,10 +579,6 @@ export default {
             many: '{won} de {count} de participantes como extensor ganaron un slot',
             other: '{won} de {count} participantes como extensor ganaron un slot',
         },
-        passiveQ: '¿Son ingresos pasivos?',
-        passiveA: 'En parte. El programa minero o la app funciona en segundo plano en una computadora o un teléfono que ya tienes, pero solo gana mientras sigue en línea, y lo que ganes depende de cuántas otras personas participen {in} y del precio del alpha. No es una inversión y no tiene un rendimiento fijo.',
-        remoteQ: '¿Es trabajo remoto {in}?',
-        remoteA: 'No. Captura la bandera no es un trabajo: no hay empleador, ni horario, ni sueldo. Puede funcionar junto con el trabajo remoto o cualquier otro trabajo, con la conexión a internet que ya tienes.',
         roleQ: 'Proveedor o extensor: ¿cuál me conviene ejecutar {in}?',
         roleBoth: 'Cualquiera de los dos. Ambos roles tienen slots abiertos {in}, así que un recién llegado gana sin selección aleatoria en cualquiera de ellos. El programa minero y la app de escritorio ejecutan ambos.',
         roleX: 'Un extensor. No todos sus slots {in} se ganaron la época pasada, así que un extensor nuevo gana sin selección aleatoria. Todos los slots de proveedor se ganaron, así que un proveedor nuevo depende de la selección aleatoria: alrededor del <b>{pct}</b>.',

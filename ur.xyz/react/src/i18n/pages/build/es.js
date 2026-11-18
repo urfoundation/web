@@ -1,7 +1,7 @@
 // /build in Spanish: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: 'Construye sobre UR | Oportunidades para operadores de red',
+        title: 'Construye sobre UR: oportunidades para operadores | UR',
         description: 'Crea productos en UR como operador de red con capacidad residencial compartida, calidad de servicio medida y la capa de incentivos de SN25.',
         breadcrumb: 'Construye sobre UR',
     },

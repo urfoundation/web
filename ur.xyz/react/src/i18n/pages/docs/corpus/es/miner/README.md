@@ -18,9 +18,9 @@ description: Empieza a minar en UR en pocos pasos. Qué hace un minero, qué nec
 >
 > No están afectados: la imagen de Docker, las apps y los mineros configurados por un instalador, que se actualizan mediante `urnet-tools`.
 
-Un minero de UR comparte tu conexión a internet como salida para un operador de red. Los validadores comprueban que realmente transporta tráfico, y Bittensor SN25 (netuid 25) paga recompensas por ese trabajo en el token α de la subred, con la marca $UR.
+Un minero de UR comparte tu conexión a internet como salida para un operador de red. Los validadores comprueban que realmente transporta tráfico, y Bittensor SN25 (netuid 25) paga recompensas por ese trabajo en el token α de la subred, con la marca $UR. Para ver todo el rol en una página, de los requisitos a las recompensas, consulta [minar Bittensor SN25 con UR](/miners).
 
-¿Prefieres una app? Las apps de URnetwork son una alternativa fácil para minar desde un teléfono o una computadora: instala una desde [ur.io](https://ur.io) y minará en segundo plano, con URnetwork como operador. Esta guía es para el programa minero, que funciona en Linux, macOS y Windows y puede minar para cualquier operador.
+¿Prefieres una app? Las [apps de URnetwork](https://ur.io/products) son una alternativa fácil para minar desde un teléfono o una computadora: instala una desde la [página de descarga de ur.io](https://ur.io/install) y minará en segundo plano, con URnetwork como operador. Esta guía es para el programa minero, que funciona en Linux, macOS y Windows y puede minar para cualquier operador.
 
 Esta página te lleva de cero a un minero en funcionamiento. El resto de la guía del minero profundiza, un tema por página:
 
@@ -37,7 +37,9 @@ Esta página te lleva de cero a un minero en funcionamiento. El resto de la guí
 
 Para los otros roles, consulta [Ejecutar un validador](/docs/validator) y [Ejecutar un operador de red](/docs/operator).
 
-## Cómo funciona
+## ¿Cómo se le paga a un minero de UR?
+
+La mayoría de los mineros se unen al **pool** de un operador. No necesitas tu propio registro en Bittensor: inicias sesión con el operador, tu minero se registra a sí mismo como dispositivo y las recompensas del pool se pagan a la wallet de Bittensor que elijas. Las flotas grandes pueden, en cambio, reclamar su propio UID de minero; consulta [el nivel superior](/docs/miner/advanced#claim-your-own-miner-uid-head-tier).
 
 ```text
 your miner (provider)
@@ -48,8 +50,6 @@ a network operator  ←─  validators
   ↓ every epoch
 your Bittensor coldkey (α, $UR)
 ```
-
-La mayoría de los mineros se unen al **pool** de un operador. No necesitas tu propio registro en Bittensor: inicias sesión con el operador, tu minero se registra a sí mismo como dispositivo y las recompensas del pool se pagan a la wallet de Bittensor que elijas. Las flotas grandes pueden, en cambio, reclamar su propio UID de minero; consulta [el nivel superior](/docs/miner/advanced#claim-your-own-miner-uid-head-tier).
 
 ## Qué necesitas
 

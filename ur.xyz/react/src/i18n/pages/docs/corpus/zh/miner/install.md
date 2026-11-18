@@ -13,7 +13,7 @@ description: 安装 UR 矿工。适用于 Linux、macOS 和 Windows 并带自动
 | [手动下载](#manual-download) | Linux, macOS, Windows | 自动，配合 `provider setup` | 需要完全掌控的人 |
 | [从源代码构建](#build-from-source) | Linux, macOS, Windows | 手动 | 开发者和审计人员 |
 
-无论你选择哪种方式，矿工都把它的身份保存在 `~/.urnetwork`（在 Windows 上为 `%USERPROFILE%\.urnetwork`）中，因此你以后可以切换方式而无需重新注册。请先备份该文件夹，并在启动新方式之前停止旧方式的后台任务，确保永远不会有两个副本同时运行。安装完成后，回到[快速开始](/docs/miner#2-run-setup)。
+无论你选择哪种方式，矿工都把它的身份保存在 `~/.urnetwork`（在 Windows 上为 `%USERPROFILE%\.urnetwork`）中，因此你以后可以切换方式而无需重新注册。请先备份该文件夹，并在启动新方式之前停止旧方式的后台任务，确保永远不会有两个副本同时运行。安装完成后，回到[快速开始](/docs/miner#2-run-setup)。各项要求汇总在[UR 矿工需要什么](/miners)中。
 
 ## 安装程序
 

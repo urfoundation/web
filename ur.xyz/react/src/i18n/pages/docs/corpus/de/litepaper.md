@@ -40,7 +40,7 @@ Betreiber finanzieren das Netzwerk, indem sie UR in Höhe ihrer tatsächlichen N
 
 Miner werden aus der Emission bezahlt, nicht aus Einlagen. Weil sich die Einlagen in der Reserve ansammeln, statt in Auszahlungen zurückzufließen, schafft echte Nutzung zusätzliche Nachfrage nach dem Token, während die Emission einem festen Zeitplan mit Halvings folgt.
 
-## IV. Zwei Wege zu verdienen
+## IV. Wie verdienen Miner?
 
 Ein einzelner Betreiber kann weit über 100.000 Miner bedienen, weit mehr als die rund 256 On-Chain-Slots eines Subnets, daher bezahlt das Netzwerk Miner über zwei Stufen, die parallel laufen.
 

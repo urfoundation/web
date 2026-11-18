@@ -1,7 +1,7 @@
 // /build in Simplified Chinese: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: '在 UR 上构建 | 网络运营商的机会',
+        title: '在 UR 上构建：网络运营商的机会 | UR',
         description: '以网络运营商身份在 UR 上构建产品：共享的住宅网络容量、实测的服务质量，以及 SN25 激励层。',
         breadcrumb: '在 UR 上构建',
     },

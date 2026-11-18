@@ -3,6 +3,7 @@ import Section from '../Section';
 import NetworkDiagram from '../NetworkDiagram';
 import OperatorsDirectory from '../OperatorsDirectory';
 import OperatorLogos from '../OperatorLogos';
+import RoleGuide, { roleGuideBlock } from '../RoleGuide';
 import { useLanguage } from '../../i18n';
 import { EXTERNAL, isExternal } from '../../lib/links';
 import { groupPageHref } from '../../../../astro/src/lib/route-localization.js';
@@ -31,6 +32,7 @@ export default function Operators() {
                     </div>
                 ))}
             </div>
+            <RoleGuide block={roleGuideBlock(t, 'operators')} id="operators-guide" lang={code} />
             <OperatorsDirectory />
         </Section>
     );

@@ -2,10 +2,10 @@ export default {
     page: {
         eyebrow: 'Dokumentation',
         updated: 'Aktualisiert',
-        title: '{title} — UR-Dokumentation',
+        title: '{title} | UR',
     },
     index: {
-        title: 'UR-Dokumentation: Miner, Validatoren und Netzbetreiber',
+        title: 'Anleitungen für Miner, Validatoren und Netzbetreiber | UR',
         description: 'Wie du auf Bittensor SN25 einen Miner oder Validator betreibst und Netzbetreiber wirst, ein Leitfaden pro Rolle, dazu das UR-Litepaper. Alles auch als Markdown.',
         breadcrumb: 'Dokumentation',
         name: 'UR-Dokumentation',
@@ -21,6 +21,7 @@ export default {
         groups: {
             docs: 'Dokumentation',
             miner: 'Miner-Leitfaden',
+            compare: 'Im Vergleich',
             legal: 'Rechtliches',
         },
     },

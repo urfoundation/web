@@ -36,7 +36,7 @@ Operators fund the network by depositing UR sized to their real usage, at a publ
 
 Miners are paid from emission, not from deposits. Because deposits accumulate in the reserve rather than being recycled into payouts, real usage adds demand for the token, while emission follows a fixed schedule with halvings.
 
-## IV. Two ways to earn
+## IV. How do miners earn?
 
 A single operator can serve well over 100,000 miners, far more than a subnet's roughly 256 on-chain slots, so the network pays miners through two tiers that run in parallel.
 

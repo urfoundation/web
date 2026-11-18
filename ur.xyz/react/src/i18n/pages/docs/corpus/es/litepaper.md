@@ -40,7 +40,7 @@ Los operadores financian la red depositando UR en proporción a su uso real, a u
 
 A los mineros se les paga con la emisión, no con los depósitos. Como los depósitos se acumulan en la reserva en lugar de reciclarse en pagos, el uso real añade demanda del token, mientras que la emisión sigue un calendario fijo con halvings.
 
-## IV. Dos formas de ganar
+## IV. ¿Cómo ganan los mineros?
 
 Un solo operador puede atender a muchos más de 100.000 mineros, muchos más que los aproximadamente 256 slots on-chain de una subred, así que la red paga a los mineros a través de dos niveles que funcionan en paralelo.
 

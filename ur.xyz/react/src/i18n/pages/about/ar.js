@@ -1,7 +1,7 @@
 // /about in Arabic: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "عن UR | الفريق الذي يبني شبكة الخصوصية",
+        title: "عن UR: الفريق الذي يبني شبكة الخصوصية | UR",
         description: "UR بروتوكول مفتوح المصدر لتطبيقات الإنترنت الخاصة على شبكة عالمية من مزوّدي النطاق الترددي المستقلين. تعرّف على المساهمين الأساسيين.",
         breadcrumb: "من نحن",
     },

@@ -3,11 +3,11 @@ import { CTF } from './ctf/data';
 import { CountryEasyWins, CountryLive } from './ctf/CountryIslands';
 import Countdown from './ctf/Countdown';
 import { Flag } from './ctf/parts';
-import { chanceText, countryMessage, lastEpochFacts, localModel, neighbours, presenceSentence, startNote, uninhabitedSentence } from './ctf/model';
+import { chanceText, lastEpochFacts, localModel, neighbours, networkFacts, startNote } from './ctf/model';
 import { ctfCopy, formats, interpolate, place } from './ctf/i18n';
 import { pagePath } from './ctf/links';
 import { BOLD, rich } from './ctf/rich';
-import { FinePrint, HowItWorks, Questions, slotWorth } from './Ctf';
+import { FinePrint, Questions, slotWorth } from './Ctf';
 import './Ctf.css';
 
 /**
@@ -23,7 +23,8 @@ import './Ctf.css';
  * (ctf/CountryIslands.jsx), passed in by the static page
  * (astro/src/components/routes/CtfCountryRoute.astro) as `live` and
  * `easyWins` and rendered here by the SPA. The header, the questions, the
- * countries around it, how the draw works and the fine print are static.
+ * countries around it and the fine print are static; how the draw works,
+ * the same in every country, is on the hub (Ctf.jsx), which this page links.
  * Until capture the flag starts, the hub's note opens the page too, in its
  * compact form (ctf/Countdown.jsx, passed in as `countdown`): the same words
  * on every country page, so it changes nothing of which pages read alike
@@ -37,9 +38,7 @@ export default function CtfCountryPage({ code, lang = 'en', updated = null, live
     if (!c) return null;
     const t = ctfCopy(m.lang);
     const f = formats(m.lang);
-    const presence = presenceSentence(m, c);
     const facts = lastEpochFacts(m, c);
-    const empty = uninhabitedSentence(c, m.lang);
     const asOf = m.potsKnown ? interpolate(m.drawn ? t.country.asOfDraw : t.country.asOfClose, { epoch: m.last.epoch, day: f.utcDay(m.asOf) }) : '';
     const { prev, next } = neighbours(m, code);
     const hub = pagePath(m.lang, '/ctf');
@@ -53,13 +52,14 @@ export default function CtfCountryPage({ code, lang = 'en', updated = null, live
                     <nav className="ctf-crumbs" aria-label={t.country.crumbs}><a href={hub}>{t.program}</a><span aria-hidden="true">›</span><span aria-current="page">{c.short}</span></nav>
                     <h1>{rich(t.country.h1, values)}</h1>
                     <p className="ctf-mission">{m.many ? f.count(t.country.missionMany, m.roleSlots, values) : rich(t.country.mission, values)}</p>
-                    <p className="ctf-intro">
-                        <span className="ctf-answer">{rich(t.country.answer, values)}</span>{t.gap}
-                        {asOf}{countryMessage(m, c)}{facts && <>{t.gap}{facts}</>}{empty && <>{t.gap}{empty}</>}{presence && <>{t.gap}{presence}</>}{t.country.disclaimer}
-                    </p>
+                    {/* the card under it says what the epoch holds here (its message, the dashboard's count, a
+                        territory's sentence), so the header adds only what the card leaves out: last epochs' draws */}
+                    {facts && <p className="ctf-intro">{asOf}{facts}</p>}
                 </header>
 
                 {live || <CountryLive code={code} lang={lang} m={m} />}
+
+                <CountryNetwork m={m} c={c} />
 
                 <CountryQuestions m={m} c={c} />
 
@@ -73,7 +73,8 @@ export default function CtfCountryPage({ code, lang = 'en', updated = null, live
                     <Around m={m} c={next} dir="next" />
                 </nav>
 
-                <HowItWorks m={m} />
+                {/* how the draw works is the same in every country, so it is told once, on the hub */}
+                <p className="ctf-sec ctf-how-link"><a href={`${hub}#how`}>{t.how.title} {RTL.has(m.lang) ? '←' : '→'}</a></p>
                 <FinePrint m={m} updated={updated} />
             </div>
         </div>
@@ -101,6 +102,64 @@ function Around({ m, c, dir }) {
     );
 }
 
+/**
+ * The country on the network: what the network's dashboard counted there over
+ * the snapshot's window (ctf/model.js networkFacts), its own figures in the
+ * static HTML, so the page says something of its country that no other page
+ * says. Nothing here is a forecast: counts, places and days only. The
+ * countries next to it in the count are about other countries, so they are
+ * marked like the A–Z neighbours (ctf/indexing.js).
+ */
+function CountryNetwork({ m, c }) {
+    const facts = networkFacts(m, c);
+    if (!facts) return null;
+    const all = ctfCopy(m.lang);
+    const t = all.network;
+    const f = formats(m.lang);
+    const values = place(c);
+    const providers = (n) => f.count(all.presence.providers, n);
+    const day = f.dayName(m.presence.day);
+    const lines = [];
+    if (facts.rank) {
+        lines.push(rich(t.rank, { ...values, day, providers: providers(c.online), rank: f.int(facts.rank), of: f.int(facts.of), total: providers(m.countedTotal) }, BOLD));
+    }
+    if (facts.week !== null && facts.month !== null) lines.push(interpolate(t.change, { week: providers(facts.week), month: providers(facts.month) }));
+    else if (facts.week !== null) lines.push(interpolate(t.changeWeek, { week: providers(facts.week) }));
+    lines.push(f.count(t.window, m.presence.days, { seen: f.int(c.seenDays), first: f.dayName(c.firstSeen), peak: providers(c.peak), peakDay: f.dayName(c.peakDay) }));
+    return (
+        <section id="network" className="ctf-sec ctf-net" aria-labelledby="ctf-net-h">
+            <h2 id="ctf-net-h" className="ctf-h2">{interpolate(t.title, values)}</h2>
+            <p className="ctf-net-text">{lines.map((line, i) => <React.Fragment key={i}>{i > 0 && all.gap}{line}</React.Fragment>)}</p>
+            <table className="ctf-net-table">
+                <caption>{interpolate(t.caption, values)}</caption>
+                <thead><tr><th scope="col">{t.day}</th><th scope="col">{t.online}</th></tr></thead>
+                <tbody>
+                    {facts.weeks.slice().reverse().map((w) => (
+                        <tr key={w.day}><td><time dateTime={w.day}>{f.dayName(w.day)}</time></td><td>{f.int(w.n)}</td></tr>
+                    ))}
+                </tbody>
+            </table>
+            {facts.near.length > 0 && (
+                <p className="ctf-net-near" data-ctf-elsewhere="">
+                    {t.near}{' '}
+                    {facts.near.map((o, i) => (
+                        <React.Fragment key={o.code}>
+                            {i > 0 && ' · '}
+                            <a href={pagePath(m.lang, `/ctf/${o.code}`)}>{o.name}</a>{' '}{f.int(o.online)}
+                        </React.Fragment>
+                    ))}
+                </p>
+            )}
+        </section>
+    );
+}
+
+/**
+ * The questions whose answers are its country's: what it earns, which role to
+ * run and, with a local note, how winnings are paid there. The rest (passive
+ * income, a job, getting paid) read the same in every country, so the hub
+ * answers them once and this links them.
+ */
 function CountryQuestions({ m, c }) {
     const t = ctfCopy(m.lang).countryFaq;
     const f = formats(m.lang);
@@ -150,12 +209,11 @@ function CountryQuestions({ m, c }) {
             title={interpolate(t.title, values)}
             items={[
                 [interpolate(t.earnQ, values), earn],
-                [t.passiveQ, rich(t.passiveA, values)],
-                [interpolate(t.remoteQ, values), t.remoteA],
                 [interpolate(t.roleQ, values), advice],
-                [t.drawQ, rich(t.drawA, values)],
-                [t.paidQ, rich(t.paidA, { ...values, note: noted })],
+                // getting paid is the same everywhere (the hub answers it) but for a local note
+                ...(noted ? [[t.paidQ, rich(t.paidA, { ...values, note: noted })]] : []),
             ]}
+            more={<a href={`${pagePath(m.lang, '/ctf')}#faq`}>{ctfCopy(m.lang).country.moreFaq} {RTL.has(m.lang) ? '←' : '→'}</a>}
         />
     );
 }

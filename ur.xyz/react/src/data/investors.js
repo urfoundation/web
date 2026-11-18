@@ -156,7 +156,7 @@ const tokenholderLetter = {
     category: 'Management Update',
     title: 'September Letter to Tokenholders',
     summary:
-        'Brien and Jack outline preparations for UR\'s mainnet launch, the next phase of SN25, Project Meridian, and the mission to make privacy an expected property of the internet.',
+        'Brien and Jack on preparing UR\'s mainnet launch, the next phase of SN25, Project Meridian, and making privacy an expected property of the internet.',
     date: '25 September 2026',
     dateIso: '2026-09-25',
     readTime: '6 min read',
@@ -192,7 +192,7 @@ const apexAnnouncement = {
     summary:
         'An open competition on Apex (SN1), operated by Macrocosmos, to improve the routing and provider-matching algorithms behind the UR network.',
     description:
-        'UR (SN25) opens its routing and provider-matching problem to the Bittensor research community through an open competition on Apex (SN1), operated by Macrocosmos.',
+        'UR (SN25) opens its routing and provider-matching problem to the Bittensor research community in an open competition on Apex (SN1), run by Macrocosmos.',
     date: '28 October 2026',
     dateIso: '2026-10-28',
     readTime: '4 min read',

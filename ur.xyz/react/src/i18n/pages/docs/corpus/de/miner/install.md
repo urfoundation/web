@@ -13,7 +13,7 @@ Der Miner ist ein einzelnes Programm, `provider`. Es gibt drei Wege, ihn zu beko
 | [Manueller Download](#manual-download) | Linux, macOS, Windows | Automatisch, mit `provider setup` | Volle Kontrolle |
 | [Build aus dem Quellcode](#build-from-source) | Linux, macOS, Windows | Von Hand | Entwickler und Auditoren |
 
-Egal, wofür du dich entscheidest: Der Miner bewahrt seine Identität in `~/.urnetwork` auf (`%USERPROFILE%\.urnetwork` unter Windows), sodass du später wechseln kannst, ohne dich neu zu registrieren. Sichere diesen Ordner zuerst und stoppe den Hintergrundjob des alten Wegs, bevor du den neuen startest, damit nie zwei Kopien gleichzeitig laufen. Gehe nach der Installation zurück zum [Schnellstart](/docs/miner#2-run-setup).
+Egal, wofür du dich entscheidest: Der Miner bewahrt seine Identität in `~/.urnetwork` auf (`%USERPROFILE%\.urnetwork` unter Windows), sodass du später wechseln kannst, ohne dich neu zu registrieren. Sichere diesen Ordner zuerst und stoppe den Hintergrundjob des alten Wegs, bevor du den neuen startest, damit nie zwei Kopien gleichzeitig laufen. Gehe nach der Installation zurück zum [Schnellstart](/docs/miner#2-run-setup). Die Voraussetzungen fasst [was ein UR-Miner braucht](/miners) zusammen.
 
 ## Die Installer
 

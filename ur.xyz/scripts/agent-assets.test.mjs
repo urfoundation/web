@@ -11,7 +11,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { DOC_ORDER } from '../react/src/lib/docs-shared.js';
+import { DOC_ORDER, LLMS_FULL_EXCLUDED } from '../react/src/lib/docs-shared.js';
 import { absoluteLinks, absoluteUrl, publishedImages } from './agent-markdown.mjs';
 import { buildLlms } from './generate-agent-assets-llms.mjs';
 
@@ -117,7 +117,7 @@ test('llms-full.txt marks each document with its page and says where each docs d
     fixtureBuild(({ full }) => {
         // a document's own horizontal rule (the litepaper has one) is not a boundary
         assert.ok(!/\n\n---\n\n<!-- source:/.test(full), 'a --- separator is still written between documents');
-        for (const slug of DOC_ORDER) {
+        for (const slug of DOC_ORDER.filter((s) => !LLMS_FULL_EXCLUDED.has(s))) {
             const url = `https://ur.xyz/docs/${slug}`;
             const header = new RegExp(`<!-- source: ${url} -->\\n\\n# [^\\n]+\\n\\nSource: ${url} · Markdown: https://ur.xyz/docs-md/${slug}\\.md · Updated: 2026-01-02\\n`);
             assert.match(full, header, `${slug}: no source marker and Source line under its H1`);

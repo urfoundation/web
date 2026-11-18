@@ -5,7 +5,7 @@ description: Problemas habituales del minero de UR: errores de inicio de sesión
 
 # Solución de problemas del minero
 
-Busca abajo el mensaje que ves, o el síntoma más parecido. Si usaste un instalador, escribe `urnetwork` donde esta página diga `provider`. ¿Sigues atascado? Pregunta [en nuestro Discord](https://discord.gg/urnetwork), con el comando que ejecutaste y lo que imprimió. Nunca publiques tu código de autorización, tus archivos de seed ni nada de `~/.urnetwork`.
+Busca abajo el mensaje que ves, o el síntoma más parecido. Si usaste un instalador, escribe `urnetwork` donde esta página diga `provider`. ¿Sigues atascado? Pregunta [en nuestro Discord](https://discord.gg/urnetwork), con el comando que ejecutaste y lo que imprimió. Nunca publiques tu código de autorización, tus archivos de seed ni nada de `~/.urnetwork`. ¿Nuevo en la minería? [Ejecutar un nodo de UR](/miners) empieza por lo que ejecuta y necesita un minero.
 
 ## Instalación
 

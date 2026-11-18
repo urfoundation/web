@@ -18,9 +18,9 @@ description: Start mining on UR in a few steps. What a miner does, what you need
 >
 > Not affected: the Docker image, the apps, and miners an installer set up, which update through `urnet-tools`.
 
-A UR miner shares your internet connection as an exit for a network operator. Validators check that it really carries traffic, and Bittensor SN25 (netuid 25) pays rewards for that work in the subnet's α token, branded $UR.
+A UR miner shares your internet connection as an exit for a network operator. Validators check that it really carries traffic, and Bittensor SN25 (netuid 25) pays rewards for that work in the subnet's α token, branded $UR. For the whole role on one page, from requirements to rewards, see [mining Bittensor SN25 with UR](/miners).
 
-Prefer an app? URnetwork's apps are an easy alternative for mining from a phone or computer: install one from [ur.io](https://ur.io), and it mines in the background with URnetwork as its operator. This guide is for the miner program, which runs on Linux, macOS and Windows and can mine for any operator.
+Prefer an app? URnetwork's [apps](https://ur.io/products) are an easy alternative for mining from a phone or computer: install one from [the ur.io download page](https://ur.io/install), and it mines in the background with URnetwork as its operator. This guide is for the miner program, which runs on Linux, macOS and Windows and can mine for any operator.
 
 This page gets you from nothing to a running miner. The rest of the miner guide goes deeper, one topic per page:
 
@@ -37,7 +37,9 @@ This page gets you from nothing to a running miner. The rest of the miner guide 
 
 For the other roles, see [Run a validator](/docs/validator) and [Run a network operator](/docs/operator).
 
-## How it works
+## How does a UR miner get paid?
+
+Most miners join an operator's **pool**. You don't need your own Bittensor registration: you sign in to the operator, your miner registers itself as a device, and the pool's rewards are paid to the Bittensor wallet you choose. Large fleets can instead claim their own miner UID; see [the head tier](/docs/miner/advanced#claim-your-own-miner-uid-head-tier).
 
 ```text
 your miner (provider)
@@ -48,8 +50,6 @@ a network operator  ←─  validators
   ↓ every epoch
 your Bittensor coldkey (α, $UR)
 ```
-
-Most miners join an operator's **pool**. You don't need your own Bittensor registration: you sign in to the operator, your miner registers itself as a device, and the pool's rewards are paid to the Bittensor wallet you choose. Large fleets can instead claim their own miner UID; see [the head tier](/docs/miner/advanced#claim-your-own-miner-uid-head-tier).
 
 ## What you need
 

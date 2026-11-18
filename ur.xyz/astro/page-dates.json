@@ -2,128 +2,128 @@
   "about": "The day each ur.xyz page last changed, for the sitemap <lastmod>: a fingerprint of what the page says and the day it last changed. The pages of the page groups are in page-dates/<group>.json. The build maintains this file (scripts/page-dates.mjs); commit it with the content it dates.",
   "pages": {
     "/": {
-      "fingerprint": "ffab891975f1c26b",
-      "lastmod": "2026-10-14"
+      "fingerprint": "c5fadb3f8fd0b94f",
+      "lastmod": "2026-11-18"
     },
     "/ar": {
-      "fingerprint": "08dd5e1e22a8304c",
-      "lastmod": "2026-10-14"
+      "fingerprint": "79b83abef55a0afa",
+      "lastmod": "2026-11-18"
     },
     "/ar/miners": {
-      "fingerprint": "b1c7a0849ee1356a",
-      "lastmod": "2026-10-14"
+      "fingerprint": "ec70d5ea3411dd09",
+      "lastmod": "2026-11-18"
     },
     "/ar/operators": {
-      "fingerprint": "9700781022ba0885",
-      "lastmod": "2026-10-31"
+      "fingerprint": "1d247eeccf07b05e",
+      "lastmod": "2026-11-18"
     },
     "/ar/research": {
-      "fingerprint": "284a3f264199ac42",
-      "lastmod": "2026-11-12"
+      "fingerprint": "71ac6418d0ac031a",
+      "lastmod": "2026-11-18"
     },
     "/ar/validators": {
-      "fingerprint": "307cc71152692456",
-      "lastmod": "2026-09-25"
+      "fingerprint": "39481de7c94e8f4f",
+      "lastmod": "2026-11-18"
     },
     "/audits/masa-l2-2025.pdf": {
       "fingerprint": "4f992398684c330c",
       "lastmod": "2026-08-18"
     },
     "/de": {
-      "fingerprint": "35d3cc2ed3d9b6e2",
-      "lastmod": "2026-10-14"
+      "fingerprint": "5a4d8c350406eef6",
+      "lastmod": "2026-11-18"
     },
     "/de/miners": {
-      "fingerprint": "922a1cf17c00c348",
-      "lastmod": "2026-10-14"
+      "fingerprint": "3cbdd20969164b77",
+      "lastmod": "2026-11-18"
     },
     "/de/operators": {
-      "fingerprint": "d4deca2f5720290f",
-      "lastmod": "2026-10-31"
+      "fingerprint": "267f0823f7037507",
+      "lastmod": "2026-11-18"
     },
     "/de/research": {
-      "fingerprint": "df772509a3dfca79",
-      "lastmod": "2026-11-12"
+      "fingerprint": "06db3271c3186e93",
+      "lastmod": "2026-11-18"
     },
     "/de/validators": {
-      "fingerprint": "7affbf410116fb54",
-      "lastmod": "2026-10-07"
+      "fingerprint": "09c0afa284194d3c",
+      "lastmod": "2026-11-18"
     },
     "/es": {
-      "fingerprint": "4877064d4ede4a7f",
-      "lastmod": "2026-10-14"
+      "fingerprint": "50aea521f2df6942",
+      "lastmod": "2026-11-18"
     },
     "/es/miners": {
-      "fingerprint": "f8ab676fe8b71bf5",
-      "lastmod": "2026-11-12"
+      "fingerprint": "7e4a446fd6761dc3",
+      "lastmod": "2026-11-18"
     },
     "/es/operators": {
-      "fingerprint": "a599e9dd550d6662",
-      "lastmod": "2026-10-31"
+      "fingerprint": "768ea0c0180824a4",
+      "lastmod": "2026-11-18"
     },
     "/es/research": {
-      "fingerprint": "ed34bb833b28b8ea",
-      "lastmod": "2026-11-12"
+      "fingerprint": "74532556320bb62c",
+      "lastmod": "2026-11-18"
     },
     "/es/validators": {
-      "fingerprint": "aaa46789c1e2f957",
-      "lastmod": "2026-11-12"
+      "fingerprint": "cc40ac45f19b8517",
+      "lastmod": "2026-11-18"
     },
     "/miners": {
-      "fingerprint": "017465877eafc6ae",
-      "lastmod": "2026-10-14"
+      "fingerprint": "1ba7ed90c0b4a54f",
+      "lastmod": "2026-11-18"
     },
     "/operators": {
-      "fingerprint": "90a61a8d2655a1fb",
-      "lastmod": "2026-10-31"
+      "fingerprint": "7ba0048c2ed7beb7",
+      "lastmod": "2026-11-18"
     },
     "/research": {
-      "fingerprint": "80cd30c344b14739",
-      "lastmod": "2026-11-09"
+      "fingerprint": "89db20afb474a49d",
+      "lastmod": "2026-11-18"
     },
     "/ru": {
-      "fingerprint": "cc8748da94050d2b",
-      "lastmod": "2026-10-14"
+      "fingerprint": "f48dd2f8b22efd2b",
+      "lastmod": "2026-11-18"
     },
     "/ru/miners": {
-      "fingerprint": "5cf877d46896f666",
-      "lastmod": "2026-10-14"
+      "fingerprint": "8e481f1929cf44d4",
+      "lastmod": "2026-11-18"
     },
     "/ru/operators": {
-      "fingerprint": "5ba968ba54eafb15",
-      "lastmod": "2026-10-31"
+      "fingerprint": "5951727a3d5e8478",
+      "lastmod": "2026-11-18"
     },
     "/ru/research": {
-      "fingerprint": "f98d16edcc1de4c8",
-      "lastmod": "2026-11-12"
+      "fingerprint": "8350ab90d51886bb",
+      "lastmod": "2026-11-18"
     },
     "/ru/validators": {
-      "fingerprint": "27a02f30eaf105ca",
-      "lastmod": "2026-10-07"
+      "fingerprint": "366cd272947bc0f5",
+      "lastmod": "2026-11-18"
     },
     "/validators": {
-      "fingerprint": "f8bdea96812e7a04",
-      "lastmod": "2026-09-25"
+      "fingerprint": "367228db7b526d26",
+      "lastmod": "2026-11-18"
     },
     "/zh": {
-      "fingerprint": "958694d8eeff277a",
-      "lastmod": "2026-10-14"
+      "fingerprint": "0876492b990927e2",
+      "lastmod": "2026-11-18"
     },
     "/zh/miners": {
-      "fingerprint": "6bf33da1bfb30bae",
-      "lastmod": "2026-10-14"
+      "fingerprint": "54ed4f19e737d926",
+      "lastmod": "2026-11-18"
     },
     "/zh/operators": {
-      "fingerprint": "a901897c2d9d5da5",
-      "lastmod": "2026-10-31"
+      "fingerprint": "198c067ee643aa1d",
+      "lastmod": "2026-11-18"
     },
     "/zh/research": {
-      "fingerprint": "51aa716640c6604b",
-      "lastmod": "2026-11-12"
+      "fingerprint": "524289a512862336",
+      "lastmod": "2026-11-18"
     },
     "/zh/validators": {
-      "fingerprint": "beb18ab2dde5e282",
-      "lastmod": "2026-09-25"
+      "fingerprint": "f33e409df02619b2",
+      "lastmod": "2026-11-18"
     }
   }
 }

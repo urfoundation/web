@@ -1,7 +1,7 @@
 // /about in Chinese (Simplified): the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "关于 UR | 构建隐私网络的人",
+        title: "关于 UR：构建隐私网络的人 | UR",
         description: "UR 是一个开源协议，用于在由独立带宽提供者组成的全球网络上构建私密互联网应用。认识它的核心贡献者。",
         breadcrumb: "关于",
     },

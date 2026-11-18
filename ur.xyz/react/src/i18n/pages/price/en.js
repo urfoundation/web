@@ -6,7 +6,7 @@
 export default {
     meta: {
         // the page's <title>: at most 60 characters
-        title: 'Usage cost | The published price of the UR network',
+        title: 'UR Network Price: Published Usage Cost | UR',
         // the name of the page's dataset in its structured data (schema.org Dataset)
         datasetName: 'UR network usage cost: the published rate sheet',
         // the title of the RSS feed of price changes, as browsers and feed readers list it

@@ -79,8 +79,17 @@ export default {
         exitFullscreen: 'Exit fullscreen'
     },
 
+    // the guides a role page lists under its explanation (RoleGuide.jsx)
+    roleGuides: {
+        title: 'The guides',
+        miner: 'How to run a miner',
+        rewards: 'Get paid for mining',
+        validator: 'How to run a validator',
+        operator: 'How to become a network operator',
+        litepaper: 'The litepaper'
+    },
     homepage: {
-        intro: 'UR subnet is a privacy network built on Bittensor. The subnet pays the people who contribute to it. Operators run servers and deposit alpha for the traffic they serve. Miners carry encrypted traffic and earn emissions. Validators re-measure the network, verify accuracy, and earn emissions.',
+        intro: 'UR (SN25) is an open-source privacy network built on Bittensor. The subnet pays the people who contribute to it. Operators run servers and deposit alpha for the traffic they serve. Miners carry encrypted traffic and earn emissions. Validators re-measure the network, verify accuracy, and earn emissions.',
         diagramAria: 'How the UR network works',
         rolesEyebrow: 'Participate in the network',
         rolesTitle: 'Three roles. One measured network.',
@@ -93,6 +102,8 @@ export default {
             miners: {
                 name: 'Miners',
                 body: 'Miners carry the traffic. They run nodes that route encrypted traffic for one or more operators, and they are paid from subnet emissions for the traffic they carry and, in the top fleets, for the routable IPs they keep available.',
+                // a link at the end of the body, to the role page's how-to
+                bodyLink: 'How to mine SN25',
                 explore: 'Explore Miners'
             },
             validators: {
@@ -103,7 +114,7 @@ export default {
         },
         whitepaperCta: 'For more detail, read the litepaper',
         // what a search result shows for the page (<title>, meta description)
-        metaTitle: 'UR | The decentralized privacy network on Bittensor SN25',
+        metaTitle: 'UR (SN25): Decentralized Privacy Network on Bittensor',
         metaDescription: 'UR is an open-source, decentralized privacy network on Bittensor SN25: miners carry encrypted traffic, validators measure it, and operators bring the demand.'
     },
 
@@ -236,8 +247,37 @@ operators: {
         title:   'The operators who run the network.',
         intro:   'Network operators run the privacy servers and the verification endpoint. An operator deposits into the subnet as a revenue-backed signal of real demand, runs the routing-verification protocol that co-signs each measured path, and commits the payout list that splits its rewards among the miners attached to it. Operators report the usage that rewards follow but never hold anyone else\'s funds.',
         cta: 'Become a network operator',
-        metaTitle: 'Network Operators: Run UR privacy servers on SN25 — UR',
-        metaDescription: 'Network operators run UR privacy servers and the /verify endpoint, deposit alpha as a revenue-backed demand signal, and report the usage their miners are paid by.',
+        metaTitle: 'UR Network Operators: Run Privacy Servers on SN25 | UR',
+        metaDescription: 'Network operators run UR privacy servers and the /verify endpoint, deposit alpha as a revenue-backed demand signal, and report their miners\' usage.',
+        guide: {
+            title: 'What does a network operator run?',
+            items: [
+                {
+                    title: 'What do you run?',
+                    body: 'One operator executable that serves the API and Connect services users and miners attach to, the /verify endpoint validators walk, and the epoch pipeline that settles your miners\' rewards. PostgreSQL, Redis, artifact storage and public TLS ingress back it.'
+                },
+                {
+                    title: 'What do you need?',
+                    body: 'A Linux host and your own domain, PostgreSQL, Redis and local durable artifact storage, the operator keys and signers, egress probes, and a public stats feed (stats.json) so the operators directory can list you.',
+                    link: {
+                        label: 'How miners join an operator\'s pool',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: 'Where does the money come from?',
+                    body: 'An operator brings its own users and products and deposits alpha as a revenue-backed signal of real demand; no deposit is due while the published rate is 0. Each epoch it commits the payout list that splits its pool among its miners, who claim from the settlement vault directly: the operator never holds anyone else\'s alpha. The ur.io apps are one operator\'s products.',
+                    link: {
+                        label: 'See the ur.io apps',
+                        href: 'https://ur.io/products'
+                    }
+                },
+                {
+                    title: 'How do you start?',
+                    body: 'Operator admission is owner-gated during the launch phase, so the first step is a conversation with the subnet owner, who registers your identities and gives you your operator id. The operator guide then walks the build, the configuration and the first epoch.'
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Run the servers',    body: 'Operators run the privacy servers and the /verify endpoint that co-signs each measured path, the coordination layer between users and the miners that carry the traffic.' },
             { tag: '02', title: 'Signal real demand',  body: 'Operators are billed in alpha sized to their real usage. Every deposit goes into a reserve and pays for the audited usage that validators weight when they score the pools.' },
@@ -252,7 +292,8 @@ operators: {
     },
 
     miners: {
-        eyebrow: 'Miners',
+        eyebrow: 'How to mine Bittensor SN25',
+        breadcrumb: 'Miners',
         title:   'The miners who convert IP subnets into the encrypted internet.',
         intro:   'Miners compete to make the most IPv4 /29 and IPv6 /48 subnets available on the network, each kept routable at any moment for ingress or egress traffic. In other words, miners convert the public internet into an anonymous private network for everyone to use. Every miner carries both ingress and egress traffic, runs a safe-by-default security model, routes only encrypted traffic, and is paid from subnet emission for the traffic it carries and the routable capacity it contributes. The fleets with the broadest distinct, routable coverage are promoted to top-level miners and earn more, all in user space, on hardware you already own.',
         both:    'A miner is both an extender and a provider: every miner takes the ingress and the egress role at once. It configures itself automatically for the system it runs on.',
@@ -261,8 +302,62 @@ operators: {
         globeLabels: { provider: 'provider', extender: 'extender', miner: 'miner' },
         simCaption: 'Miners compete for the most unique IPs reliably available on the network. Top miners get promoted to their own UID slot.',
         cta: 'Become a miner',
-        metaTitle: 'Miners: Carry encrypted traffic, earn SN25 emissions — UR',
-        metaDescription: 'UR miners keep IPv4 /29 and IPv6 /48 subnets routable for encrypted traffic on Bittensor SN25, and earn emissions for the traffic they carry and their coverage.',
+        metaTitle: 'How to Mine Bittensor SN25: UR Miners | UR',
+        metaDescription: 'How to mine Bittensor SN25 as a UR miner: what you run, the hardware, install steps for Linux, macOS and Windows, how rewards are set, and troubleshooting.',
+        guide: {
+            title: 'How do you start mining on SN25?',
+            compared: { label: 'Compared with', links: [{ label: 'Mysterium', href: '/docs/compare/mysterium' }, { label: 'Grass', href: '/docs/compare/grass' }, { label: 'Sentinel', href: '/docs/compare/sentinel' }, { label: 'Orchid', href: '/docs/compare/orchid' }, { label: 'all bandwidth-sharing networks', href: '/docs/compare' }] },
+            items: [
+                {
+                    title: 'What do you run?',
+                    body: 'You run the miner program, provider, on a computer that stays online. Every miner is both a provider, an exit for traffic, and an extender, an entry point, and it configures itself for the system it runs on. Most miners join a network operator\'s pool, so no Bittensor registration of your own is needed. On a phone or computer, a URnetwork app can mine in the background instead, with URnetwork as its operator.',
+                    link: {
+                        label: 'Get a URnetwork app',
+                        href: 'https://ur.io/install'
+                    }
+                },
+                {
+                    title: 'What hardware do you need?',
+                    body: 'A computer that stays online: a home PC, a server or a Raspberry Pi 2 or newer all work. Every release carries the miner for Linux on 64-bit and 32-bit Intel, AMD and ARM (not a Pi Zero or Pi 1), for macOS on Apple silicon and Intel (the installer needs macOS 12 or later), and for Windows on 64-bit Intel or AMD and on ARM64. Each miner needs one stable public internet address. Its extender needs incoming TCP port 443; UDP ports 443 and 4053 are recommended.',
+                    link: {
+                        label: 'See the build releases',
+                        href: 'https://github.com/urnetwork/build/releases'
+                    }
+                },
+                {
+                    title: 'Where do the rewards come from?',
+                    body: 'From the subnet\'s miner emission, not from a fixed price per byte. In an operator\'s pool, a device\'s share follows the traffic it completed and how reliably validators measured it, and paid and free traffic of the same size earn the same credit. Momentum, the share of miner emission paid out now, is 10%; the rest goes to the Network Capacity Reserve. Your operator\'s published policy and payout files show what is actually paid.',
+                    link: {
+                        label: 'How rewards are counted',
+                        href: '/docs/miner/rewards#how-rewards-are-counted'
+                    }
+                },
+                {
+                    title: 'How do you start?',
+                    body: 'Create an account with a network operator (the miner uses bringyour.com unless you choose another) and get an auth code. Install the miner (the installer for your system runs it in the background and keeps it up to date), run provider setup, which signs it in and sets the Bittensor coldkey your rewards are paid to, and check on it with provider status.',
+                    link: {
+                        label: 'Install steps for Linux, macOS and Windows',
+                        href: '/docs/miner/install'
+                    }
+                },
+                {
+                    title: 'What if something goes wrong?',
+                    body: 'Ask the miner first: provider status and provider doctor report what it sees. The troubleshooting page lists the common messages, from sign-in errors and a miner that keeps being refused to an extender that cannot bind TCP port 443 and a claim proof that is not ready, with what to do about each.',
+                    link: {
+                        label: 'Miner troubleshooting',
+                        href: '/docs/miner/troubleshooting'
+                    }
+                },
+                {
+                    title: 'How is a miner measured?',
+                    body: 'Validators walk chains of miners and keep a signed record of each completed hop, so a miner is scored on traffic it actually carried. The routing and matching the network runs change only when a change beats the measured noise of its instrument, and every attempt, rejected ones included, is published.',
+                    link: {
+                        label: 'Read the research methodology',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Egress',              body: 'As egress, a miner is an exit IP of the shared network. It rejects traffic that conflicts with common regulation directions like CFAA and DMCA, blocks known-malicious IPs, and routes only encrypted traffic, protecting both miners and users.' },
             { tag: '02', title: 'Ingress',             body: 'As ingress (an extender), a miner creates entry points that improve reachability worldwide, using N-layer TLS, SNI spoofing, and trusted forwarding. A rotating subset is exposed each cycle, and clients automatically retry the entry points that worked before.' },
@@ -278,8 +373,58 @@ operators: {
         intro:   'Validators are independent. Each stakes its own UR and runs the routing-verification protocol, continuously walking operator-assigned chains of miners to prove real-time transit and measure which miners are the weakest links. That measurement is the core signal the network pays for, and validators earn native dividends for producing it accurately.',
         simCaption: 'Validators probe the available IP surface area and rank miners by reliability.',
         cta: 'Become a validator',
-        metaTitle: 'Validators: Measure the UR network, earn SN25 dividends — UR',
+        metaTitle: 'UR SN25 Validators: Measure the Network, Earn | UR',
         metaDescription: 'UR validators stake their own UR, walk operator-assigned chains of miners to prove real-time transit, and earn Bittensor dividends for accurate scoring.',
+        guide: {
+            title: 'How do you run a validator on SN25?',
+            items: [
+                {
+                    title: 'What do you run?',
+                    body: 'One validator process on Bittensor SN25 (netuid 25). It walks /verify trails through each operator\'s miners, keeps the signed evidence, and submits the resulting miner weights through Bittensor\'s native commit-reveal.',
+                    link: {
+                        label: 'What the miners it measures run',
+                        href: '/miners'
+                    }
+                },
+                {
+                    title: 'What do you need?',
+                    body: 'A Linux host with persistent storage and continuous access to every configured operator\'s API, a Bittensor coldkey with funds for registration, staking and fees, a registered SN25 hotkey with enough stake for a validator permit, and an approved production configuration from the deployment\'s bootstrap process.'
+                },
+                {
+                    title: 'Where do the rewards come from?',
+                    body: 'Validators earn native Bittensor dividends for accurate, consensus-aligned scoring. They are separate from the miner rewards claimed from UR\'s settlement vault, and there is no validator claim command.'
+                },
+                {
+                    title: 'How do you start?',
+                    body: 'Download the validator from the build releases page (binaries for Linux and macOS) or build it from source, create its service keys, register and stake on SN25, authenticate with every operator, then provision the configuration and run it. The validator guide walks each step.'
+                }
+            ]
+        },
+        scoring: {
+            title: 'How does SN25 scoring differ?',
+            items: [
+                {
+                    title: 'Proof of transit, not self-reports',
+                    body: 'A validator walks operator-assigned chains of miners and keeps a signed, self-proving record of each completed hop, so a score rests on traffic that was actually carried, and anyone can check the proof.'
+                },
+                {
+                    title: 'Pools by demand and quality, fleets by breadth',
+                    body: 'Each cycle a validator scores every operator\'s pool by demand and measured quality, and ranks the top fleets by how many distinct, routable exit IPs they serve rather than by traffic volume. While the published rate is 0, every pool is given equal demand, so measured quality alone steers the pool channel.'
+                },
+                {
+                    title: 'Copying earns nothing',
+                    body: 'Scores are submitted under commit-reveal, which hides each validator\'s scores until they are stale, so a validator has to run real trails. Bittensor\'s Yuma Consensus turns the independent scores into miner emission.'
+                },
+                {
+                    title: 'Measured changes, published results',
+                    body: 'The routing and matching the network runs are improved under one discipline: a change counts only when it beats the measured noise of its instrument, and every attempt, rejected ones included, is published.',
+                    link: {
+                        label: 'Read the research methodology',
+                        href: '/research/methodology'
+                    }
+                }
+            ]
+        },
         roles: [
             { tag: '01', title: 'Walk the routes',        body: 'Validators walk operator-assigned chains of miners and collect a signed, self-proving record of each completed hop: cryptographic proof of real-time transit that anyone can check.' },
             { tag: '02', title: 'Score the network',      body: 'Each cycle a validator scores every operator\'s pool by demand and measured quality, and ranks the top fleets by routable-IP breadth, all under commit-reveal. Bittensor\'s Yuma Consensus turns those independent scores into miner emission.' },
@@ -291,8 +436,10 @@ operators: {
     research: {
         eyebrow: 'Research',
         title:   'Open algorithms, open data.',
-        metaTitle: 'Research: Open algorithms, data and audits — UR',
+        metaTitle: 'Research: Open algorithms, data and audits | UR',
         metaDescription: 'UR research in the open: routing, matching, transfer and reward algorithms with source and anonymized data, the Apex SN1 latency competition, and audits.',
+        // a link after the intro, to /miners
+        minersLink: 'Run a UR miner on SN25: what it needs and how it is paid',
         intro:   'The protocol is a decentralized-native, multi-IP, multi-transport system designed to scale to millions of miners per network operator. Each algorithm area below is published with its source and, where applicable, anonymized data sets for independent analysis.',
         // the card for the research report, under the intro
         report: {

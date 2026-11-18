@@ -5,7 +5,7 @@ description: Cobra por minar en UR. Configura la wallet de pago de tu minero, en
 
 # Cobrar por minar
 
-Tu minero gana por el tráfico que transporta. Esta página cubre las tres partes de cobrar: decirle al operador a qué wallet de Bittensor pagar ([configura tu wallet de pago](#set-your-payout-wallet)), [cómo se cuentan las recompensas](#how-rewards-are-counted) y [cómo reclamarlas](#claim-your-rewards).
+Tu minero gana por el tráfico que transporta. Esta página cubre las tres partes de cobrar: decirle al operador a qué wallet de Bittensor pagar ([configura tu wallet de pago](#set-your-payout-wallet)), [cómo se cuentan las recompensas](#how-rewards-are-counted) y [cómo reclamarlas](#claim-your-rewards). Para ver cómo encaja el rol, consulta [cómo funciona la minería en SN25](/miners).
 
 Si usaste un instalador, escribe `urnetwork` donde esta página diga `provider`.
 

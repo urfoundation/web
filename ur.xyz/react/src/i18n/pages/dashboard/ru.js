@@ -5,7 +5,7 @@
 // The period buttons follow /reserve («7Д», «30Д», «Всё»).
 export default {
     meta: {
-        title: 'Статистика UR',
+        title: 'UR (SN25): статистика сети и выплаты онлайн | UR',
         description: 'Текущая статистика URnetwork и SN25: пользователи, провайдеры онлайн, переданные данные, эпохи, выплаты и Network Capacity Reserve — из Grafana и основной сети Bittensor.',
     },
 

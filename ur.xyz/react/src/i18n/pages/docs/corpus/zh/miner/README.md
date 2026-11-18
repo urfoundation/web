@@ -18,9 +18,9 @@ description: 只需几步即可在 UR 上开始挖矿。矿工做什么、你需
 >
 > 不受影响的有：Docker 镜像、各个应用，以及由安装程序设置、通过 `urnet-tools` 更新的矿工。
 
-UR 矿工把你的互联网连接作为出口提供给网络运营商。验证者检查它是否真的在承载流量，Bittensor SN25（netuid 25）则以子网的 α 代币（品牌名 $UR）为这项工作支付奖励。
+UR 矿工把你的互联网连接作为出口提供给网络运营商。验证者检查它是否真的在承载流量，Bittensor SN25（netuid 25）则以子网的 α 代币（品牌名 $UR）为这项工作支付奖励。想在一页内了解整个角色，从要求到奖励，请看[用 UR 挖矿 Bittensor SN25](/miners)。
 
-更喜欢用应用？URnetwork 的应用是在手机或电脑上挖矿的简便选择：从 [ur.io](https://ur.io) 安装一个，它就会在后台挖矿，以 URnetwork 为运营商。本指南介绍的是矿工程序，它可在 Linux、macOS 和 Windows 上运行，并能为任何运营商挖矿。
+更喜欢用应用？URnetwork 的[应用](https://ur.io/products)是在手机或电脑上挖矿的简便选择：从 [ur.io 下载页面](https://ur.io/install)安装一个，它就会在后台挖矿，以 URnetwork 为运营商。本指南介绍的是矿工程序，它可在 Linux、macOS 和 Windows 上运行，并能为任何运营商挖矿。
 
 本页带你从零开始运行起一个矿工。矿工指南的其余页面会深入介绍，每页一个主题：
 
@@ -37,7 +37,9 @@ UR 矿工把你的互联网连接作为出口提供给网络运营商。验证�
 
 其他角色请参阅[运行验证者](/docs/validator)和[运行网络运营商](/docs/operator)。
 
-## 工作原理
+## UR 矿工如何获得报酬？
+
+大多数矿工会加入某个运营商的**池**。你不需要自己的 Bittensor 注册：你在运营商处登录，你的矿工将自己注册为设备，池的奖励会支付到你选择的 Bittensor 钱包。大型集群也可以改为领取自己的矿工 UID；请参阅[头部层级](/docs/miner/advanced#claim-your-own-miner-uid-head-tier)。
 
 ```text
 your miner (provider)
@@ -48,8 +50,6 @@ a network operator  ←─  validators
   ↓ every epoch
 your Bittensor coldkey (α, $UR)
 ```
-
-大多数矿工会加入某个运营商的**池**。你不需要自己的 Bittensor 注册：你在运营商处登录，你的矿工将自己注册为设备，池的奖励会支付到你选择的 Bittensor 钱包。大型集群也可以改为领取自己的矿工 UID；请参阅[头部层级](/docs/miner/advanced#claim-your-own-miner-uid-head-tier)。
 
 ## 你需要什么
 

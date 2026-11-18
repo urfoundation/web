@@ -52,7 +52,10 @@
 // Each country also gets the providers the network's dashboard counted online
 // there (react/public/dashboard/history.json, panel 33 at the end of each UTC
 // day): its count on the snapshot's day, and over the 90 days to it the days
-// it had any, the last such day and the most at the end of a day.
+// it had any, the last such day and the most at the end of a day (with the
+// day of that most and the first day with any), and its count on that day and
+// each of the eight weeks before it: the country's own figures, which set its
+// page apart from every other country's.
 //
 // Before capture the flag starts (epoch 8, the owner's decision) there is no
 // answer to import: --prelaunch writes the pre-launch aggregate from the
@@ -101,6 +104,8 @@ export const UNINHABITED = Object.freeze(['aq', 'bv', 'gs', 'hm', 'io', 'tf', 'u
 // block 9,600,028 at about 18:25 UTC on November 27, as /mainnet gives it)
 export const FIRST_EPOCH = 8;
 const PRESENCE_DAYS = 90;
+// the weeks before the presence day that a country's weekly counts go back
+const WEEKS = 8;
 const ROLES = ['providers', 'extenders'];
 
 // The name as a sentence uses it, as the API gives `sentence_name`
@@ -162,33 +167,42 @@ export function presenceFrom(history, day) {
     const days = Object.keys(history?.countries || {}).filter((d) => d <= day).sort().slice(-PRESENCE_DAYS);
     if (!days.length) return null;
     const last = days[days.length - 1];
+    // the weekly days: the presence day and each of the WEEKS before it, a week apart, oldest first
+    const weeks = Array.from({ length: WEEKS + 1 }, (_, k) => new Date(Date.parse(`${last}T00:00:00Z`) - (WEEKS - k) * 7 * 86_400_000).toISOString().slice(0, 10));
+    const inWindow = new Set(days);
+    const blank = () => ({ online: 0, seen_days: 0, last_seen: null, peak: 0, peak_day: null, first_seen: null, weekly: weeks.map((d) => (inWindow.has(d) ? 0 : null)) });
     const byCode = {};
     for (const d of days) {
+        const week = weeks.indexOf(d);
         for (const [cc, count] of Object.entries(history.countries[d])) {
             const code = cc.toLowerCase();
-            const entry = (byCode[code] ||= { online: 0, seen_days: 0, last_seen: null, peak: 0 });
+            const entry = (byCode[code] ||= blank());
             const n = Math.round(count);
             if (n > 0) {
                 entry.seen_days += 1;
+                entry.first_seen ||= d;
                 entry.last_seen = d; // days run in order
-                entry.peak = Math.max(entry.peak, n);
+                if (n > entry.peak) [entry.peak, entry.peak_day] = [n, d];
             }
             if (d === last) entry.online = n;
+            if (week >= 0) entry.weekly[week] = n;
         }
     }
-    return { meta: { source: 'https://ur.xyz/dashboard', day: last, days: days.length }, byCode };
+    return { meta: { source: 'https://ur.xyz/dashboard', day: last, days: days.length }, byCode, blank };
 }
 
 function withPresence(country, presence) {
-    if (!presence) return { ...country, online: null, seen_days: null, last_seen: null, peak: null };
-    const p = presence.byCode[country.code] || { online: 0, seen_days: 0, last_seen: null, peak: 0 };
-    return { ...country, online: p.online, seen_days: p.seen_days, last_seen: p.last_seen, peak: p.peak };
+    if (!presence) return { ...country, online: null, seen_days: null, last_seen: null, peak: null, peak_day: null, first_seen: null, weekly: null };
+    const p = presence.byCode[country.code] || presence.blank();
+    return { ...country, online: p.online, seen_days: p.seen_days, last_seen: p.last_seen, peak: p.peak, peak_day: p.peak_day, first_seen: p.first_seen, weekly: p.weekly };
 }
 
 const FIGURES = 'Amounts are integers of rao (1 alpha is 10^9 rao). '
     + 'A role\'s won, units and near_misses, and a country\'s near_misses, are null without a draw last epoch. '
     + 'online, seen_days, last_seen and peak are the providers the dashboard counted online in the country at the end of a day '
-    + '(react/public/dashboard/history.json): on the presence day, the days of the window with any, the last of them, and the most.';
+    + '(react/public/dashboard/history.json): on the presence day, the days of the window with any, the last of them, and the most; '
+    + 'peak_day and first_seen are the first day of the most and the first day with any; weekly is the count on the presence day and on each '
+    + 'of the 8 weeks before it, a week apart, oldest first (null for a day the history lacks).';
 
 const aboutOperator = (op) => `One network operator's capture the flag state: a snapshot of GET ${op ? op.api_url : '<api_url>'}/sn/ctf, written by `
     + 'scripts/ctf-import.mjs, which adds every listed operator\'s into react/src/data/ctf-epoch.json for the pages (ur.xyz/ctf and /ctf/<cc>); '
@@ -658,6 +672,10 @@ export function snapshotProblems(s) {
         if (c.online !== null && (!isInt(c.online) || c.online < 0 || !isInt(c.seen_days) || !isInt(c.peak) || c.peak < c.online
             || (c.seen_days > 0) !== (c.last_seen !== null) || (c.last_seen !== null && !/^\d{4}-\d{2}-\d{2}$/.test(c.last_seen)))) {
             bad(`${c.code}: dashboard counts ${JSON.stringify([c.online, c.seen_days, c.last_seen, c.peak])}`);
+        }
+        if (c.online !== null && (!Array.isArray(c.weekly) || c.weekly.length !== WEEKS + 1 || c.weekly.some((n) => n !== null && (!isInt(n) || n < 0 || n > c.peak))
+            || (c.weekly[WEEKS] !== null && c.weekly[WEEKS] !== c.online) || (c.seen_days > 0) !== (c.first_seen !== null) || (c.peak > 0) !== (c.peak_day !== null))) {
+            bad(`${c.code}: dashboard weekly counts ${JSON.stringify([c.weekly, c.first_seen, c.peak_day])}`);
         }
         held += flags;
         pots += c.providers.pot + c.extenders.pot;

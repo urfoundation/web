@@ -1,7 +1,7 @@
 // /dashboard in Spanish: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "Estadísticas de UR",
+        title: "UR (SN25): estadísticas de red y pagos en vivo | UR",
         description: "Estadísticas en vivo de URnetwork y SN25: usuarios, proveedores en línea, datos transportados, épocas, pagos y Network Capacity Reserve, de Grafana y la mainnet de Bittensor.",
     },
     heading: "Estadísticas de UR",

@@ -246,7 +246,7 @@ export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
             <header className={navClass}>
                 <div className="nav-inner">
                     <a className="nav-brand" href={homeHref} onClick={goHome}>
-                        <img src="/ur.svg" alt="UR" className="nav-logo" />
+                        <img src="/ur.svg" alt="UR" className="nav-logo" width="474" height="265" />
                     </a>
 
                     <nav className="nav-links" aria-label={t.nav.primaryNav}>
@@ -285,7 +285,7 @@ export default function Nav({ disclaimerVisible, activeRoute, aboutHref }) {
                 aria-label={t.nav.siteMenu}
             >
                 <div className="nav-drawer-bar">
-                    <a className="nav-brand" href={homeHref} onClick={goHome}><img src="/ur.svg" alt="UR" className="nav-logo" /></a>
+                    <a className="nav-brand" href={homeHref} onClick={goHome}><img src="/ur.svg" alt="UR" className="nav-logo" width="474" height="265" /></a>
                     <button type="button" className="nav-menu-toggle is-open" aria-label={t.nav.closeMenu} onClick={() => setMenuOpen(false)}>
                         <span /><span /><span />
                     </button>

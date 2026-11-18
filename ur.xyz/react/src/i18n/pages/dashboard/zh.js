@@ -1,7 +1,7 @@
 // /dashboard in Simplified Chinese: the translation of en.js beside it (same keys).
 export default {
     meta: {
-        title: "UR 数据统计",
+        title: "UR (SN25) 实时网络统计与支付 | UR",
         description: "URnetwork 与 SN25 实时统计：用户、在线提供者、承载数据量、周期、支付和网络容量储备，读取自 Grafana 与 Bittensor 主网。",
     },
     heading: "UR 数据统计",

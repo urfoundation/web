@@ -4,7 +4,7 @@ description: Run a URnetwork operator in one binary, configure PostgreSQL, Redis
 
 # How to become a network operator
 
-A network operator runs the servers of the UR privacy network: the API and Connect services that users and miners attach to, the `/verify` endpoint that validators walk, and the epoch pipeline that settles its miners' rewards on **Bittensor SN25 (netuid 25)**. An operator brings its own users and products (the ur.io apps are one operator's), deposits α as a revenue-backed signal of real demand, and each settlement epoch commits the Merkle payout list that splits its pool among its miners. It reports the usage the split follows but never holds anyone else's α: the immutable settlement vault owns the pool and every miner claims from it directly.
+A network operator runs the servers of the UR privacy network: the API and Connect services that users and miners attach to, the `/verify` endpoint that validators walk, and the epoch pipeline that settles its miners' rewards on **Bittensor SN25 (netuid 25)**. An operator brings its own users and products (the [ur.io apps](https://ur.io/products) are one operator's), deposits α as a revenue-backed signal of real demand, and each settlement epoch commits the Merkle payout list that splits its pool among its miners. It reports the usage the split follows but never holds anyone else's α: the immutable settlement vault owns the pool and every miner claims from it directly.
 
 The [`server/cli/all/main.go`](https://github.com/urnetwork/server/blob/main/cli/all/main.go) entry point runs the API, Connect and the production taskworker together. You deploy one operator executable; PostgreSQL, Redis, artifact storage and public TLS ingress remain backing services. For the mechanism read the [litepaper](/docs/litepaper); for the other roles see [How to run a miner](/docs/miner) and [How to run a validator](/docs/validator).
 
@@ -541,7 +541,7 @@ bringyourctl st finalize --epoch=<epoch>
 
 A manual `--alpha_rao` deposit is still bounded by `deposit_epoch_cap_rao`. Voluntary conviction (`addConviction`, the same one-way path, which raises your tier without counting as demand) has no server task; it is a transaction from your deposit signer.
 
-## How you are measured and paid
+## How is a network operator measured and paid?
 
 An operator's pool emission belongs to its miners, and the settlement vault pays the realized captured amount against the operator's root. Providers are paid **momentum**: the share of the native miner allocation used now to power the network, split between operator pools and head fleets. Momentum is 10% at launch. The [Network Capacity Reserve](/reserve), the `ur-reserve` 2-of-3 multisig, receives the rest: miner emissions × (1 − momentum). Its share is not fixed; it receives less as momentum grows. These are routing targets subject to native consensus and runtime behavior, not guaranteed fixed payouts. The native reserve is separate from the immutable deposit sink and the settlement vault's claim balances. See the [native reserve allocation](https://github.com/urfoundation/sn/blob/main/mainnet/TREASURY-EMISSIONS.md). Your operator revenue comes from your own business; the subnet pays miners for carrying that traffic.
 

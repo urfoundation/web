@@ -5,7 +5,7 @@ description: Häufige Probleme des UR-Miners beheben. Anmeldefehler, ein Miner, 
 
 # Fehlerbehebung für den Miner
 
-Suche unten die Meldung, die du siehst, oder das ähnlichste Symptom. Wenn du einen Installer benutzt hast, tippe `urnetwork` überall, wo diese Seite `provider` sagt. Kommst du trotzdem nicht weiter? Frag [auf unserem Discord](https://discord.gg/urnetwork), mit dem Befehl, den du ausgeführt hast, und dem, was er ausgegeben hat. Poste nie deinen Auth-Code, Seed-Dateien oder irgendetwas aus `~/.urnetwork`.
+Suche unten die Meldung, die du siehst, oder das ähnlichste Symptom. Wenn du einen Installer benutzt hast, tippe `urnetwork` überall, wo diese Seite `provider` sagt. Kommst du trotzdem nicht weiter? Frag [auf unserem Discord](https://discord.gg/urnetwork), mit dem Befehl, den du ausgeführt hast, und dem, was er ausgegeben hat. Poste nie deinen Auth-Code, Seed-Dateien oder irgendetwas aus `~/.urnetwork`. Neu beim Mining? [Einen UR-Node betreiben](/miners) beginnt damit, was ein Miner betreibt und braucht.
 
 ## Installieren
 

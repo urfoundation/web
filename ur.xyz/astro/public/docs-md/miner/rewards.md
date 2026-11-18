@@ -1,7 +1,7 @@
 
 # Get paid for mining
 
-Your miner earns for the traffic it carries. This page covers the three parts of getting paid: telling the operator which Bittensor wallet to pay ([set your payout wallet](#set-your-payout-wallet)), [how rewards are counted](#how-rewards-are-counted), and [claiming them](#claim-your-rewards).
+Your miner earns for the traffic it carries. This page covers the three parts of getting paid: telling the operator which Bittensor wallet to pay ([set your payout wallet](#set-your-payout-wallet)), [how rewards are counted](#how-rewards-are-counted), and [claiming them](#claim-your-rewards). For how the role fits together, see [how SN25 mining works](https://ur.xyz/miners).
 
 If you used an installer, type `urnetwork` wherever this page says `provider`.
 

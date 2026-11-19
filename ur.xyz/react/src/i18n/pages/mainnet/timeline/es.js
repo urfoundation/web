@@ -293,6 +293,13 @@ export default {
                 'El aviso completo en el repositorio sn',
             ],
         },
+        'proxy-slots-no-unit': {
+            title: 'Los slots de proxy no muestran ninguna unidad del Top 200, de Captura la bandera ni de extensor',
+            detail: 'Desde el lanzamiento de servidores del operador de red del 19 de noviembre, un proveedor cuyas conexiones a la plataforma indican que pasan por un proxy no cuenta en ninguna dirección propia: sus saltos de rastro no registran ningún prefijo, así que no añade ninguna unidad de amplitud del Top 200 a su flota, no es candidato de Captura la bandera y sus registros de extensor cuentan como inactivos. El lanzamiento del proveedor que le sigue envía cada conexión de un slot de proxy a través de su proxy y marca cada una. Los hosts directos no cambian, así que vincula solo dispositivos directos.',
+            sources: [
+                'El aviso completo en el repositorio sn',
+            ],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Reclamaciones de la época 5',
             detail: 'La época 5 termina en el bloque 9.499.228, y las reclamaciones siguen a su período de impugnación de 14.400 bloques. La financiación recuperada de las épocas 1 y 3 no forma parte del pago de la época 5: su incorporación no se programó a tiempo (consulta el aviso de la época 3 arriba).',

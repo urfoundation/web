@@ -783,12 +783,14 @@ test('extenders reached only over WebRTC: a milestone and a notice as the next s
 });
 
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): Top 200 binding, of November 17,
-    // then the share of extenders reached only over WebRTC, of November 16, then the providers without UDP or
-    // IPv6, of November 13, then the extender pool and the extenders' share, both of November 12, then capture
-    // the flag and Pro data, both of November 11, the later-posted first, then epoch 3's of October 31. The data
-    // lists them in the order they were posted, the other way round, so this order is the sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): proxy slots showing no unit, of
+    // November 19, then Top 200 binding, of November 17, then the share of extenders reached only over WebRTC, of
+    // November 16, then the providers without UDP or IPv6, of November 13, then the extender pool and the
+    // extenders' share, both of November 12, then capture the flag and Pro data, both of November 11, the
+    // later-posted first, then epoch 3's of October 31. The data lists them in the order they were posted, the
+    // other way round, so this order is the sort's
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
+        ['notice-proxy-slots-no-unit', 'November 19, 2026'],
         ['notice-top200-binding-open', 'November 17, 2026'],
         ['notice-extender-webrtc-relay-share', 'November 16, 2026'],
         ['notice-providers-without-udp-or-ipv6', 'November 13, 2026'],
@@ -1026,10 +1028,10 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     // epoch after the current one) and the oracle that mirrors a published manifest (sn commitmentoracle)
     assert.ok(milestone.detail.startsWith("A network projected to rank inside SN25's head of 200 top-level seats can claim its spot: register a hotkey on SN25, publish the fleet's manifest from it, which the network operator's commitment oracle mirrors to the coordinator on chain 964, and bind each device for up to 12 epochs, starting after the current epoch. "));
     assert.match(milestone.detail, / a bound device leaves the provider pool while its binding is active\. Nothing changes for a provider that doesn't claim\.$/);
-    // in date order: after the milestones of November 16, before capture the flag's presence sampling
+    // in date order: after the milestones of November 16, before the proxy-slot rule of November 19
     const ids = events.map((e) => e.id);
     assert.equal(ids.indexOf(milestone.id), ids.indexOf('extender-webrtc-relay-share') + 1);
-    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-presence-sampling'));
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('proxy-slots-no-unit'));
 
     const notice = mainnetNotices.find((n) => n.id === 'notice-top200-binding-open');
     assert.ok(notice, 'the notice is listed');
@@ -1046,7 +1048,9 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     // paid by score while the validator steers; the cohort's per-fleet priority is its size over the 200 seats
     // (server model/verify_cohort_model.go, VerifyCohortPriorityPerFleet: 1,500 / 200)
     assert.match(pay, /^The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights\. /);
-    assert.match(pay, / at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured\. Rewards are paid in alpha, whose value changes and can fall\.$/);
+    // and bind direct devices only: from the server release of November 19, a proxy slot shows no unit (sn
+    // mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md; the notice of that day says when)
+    assert.match(pay, / at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured, and bind direct devices only: a proxy slot shows no head-breadth unit\. Rewards are paid in alpha, whose value changes and can fall\.$/);
     // a device earns in one tier at a time (server controller/st_head_exclusion.go); immunity is 21,600 blocks
     assert.match(pool, /^A bound device leaves the provider pool: while its binding is active at either boundary of an epoch, it earns no pool share for that epoch, whether or not its fleet earns\. /);
     assert.match(pool, / so register in the 3 days before the epoch your binding starts\.$/);
@@ -1058,5 +1062,46 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     // facts of the opening only: no reward figure, no share of emission, no calendar date in the text
     const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
     assert.doesNotMatch(words, /\d\s?%|\$\s?\d|\d\s?α|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/);
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+});
+
+test('a proxy slot shows no unit: a milestone and a notice, dated the day of the server release', () => {
+    // the network operator's server release of November 19 reads the mark connect sends on every transport it
+    // dials through a proxy (X-UR-Egress-Proxy: 1), so such a provider's hops record the zero egress hash; the sn
+    // notice and WHITEPAPER §8.4, §8.6.2 (E1), CAPTURETHEFLAG §4.2 and VALIDATOR §8.1 hold the rule
+    const milestone = events.find((e) => e.id === 'proxy-slots-no-unit');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'done');
+    assert.equal(milestone.approximate, undefined);
+    assert.equal(milestone.date, '2026-11-19');
+    assert.equal(milestone.key, undefined);
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md';
+    assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
+    assert.equal(milestone.title, 'Proxy slots show no head, capture the flag or extender unit');
+    assert.ok(milestone.detail.startsWith("From the network operator's server release of November 19, a provider whose platform connections say they come through a proxy counts at no address of its own: "));
+    assert.match(milestone.detail, / Direct hosts are unchanged, so bind direct devices only\.$/);
+    // in date order: after Top 200 binding, of November 17, before capture the flag's presence sampling
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('top200-binding-open') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-presence-sampling'));
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-6');
+
+    const notice = mainnetNotices.find((n) => n.id === 'notice-proxy-slots-no-unit');
+    assert.ok(notice, 'the notice is listed');
+    // posted the day of the milestone, and the full text in the sn repo is named by that day
+    assert.equal(notice.date, 'November 19, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 19));
+    assert.equal(notice.title, 'A proxy slot shows no head, capture the flag or extender unit. Bind direct devices only.');
+    assert.equal(notice.paragraphs.length, 3);
+    const [rule, unchanged, bind] = notice.paragraphs;
+    assert.ok(rule.startsWith("From the network operator's server release of November 19, 2026, a provider whose platform connections say they come through a proxy counts at no address of its own. "));
+    assert.match(rule, / so this applies to proxy slots once they update\.$/);
+    assert.match(unchanged, /^Such a provider adds no head-breadth unit to its fleet, is no capture the flag candidate, and has no extender unit\. /);
+    assert.match(unchanged, / Direct hosts are unchanged: a host shows its own \/29 or \/48 through a direct slot, a provider run without a proxy file\.$/);
+    assert.match(bind, /^Bind direct devices only: a bound proxy slot earns no head score and no pool share\. /);
+    assert.match(bind, / No signed amendment is needed, and validators need no new release\.$/);
+    // the rule moves units, not amounts: no reward figure
+    const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
+    assert.doesNotMatch(words, /\d\s?%|\$\s?\d|\d\s?α|\balpha\b/i);
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });

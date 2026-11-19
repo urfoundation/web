@@ -446,6 +446,16 @@
       ]
     },
     {
+      "id": "proxy-slots-no-unit",
+      "date": "2026-11-19",
+      "status": "done",
+      "title": "Proxy slots show no head, capture the flag or extender unit",
+      "detail": "From the network operator's server release of November 19, a provider whose platform connections say they come through a proxy counts at no address of its own: its trail hops record no prefix, so it adds no head-breadth unit to its fleet, it is no capture the flag candidate, and its extender records count as not active. The provider release that follows sends every connection of a proxy slot through its proxy and marks each one. Direct hosts are unchanged, so bind direct devices only.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md" }
+      ]
+    },
+    {
       "id": "capture-the-flag-presence-sampling",
       "date": "2026-11-20",
       "status": "planned",

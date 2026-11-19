@@ -293,6 +293,13 @@ export default {
                 'Die vollständige Mitteilung im sn-Repo',
             ],
         },
+        'proxy-slots-no-unit': {
+            title: 'Proxy-Slots zeigen keine Top-200-, Capture-the-Flag- oder Extender-Einheit',
+            detail: 'Ab dem Server-Release des Netzbetreibers vom 19. November zählt ein Provider, dessen Plattformverbindungen angeben, über einen Proxy zu laufen, an keiner eigenen Adresse: Seine Trail-Hops erfassen kein Präfix, sodass er seiner Flotte keine Top-200-Breiteneinheit hinzufügt, er ist kein Kandidat für Capture the Flag, und seine Extender-Einträge gelten als nicht aktiv. Das darauf folgende Provider-Release leitet jede Verbindung eines Proxy-Slots über dessen Proxy und markiert jede davon. Direkte Hosts bleiben unverändert, binde also nur direkte Geräte.',
+            sources: [
+                'Die vollständige Mitteilung im sn-Repo',
+            ],
+        },
         'epoch-5-claims-with-recovery': {
             title: 'Claims für Epoche 5',
             detail: 'Epoche 5 endet mit Block 9.499.228, und die Claims folgen nach ihrer Anfechtungsfrist von 14.400 Blöcken. Die zurückgewonnene Finanzierung der Epochen 1 und 3 ist nicht Teil der Auszahlung von Epoche 5: Ihre Aufnahme wurde nicht rechtzeitig eingeplant (siehe die Mitteilung zu Epoche 3 oben).',

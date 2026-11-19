@@ -101,6 +101,11 @@ test('the key milestones are marked: the ones the sn summary marks, numbered in 
     }
     // a milestone not marked key is not on the summary
     assert.equal(marker('bittensor-runtime-478'), undefined);
+    // three milestones start at epoch 8's first block: the extender pool, capture the flag and the measured cohort's
+    // rotation, in that order, and capture the flag alone marks it
+    const epoch8 = Date.parse(mainnetEpochs.at(-1).start.time);
+    assert.deepEqual(events.filter((e) => parseWhen(e.date).start.ms === epoch8).map((e) => e.id), ['extender-pool-epoch-8', 'capture-the-flag-epoch-8', 'measured-cohort-rotates-epoch-8']);
+    assert.deepEqual(model.markers.filter((m) => instantOf(m) === epoch8).map((m) => m.id), ['capture-the-flag-epoch-8']);
 });
 
 test('a marker sits in the band of its date, as far through it as its date is', () => {

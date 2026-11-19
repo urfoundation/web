@@ -353,6 +353,13 @@ export default {
                 'Primer bloque de la época 8, 9.600.028',
             ],
         },
+        'measured-cohort-rotates-epoch-8': {
+            title: 'La cohorte medida rota desde la época 8',
+            detail: 'Desde el bloque 9.600.028, el primero de la época 8, el validador descarta la puntuación de calidad de un proveedor al que no midió ni una sola vez en toda una época, y el operador de red cuenta un dispositivo en su cohorte medida solo hasta dos épocas después de su última medición. El espacio que se libera va primero a las flotas que han reclamado su puesto, como máximo 7 dispositivos cada una, y después a un dispositivo de cada red que no ha reclamado su puesto y que la clasificación sitúa en su Top 400, así que una red situada dentro del Top 200 pasa a ser medible en unas dos horas tras el inicio de cada época. Las puntuaciones de calidad solo ponderan unos pools frente a otros, por lo que no cambia el pago de nadie.',
+            sources: [
+                'El diseño en el repositorio sn',
+            ],
+        },
         'capture-the-flag-first-draw': {
             title: 'Selección aleatoria y raíz de Captura la bandera de la época 8',
             detail: 'La época 8 termina en el bloque 9.650.428. El operador de red registra su lista de participantes antes del bloque 9.651.028, una ronda de drand publicada al menos un minuto después selecciona al azar a los ganadores, y la raíz de Captura la bandera se registra junto con la del pool de proveedores antes del bloque 9.651.628. Si la selección aleatoria no está lista para entonces, el operador no registra ninguna lista para la época 8: cada slot se traslada al fondo acumulado de su país, y los primeros ganadores se seleccionan al azar en la época 9.',

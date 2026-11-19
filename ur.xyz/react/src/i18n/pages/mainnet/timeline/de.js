@@ -353,6 +353,13 @@ export default {
                 'Erster Block von Epoche 8, 9.600.028',
             ],
         },
+        'measured-cohort-rotates-epoch-8': {
+            title: 'Die gemessene Kohorte rotiert ab Epoche 8',
+            detail: 'Ab Block 9.600.028, dem ersten von Epoche 8, verwirft der Validator den Qualitäts-Score eines Providers, den er eine ganze Epoche lang kein einziges Mal gemessen hat, und der Netzbetreiber zählt ein Gerät in seiner gemessenen Kohorte nur noch bis zwei Epochen nach seiner letzten Messung. Frei werdende Plätze in der Kohorte gehen zuerst an Flotten, die sich ihren Platz gesichert haben, höchstens 7 Geräte je Flotte, dann an je ein Gerät jedes Netzwerks, das sich keinen Platz gesichert hat und in der Rangliste unter den Top 400 steht, sodass ein Netzwerk, das in den Top 200 rangiert, innerhalb von etwa zwei Stunden nach Beginn jeder Epoche messbar wird. Qualitäts-Scores gewichten nur Pools gegeneinander, die Auszahlung ändert sich also für niemanden.',
+            sources: [
+                'Das Design im sn-Repo',
+            ],
+        },
         'capture-the-flag-first-draw': {
             title: 'Zufallsauswahl und Root von Capture the Flag für Epoche 8',
             detail: 'Epoche 8 endet mit Block 9.650.428. Der Netzbetreiber schreibt seine Teilnehmerliste bis Block 9.651.028 fest, eine mindestens eine Minute später veröffentlichte drand-Runde wählt die Gewinner zufällig aus, und der Root von Capture the Flag wird zusammen mit dem des Provider-Pools bis Block 9.651.628 festgeschrieben. Ist die Zufallsauswahl bis dahin nicht fertig, schreibt der Betreiber für Epoche 8 keine Liste fest: Jeder Slot wird in den Topf seines Landes übertragen, und die ersten Gewinner werden in Epoche 9 zufällig ausgewählt.',

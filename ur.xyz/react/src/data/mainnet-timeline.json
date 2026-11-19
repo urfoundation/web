@@ -521,6 +521,16 @@
       ]
     },
     {
+      "id": "measured-cohort-rotates-epoch-8",
+      "date": "2026-11-27T18:25:00Z",
+      "status": "scheduled",
+      "title": "The measured cohort rotates from epoch 8",
+      "detail": "From block 9,600,028, the first of epoch 8, the validator drops the quality score of a provider it measured not at all in a whole epoch, and the network operator counts a device in its measured cohort only until two epochs after it was last measured. Room that frees goes first to claimed fleets, at most 7 devices each, then to one device of each unclaimed network the board ranks in its top 400, so a network ranked inside the head becomes measurable within about two hours of each epoch's start. Quality scores only weigh pools against each other, so no one's pay changes.",
+      "sources": [
+        { "label": "The design in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/VERIFY-COHORT-V2.md" }
+      ]
+    },
+    {
       "id": "capture-the-flag-first-draw",
       "date": "2026-12-04T18:25:00Z/2026-12-04T22:25:00Z",
       "status": "planned",

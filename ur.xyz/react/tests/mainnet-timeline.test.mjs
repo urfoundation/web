@@ -1049,8 +1049,9 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     // (server model/verify_cohort_model.go, VerifyCohortPriorityPerFleet: 1,500 / 200)
     assert.match(pay, /^The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights\. /);
     // and bind direct devices only: from the server release of November 19, a proxy slot shows no unit (sn
-    // mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md; the notice of that day says when)
-    assert.match(pay, / at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured, and bind direct devices only: a proxy slot shows no head-breadth unit\. Rewards are paid in alpha, whose value changes and can fall\.$/);
+    // mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md; the notice of that day says when). From epoch 8 the
+    // cohort rotates (sn VERIFY-COHORT-V2.md; the milestone at epoch 8's first block says how)
+    assert.match(pay, / at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured, and bind direct devices only: a proxy slot shows no head-breadth unit\. From epoch 8 the cohort counts a device only until two epochs after it was last measured, and each unclaimed network ranked in the top 400 has one device measured\. Rewards are paid in alpha, whose value changes and can fall\.$/);
     // a device earns in one tier at a time (server controller/st_head_exclusion.go); immunity is 21,600 blocks
     assert.match(pool, /^A bound device leaves the provider pool: while its binding is active at either boundary of an epoch, it earns no pool share for that epoch, whether or not its fleet earns\. /);
     assert.match(pool, / so register in the 3 days before the epoch your binding starts\.$/);
@@ -1104,4 +1105,34 @@ test('a proxy slot shows no unit: a milestone and a notice, dated the day of the
     const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
     assert.doesNotMatch(words, /\d\s?%|\$\s?\d|\d\s?α|\balpha\b/i);
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+});
+
+test('the measured cohort rotates from epoch 8: a scheduled milestone at epoch 8\'s first block, beside the extender pool and capture the flag', () => {
+    // verify cohort v2 (sn VERIFY-COHORT-V2.md, approved November 17): with the validator release that ships before
+    // epoch 8, the validator retires an idle provider's quality score, and the network operator's measured cohort
+    // keeps a device only until two epochs after its last measurement and admits by rank. Scheduled until the first
+    // epoch-8 summary shows the validator retiring, then done, with the release as its source
+    const epoch7 = mainnetEpochs.find((e) => e.number === 7);
+    const milestone = events.find((e) => e.id === 'measured-cohort-rotates-epoch-8');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'scheduled');
+    assert.equal(milestone.approximate, undefined);
+    assert.equal(milestone.key, undefined);
+    assert.equal(milestone.date, epoch7.end.time);
+    assert.equal(whenText(parseWhen(milestone.date), { approxStart: isApproximate(milestone) }), 'Fri Nov 27 · ≈18:25 UTC');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-8');
+    // in date order: after the extender pool and capture the flag, which start at the same block, before epoch 8's draw
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('capture-the-flag-epoch-8') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-first-draw'));
+    assert.deepEqual(milestone.sources, [{ label: 'The design in the sn repo', kind: 'doc', ref: 'https://github.com/urfoundation/sn/blob/main/VERIFY-COHORT-V2.md' }]);
+    assert.equal(milestone.title, 'The measured cohort rotates from epoch 8');
+    // R1, the cohort's expiry and its admission order: claimed fleets' 7 devices each, then one device of each
+    // unclaimed network in the board's top 400
+    assert.ok(milestone.detail.startsWith(`From block ${thousands(epoch7.end.block)}, the first of epoch 8, the validator drops the quality score of a provider it measured not at all in a whole epoch, `));
+    assert.match(milestone.detail, / the network operator counts a device in its measured cohort only until two epochs after it was last measured\. /);
+    assert.match(milestone.detail, / Room that frees goes first to claimed fleets, at most 7 devices each, then to one device of each unclaimed network the board ranks in its top 400, so a network ranked inside the head becomes measurable within about two hours of each epoch's start\. /);
+    assert.match(milestone.detail, / Quality scores only weigh pools against each other, so no one's pay changes\.$/);
+    // the rule moves who is measured, not amounts: no reward figure
+    assert.doesNotMatch(`${milestone.title} ${milestone.detail}`, /\d\s?%|\$\s?\d|\d\s?α|\balpha\b/i);
 });

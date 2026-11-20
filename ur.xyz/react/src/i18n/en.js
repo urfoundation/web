@@ -571,12 +571,14 @@ operators: {
             // is an epoch's number, {date} the day of the figures, {value} a
             // change in percent and {before} and {after} a figure's values, all
             // written in the page's language. lower or higher words a change by
-            // its sign; ttfb follows caveat while time to first byte is no better
+            // its sign; ttfb follows caveat while time to first byte is no better,
+            // notTtfb instead when no epoch measured time to first byte; through
+            // marks a figure the newer epochs did not measure
             results: {
                 progressLabel: 'Competition progress',
                 progress: '{done} of {total} epochs complete',
                 title: 'Net improvement since the start',
-                comparison: 'Epoch {epoch} winner against the starting baseline',
+                comparison: 'Epochs 1 to {epoch}, every winner chained from the starting baseline',
                 asOf: 'As of {date}',
                 lower: '{value}% lower',
                 higher: '{value}% higher',
@@ -584,8 +586,10 @@ operators: {
                     p95CompletionS: { name: 'p95 full-request completion time', range: '{before} s to {after} s' },
                     medianThroughputMbps: { name: 'Median transfer throughput', range: '{before} to {after} Mbps' }
                 },
-                caveat: 'These are benchmark evaluation results against the starting baseline, not deployed product gains.',
+                caveat: 'These are benchmark evaluation results, not deployed product gains. Each epoch is measured against its own baseline; the net change multiplies those changes together.',
                 ttfb: 'Time to first byte did not improve.',
+                notTtfb: 'The completion time is not time to first byte.',
+                through: 'through epoch {epoch}',
                 link: 'Epoch {epoch} results (JSON)'
             }
         },

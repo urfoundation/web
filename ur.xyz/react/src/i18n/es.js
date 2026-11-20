@@ -535,7 +535,7 @@ operators: {
                 progressLabel: 'Progreso de la competencia',
                 progress: '{done} de {total} épocas completadas',
                 title: 'Mejora neta desde el inicio',
-                comparison: 'Ganadora de la época {epoch} frente a la línea base inicial',
+                comparison: 'Épocas 1 a {epoch}: el cambio de cada ganadora, encadenado desde la línea base inicial',
                 asOf: 'Datos al {date}',
                 lower: '{value} % menor',
                 higher: '{value} % mayor',
@@ -543,8 +543,10 @@ operators: {
                     p95CompletionS: { name: 'Tiempo p95 de finalización de solicitudes completas', range: 'de {before} s a {after} s' },
                     medianThroughputMbps: { name: 'Rendimiento mediano de transferencia', range: 'de {before} a {after} Mbps' }
                 },
-                caveat: 'Son resultados de evaluación en el benchmark frente a la línea base inicial, no mejoras del producto desplegado.',
+                caveat: 'Son resultados de evaluación en el benchmark, no mejoras del producto desplegado. Cada época se mide frente a su propia línea base; el cambio neto multiplica esos cambios.',
                 ttfb: 'El tiempo hasta el primer byte no mejoró.',
+                notTtfb: 'El tiempo de finalización no es el tiempo hasta el primer byte.',
+                through: 'hasta la época {epoch}',
                 link: 'Resultados de la época {epoch} (JSON)'
             }
         },

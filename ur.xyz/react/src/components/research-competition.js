@@ -12,19 +12,25 @@
  * null and the card's art, title and button are not links.
  *
  * Under its text the card shows how many of the six epochs are complete, as a
- * bar, and the net change from the starting baseline to the current best, the
- * newest approved winner (each winner becomes the next epoch's baseline). Both
- * follow APEX_RESULTS below, which changes by edit, never with the clock.
+ * bar, and the net improvement since the start in every dimension measured so
+ * far. Each epoch is measured against its own freshly run baseline (the
+ * previous winner, re-measured), so its change is a ratio, winner over
+ * baseline; a figure's net change multiplies the ratios of every epoch that
+ * measured it, applied to the starting baseline. A figure an epoch did not
+ * measure carries no change from that epoch, and the card says which epoch
+ * the figure runs through. Both follow APEX_RESULTS below, which changes by
+ * edit, never with the clock.
  * When an epoch is sealed and summarized, add one entry to `epochs`: its
- * number, the day it was sealed, its public result, and its approved winner's
- * figures from its summary in the server repo
- * (connect/sim-latency/epoch-summary/EPOCH<n>.md, "Results at a glance", the
- * winning submission's column), or `winner: null` if no submission was
- * approved, which leaves the current best as it was; and set `asOf` to the day
- * you checked the figures (the tests refuse an `asOf` before the newest seal).
- * The bar, the change and its percentages, the "time to first byte did not
- * improve" line (shown while the current best's median or p95 TTFB is no
- * better than the baseline's) and the results link all follow; no dictionary
+ * number, the day it was sealed, its public result, and its baseline and
+ * approved winner's figures from its summary in the server repo
+ * (connect/sim-latency/epoch-summary/EPOCH<n>.md, the results table), or
+ * `winner: null` if no submission was approved, which leaves the net change as
+ * it was; and set `asOf` to the day you checked the figures (the tests refuse
+ * an `asOf` before the newest seal). Record only the figures the summary
+ * reports as such, on both sides: never record bytes received as throughput.
+ * The bar, the changes, the TTFB line (shown while the chained median or p95
+ * TTFB is no better than the start, or, if no epoch measured TTFB, that the
+ * completion time is not TTFB) and the results link all follow; no dictionary
  * needs an edit.
  */
 import { intlLocale } from '../i18n/locale.js';
@@ -43,20 +49,20 @@ export const APEX_COMPETITION = Object.freeze({
  */
 export const APEX_RESULTS = Object.freeze({
     // the day the figures were last checked against the public results
-    asOf: '2026-11-09',
-    // the competition's starting baseline (EPOCH1.md, "Starting baseline")
-    baseline: Object.freeze({
-        p95CompletionS: 19.556,
-        medianThroughputMbps: 4.987,
-        medianTtfbMs: 172.277,
-        p95TtfbMs: 2168.952,
-    }),
+    asOf: '2026-11-20',
     // the completed epochs, in order
     epochs: Object.freeze([
         Object.freeze({
             epoch: 1,
             sealed: '2026-11-07',
             result: 'https://api.bringyour.com/competition/v2/rounds/01a1855d-49bd-0250-90db-d0c0885f0e46/result',
+            // EPOCH1.md, "Starting baseline": the competition's starting baseline
+            baseline: Object.freeze({
+                p95CompletionS: 19.556,
+                medianThroughputMbps: 4.987,
+                medianTtfbMs: 172.277,
+                p95TtfbMs: 2168.952,
+            }),
             // EPOCH1.md, "Winning submission" (job 01a1a440-fd2e-538a-365c-f4b23eed4739)
             winner: Object.freeze({
                 p95CompletionS: 7.062,
@@ -64,6 +70,16 @@ export const APEX_RESULTS = Object.freeze({
                 medianTtfbMs: 284.084,
                 p95TtfbMs: 4190.036,
             }),
+        }),
+        Object.freeze({
+            epoch: 2,
+            sealed: '2026-11-18',
+            result: 'https://api.bringyour.com/competition/v2/rounds/01a1c110-585b-ce38-4f29-ca4860a1c058/result',
+            // EPOCH2.md, "Shared baseline". The summary reports no throughput or
+            // TTFB (bytes received is not throughput), so neither is recorded.
+            baseline: Object.freeze({ p95CompletionS: 6.958769 }),
+            // EPOCH2.md, "Approved winner" (job 01a1e7b9-0b4e-cec4-3fad-526342ab01ac)
+            winner: Object.freeze({ p95CompletionS: 0.117002 }),
         }),
     ]),
 });
@@ -74,7 +90,7 @@ export const APEX_RESULTS = Object.freeze({
  * that is better, and the decimals its values are written with.
  */
 export const APEX_RESULT_METRICS = Object.freeze([
-    Object.freeze({ key: 'p95CompletionS', better: 'lower', digits: 2 }),
+    Object.freeze({ key: 'p95CompletionS', better: 'lower', digits: 3 }),
     Object.freeze({ key: 'medianThroughputMbps', better: 'higher', digits: 2 }),
 ]);
 
@@ -109,33 +125,46 @@ export function competitionProgress({ epochs } = APEX_RESULTS, { rounds } = APEX
 }
 
 /**
- * The net change from the starting baseline to the current best, the newest
- * completed epoch with an approved winner; null until there is one. Each
- * figure's change is a percentage of its baseline value, rounded to one
- * decimal, with its direction ('lower' or 'higher') and whether that is the
- * better one. `ttfbImproved` holds only when both the median and the p95 time
- * to first byte are lower than the baseline's.
+ * The net improvement since the start; null until an epoch has an approved
+ * winner. For each figure measured by at least one such epoch: `before` is
+ * the starting baseline of the first epoch that measured it, `factor` the
+ * product of winner / baseline over every epoch that measured it, `after`
+ * before × factor, and `through` the last epoch that measured it. Each change
+ * is a percentage of `before`, rounded to one decimal, with its direction
+ * ('lower' or 'higher') and whether that is the better one. `ttfb` is 'worse'
+ * when the chained median or p95 time to first byte is no better than the
+ * start, 'unreported' when no epoch measured it, and null when both improved.
  */
-export function netImprovement({ baseline, epochs } = APEX_RESULTS, metrics = APEX_RESULT_METRICS) {
-    const best = [...epochs].reverse().find((e) => e.winner);
-    if (!best) return null;
-    const { winner } = best;
+function chain(epochs, key) {
+    const measured = epochs.filter((e) => key in e.winner && key in e.baseline);
+    if (!measured.length) return null;
+    const factor = measured.reduce((f, e) => f * (e.winner[key] / e.baseline[key]), 1);
+    const before = measured[0].baseline[key];
+    return { before, factor, after: before * factor, through: measured[measured.length - 1].epoch };
+}
+
+export function netImprovement({ epochs } = APEX_RESULTS, metrics = APEX_RESULT_METRICS) {
+    const won = epochs.filter((e) => e.winner);
+    if (!won.length) return null;
+    const median = chain(won, 'medianTtfbMs');
+    const p95 = chain(won, 'p95TtfbMs');
     return {
-        epoch: best.epoch,
-        metrics: metrics.map(({ key, better, digits }) => {
-            const before = baseline[key];
-            const after = winner[key];
-            return {
+        epoch: won[won.length - 1].epoch,
+        metrics: metrics.flatMap(({ key, better, digits }) => {
+            const c = chain(won, key);
+            if (!c) return [];
+            return [{
                 key,
                 digits,
-                before,
-                after,
-                change: Math.round((Math.abs(after - before) / before) * 1000) / 10,
-                direction: after < before ? 'lower' : 'higher',
-                improved: better === 'lower' ? after < before : after > before,
-            };
+                before: c.before,
+                after: c.after,
+                through: c.through,
+                change: Math.round(Math.abs(1 - c.factor) * 1000) / 10,
+                direction: c.factor < 1 ? 'lower' : 'higher',
+                improved: better === 'lower' ? c.factor < 1 : c.factor > 1,
+            }];
         }),
-        ttfbImproved: winner.medianTtfbMs < baseline.medianTtfbMs && winner.p95TtfbMs < baseline.p95TtfbMs,
+        ttfb: !median || !p95 ? 'unreported' : median.factor < 1 && p95.factor < 1 ? null : 'worse',
     };
 }
 
@@ -182,8 +211,10 @@ export function competitionResultsText(copy, lang, results = APEX_RESULTS, compe
                 change: fill(copy[m.direction], { value: number(m.change, 1) }),
                 name: copy.metrics[m.key].name,
                 range: fill(copy.metrics[m.key].range, { before: number(m.before, m.digits), after: number(m.after, m.digits) }),
+                // a figure the newer epochs did not measure says where it stops
+                through: m.through < net.epoch ? fill(copy.through, { epoch: number(m.through) }) : null,
             })),
-            caveat: joinSentences(copy.caveat, !net.ttfbImproved && copy.ttfb),
+            caveat: joinSentences(copy.caveat, net.ttfb === 'worse' && copy.ttfb, net.ttfb === 'unreported' && copy.notTtfb),
         },
         link: latest ? { href: latest.result, label: fill(copy.link, { epoch: number(latest.epoch) }) } : null,
     };

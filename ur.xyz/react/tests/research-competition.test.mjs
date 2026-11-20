@@ -71,27 +71,35 @@ test('every language writes the start the clock counts to', async () => {
 });
 
 // ── progress and results ─────────────────────────────────────────────────────
-// The figures are epoch 1's summary in the server repo
-// (connect/sim-latency/epoch-summary/EPOCH1.md, "Results at a glance"): the
-// starting baseline and the winning submission, checked on November 9, 2026.
+// The figures are the epoch summaries in the server repo
+// (connect/sim-latency/epoch-summary/EPOCH<n>.md, the results table), each
+// epoch against its own baseline, checked against the public results on
+// November 20, 2026. EPOCH2.md reports completion time only: no throughput
+// (bytes received is not throughput) and no time to first byte.
 
-test('the results are epoch 1 against the starting baseline, as of November 9, 2026', () => {
-    assert.equal(APEX_RESULTS.asOf, '2026-11-09');
-    assert.deepEqual({ ...APEX_RESULTS.baseline }, { p95CompletionS: 19.556, medianThroughputMbps: 4.987, medianTtfbMs: 172.277, p95TtfbMs: 2168.952 });
-    assert.equal(APEX_RESULTS.epochs.length, 1);
-    const [e1] = APEX_RESULTS.epochs;
+test('the results are epochs 1 and 2, each against its own baseline, as of November 20, 2026', () => {
+    assert.equal(APEX_RESULTS.asOf, '2026-11-20');
+    assert.equal(APEX_RESULTS.epochs.length, 2);
+    const [e1, e2] = APEX_RESULTS.epochs;
     assert.equal(e1.epoch, 1);
     assert.equal(e1.sealed, '2026-11-07'); // the result's seal.sealed_at
     assert.equal(e1.result, 'https://api.bringyour.com/competition/v2/rounds/01a1855d-49bd-0250-90db-d0c0885f0e46/result');
+    assert.deepEqual({ ...e1.baseline }, { p95CompletionS: 19.556, medianThroughputMbps: 4.987, medianTtfbMs: 172.277, p95TtfbMs: 2168.952 });
     assert.deepEqual({ ...e1.winner }, { p95CompletionS: 7.062, medianThroughputMbps: 10.15, medianTtfbMs: 284.084, p95TtfbMs: 4190.036 });
+    assert.equal(e2.epoch, 2);
+    assert.equal(e2.sealed, '2026-11-18'); // seal.sealed_at 2026-11-18T14:35:51Z
+    assert.equal(e2.result, 'https://api.bringyour.com/competition/v2/rounds/01a1c110-585b-ce38-4f29-ca4860a1c058/result');
+    // seal.baseline_raw_score 6958.769 ms; the winner's raw_score 117.002 ms
+    assert.deepEqual({ ...e2.baseline }, { p95CompletionS: 6.958769 });
+    assert.deepEqual({ ...e2.winner }, { p95CompletionS: 0.117002 });
 });
 
-test('the results are well formed: epochs 1 to n in order, within the rounds, each winner with every figure', () => {
+const KNOWN = ['p95CompletionS', 'medianThroughputMbps', 'medianTtfbMs', 'p95TtfbMs'];
+
+test('the results are well formed: epochs 1 to n in order, within the rounds, each winner with its baseline\'s figures', () => {
     assert.match(APEX_RESULTS.asOf, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(Date.parse(`${APEX_RESULTS.asOf}T00:00:00Z`) >= Date.parse(APEX_COMPETITION.startsAt), 'checked after the start');
     assert.ok(APEX_RESULTS.epochs.length <= APEX_COMPETITION.rounds);
-    const keys = [...APEX_RESULT_METRICS.map((m) => m.key), 'medianTtfbMs', 'p95TtfbMs'];
-    for (const key of keys) assert.ok(APEX_RESULTS.baseline[key] > 0, `baseline: ${key}`);
     APEX_RESULTS.epochs.forEach((e, i) => {
         assert.equal(e.epoch, i + 1, 'epochs are numbered from 1, in order');
         assert.match(e.sealed, /^\d{4}-\d{2}-\d{2}$/, `epoch ${e.epoch}: the day it was sealed`);
@@ -99,44 +107,68 @@ test('the results are well formed: epochs 1 to n in order, within the rounds, ea
         assert.ok(APEX_RESULTS.asOf >= e.sealed, `asOf (${APEX_RESULTS.asOf}) is before epoch ${e.epoch} was sealed: move it to the day the figures were checked`);
         assert.match(e.result, /^https:\/\/api\.bringyour\.com\/competition\/v2\/rounds\/[\da-f-]{36}\/result$/, `epoch ${e.epoch}: its public result`);
         if (e.winner === null) return; // no approved winner
-        for (const key of keys) assert.ok(e.winner[key] > 0, `epoch ${e.epoch} winner: ${key}`);
+        assert.ok(e.winner.p95CompletionS > 0 && e.baseline.p95CompletionS > 0, `epoch ${e.epoch}: the official objective, both sides`);
+        for (const key of Object.keys(e.winner)) {
+            assert.ok(KNOWN.includes(key), `epoch ${e.epoch} winner: unknown figure ${key}`);
+            assert.ok(e.winner[key] > 0 && e.baseline[key] > 0, `epoch ${e.epoch}: ${key} on both sides`);
+        }
+        assert.deepEqual(Object.keys(e.baseline).sort(), Object.keys(e.winner).sort(), `epoch ${e.epoch}: the same figures on both sides`);
+        // TTFB is both figures or neither
+        assert.equal('medianTtfbMs' in e.winner, 'p95TtfbMs' in e.winner, `epoch ${e.epoch}: both TTFB figures or neither`);
     });
 });
 
-test('one of six epochs is complete', () => {
-    assert.deepEqual(competitionProgress(), { done: 1, total: 6 });
+test('two of six epochs are complete', () => {
+    assert.deepEqual(competitionProgress(), { done: 2, total: 6 });
 });
 
-test('the net improvement is computed from the stored figures: p95 63.9% lower, throughput 103.5% higher', () => {
+test('the net improvement chains each epoch from the starting baseline: p95 99.4% lower, throughput 103.5% higher through epoch 1', () => {
     const net = netImprovement();
-    assert.equal(net.epoch, 1);
+    assert.equal(net.epoch, 2);
     const [p95, throughput] = net.metrics;
-    assert.deepEqual(p95, { key: 'p95CompletionS', digits: 2, before: 19.556, after: 7.062, change: 63.9, direction: 'lower', improved: true });
-    assert.deepEqual(throughput, { key: 'medianThroughputMbps', digits: 2, before: 4.987, after: 10.15, change: 103.5, direction: 'higher', improved: true });
-    // worked from the raw values: (19.556 − 7.062) / 19.556 and (10.150 − 4.987) / 4.987
-    assert.equal(Math.round(((19.556 - 7.062) / 19.556) * 1000) / 10, 63.9);
-    assert.equal(Math.round(((10.15 - 4.987) / 4.987) * 1000) / 10, 103.5);
-    // time to first byte got worse (EPOCH1.md: the median 64.9% higher, p95 93.2% higher)
-    assert.equal(net.ttfbImproved, false);
+    // (7.062 / 19.556) × (0.117002 / 6.958769), applied to 19.556 s
+    const factor = (7.062 / 19.556) * (0.117002 / 6.958769);
+    assert.equal(p95.before, 19.556);
+    assert.ok(Math.abs(p95.after - 19.556 * factor) < 1e-12);
+    assert.deepEqual([p95.change, p95.direction, p95.improved, p95.through, p95.digits], [99.4, 'lower', true, 2, 3]);
+    // epoch 2 did not measure throughput: epoch 1's change stands, through epoch 1
+    assert.deepEqual([throughput.before, throughput.after, throughput.change, throughput.direction, throughput.through], [4.987, 10.15, 103.5, 'higher', 1]);
+    // TTFB was measured only in epoch 1, where it got worse
+    assert.equal(net.ttfb, 'worse');
 });
 
-test('adding an epoch is one entry: the progress, the current best and the TTFB line follow', () => {
-    const e1 = APEX_RESULTS.epochs[0];
-    const e2 = { epoch: 2, sealed: '2026-11-21', result: e1.result.replace('01a1855d', '02a1855d'), winner: { p95CompletionS: 5, medianThroughputMbps: 9, medianTtfbMs: 150, p95TtfbMs: 2000 } };
-    const two = { ...APEX_RESULTS, epochs: [e1, e2] };
-    assert.deepEqual(competitionProgress(two), { done: 2, total: 6 });
-    const net = netImprovement(two);
-    assert.equal(net.epoch, 2);
-    assert.equal(net.metrics[0].change, 74.4); // 19.556 s to 5 s
-    assert.equal(net.ttfbImproved, true);
-    // a figure worse than the baseline is worded by its direction and not counted as improved
-    const worse = netImprovement({ ...two, epochs: [e1, { ...e2, winner: { ...e2.winner, medianThroughputMbps: 4 } }] }).metrics[1];
-    assert.deepEqual([worse.direction, worse.improved, worse.change], ['lower', false, 19.8]);
-    // an epoch with no approved winner is complete and leaves the current best as it was
-    const none = { ...APEX_RESULTS, epochs: [e1, { ...e2, winner: null }] };
-    assert.deepEqual(competitionProgress(none), { done: 2, total: 6 });
-    assert.equal(netImprovement(none).epoch, 1);
-    // before the first epoch: none complete, no net change and no results link
+test('adding an epoch is one entry: the progress, the chained changes and the TTFB line follow', () => {
+    const [e1, e2] = APEX_RESULTS.epochs;
+    // epoch 1 alone: both figures against the starting baseline
+    const one = { ...APEX_RESULTS, epochs: [e1] };
+    assert.deepEqual(competitionProgress(one), { done: 1, total: 6 });
+    assert.deepEqual(netImprovement(one).metrics.map((m) => [m.key, m.change, m.direction, m.improved]), [
+        ['p95CompletionS', 63.9, 'lower', true],
+        ['medianThroughputMbps', 103.5, 'higher', true],
+    ]);
+    // a third epoch that cuts TTFB on its own baseline and doubles throughput
+    const e3 = {
+        epoch: 3, sealed: '2026-11-25', result: e2.result.replace('01a1c110', '03a1c110'),
+        baseline: { p95CompletionS: 0.12, medianThroughputMbps: 10, medianTtfbMs: 300, p95TtfbMs: 4000 },
+        winner: { p95CompletionS: 0.12, medianThroughputMbps: 20, medianTtfbMs: 100, p95TtfbMs: 1000 },
+    };
+    const n3 = netImprovement({ ...APEX_RESULTS, epochs: [e1, e2, e3] });
+    assert.equal(n3.epoch, 3);
+    // throughput chains epochs 1 and 3: (10.15 / 4.987) × 2
+    assert.equal(n3.metrics[1].change, Math.round(((10.15 / 4.987) * 2 - 1) * 1000) / 10);
+    assert.equal(n3.metrics[1].through, 3);
+    // TTFB chains to (284.084 / 172.277) / 3 and (4190.036 / 2168.952) / 4: both now better than the start
+    assert.equal(n3.ttfb, null);
+    // a later regression is chained in too, and worded by its direction
+    const back = netImprovement({ ...APEX_RESULTS, epochs: [e1, { ...e2, winner: { p95CompletionS: 6.958769 * 200 } }] }).metrics[0];
+    assert.deepEqual([back.direction, back.improved], ['higher', false]);
+    // an epoch with no approved winner is complete and leaves the net change as it was
+    const none = { ...APEX_RESULTS, epochs: [e1, e2, { ...e3, winner: null }] };
+    assert.deepEqual(competitionProgress(none), { done: 3, total: 6 });
+    assert.deepEqual(netImprovement(none), netImprovement());
+    // no epoch measured TTFB: say what the completion time is not
+    assert.equal(netImprovement({ ...APEX_RESULTS, epochs: [e2] }).ttfb, 'unreported');
+    // before the first epoch: none complete, no change and no results link
     const start = { ...APEX_RESULTS, epochs: [] };
     assert.deepEqual(competitionProgress(start), { done: 0, total: 6 });
     assert.equal(netImprovement(start), null);
@@ -144,50 +176,56 @@ test('adding an epoch is one entry: the progress, the current best and the TTFB 
     assert.deepEqual([text.progress, text.net, text.link], ['0 of 6', null, null]);
 });
 
-test('the card says, in English, 1 of 6 epochs complete and the two figures with what they are not', async () => {
+test('the card says, in English, 2 of 6 epochs complete and the net figures with what they are not', async () => {
     const r = competitionResultsText((await dictionary('en')).research.competition.results, 'en');
-    assert.deepEqual([r.done, r.total, r.progressLabel, r.progress], [1, 6, 'Competition progress', '1 of 6 epochs complete']);
+    assert.deepEqual([r.done, r.total, r.progressLabel, r.progress], [2, 6, 'Competition progress', '2 of 6 epochs complete']);
     assert.equal(r.net.title, 'Net improvement since the start');
-    assert.equal(r.net.comparison, 'Epoch 1 winner against the starting baseline');
-    assert.deepEqual([r.net.asOf, r.net.asOfIso], ['As of November 9, 2026', '2026-11-09']);
-    assert.deepEqual(r.net.metrics.map((m) => [m.change, m.name, m.range]), [
-        ['63.9% lower', 'p95 full-request completion time', '19.56 s to 7.06 s'],
-        ['103.5% higher', 'Median transfer throughput', '4.99 to 10.15 Mbps'],
+    assert.equal(r.net.comparison, 'Epochs 1 to 2, every winner chained from the starting baseline');
+    assert.deepEqual([r.net.asOf, r.net.asOfIso], ['As of November 20, 2026', '2026-11-20']);
+    assert.deepEqual(r.net.metrics.map((m) => [m.change, m.name, m.range, m.through]), [
+        ['99.4% lower', 'p95 full-request completion time', '19.556 s to 0.119 s', null],
+        ['103.5% higher', 'Median transfer throughput', '4.99 to 10.15 Mbps', 'through epoch 1'],
     ]);
-    assert.equal(r.net.caveat, 'These are benchmark evaluation results against the starting baseline, not deployed product gains. Time to first byte did not improve.');
-    assert.deepEqual(r.link, { href: APEX_RESULTS.epochs[0].result, label: 'Epoch 1 results (JSON)' });
+    assert.equal(r.net.caveat, 'These are benchmark evaluation results, not deployed product gains. Each epoch is measured against its own baseline; the net change multiplies those changes together. Time to first byte did not improve.');
+    assert.deepEqual(r.link, { href: APEX_RESULTS.epochs[1].result, label: 'Epoch 2 results (JSON)' });
 });
 
 // each language's decimal mark (i18n/locale.js: Arabic keeps Western digits)
 const DECIMAL = { en: '.', ar: '.', de: ',', es: ',', ru: ',', zh: '.' };
 
-test('every language shows the count, the figures in its own number format, the caveat and the link', async () => {
+test('every language shows the count, the figure in its own number format, the caveat and the link', async () => {
     for (const code of LANGS) {
         const copy = (await dictionary(code)).research.competition.results;
         assert.ok(copy, `${code}: research.competition.results`);
         for (const { key } of APEX_RESULT_METRICS) assert.ok(copy.metrics?.[key]?.name && copy.metrics[key].range, `${code}: the ${key} figure`);
+        assert.ok(copy.ttfb && copy.notTtfb && copy.through, `${code}: both TTFB lines and the through label`);
         const r = competitionResultsText(copy, code);
-        const strings = [r.progressLabel, r.progress, r.net.title, r.net.comparison, r.net.asOf, ...r.net.metrics.flatMap((m) => [m.change, m.name, m.range]), r.net.caveat, r.link.label];
+        const strings = [r.progressLabel, r.progress, r.net.title, r.net.comparison, r.net.asOf, ...r.net.metrics.flatMap((m) => [m.change, m.name, m.range, ...(m.through ? [m.through] : [])]), r.net.caveat, r.link.label];
         for (const s of strings) {
             assert.ok(typeof s === 'string' && s.trim(), `${code}: a string is missing`);
             assert.doesNotMatch(s, /\{\w+\}/, `${code}: a placeholder is left in "${s}"`);
         }
-        assert.match(r.progress, /(^|\D)1(\D|$)/, `${code}: the epochs complete in "${r.progress}"`);
+        assert.match(r.progress, /(^|\D)2(\D|$)/, `${code}: the epochs complete in "${r.progress}"`);
         assert.match(r.progress, /(^|\D)6(\D|$)/, `${code}: the epochs in all in "${r.progress}"`);
         const d = DECIMAL[code];
         const [p95, throughput] = r.net.metrics;
-        assert.ok(p95.change.includes(`63${d}9`) && throughput.change.includes(`103${d}5`), `${code}: ${p95.change}, ${throughput.change}`);
+        assert.ok(p95.change.includes(`99${d}4`) && throughput.change.includes(`103${d}5`), `${code}: ${p95.change}, ${throughput.change}`);
         assert.notEqual(copy.lower, copy.higher, `${code}: lower and higher`);
-        for (const [m, before, after] of [[p95, `19${d}56`, `7${d}06`], [throughput, `4${d}99`, `10${d}15`]]) {
+        for (const [m, before, after] of [[p95, `19${d}556`, `0${d}119`], [throughput, `4${d}99`, `10${d}15`]]) {
             const from = m.range.indexOf(before);
             const to = m.range.indexOf(after);
             assert.ok(from !== -1 && to > from, `${code}: "${m.range}" reads ${before} first, then ${after}`);
         }
-        assert.ok(r.net.asOf.includes('2026') && /(^|\D)9(\D|$)/.test(r.net.asOf), `${code}: the day in "${r.net.asOf}"`);
-        assert.match(r.net.comparison, /(^|\D)1(\D|$)/, `${code}: the winner's epoch`);
+        assert.equal(p95.through, null, `${code}: p95 runs through the latest epoch`);
+        assert.match(throughput.through, /(^|\D)1(\D|$)/, `${code}: throughput runs through epoch 1`);
+        assert.ok(r.net.asOf.includes('2026') && /(^|\D)20(\D|$)/.test(r.net.asOf), `${code}: the day in "${r.net.asOf}"`);
+        assert.match(r.net.comparison, /(^|\D)2(\D|$)/, `${code}: the latest epoch`);
         // the caveat, then the TTFB line: a space between them, none after a full-width stop
         assert.equal(r.net.caveat, copy.caveat + (code === 'zh' ? '' : ' ') + copy.ttfb, code);
-        assert.match(r.link.label, /(^|\D)1(\D|$)/, `${code}: the link names epoch 1`);
+        // with no TTFB measured at all, the not-TTFB line instead
+        const e2only = competitionResultsText(copy, code, { ...APEX_RESULTS, epochs: [APEX_RESULTS.epochs[1]] });
+        assert.equal(e2only.net.caveat, copy.caveat + (code === 'zh' ? '' : ' ') + copy.notTtfb, `${code}: no TTFB`);
+        assert.match(r.link.label, /(^|\D)2(\D|$)/, `${code}: the link names epoch 2`);
         assert.match(r.link.label, /JSON/, `${code}: the link says it is data`);
     }
 });

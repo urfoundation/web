@@ -533,7 +533,7 @@ operators: {
                 progressLabel: '竞赛进度',
                 progress: '共 {total} 个周期，已完成 {done} 个',
                 title: '开赛以来的净提升',
-                comparison: '第 {epoch} 周期胜出方案对比初始基线',
+                comparison: '第 1 至 {epoch} 周期：各胜出方案的变化自初始基线起连乘',
                 asOf: '截至 {date}',
                 lower: '降低 {value}%',
                 higher: '提高 {value}%',
@@ -541,8 +541,10 @@ operators: {
                     p95CompletionS: { name: '完整请求的 p95 完成时间', range: '从 {before} 秒到 {after} 秒' },
                     medianThroughputMbps: { name: '传输吞吐量中位数', range: '从 {before} 到 {after} Mbps' }
                 },
-                caveat: '以上为相对初始基线的基准评测结果，并非已部署产品的提升。',
+                caveat: '以上为基准评测结果，并非已部署产品的提升。每个周期均对比其自身基线测量；净变化为各周期变化的乘积。',
                 ttfb: '首字节时间没有改善。',
+                notTtfb: '完成时间并非首字节时间。',
+                through: '截至第 {epoch} 周期',
                 link: '第 {epoch} 周期结果（JSON）'
             }
         },

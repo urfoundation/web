@@ -171,8 +171,8 @@ const PROGRESS_LABEL_ID = 'research-competition-progress-label';
 /**
  * The competition's progress and results, under the card's text: how many of
  * its epochs are complete, as a bar of one segment per epoch, then the net
- * change from the starting baseline to the current best (the newest approved
- * winner) and what those figures are not. They come from APEX_RESULTS
+ * improvement since the start in each dimension measured (every epoch's
+ * change chained from the starting baseline) and what those figures are not. They come from APEX_RESULTS
  * (research-competition.js) and change by edit, not with the clock, so unlike
  * the band this block is in the sitemap's content fingerprint and in the
  * parity test's pixels. Figures and the day are in the page's language.
@@ -217,6 +217,7 @@ function CompetitionResults({ copy, lang }) {
                                 <b>{m.change}</b>
                                 <span className="research-competition-stat-name">{m.name}</span>
                                 <span className="research-competition-stat-range">{m.range}</span>
+                                {m.through && <span className="research-competition-stat-range">{m.through}</span>}
                             </div>
                         ))}
                     </div>

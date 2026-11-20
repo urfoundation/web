@@ -535,7 +535,7 @@ operators: {
                 progressLabel: 'Fortschritt des Wettbewerbs',
                 progress: '{done} von {total} Epochen abgeschlossen',
                 title: 'Nettoverbesserung seit dem Start',
-                comparison: 'Gewinner der Epoche {epoch} gegenüber der Start-Baseline',
+                comparison: 'Epochen 1 bis {epoch}: die Änderung jedes Gewinners, verkettet ab der Start-Baseline',
                 asOf: 'Stand: {date}',
                 lower: '{value} % niedriger',
                 higher: '{value} % höher',
@@ -543,8 +543,10 @@ operators: {
                     p95CompletionS: { name: 'p95-Abschlusszeit vollständiger Anfragen', range: 'von {before} s auf {after} s' },
                     medianThroughputMbps: { name: 'Median des Übertragungsdurchsatzes', range: 'von {before} auf {after} Mbit/s' }
                 },
-                caveat: 'Dies sind Ergebnisse der Benchmark-Auswertung gegenüber der Start-Baseline, keine Verbesserungen im ausgerollten Produkt.',
+                caveat: 'Dies sind Ergebnisse der Benchmark-Auswertung, keine Verbesserungen im ausgerollten Produkt. Jede Epoche wird an ihrer eigenen Baseline gemessen; die Nettoänderung multipliziert diese Änderungen.',
                 ttfb: 'Die Zeit bis zum ersten Byte hat sich nicht verbessert.',
+                notTtfb: 'Die Abschlusszeit ist nicht die Zeit bis zum ersten Byte.',
+                through: 'bis Epoche {epoch}',
                 link: 'Ergebnisse der Epoche {epoch} (JSON)'
             }
         },

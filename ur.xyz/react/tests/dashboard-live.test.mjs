@@ -13,10 +13,13 @@ import { COUNTRIES, grafanaPanel, grafanaStats } from './dashboard-fixture.mjs';
 
 const history = JSON.parse(readFileSync(new URL('../public/dashboard/history.json', import.meta.url), 'utf8'));
 const DAY = 86_400_000;
+// Keep yesterday one day beyond the committed history so the fixture fills a gap.
+const fixtureNow = Date.parse(`${history.end}T12:00:00Z`) + 2 * DAY;
+const fixtureStats = grafanaStats(fixtureNow);
 // the fixture as fetch: stats.json and the panel queries
 async function fixtureFetch(url, init = {}) {
     const u = new URL(url, 'http://fixture');
-    if (u.pathname.endsWith('/stats.json')) return new Response(JSON.stringify(grafanaStats()), { status: 200 });
+    if (u.pathname.endsWith('/stats.json')) return new Response(JSON.stringify(fixtureStats), { status: 200 });
     const panel = /\/panels\/(\d+)\/query$/.exec(u.pathname);
     const answer = panel && grafanaPanel(Number(panel[1]), JSON.parse(init.body || '{}'));
     return answer ? new Response(JSON.stringify(answer), { status: 200 }) : new Response('no fixture', { status: 404 });
@@ -25,17 +28,17 @@ async function fixtureFetch(url, init = {}) {
 const NO_CHAIN = ['http://127.0.0.1:9'];
 
 test('with the chain unreachable, the page still gets every Grafana part, and the chain\'s come back null', async () => {
-    const S = await buildLive({ g: grafana('http://fixture', { fetchImpl: fixtureFetch }), history, endpoints: NO_CHAIN });
+    const S = await buildLive({ g: grafana('http://fixture', { fetchImpl: fixtureFetch }), history, now: fixtureNow, endpoints: NO_CHAIN });
     assert.equal(S.RESERVE, null);
     assert.equal(S.EMISSION, null);
     assert.equal(S.ROUTING, null);
     assert.equal(S.EXTRA.conviction, null);
     assert.equal(S.EXTRA.recipients, null);
     assert.equal(S.TOKEN.tao, null);
-    assert.equal(S.TOKEN.usd, grafanaStats().alpha_usd);
+    assert.equal(S.TOKEN.usd, fixtureStats.alpha_usd);
     assert.equal(Object.keys(S.COUNTRY_NOW).length, COUNTRIES.length);
     assert.ok(S.EXT.list.length > 0);
-    assert.equal(S.EPOCH.n, grafanaStats().epoch);
+    assert.equal(S.EPOCH.n, fixtureStats.epoch);
     assert.ok(S.LIVE.providers > 0 && S.LIVE.users24 > 0 && S.LIVE.cities > 0);
     for (const k of ['providers', 'traffic', 'users24', 'nets']) assert.ok(S.Hs[k].some((v) => v != null), `hourly ${k}`);
     // the days the committed history lacks are read from Grafana: the last full day is yesterday
@@ -72,7 +75,7 @@ test('nothing answered and no history file: an empty time base ending yesterday'
 });
 
 test('each part is its own read: the stats feed, the history, every hourly gauge, the countries and the chain\'s two', () => {
-    const reads = liveReads({ g: grafana('http://fixture', { fetchImpl: fixtureFetch }), history, endpoints: NO_CHAIN });
+    const reads = liveReads({ g: grafana('http://fixture', { fetchImpl: fixtureFetch }), history, now: fixtureNow, endpoints: NO_CHAIN });
     for (const k of ['stats', 'history', 't24', 't72', 'countries', 'extenders', 'countries1', 'countries3', ...CHAIN_READS]) assert.equal(typeof reads[k], 'function', k);
     assert.equal(Object.keys(reads).filter((k) => k.startsWith('hourly.')).length, 11);
 });
@@ -111,7 +114,7 @@ const fixtureWith = ({ empty = [], down = [] }) => async (url, init = {}) => {
 };
 
 test('a read that answers without its figures has not answered: it rejects, to be asked again', async () => {
-    const reads = liveReads({ g: grafana('http://fixture', { fetchImpl: fixtureWith({ empty: [36, 33, 1] }) }), history, endpoints: NO_CHAIN });
+    const reads = liveReads({ g: grafana('http://fixture', { fetchImpl: fixtureWith({ empty: [36, 33, 1] }) }), history, now: fixtureNow, endpoints: NO_CHAIN });
     await assert.rejects(reads['hourly.providers'](), /panel 36: no data/);
     await assert.rejects(reads.countries(), /panel 33: no countries/);
     await assert.rejects(reads.t24(), /panel 1: no data/);
@@ -120,12 +123,13 @@ test('a read that answers without its figures has not answered: it rejects, to b
 
 test('the page\'s history keeps what it could read and comes back partial; the daily job\'s fails', async () => {
     const g = grafana('http://fixture', { fetchImpl: fixtureWith({ down: [31] }) });
-    const h = await liveReads({ g, history, endpoints: NO_CHAIN }).history();
-    const yesterday = new Date(Math.floor(Date.now() / DAY) * DAY - DAY).toISOString().slice(0, 10);
+    const h = await liveReads({ g, history, now: fixtureNow, endpoints: NO_CHAIN }).history();
+    const yesterday = new Date(fixtureNow - DAY).toISOString().slice(0, 10);
     assert.equal(h.partial, true);
     assert.equal(h.end, yesterday);
     assert.ok(h.days[yesterday]?.providers != null, 'the gauges that answered fill the gap');
     assert.equal(h.days[yesterday]?.traffic, undefined, 'the series that failed is left out');
     assert.equal(history.partial, undefined, 'the file itself is untouched');
-    await assert.rejects(buildHistory({ g, prev: history, days: 3, chain: false, countries: false }), /grafana panel 31: HTTP 503/);
+    assert.equal(history.days[yesterday], undefined, 'the fixture still lacks yesterday');
+    await assert.rejects(buildHistory({ g, prev: history, now: fixtureNow, days: 3, chain: false, countries: false }), /grafana panel 31: HTTP 503/);
 });

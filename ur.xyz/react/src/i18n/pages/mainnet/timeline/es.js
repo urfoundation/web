@@ -295,7 +295,7 @@ export default {
         },
         'proxy-slots-no-unit': {
             title: 'Los slots de proxy no muestran ninguna unidad del Top 200, de Captura la bandera ni de extensor',
-            detail: 'Desde el lanzamiento de servidores del operador de red del 19 de noviembre, un proveedor cuyas conexiones a la plataforma indican que pasan por un proxy no cuenta en ninguna dirección propia: sus saltos de rastro no registran ningún prefijo, así que no añade ninguna unidad de amplitud del Top 200 a su flota, no es candidato de Captura la bandera y sus registros de extensor cuentan como inactivos. El lanzamiento del proveedor que le sigue envía cada conexión de un slot de proxy a través de su proxy y marca cada una. Los hosts directos no cambian, así que vincula solo dispositivos directos.',
+            detail: 'Desde el lanzamiento de servidores del operador de red del 19 de noviembre, un proveedor cuyas conexiones a la plataforma indican que pasan por un proxy no cuenta en ninguna dirección propia: sus saltos de rastro no registran ningún prefijo, así que no añade ninguna unidad de amplitud del Top 200 a su flota, no es candidato de Captura la bandera y sus registros de extensor cuentan como inactivos. El lanzamiento del proveedor que le sigue envía cada conexión de un slot de proxy a través de su proxy y marca cada una. Los hosts directos no cambian, así que vincula solo dispositivos directos. Se retiró el 21 de noviembre de 2026.',
             sources: [
                 'El aviso completo en el repositorio sn',
             ],
@@ -320,6 +320,13 @@ export default {
                 'El precio firmado en el repositorio sn',
                 'Primer bloque de la época 7, 9.549.628',
                 'Primer depósito con precio',
+            ],
+        },
+        'proxy-slots-count-again': {
+            title: 'Los slots de proxy vuelven a contar como cualquier otro proveedor',
+            detail: 'Desde el lanzamiento de servidores del operador de red del 21 de noviembre, un proveedor cuenta en la dirección en la que la red lo ve, tanto si el minero es dueño de esa dirección como si la incorpora a la red a través de un proxy. Los saltos de rastro de un slot de proxy vuelven a registrar su /29 o /48, el slot es candidato de Captura la bandera y sus registros de extensor cuentan como activos. Esto retira la regla del 19 de noviembre. Los clientes y los operadores de red eligen proveedores por latencia y velocidad, así que un proveedor directo sigue ganando donde es más rápido.',
+            sources: [
+                'El aviso completo en el repositorio sn',
             ],
         },
         'capture-the-flag-pool-registration': {

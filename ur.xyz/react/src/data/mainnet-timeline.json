@@ -450,7 +450,7 @@
       "date": "2026-11-19",
       "status": "done",
       "title": "Proxy slots show no head, capture the flag or extender unit",
-      "detail": "From the network operator's server release of November 19, a provider whose platform connections say they come through a proxy counts at no address of its own: its trail hops record no prefix, so it adds no head-breadth unit to its fleet, it is no capture the flag candidate, and its extender records count as not active. The provider release that follows sends every connection of a proxy slot through its proxy and marks each one. Direct hosts are unchanged, so bind direct devices only.",
+      "detail": "From the network operator's server release of November 19, a provider whose platform connections say they come through a proxy counts at no address of its own: its trail hops record no prefix, so it adds no head-breadth unit to its fleet, it is no capture the flag candidate, and its extender records count as not active. The provider release that follows sends every connection of a proxy slot through its proxy and marks each one. Direct hosts are unchanged, so bind direct devices only. Withdrawn on November 21, 2026.",
       "sources": [
         { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md" }
       ]
@@ -476,6 +476,16 @@
         { "label": "The signed price in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/price.yml" },
         { "label": "Epoch 7's first block, 9,549,628", "kind": "evm_block", "ref": "" },
         { "label": "First priced deposit", "kind": "evm_tx", "ref": "" }
+      ]
+    },
+    {
+      "id": "proxy-slots-count-again",
+      "date": "2026-11-21",
+      "status": "done",
+      "title": "Proxy slots count like any other provider again",
+      "detail": "From the network operator's server release of November 21, a provider counts at the address the network sees it at, whether the miner owns it or brings it in through a proxy. A proxy slot's trail hops record its /29 or /48 again, it is a capture the flag candidate, and its extender records count as active. This withdraws the rule of November 19. Clients and the network operators choose providers by latency and speed, so a direct provider still wins where it is faster.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-21-proxy-slots-count-again.md" }
       ]
     },
     {

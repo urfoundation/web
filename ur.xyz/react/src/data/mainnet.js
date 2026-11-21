@@ -142,9 +142,9 @@ export const mainnetActions = {
 // in the order they were posted: a new notice goes at the end. The page shows
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
-// posted, the later first. So it shows that a proxy slot shows no head, capture
-// the flag or extender unit, of November 19, then Top 200 fleet binding open on
-// SN25, of November 17, then the share of extenders reached only over WebRTC, of
+// posted, the later first. So it shows that proxy slots count like any other
+// provider again, of November 21, then Top 200 fleet binding open on SN25, of
+// November 17, then the share of extenders reached only over WebRTC, of
 // November 16, then the providers without UDP or IPv6, offered for the traffic
 // they carry as the next releases roll out, of November 13, then the extender
 // pool from epoch 8 and the extenders' share on
@@ -156,7 +156,10 @@ export const mainnetActions = {
 // epochs' and the milestones' (tests/mainnet-timeline.test.mjs holds them
 // together). `id` is the anchor of the notice's box. `link` opens a notice's
 // full text in the sn repo once that is on sn's main branch, and until then the
-// notice's milestone on this page.
+// notice's milestone on this page. A withdrawn notice comes off the top: the
+// notice of November 19, that a proxy slot shows no head, capture the flag or
+// extender unit, was withdrawn on November 21, and its milestone keeps the
+// record, marked withdrawn.
 const NOTICES = [
     {
         id: 'notice',
@@ -256,22 +259,21 @@ const NOTICES = [
         paragraphs: [
             "Top-level miners can now claim a spot in SN25's head, its 200 top-level seats. The Top 200 page on ur.io and the current apps no longer say that claiming isn't open: they prompt a network projected to rank inside the head to claim its spot. Claiming is optional, and nothing changes for a provider that doesn't claim.",
             "A claim has three steps. Register a hotkey on SN25: registering burns TAO from your coldkey, and the burn is not refunded. Publish the fleet's manifest from that hotkey: once the commitment is final, the network operator's commitment oracle mirrors it to the coordinator on chain 964 by itself. Then bind each device to the fleet, for up to 12 epochs, starting after the current epoch. The Top 200 page, the apps and the command-line guide walk through each step, and nothing in a claim asks for a recovery phrase.",
-            "The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights. A fleet is scored on the devices the validator measures, and at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured, and bind direct devices only: a proxy slot shows no head-breadth unit. From epoch 8 the cohort counts a device only until two epochs after it was last measured, and each unclaimed network ranked in the top 400 has one device measured. Rewards are paid in alpha, whose value changes and can fall.",
+            "The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights. A fleet is scored on the devices the validator measures, and at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured. From epoch 8 the cohort counts a device only until two epochs after it was last measured, and each unclaimed network ranked in the top 400 has one device measured. Rewards are paid in alpha, whose value changes and can fall.",
             "A bound device leaves the provider pool: while its binding is active at either boundary of an epoch, it earns no pool share for that epoch, whether or not its fleet earns. A UID with no emission can be replaced once its immunity ends, about 3 days after it registers, and a binding starts no earlier than the next epoch, so register in the 3 days before the epoch your binding starts.",
             "A commitment older than 100,800 blocks (14 days) can't bind new devices, and commitments in the older format are not mirrored, so a fleet that published in that format, or more than 14 days ago, publishes again. Command-line writes need the provider release with the fleet storage command and the reviewed fleet runtime authority document for the chain's current runtime, 491, published in the sn repo with its SHA-256, and a new chain runtime needs a new document.",
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-17-top200-binding-open.md' },
     },
     {
-        id: 'notice-proxy-slots-no-unit',
-        date: 'November 19, 2026',
-        title: 'A proxy slot shows no head, capture the flag or extender unit. Bind direct devices only.',
+        id: 'notice-proxy-slots-count-again',
+        date: 'November 21, 2026',
+        title: 'Proxy slots count like any other provider again.',
         paragraphs: [
-            "From the network operator's server release of November 19, 2026, a provider whose platform connections say they come through a proxy counts at no address of its own. The provider release that follows sends every connection of a proxy slot through its proxy, and marks each one, so this applies to proxy slots once they update.",
-            "Such a provider adds no head-breadth unit to its fleet, is no capture the flag candidate, and has no extender unit. It still carries traffic and earns its pool share by usage, unless it is bound to a fleet. Direct hosts are unchanged: a host shows its own /29 or /48 through a direct slot, a provider run without a proxy file.",
-            "Bind direct devices only: a bound proxy slot earns no head score and no pool share. A head unit is the address block of a host a fleet runs, and without this rule buying proxies would buy head breadth. No signed amendment is needed, and validators need no new release.",
+            "From the network operator's server release of November 21, 2026, a proxy slot counts at its proxy's address like any other provider: its trail hops record its /29 or /48, it is a capture the flag candidate, and its extender records count as active.",
+            'Nothing to do. You can bind a proxy slot like any other device. Hops a proxy slot confirmed between November 19 and this release recorded no prefix and keep what they recorded.',
         ],
-        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md' },
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-21-proxy-slots-count-again.md' },
     },
 ];
 

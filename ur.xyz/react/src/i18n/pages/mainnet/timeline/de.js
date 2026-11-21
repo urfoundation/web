@@ -295,7 +295,7 @@ export default {
         },
         'proxy-slots-no-unit': {
             title: 'Proxy-Slots zeigen keine Top-200-, Capture-the-Flag- oder Extender-Einheit',
-            detail: 'Ab dem Server-Release des Netzbetreibers vom 19. November zählt ein Provider, dessen Plattformverbindungen angeben, über einen Proxy zu laufen, an keiner eigenen Adresse: Seine Trail-Hops erfassen kein Präfix, sodass er seiner Flotte keine Top-200-Breiteneinheit hinzufügt, er ist kein Kandidat für Capture the Flag, und seine Extender-Einträge gelten als nicht aktiv. Das darauf folgende Provider-Release leitet jede Verbindung eines Proxy-Slots über dessen Proxy und markiert jede davon. Direkte Hosts bleiben unverändert, binde also nur direkte Geräte.',
+            detail: 'Ab dem Server-Release des Netzbetreibers vom 19. November zählt ein Provider, dessen Plattformverbindungen angeben, über einen Proxy zu laufen, an keiner eigenen Adresse: Seine Trail-Hops erfassen kein Präfix, sodass er seiner Flotte keine Top-200-Breiteneinheit hinzufügt, er ist kein Kandidat für Capture the Flag, und seine Extender-Einträge gelten als nicht aktiv. Das darauf folgende Provider-Release leitet jede Verbindung eines Proxy-Slots über dessen Proxy und markiert jede davon. Direkte Hosts bleiben unverändert, binde also nur direkte Geräte. Am 21. November 2026 zurückgenommen.',
             sources: [
                 'Die vollständige Mitteilung im sn-Repo',
             ],
@@ -320,6 +320,13 @@ export default {
                 'Der signierte Preis im sn-Repo',
                 'Erster Block von Epoche 7, 9.549.628',
                 'Erste bepreiste Einlage',
+            ],
+        },
+        'proxy-slots-count-again': {
+            title: 'Proxy-Slots zählen wieder wie jeder andere Provider',
+            detail: 'Ab dem Server-Release des Netzbetreibers vom 21. November zählt ein Provider an der Adresse, unter der das Netzwerk ihn sieht, unabhängig davon, ob der Miner diese Adresse besitzt oder sie über einen Proxy ins Netzwerk einbringt. Die Trail-Hops eines Proxy-Slots erfassen wieder sein /29 oder /48, er ist ein Kandidat für Capture the Flag, und seine Extender-Einträge gelten als aktiv. Damit ist die Regel vom 19. November zurückgenommen. Clients und die Netzbetreiber wählen Provider nach Latenz und Geschwindigkeit, daher gewinnt ein direkter Provider weiterhin dort, wo er schneller ist.',
+            sources: [
+                'Die vollständige Mitteilung im sn-Repo',
             ],
         },
         'capture-the-flag-pool-registration': {

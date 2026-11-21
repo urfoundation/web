@@ -783,14 +783,15 @@ test('extenders reached only over WebRTC: a milestone and a notice as the next s
 });
 
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): proxy slots showing no unit, of
-    // November 19, then Top 200 binding, of November 17, then the share of extenders reached only over WebRTC, of
-    // November 16, then the providers without UDP or IPv6, of November 13, then the extender pool and the
-    // extenders' share, both of November 12, then capture the flag and Pro data, both of November 11, the
-    // later-posted first, then epoch 3's of October 31. The data lists them in the order they were posted, the
-    // other way round, so this order is the sort's
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): proxy slots counting like any other
+    // provider again, of November 21, then Top 200 binding, of November 17, then the share of extenders reached
+    // only over WebRTC, of November 16, then the providers without UDP or IPv6, of November 13, then the extender
+    // pool and the extenders' share, both of November 12, then capture the flag and Pro data, both of November 11,
+    // the later-posted first, then epoch 3's of October 31. The data lists them in the order they were posted, the
+    // other way round, so this order is the sort's. The notice of November 19, that a proxy slot showed no unit,
+    // came off the top when it was withdrawn on November 21; its milestone keeps the record
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
-        ['notice-proxy-slots-no-unit', 'November 19, 2026'],
+        ['notice-proxy-slots-count-again', 'November 21, 2026'],
         ['notice-top200-binding-open', 'November 17, 2026'],
         ['notice-extender-webrtc-relay-share', 'November 16, 2026'],
         ['notice-providers-without-udp-or-ipv6', 'November 13, 2026'],
@@ -1048,10 +1049,11 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     // paid by score while the validator steers; the cohort's per-fleet priority is its size over the 200 seats
     // (server model/verify_cohort_model.go, VerifyCohortPriorityPerFleet: 1,500 / 200)
     assert.match(pay, /^The SN25 validator weights the head's selected fleets in proportion to each fleet's score, not its rank, and a spot pays only while the validator steers its weights\. /);
-    // and bind direct devices only: from the server release of November 19, a proxy slot shows no unit (sn
-    // mainnet/notices/2026-11-19-proxy-slots-show-no-unit.md; the notice of that day says when). From epoch 8 the
-    // cohort rotates (sn VERIFY-COHORT-V2.md; the milestone at epoch 8's first block says how)
-    assert.match(pay, / at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured, and bind direct devices only: a proxy slot shows no head-breadth unit\. From epoch 8 the cohort counts a device only until two epochs after it was last measured, and each unclaimed network ranked in the top 400 has one device measured\. Rewards are paid in alpha, whose value changes and can fall\.$/);
+    // From epoch 8 the cohort rotates (sn VERIFY-COHORT-V2.md; the milestone at epoch 8's first block says how)
+    assert.match(pay, / at most 7 devices of each fleet draw ahead of other providers into the measured cohort, so bind at most 7 unless the others are already measured\. From epoch 8 the cohort counts a device only until two epochs after it was last measured, and each unclaimed network ranked in the top 400 has one device measured\. Rewards are paid in alpha, whose value changes and can fall\.$/);
+    // the line of November 19, bind direct devices only, went with its rule on November 21, as it did from the
+    // full notice on sn main (mainnet/notices/2026-11-17-top200-binding-open.md): a proxy slot counts like any device
+    assert.doesNotMatch(notice.paragraphs.join(' '), /direct devices|proxy slot|head-breadth/i);
     // a device earns in one tier at a time (server controller/st_head_exclusion.go); immunity is 21,600 blocks
     assert.match(pool, /^A bound device leaves the provider pool: while its binding is active at either boundary of an epoch, it earns no pool share for that epoch, whether or not its fleet earns\. /);
     assert.match(pool, / so register in the 3 days before the epoch your binding starts\.$/);
@@ -1066,10 +1068,11 @@ test('Top 200 fleet binding is open: a milestone and a notice, with the limits a
     assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
-test('a proxy slot shows no unit: a milestone and a notice, dated the day of the server release', () => {
-    // the network operator's server release of November 19 reads the mark connect sends on every transport it
-    // dials through a proxy (X-UR-Egress-Proxy: 1), so such a provider's hops record the zero egress hash; the sn
-    // notice and WHITEPAPER §8.4, §8.6.2 (E1), CAPTURETHEFLAG §4.2 and VALIDATOR §8.1 hold the rule
+test('a proxy slot shows no unit: a milestone dated the day of the server release, withdrawn on November 21, its notice off the top', () => {
+    // the network operator's server release of November 19 read the mark connect sends on every transport it
+    // dials through a proxy (X-UR-Egress-Proxy: 1), so such a provider's hops recorded the zero egress hash. The
+    // rule was withdrawn on November 21 (sn mainnet/notices/2026-11-21-proxy-slots-count-again.md): its notice came
+    // off the top, and its milestone keeps the record, marked withdrawn
     const milestone = events.find((e) => e.id === 'proxy-slots-no-unit');
     assert.ok(milestone, 'the milestone is listed');
     assert.equal(milestone.status, 'done');
@@ -1080,31 +1083,64 @@ test('a proxy slot shows no unit: a milestone and a notice, dated the day of the
     assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
     assert.equal(milestone.title, 'Proxy slots show no head, capture the flag or extender unit');
     assert.ok(milestone.detail.startsWith("From the network operator's server release of November 19, a provider whose platform connections say they come through a proxy counts at no address of its own: "));
-    assert.match(milestone.detail, / Direct hosts are unchanged, so bind direct devices only\.$/);
+    assert.match(milestone.detail, / Direct hosts are unchanged, so bind direct devices only\. Withdrawn on November 21, 2026\.$/);
     // in date order: after Top 200 binding, of November 17, before capture the flag's presence sampling
     const ids = events.map((e) => e.id);
     assert.equal(ids.indexOf(milestone.id), ids.indexOf('top200-binding-open') + 1);
     assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-presence-sampling'));
     assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-6');
 
-    const notice = mainnetNotices.find((n) => n.id === 'notice-proxy-slots-no-unit');
+    // its notice is off the top: no notice is it, or links its full text, which the sn repo keeps under a
+    // withdrawal banner
+    assert.equal(mainnetNotices.find((n) => n.id === 'notice-proxy-slots-no-unit'), undefined);
+    assert.ok(!mainnetNotices.some((n) => n.link.href === fullText));
+    // the rule moved units, not amounts: no reward figure
+    assert.doesNotMatch(`${milestone.title} ${milestone.detail}`, /\d\s?%|\$\s?\d|\d\s?α|\balpha\b/i);
+});
+
+test('proxy slots count like any other provider again: a milestone and a notice, dated the day of the server release that withdrew the rule of November 19', () => {
+    // the network operator's server release of November 21 (api and taskworker) reverted the rule of November 19
+    // and the exit judging built on it: a provider counts at the address the network sees it at, whether the miner
+    // owns it or brings it in through a proxy. The sn notice (mainnet/notices/2026-11-21-proxy-slots-count-again.md,
+    // on sn main) says what changes
+    const milestone = events.find((e) => e.id === 'proxy-slots-count-again');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'done');
+    assert.equal(milestone.approximate, undefined);
+    assert.equal(milestone.date, '2026-11-21');
+    assert.equal(milestone.key, undefined);
+    assert.equal(whenText(parseWhen(milestone.date), { approxStart: isApproximate(milestone) }), 'Sat Nov 21');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-7');
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-21-proxy-slots-count-again.md';
+    assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
+    assert.equal(milestone.title, 'Proxy slots count like any other provider again');
+    assert.ok(milestone.detail.startsWith("From the network operator's server release of November 21, a provider counts at the address the network sees it at, whether the miner owns it or brings it in through a proxy. "));
+    assert.match(milestone.detail, / A proxy slot's trail hops record its \/29 or \/48 again, it is a capture the flag candidate, and its extender records count as active\. This withdraws the rule of November 19\. /);
+    assert.match(milestone.detail, / Clients and the network operators choose providers by latency and speed, so a direct provider still wins where it is faster\.$/);
+    // in date order: after the first priced deposits, at epoch 7's first block, before capture the flag's pool
+    // registration; the milestone it withdraws keeps the record
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('demand-deposits-priced') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-pool-registration'));
+    assert.ok(events.find((e) => e.id === 'proxy-slots-no-unit').detail.endsWith(' Withdrawn on November 21, 2026.'));
+
+    const notice = mainnetNotices.find((n) => n.id === 'notice-proxy-slots-count-again');
     assert.ok(notice, 'the notice is listed');
-    // posted the day of the milestone, and the full text in the sn repo is named by that day
-    assert.equal(notice.date, 'November 19, 2026');
-    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 19));
-    assert.equal(notice.title, 'A proxy slot shows no head, capture the flag or extender unit. Bind direct devices only.');
-    assert.equal(notice.paragraphs.length, 3);
-    const [rule, unchanged, bind] = notice.paragraphs;
-    assert.ok(rule.startsWith("From the network operator's server release of November 19, 2026, a provider whose platform connections say they come through a proxy counts at no address of its own. "));
-    assert.match(rule, / so this applies to proxy slots once they update\.$/);
-    assert.match(unchanged, /^Such a provider adds no head-breadth unit to its fleet, is no capture the flag candidate, and has no extender unit\. /);
-    assert.match(unchanged, / Direct hosts are unchanged: a host shows its own \/29 or \/48 through a direct slot, a provider run without a proxy file\.$/);
-    assert.match(bind, /^Bind direct devices only: a bound proxy slot earns no head score and no pool share\. /);
-    assert.match(bind, / No signed amendment is needed, and validators need no new release\.$/);
+    // the newest, at the top: posted the day of the milestone, and the full text in the sn repo is named by that day
+    assert.equal(mainnetNotices[0], notice);
+    assert.equal(notice.date, 'November 21, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 21));
+    assert.equal(notice.title, 'Proxy slots count like any other provider again.');
+    assert.deepEqual(notice.paragraphs, [
+        "From the network operator's server release of November 21, 2026, a proxy slot counts at its proxy's address like any other provider: its trail hops record its /29 or /48, it is a capture the flag candidate, and its extender records count as active.",
+        'Nothing to do. You can bind a proxy slot like any other device. Hops a proxy slot confirmed between November 19 and this release recorded no prefix and keep what they recorded.',
+    ]);
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+    // the sn notice says nothing of the probed exit's brief judging (the owner dropped it), and neither does this;
     // the rule moves units, not amounts: no reward figure
     const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
+    assert.doesNotMatch(words, /probed exit|exit IP|\bjudg/i);
     assert.doesNotMatch(words, /\d\s?%|\$\s?\d|\d\s?α|\balpha\b/i);
-    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
 });
 
 test('the measured cohort rotates from epoch 8: a scheduled milestone at epoch 8\'s first block, beside the extender pool and capture the flag', () => {

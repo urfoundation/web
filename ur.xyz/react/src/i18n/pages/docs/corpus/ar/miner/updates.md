@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: أبقِ مُعدِّن UR محدَّثًا. كيف تحدّثه المُثبِّتات وخدمة المُعدِّن تلقائيًا، وكيف تتحقق من التحديثات أو تغيّرها أو توقفها، وتبقى على نسخة واحدة.
+description: أبقِ مُعدِّن UR محدَّثًا. كيف تحدّثه المُثبِّتات وخدمة المُعدِّن، وكيف تغيّر التحديثات أو توقفها، وتبقى على نسخة واحدة، وتحدّث حاوية Docker.
 ---
 
 # إبقاء المُعدِّن محدَّثًا
@@ -85,6 +85,31 @@ provider update --on
 ```
 
 يمكنك أيضًا تثبيت الخدمة والتحديثات موقوفة: `URNETWORK_AUTO_UPDATE=0 provider service install`. لا يؤثر ذلك في مُعدِّن أعدّه مُثبِّت؛ استخدم هناك `urnet-tools auto-update off`. وعندما تكون التحديثات موقوفة، شغّل `provider update` بنفسك من حين إلى آخر.
+
+## Docker
+
+لا تحدّث [حاوية Docker](/docs/miner/install#docker) الخاصة بالمُعدِّن نفسها أبدًا: فهي تشغّل الصورة التي أُنشئت منها حتى تعيد إنشاءها، ولا تكفي إعادة تشغيلها. عندما تُنشر صورة نسخة ما، تنتقل إليها الوسوم `latest` و`g4-latest` (و`beta-latest`، ومن `g1-latest` إلى `g3-latest`).
+
+> من يوليو 2026 حتى 22 نوفمبر 2026، لم يُعَد بناء الصورة، وكان كل وسم منها على النسخة 2026.7.2. والحاوية التي أُنشئت في تلك الفترة لا تزال تشغّل 2026.7.2 حتى تحدّثها.
+
+لتحديث حاوية بدأتها بالأمر `docker run`، اسحب الصورة، ثم أعد إنشاء الحاوية بالخيارات نفسها ودليل الحالة نفسه:
+
+```bash
+docker pull bringyour/community-provider:latest
+docker stop urnetwork
+docker rm urnetwork
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+مع Docker Compose، في مجلد ملف `compose.yaml` الخاص بك:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+بعد ذلك يطبع `docker exec urnetwork bringyour-provider --version` النسخة التي تشغّلها. لا تحتاج السكربتات وملفات Compose المكتوبة للصورة القديمة إلى تغيير: فالصورة تقبل الأوامر نفسها (`auth` و`provide` و`auth-provide` و`proxy`) ودليل الحالة نفسه. والأدوات التي تعيد إنشاء الحاويات عندما ينتقل وسمها، مثل Watchtower، تحدّث من تلقاء نفسها الحاوية التي تتبع `latest`. وللبقاء على نسخة واحدة بدلًا من ذلك، استخدم وسمها، مثل `bringyour/community-provider:2026.11.19-1103608200`، وغيّر الوسم للتحديث.
 
 ## من دون تحديثات تلقائية
 

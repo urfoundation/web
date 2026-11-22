@@ -13,7 +13,9 @@
 >
 > If you run the miner yourself, without that service, `provider update` refuses too: install the new release as in [Manual download](https://ur.xyz/docs/miner/install#manual-download) and restart the miner.
 >
-> Not affected: the Docker image, the apps, and miners an installer set up, which update through `urnet-tools`.
+> **The Docker image `bringyour/community-provider` didn't update either.** A container never updates itself, and the image wasn't rebuilt from July until November 22, 2026, so every tag of it stayed on version 2026.7.2. It now carries the current release: pull it and recreate your containers, as in [Updates](https://ur.xyz/docs/miner/updates#docker).
+>
+> Not affected: the apps, and miners an installer set up, which update through `urnet-tools`.
 
 A UR miner shares your internet connection as an exit for a network operator. Validators check that it really carries traffic, and Bittensor SN25 (netuid 25) pays rewards for that work in the subnet's α token, branded $UR. For the whole role on one page, from requirements to rewards, see [mining Bittensor SN25 with UR](https://ur.xyz/miners).
 

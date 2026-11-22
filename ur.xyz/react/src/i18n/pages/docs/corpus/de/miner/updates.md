@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Updates des UR-Miners: Wie Installer und Miner-Dienst ihn automatisch aktualisieren, wie du Updates prüfst, änderst oder abschaltest und bei einer Version bleibst.
+description: Updates des UR-Miners: wie Installer und Miner-Dienst ihn aktualisieren, wie du Updates änderst oder abschaltest, bei einer Version bleibst und Docker aktualisierst.
 ---
 
 # Den Miner aktuell halten
@@ -85,6 +85,31 @@ provider update --on
 ```
 
 Du kannst den Dienst auch mit abgeschalteten Updates installieren: `URNETWORK_AUTO_UPDATE=0 provider service install`. Das betrifft keinen Miner, den ein Installer eingerichtet hat; verwende dort `urnet-tools auto-update off`. Bei abgeschalteten Updates führe ab und zu selbst `provider update` aus.
+
+## Docker
+
+Ein [Docker-Container](/docs/miner/install#docker) des Miners aktualisiert sich nie selbst: Er führt das Image aus, aus dem er erstellt wurde, bis du ihn neu erstellst, und ein Neustart reicht nicht. Wenn das Image eines Releases veröffentlicht wird, wandern die Tags `latest` und `g4-latest` (sowie `beta-latest`, `g1-latest` bis `g3-latest`) zu ihm.
+
+> Von Juli 2026 bis zum 22. November 2026 wurde das Image nicht neu gebaut, und jeder seiner Tags war Version 2026.7.2. Ein Container, der in dieser Zeit erstellt wurde, führt weiterhin 2026.7.2 aus, bis du ihn aktualisierst.
+
+Um einen mit `docker run` gestarteten Container zu aktualisieren, ziehe das Image und erstelle den Container dann mit denselben Optionen und demselben Zustandsverzeichnis neu:
+
+```bash
+docker pull bringyour/community-provider:latest
+docker stop urnetwork
+docker rm urnetwork
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+Mit Docker Compose, im Ordner deiner `compose.yaml`:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Danach gibt `docker exec urnetwork bringyour-provider --version` die Version aus, die er ausführt. Skripte und Compose-Dateien, die für das alte Image geschrieben wurden, müssen nicht geändert werden: Das Image nimmt dieselben Befehle (`auth`, `provide`, `auth-provide`, `proxy`) und dasselbe Zustandsverzeichnis. Werkzeuge, die Container neu erstellen, wenn ihr Tag wandert, etwa Watchtower, aktualisieren einen Container, der `latest` folgt, von selbst. Um stattdessen bei einer Version zu bleiben, verwende ihren Tag, etwa `bringyour/community-provider:2026.11.19-1103608200`, und ändere den Tag, um zu aktualisieren.
 
 ## Ohne automatische Updates
 

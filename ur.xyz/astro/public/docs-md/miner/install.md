@@ -1,13 +1,14 @@
 
 # Install the miner
 
-The miner is a single program, `provider`. There are three ways to get it:
+The miner is a single program, `provider`. There are four ways to get it:
 
 | Way | Systems | Updates | Best for |
 | --- | --- | --- | --- |
 | [Installer](#the-installers) | Linux, macOS, Windows | Automatic | Most people |
 | [Manual download](#manual-download) | Linux, macOS, Windows | Automatic, with `provider setup` | Full control |
 | [Build from source](#build-from-source) | Linux, macOS, Windows | By hand | Developers and auditors |
+| [Docker](#docker) | Linux containers (amd64, arm64) | A new image, by hand | Containers |
 
 Whichever you choose, the miner keeps its identity in `~/.urnetwork` (`%USERPROFILE%\.urnetwork` on Windows), so you can switch later without registering again. Back that folder up first, and stop the old way's background job before starting the new one, so two copies never run at once. After installing, go back to [the quick start](https://ur.xyz/docs/miner#2-run-setup). The requirements are summed up in [what a UR miner needs](https://ur.xyz/miners).
 
@@ -186,6 +187,21 @@ provider --help
 ```
 
 A build of your own says `development build` and never updates itself. Update it by building again.
+
+## Docker
+
+The image [`bringyour/community-provider`](https://hub.docker.com/r/bringyour/community-provider) runs the `provider` release in a container, for `linux/amd64` and `linux/arm64`. It takes the miner's commands: sign in once, then start it with `provide`, which registers the device on its first start.
+
+```bash
+docker volume create urnetwork
+docker run --rm -it -v urnetwork:/root/.urnetwork bringyour/community-provider:latest auth
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+`auth` asks for your auth code, or takes it after `auth`. The miner keeps its identity in the container's `/root/.urnetwork`, here the named volume `urnetwork`. Give each container its own state directory like this one, owned by root and not writable by others, and the miner keeps its device when you recreate the container to update it. A state directory owned by another user (such as a folder of yours mounted with `-v ~/.urnetwork:/root/.urnetwork`), writable by everyone, read-only, or shared by several containers works too, but then each new container registers a new device, and the log says so when it starts.
+
+`docker exec urnetwork bringyour-provider status` shows whether it's signed in and connected. The extender needs the container's ports published; see [Run an extender](https://ur.xyz/docs/miner/extender#docker). A container never updates itself; see [Updates](https://ur.xyz/docs/miner/updates#docker).
 
 ## A binary from your operator
 

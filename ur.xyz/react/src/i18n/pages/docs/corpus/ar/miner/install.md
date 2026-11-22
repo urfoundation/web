@@ -1,17 +1,18 @@
 ---
 published: 2026-10-21
-description: ثبّت مُعدِّن UR. المُثبِّتات لأنظمة Linux وmacOS وWindows مع التحديثات التلقائية، والتنزيل اليدوي، وبناء provider من المصدر.
+description: ثبّت مُعدِّن UR. المُثبِّتات لأنظمة Linux وmacOS وWindows مع التحديثات التلقائية، والتنزيل اليدوي، وبناء provider من المصدر، وصورة Docker.
 ---
 
 # تثبيت المُعدِّن
 
-المُعدِّن برنامج واحد، `provider`. هناك ثلاث طرق للحصول عليه:
+المُعدِّن برنامج واحد، `provider`. هناك أربع طرق للحصول عليه:
 
 | الطريقة | الأنظمة | التحديثات | الأنسب لـ |
 | --- | --- | --- | --- |
 | [المُثبِّت](#the-installers) | Linux, macOS, Windows | تلقائية | معظم الناس |
 | [التنزيل اليدوي](#manual-download) | Linux, macOS, Windows | تلقائية، مع `provider setup` | التحكم الكامل |
 | [البناء من المصدر](#build-from-source) | Linux, macOS, Windows | يدوية | المطوّرون والمدقّقون |
+| [Docker](#docker) | حاويات Linux (amd64، arm64) | صورة جديدة، يدويًا | الحاويات |
 
 أيًّا كانت الطريقة التي تختارها، يحتفظ المُعدِّن بهويته في `~/.urnetwork` (`%USERPROFILE%\.urnetwork` في Windows)، لذا يمكنك التبديل لاحقًا دون التسجيل مرة أخرى. خذ نسخة احتياطية من ذلك المجلد أولًا، وأوقف المهمة الخلفية للطريقة القديمة قبل بدء الجديدة، كي لا تعمل نسختان في الوقت نفسه أبدًا. بعد التثبيت، عُد إلى [البدء السريع](/docs/miner#2-run-setup). تلخّص صفحة [ما يحتاجه مُعدِّن UR](/miners) المتطلبات.
 
@@ -190,6 +191,21 @@ provider --help
 ```
 
 البناء الخاص بك يعرض `development build` ولا يحدّث نفسه أبدًا. حدّثه بإعادة البناء.
+
+## Docker
+
+تشغّل الصورة [`bringyour/community-provider`](https://hub.docker.com/r/bringyour/community-provider) نسخة `provider` داخل حاوية، لمعماريتَي `linux/amd64` و`linux/arm64`. وهي تقبل أوامر المُعدِّن: سجّل الدخول مرة واحدة، ثم شغّلها بالأمر `provide`، الذي يسجّل الجهاز عند أول تشغيل له.
+
+```bash
+docker volume create urnetwork
+docker run --rm -it -v urnetwork:/root/.urnetwork bringyour/community-provider:latest auth
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+يطلب `auth` رمز المصادقة الخاص بك، أو يأخذه بعد `auth`. يحتفظ المُعدِّن بهويته في `/root/.urnetwork` داخل الحاوية، وهو هنا وحدة التخزين المسمّاة `urnetwork`. امنح كل حاوية دليل حالة خاصًا بها مثل هذا، مملوكًا للمستخدم root وغير قابل للكتابة من الآخرين، فيحتفظ المُعدِّن بجهازه عندما تعيد إنشاء الحاوية لتحديثها. ويعمل أيضًا دليل حالة يملكه مستخدم آخر (مثل مجلد لك مركّب بالخيار `-v ~/.urnetwork:/root/.urnetwork`)، أو قابل للكتابة من الجميع، أو للقراءة فقط، أو مشترك بين عدة حاويات، لكن عندها تسجّل كل حاوية جديدة جهازًا جديدًا، ويذكر السجل ذلك عند بدء التشغيل.
+
+يُظهر `docker exec urnetwork bringyour-provider status` ما إذا كان قد سجّل الدخول وما إذا كان متصلًا. يحتاج الموسِّع إلى نشر منافذ الحاوية؛ راجع [تشغيل موسِّع](/docs/miner/extender#docker). لا تحدّث الحاوية نفسها أبدًا؛ راجع [التحديثات](/docs/miner/updates#docker).
 
 ## ملف تنفيذي من مشغّلك
 

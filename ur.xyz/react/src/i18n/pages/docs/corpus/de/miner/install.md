@@ -1,17 +1,18 @@
 ---
 published: 2026-10-21
-description: Den UR-Miner installieren. Die Installer für Linux, macOS und Windows mit automatischen Updates, ein manueller Download und der Build von provider aus dem Quellcode.
+description: Den UR-Miner installieren. Die Installer für Linux, macOS und Windows mit automatischen Updates, ein manueller Download, der Build aus dem Quellcode und das Docker-Image.
 ---
 
 # Den Miner installieren
 
-Der Miner ist ein einzelnes Programm, `provider`. Es gibt drei Wege, ihn zu bekommen:
+Der Miner ist ein einzelnes Programm, `provider`. Es gibt vier Wege, ihn zu bekommen:
 
 | Weg | Systeme | Updates | Am besten für |
 | --- | --- | --- | --- |
 | [Installer](#the-installers) | Linux, macOS, Windows | Automatisch | Die meisten |
 | [Manueller Download](#manual-download) | Linux, macOS, Windows | Automatisch, mit `provider setup` | Volle Kontrolle |
 | [Build aus dem Quellcode](#build-from-source) | Linux, macOS, Windows | Von Hand | Entwickler und Auditoren |
+| [Docker](#docker) | Linux-Container (amd64, arm64) | Ein neues Image, von Hand | Container |
 
 Egal, wofür du dich entscheidest: Der Miner bewahrt seine Identität in `~/.urnetwork` auf (`%USERPROFILE%\.urnetwork` unter Windows), sodass du später wechseln kannst, ohne dich neu zu registrieren. Sichere diesen Ordner zuerst und stoppe den Hintergrundjob des alten Wegs, bevor du den neuen startest, damit nie zwei Kopien gleichzeitig laufen. Gehe nach der Installation zurück zum [Schnellstart](/docs/miner#2-run-setup). Die Voraussetzungen fasst [was ein UR-Miner braucht](/miners) zusammen.
 
@@ -190,6 +191,21 @@ provider --help
 ```
 
 Ein eigener Build meldet `development build` und aktualisiert sich nie selbst. Aktualisiere ihn, indem du neu baust.
+
+## Docker
+
+Das Image [`bringyour/community-provider`](https://hub.docker.com/r/bringyour/community-provider) führt das `provider`-Release in einem Container aus, für `linux/amd64` und `linux/arm64`. Es nimmt die Befehle des Miners: Melde dich einmal an und starte es dann mit `provide`, das das Gerät beim ersten Start registriert.
+
+```bash
+docker volume create urnetwork
+docker run --rm -it -v urnetwork:/root/.urnetwork bringyour/community-provider:latest auth
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+`auth` fragt nach deinem Auth-Code oder nimmt ihn nach `auth` entgegen. Der Miner bewahrt seine Identität im `/root/.urnetwork` des Containers auf, hier im benannten Volume `urnetwork`. Gib jedem Container ein eigenes Zustandsverzeichnis wie dieses, das root gehört und für andere nicht beschreibbar ist, dann behält der Miner sein Gerät, wenn du den Container für ein Update neu erstellst. Ein Zustandsverzeichnis, das einem anderen Benutzer gehört (etwa ein Ordner von dir, eingebunden mit `-v ~/.urnetwork:/root/.urnetwork`), für alle beschreibbar, schreibgeschützt oder von mehreren Containern geteilt ist, funktioniert auch, aber dann registriert jeder neue Container ein neues Gerät, und das Log sagt es beim Start.
+
+`docker exec urnetwork bringyour-provider status` zeigt, ob er angemeldet und verbunden ist. Der Extender braucht die veröffentlichten Ports des Containers; siehe [Einen Extender betreiben](/docs/miner/extender#docker). Ein Container aktualisiert sich nie selbst; siehe [Updates](/docs/miner/updates#docker).
 
 ## Ein Binary von deinem Betreiber
 

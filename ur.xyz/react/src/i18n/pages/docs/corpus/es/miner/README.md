@@ -16,7 +16,9 @@ description: Empieza a minar en UR en pocos pasos. Qué hace un minero, qué nec
 >
 > Si ejecutas el minero tú mismo, sin ese servicio, `provider update` también se niega: instala la nueva versión como en [Descarga manual](/docs/miner/install#manual-download) y reinicia el minero.
 >
-> No están afectados: la imagen de Docker, las apps y los mineros configurados por un instalador, que se actualizan mediante `urnet-tools`.
+> **La imagen de Docker `bringyour/community-provider` tampoco se actualizó.** Un contenedor nunca se actualiza solo, y la imagen no se reconstruyó desde julio hasta el 22 de noviembre de 2026, así que todas sus etiquetas se quedaron en la versión 2026.7.2. Ahora lleva la versión actual: descárgala de nuevo y vuelve a crear tus contenedores, como en [Actualizaciones](/docs/miner/updates#docker).
+>
+> No están afectados: las apps y los mineros configurados por un instalador, que se actualizan mediante `urnet-tools`.
 
 Un minero de UR comparte tu conexión a internet como salida para un operador de red. Los validadores comprueban que realmente transporta tráfico, y Bittensor SN25 (netuid 25) paga recompensas por ese trabajo en el token α de la subred, con la marca $UR. Para ver todo el rol en una página, de los requisitos a las recompensas, consulta [minar Bittensor SN25 con UR](/miners).
 

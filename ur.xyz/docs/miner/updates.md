@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Keep the UR miner up to date: how installers and its own service update it, how to check, change or turn off updates, and how to stay on one version.
+description: Keep the UR miner up to date: how installers and its own service update it, how to change or turn off updates, how to stay on one version, and how to update Docker.
 ---
 
 # Keep the miner up to date
@@ -85,6 +85,31 @@ provider update --on
 ```
 
 You can also install the service with updates off: `URNETWORK_AUTO_UPDATE=0 provider service install`. That doesn't affect a miner an installer set up; use `urnet-tools auto-update off` there. With updates off, run `provider update` yourself from time to time.
+
+## Docker
+
+A [Docker container](/docs/miner/install#docker) of the miner never updates itself: it runs the image it was created from until you recreate it, and restarting it isn't enough. When a release's image is published, the tags `latest` and `g4-latest` (and `beta-latest`, `g1-latest` to `g3-latest`) move to it.
+
+> From July 2026 until November 22, 2026, the image wasn't rebuilt, and every tag of it was version 2026.7.2. A container created in that time still runs 2026.7.2 until you update it.
+
+To update a container started with `docker run`, pull the image, then recreate the container with the same options and the same state directory:
+
+```bash
+docker pull bringyour/community-provider:latest
+docker stop urnetwork
+docker rm urnetwork
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+With Docker Compose, in the folder of your `compose.yaml`:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Then `docker exec urnetwork bringyour-provider --version` prints the version it runs. Scripts and compose files written for the old image don't need to change: the image takes the same commands (`auth`, `provide`, `auth-provide`, `proxy`) and the same state directory. Tools that recreate containers when their tag moves, such as Watchtower, update a container that follows `latest` by themselves. To stay on one version instead, use its tag, such as `bringyour/community-provider:2026.11.19-1103608200`, and change the tag to update.
 
 ## Without automatic updates
 

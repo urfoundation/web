@@ -16,7 +16,9 @@ description: Starte das Mining auf UR in wenigen Schritten. Was ein Miner tut, w
 >
 > Wenn du den Miner selbst betreibst, ohne diesen Dienst, bricht `provider update` ebenfalls ab: Installiere das neue Release wie unter [Manueller Download](/docs/miner/install#manual-download) und starte den Miner neu.
 >
-> Nicht betroffen: das Docker-Image, die Apps und Miner, die ein Installer eingerichtet hat und die sich über `urnet-tools` aktualisieren.
+> **Auch das Docker-Image `bringyour/community-provider` hat sich nicht aktualisiert.** Ein Container aktualisiert sich nie selbst, und das Image wurde von Juli bis zum 22. November 2026 nicht neu gebaut, sodass jeder seiner Tags auf Version 2026.7.2 blieb. Jetzt enthält es das aktuelle Release: Ziehe es neu und erstelle deine Container neu, wie unter [Updates](/docs/miner/updates#docker) beschrieben.
+>
+> Nicht betroffen: die Apps und Miner, die ein Installer eingerichtet hat und die sich über `urnet-tools` aktualisieren.
 
 Ein UR-Miner teilt deine Internetverbindung als Exit für einen Netzbetreiber. Validatoren prüfen, dass er wirklich Verkehr trägt, und Bittensor SN25 (netuid 25) zahlt für diese Arbeit Belohnungen im α-Token des Subnets, der als $UR auftritt. Die ganze Rolle auf einer Seite, von den Voraussetzungen bis zu den Belohnungen, zeigt [Bittensor SN25 mit UR minen](/miners).
 

@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: 让 UR 矿工保持最新。安装程序和矿工自己的服务如何自动更新它，如何检查、更改或关闭更新，以及如何停留在某个版本。
+description: 让 UR 矿工保持最新。安装程序和矿工自己的服务如何更新它，如何更改或关闭更新，如何停留在某个版本，以及如何更新 Docker 容器。
 ---
 
 # 让矿工保持最新
@@ -85,6 +85,31 @@ provider update --on
 ```
 
 你也可以在安装服务时关闭更新：`URNETWORK_AUTO_UPDATE=0 provider service install`。这不会影响由安装程序设置的矿工；对那种矿工请使用 `urnet-tools auto-update off`。关闭更新后，请不时自己运行 `provider update`。
+
+## Docker
+
+矿工的 [Docker 容器](/docs/miner/install#docker) 从不自行更新：在你重新创建它之前，它一直运行创建它时所用的镜像，只重启是不够的。某个版本的镜像发布后，标签 `latest` 和 `g4-latest`（以及 `beta-latest`、`g1-latest` 到 `g3-latest`）会指向它。
+
+> 从 2026 年 7 月到 2026 年 11 月 22 日，该镜像没有重新构建，它的每个标签都是版本 2026.7.2。在这段时间创建的容器仍在运行 2026.7.2，直到你更新它。
+
+要更新用 `docker run` 启动的容器，先拉取镜像，然后用相同的选项和相同的状态目录重新创建容器：
+
+```bash
+docker pull bringyour/community-provider:latest
+docker stop urnetwork
+docker rm urnetwork
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+使用 Docker Compose 时，在你的 `compose.yaml` 所在的文件夹中运行：
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+之后，`docker exec urnetwork bringyour-provider --version` 会显示它运行的版本。为旧镜像编写的脚本和 Compose 文件无需修改：镜像接受相同的命令（`auth`、`provide`、`auth-provide`、`proxy`）和相同的状态目录。会在标签移动时重新创建容器的工具（例如 Watchtower）会自行更新跟随 `latest` 的容器。如果想停留在某个版本，请使用它的标签，例如 `bringyour/community-provider:2026.11.19-1103608200`，更新时再更改标签。
 
 ## 不使用自动更新
 

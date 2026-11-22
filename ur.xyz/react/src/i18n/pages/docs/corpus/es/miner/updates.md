@@ -1,6 +1,6 @@
 ---
 published: 2026-10-21
-description: Actualizaciones del minero de UR: cómo lo actualizan los instaladores y su servicio, y cómo comprobar, cambiar o desactivar las actualizaciones o fijar una versión.
+description: Actualizaciones del minero de UR: cómo lo actualizan los instaladores y su servicio, cómo cambiar o desactivar las actualizaciones, fijar una versión y actualizar Docker.
 ---
 
 # Mantener el minero actualizado
@@ -85,6 +85,31 @@ provider update --on
 ```
 
 También puedes instalar el servicio con las actualizaciones desactivadas: `URNETWORK_AUTO_UPDATE=0 provider service install`. Eso no afecta a un minero configurado por un instalador; allí usa `urnet-tools auto-update off`. Con las actualizaciones desactivadas, ejecuta `provider update` tú mismo de vez en cuando.
+
+## Docker
+
+Un [contenedor de Docker](/docs/miner/install#docker) del minero nunca se actualiza solo: ejecuta la imagen a partir de la que se creó hasta que lo recreas, y reiniciarlo no basta. Cuando se publica la imagen de una versión, las etiquetas `latest` y `g4-latest` (y `beta-latest`, de `g1-latest` a `g3-latest`) pasan a ella.
+
+> Desde julio de 2026 hasta el 22 de noviembre de 2026, la imagen no se reconstruyó, y todas sus etiquetas eran la versión 2026.7.2. Un contenedor creado en ese tiempo sigue ejecutando 2026.7.2 hasta que lo actualices.
+
+Para actualizar un contenedor iniciado con `docker run`, descarga la imagen y luego recrea el contenedor con las mismas opciones y el mismo directorio de estado:
+
+```bash
+docker pull bringyour/community-provider:latest
+docker stop urnetwork
+docker rm urnetwork
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+Con Docker Compose, en la carpeta de tu `compose.yaml`:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Luego `docker exec urnetwork bringyour-provider --version` muestra la versión que ejecuta. Los scripts y archivos de Compose escritos para la imagen antigua no necesitan cambios: la imagen acepta los mismos comandos (`auth`, `provide`, `auth-provide`, `proxy`) y el mismo directorio de estado. Las herramientas que recrean contenedores cuando su etiqueta se mueve, como Watchtower, actualizan por sí solas un contenedor que sigue `latest`. Para quedarte en una versión, usa su etiqueta, como `bringyour/community-provider:2026.11.19-1103608200`, y cambia la etiqueta para actualizar.
 
 ## Sin actualizaciones automáticas
 

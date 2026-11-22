@@ -16,7 +16,9 @@ description: 只需几步即可在 UR 上开始挖矿。矿工做什么、你需
 >
 > 如果你自己运行矿工、没有使用该服务，`provider update` 也会拒绝：请按[手动下载](/docs/miner/install#manual-download)中的说明安装新版本，然后重启矿工。
 >
-> 不受影响的有：Docker 镜像、各个应用，以及由安装程序设置、通过 `urnet-tools` 更新的矿工。
+> **Docker 镜像 `bringyour/community-provider` 也没有更新。** 容器从不自行更新，而该镜像从 7 月到 2026 年 11 月 22 日一直没有重新构建，因此它的每个标签都停留在版本 2026.7.2。现在它包含当前版本：请重新拉取它并重新创建你的容器，方法见[更新](/docs/miner/updates#docker)。
+>
+> 不受影响的有：各个应用，以及由安装程序设置、通过 `urnet-tools` 更新的矿工。
 
 UR 矿工把你的互联网连接作为出口提供给网络运营商。验证者检查它是否真的在承载流量，Bittensor SN25（netuid 25）则以子网的 α 代币（品牌名 $UR）为这项工作支付奖励。想在一页内了解整个角色，从要求到奖励，请看[用 UR 挖矿 Bittensor SN25](/miners)。
 

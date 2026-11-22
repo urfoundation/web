@@ -1,17 +1,18 @@
 ---
 published: 2026-10-21
-description: Instala el minero de UR. Los instaladores para Linux, macOS y Windows con actualizaciones automáticas, una descarga manual y la compilación de provider desde el código fuente.
+description: Instala el minero de UR. Los instaladores para Linux, macOS y Windows con actualizaciones automáticas, una descarga manual, la compilación desde el código fuente y Docker.
 ---
 
 # Instalar el minero
 
-El minero es un único programa, `provider`. Hay tres formas de obtenerlo:
+El minero es un único programa, `provider`. Hay cuatro formas de obtenerlo:
 
 | Forma | Sistemas | Actualizaciones | Ideal para |
 | --- | --- | --- | --- |
 | [Instalador](#the-installers) | Linux, macOS, Windows | Automáticas | La mayoría de la gente |
 | [Descarga manual](#manual-download) | Linux, macOS, Windows | Automáticas, con `provider setup` | Control total |
 | [Compilar desde el código fuente](#build-from-source) | Linux, macOS, Windows | A mano | Desarrolladores y auditores |
+| [Docker](#docker) | Contenedores Linux (amd64, arm64) | Una imagen nueva, a mano | Contenedores |
 
 Elijas la que elijas, el minero guarda su identidad en `~/.urnetwork` (`%USERPROFILE%\.urnetwork` en Windows), así que más adelante puedes cambiar de forma sin volver a registrarte. Haz primero una copia de seguridad de esa carpeta y detén la tarea en segundo plano de la forma antigua antes de iniciar la nueva, para que nunca se ejecuten dos copias a la vez. Después de instalar, vuelve al [inicio rápido](/docs/miner#2-run-setup). Los requisitos se resumen en [lo que necesita un minero de UR](/miners).
 
@@ -190,6 +191,21 @@ provider --help
 ```
 
 Una compilación propia indica `development build` y nunca se actualiza sola. Actualízala volviendo a compilar.
+
+## Docker
+
+La imagen [`bringyour/community-provider`](https://hub.docker.com/r/bringyour/community-provider) ejecuta la versión publicada de `provider` en un contenedor, para `linux/amd64` y `linux/arm64`. Acepta los comandos del minero: inicia sesión una vez y luego arráncala con `provide`, que registra el dispositivo en su primer inicio.
+
+```bash
+docker volume create urnetwork
+docker run --rm -it -v urnetwork:/root/.urnetwork bringyour/community-provider:latest auth
+docker run -d --name urnetwork --restart unless-stopped \
+  -v urnetwork:/root/.urnetwork bringyour/community-provider:latest provide
+```
+
+`auth` te pide tu código de autorización, o lo acepta después de `auth`. El minero guarda su identidad en el `/root/.urnetwork` del contenedor, aquí el volumen con nombre `urnetwork`. Da a cada contenedor su propio directorio de estado como este, propiedad de root y sin permiso de escritura para otros, y el minero conserva su dispositivo cuando recreas el contenedor para actualizarlo. Un directorio de estado propiedad de otro usuario (como una carpeta tuya montada con `-v ~/.urnetwork:/root/.urnetwork`), con permiso de escritura para todos, de solo lectura o compartido por varios contenedores también funciona, pero entonces cada contenedor nuevo registra un dispositivo nuevo, y el registro lo indica al arrancar.
+
+`docker exec urnetwork bringyour-provider status` muestra si ha iniciado sesión y está conectado. El extensor necesita que los puertos del contenedor estén publicados; consulta [Ejecutar un extensor](/docs/miner/extender#docker). Un contenedor nunca se actualiza solo; consulta [Actualizaciones](/docs/miner/updates#docker).
 
 ## Un binario de tu operador
 

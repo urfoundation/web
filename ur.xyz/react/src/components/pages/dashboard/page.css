@@ -533,6 +533,8 @@ section[data-tab="method"]:not([hidden])~.foot .hwc{display:none!important}
 #tip .row:only-of-type{justify-content:flex-start;gap:7px}
 /* epochs (2026-11-02): earlier epochs behind a button; pending payouts */
 #e-tbl tr.ep-old{display:none}#e-tbl.show-old tr.ep-old{display:table-row}
+/* under an epoch's earned total: how it was paid (pool, top-level miners); wraps so the column stays narrow */
+#e-tbl .ep-split{display:block;font-size:.8em;line-height:1.35;margin-top:2px;white-space:normal;max-width:22ch;margin-inline-start:auto;text-wrap:balance}
 #e-more{margin-top:12px}
 #p-tot.pend{font-size:clamp(34px,3.4vw,46px);letter-spacing:-.02em}
 #p-pend a{color:var(--ink);text-underline-offset:3px}

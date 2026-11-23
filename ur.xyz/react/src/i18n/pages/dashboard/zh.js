@@ -74,7 +74,7 @@ export default {
         runningTotal: "累计总量",
         users: "用户",
         growth: "增长",
-        signups: "注册",
+        signups: "净新增网络",
         providers: "提供者",
         providersByCountry: "各国提供者",
         details: "详情",

@@ -91,6 +91,12 @@ export function grafanaPanel(pid, query) {
         const prev = (x) => { const e = epochAt(x); return e && e.number > 0 ? 180_000 * scale : null; };
         return { results: { ...one('A', {}, 'this epoch', (x) => usersSoFar(x) * scale), ...one('B', {}, 'last epoch', prev) } };
     }
+    // miner emissions (panel 19): A is what was captured in the epoch so far, the epoch before's emission;
+    // B the epoch before's figure, the emission of the one before that
+    if (pid === 19) {
+        const captured = (x, back) => { const e = epochAt(x); return e && e.number > back ? 1_600 + e.number - back : null; };
+        return { results: { ...one('A', {}, 'this epoch', (x) => captured(x, 1)), ...one('B', {}, 'last epoch', (x) => captured(x, 2)) } };
+    }
     if (pid === 33 || pid === 71) {
         // an instant query: one point a country, at the end of the range
         const list = pid === 33 ? COUNTRIES : EXTENDERS;

@@ -6,7 +6,7 @@
  * Two halves, so a visit costs a handful of requests rather than hundreds:
  *
  *   buildHistory()  runs once a day (scripts/dashboard-history.mjs, from a
- *                   GitHub Action) and writes public/dashboard/history.json:
+ *                   scheduled job) and writes public/dashboard/history.json:
  *                   one value per UTC day for every series, the country
  *                   counts at the end of each day, 90 days of hourly
  *                   throughput, the reserve's daily balance and the α price
@@ -26,35 +26,91 @@
  * share of the measured total in proportion to that hour's throughput, the
  * same method as the page's "When traffic flows".
  */
-import { FINNEY_ARCHIVE, FINNEY_RPC, readReserve, readReserveAt } from './subtensor.js';
+import { FINNEY_ARCHIVE, FINNEY_RPC, readEmissionAt, readReserve, readReserveAt } from './subtensor.js';
 import { readConviction } from './conviction.js';
+import {
+    BLOCK_SECONDS, EPOCH_BLOCKS, EPOCH_ONE_START_BLOCK, EPOCH_ONE_START_MS, EPOCH_ZERO_START_BLOCK, EPOCH_ZERO_START_MS,
+    LATEST_ANCHOR_BLOCK, LATEST_ANCHOR_MS, epochStartBlock,
+} from './epoch.js';
 
 export const GRAFANA = 'https://grafana.bringyour.com';
 const DASHBOARD = 'ea86caca098b4b91b873fd8dacbf2676';
 export const H = 3_600_000, DAY = 86_400_000;
 export const RESERVE_WALLET = '5CcHGEqKK3RXeEA2sVycHQAQGrqsyhWaYu9FjGtDVN6nwMwR';
-const ND = 90, NH = 144, EPOCH_MS = 7 * DAY;
+const ND = 90, NH = 144, EPOCH_MS = 7 * DAY, BLOCK_MS = BLOCK_SECONDS * 1000;
 const RESERVE_FROM = Date.UTC(2026, 9, 10); // the reserve wallet's first balance (10 Oct 2026)
-const MAINNET_FROM = Date.UTC(2026, 9, 8); // SN25 mainnet, epoch 0 (8 Oct 2026)
+const MAINNET_FROM = EPOCH_ZERO_START_MS; // SN25 mainnet, epoch 0 (8 Oct 2026, 18:08:12 UTC)
+// History version 2 keeps each epoch's miner emission against the epoch that earned it (version 1 kept
+// it one epoch late) and each epoch's data carried from its own window.
+const HISTORY_VERSION = 2;
+// An epoch's miner emission is captured in the next epoch's first 120 blocks (urnetwork/server
+// PUBLICSTATS.md); the feed's figure for it is read only once this long into the next epoch.
+const CAPTURE_MS = 2 * H;
 
 /**
- * Provider payouts by epoch (updated 2026-11-09). What providers earned in an epoch comes from the
- * stats feed (prev_miner_emissions_alpha, kept per epoch in the history); this table only holds what
- * the feed can't say:
+ * Provider payouts by epoch (updated 2026-11-23). What providers earned in an epoch is everything SN25
+ * paid to miner UIDs other than the reserve's two: the operator pools' UIDs and the top providers' own.
+ * The daily job reads it from the chain (providersEarned: the epoch's miner allocation less what the
+ * reserve's UIDs gained between its first and last blocks) and keeps it per epoch in the history.
+ * The part paid through an operator pool is what its settlement vault captured: the stats feed's miner
+ * emissions, which run one epoch late (during epoch n, miner_emissions_alpha is epoch n−1's and
+ * prev_miner_emissions_alpha epoch n−2's), kept per epoch too. This table holds what neither can say:
  *   testing  epochs 0 and 1 were testing; providers were still paid in USDC (Lemz)
- *   earned   α earned, where the feed's figure isn't kept: epoch 3's 4,132.72 α, which closed on
- *            version 1 without a payout root and is recovered and paid with epoch 5 (ur.xyz/mainnet, 6 Nov)
- *   paid     set once an epoch's payout is confirmed paid; until then the page shows it as pending
- *            (claims can be delayed or paused, so nothing is marked paid from the schedule alone)
- * No payout has been confirmed yet. The schedule lives on ur.xyz/mainnet.
+ *   poolAll  everything the epoch's providers earned went through the pool: epochs 2 and 3, when the
+ *            v1 pool (UID 169) had the whole providers' share and no other miner UID earned; the vault
+ *            captured both together, as epoch 3's 4,132.72 α (ur.xyz/mainnet, 31 Oct)
+ *   pool     α the pool captured, set by hand so a missed daily run can't lose it: epochs 2 and 3
+ *            (2,066.36 α each, the chain's figure for each epoch: they sum to the 4,132.72 α captured,
+ *            and stand in while the history lacks the epoch's total), 4 (1,695.145671488 α, captured in
+ *            epoch 5) and 5 (1,627.003062563 α, captured in epoch 6)
+ *   total    what the epoch's providers earned, as the chain gave it (providersEarned, read on 23 Nov):
+ *            kept here so the page shows it before the daily history has it
+ *   paid     α of the pool's part confirmed paid; until then the page shows it as pending (claims can
+ *            be delayed or paused, so nothing is marked paid from the schedule alone)
+ * No pool payout has been confirmed yet. The schedule lives on ur.xyz/mainnet.
  */
 export const PAYOUTS = {
     epochs: {
         0: { testing: true },
         1: { testing: true },
-        3: { earned: 4132.72 },
+        2: { poolAll: true, pool: 2066.36, total: 2066.36 },
+        3: { poolAll: true, pool: 2066.36, total: 2066.36 },
+        4: { pool: 1695.145671488, total: 2055.80 },
+        5: { pool: 1627.003062563, total: 2063.44 },
+        6: { total: 2064.99 },
     },
 };
+
+/**
+ * What every miner UID but the reserve's earned over `blocks` blocks: the miner allocation (less any
+ * share the chain burns) less what the reserve's UIDs gained. Null when the figures can't be right: the
+ * reserve gaining more than the allocation, or the providers' figure past half of it (the providers'
+ * share is a tenth; anything near half means the reserve moved α out, so its gain undercounts).
+ */
+export function providersEarned({ startAlpha, endAlpha, minerPerBlock, blocks = EPOCH_BLOCKS, burned = 0 }) {
+    if (![startAlpha, endAlpha, minerPerBlock].every(Number.isFinite)) return null;
+    const allocation = minerPerBlock * blocks * (1 - (burned || 0)), earned = allocation - (endAlpha - startAlpha);
+    return earned >= 0 && earned <= allocation / 2 ? earned : null;
+}
+
+/**
+ * When epoch k starts: the chain's own time where the feed has reported it (its epoch_start, kept
+ * per epoch in `starts`), else interpolated by block between the nearest known times (epoch.js's
+ * anchors and the kept starts), at 12 s a block past the last of them.
+ */
+export function epochClock(starts = {}) {
+    const pts = [[EPOCH_ZERO_START_BLOCK, EPOCH_ZERO_START_MS], [EPOCH_ONE_START_BLOCK, EPOCH_ONE_START_MS], [LATEST_ANCHOR_BLOCK, LATEST_ANCHOR_MS],
+        ...Object.entries(starts).map(([n, t]) => [epochStartBlock(+n), t])].sort((a, b) => a[0] - b[0]);
+    return (k) => {
+        if (starts[k] != null) return starts[k];
+        const b = epochStartBlock(k), i = pts.findIndex(([pb]) => pb >= b);
+        if (i === -1) { const [pb, pt] = pts[pts.length - 1]; return pt + (b - pb) * BLOCK_MS; }
+        if (pts[i][0] === b) return pts[i][1];
+        if (i === 0) return pts[0][1] - (pts[0][0] - b) * BLOCK_MS;
+        const [b0, t0] = pts[i - 1], [b1, t1] = pts[i];
+        return Math.round(t0 + ((b - b0) * (t1 - t0)) / (b1 - b0));
+    };
+}
 
 /** Gauges read hourly: [key, Grafana panel, how a day is summarised]. */
 const GAUGES = [
@@ -249,40 +305,69 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
             });
         }
     }
-    // every finished epoch: its dates, users and operator deposits (Grafana panels 17 and 18, which
-    // count up through an epoch and reset at the next) and data carried (the days it spans, split pro rata at its boundaries);
-    // the epoch just finished takes the feed's own prev_* figures
+    // every finished epoch: its dates (the chain's, epochClock), users and operator deposits (Grafana panels
+    // 17 and 18, which count up through an epoch and reset at the next), data carried (panel 1 over the
+    // epoch's own window while Grafana still has it, else the days it spans, split pro rata at its
+    // boundaries) and what providers earned (the feed's miner emissions); the epoch just finished takes
+    // the feed's own prev_* figures
     if (st.epoch) {
         const cur = st.epoch, s0 = st.epoch_start * 1000;
-        const bounds = (k) => (k === 0 ? [MAINNET_FROM, s0 - (cur - 1) * EPOCH_MS] : [s0 - (cur - k) * EPOCH_MS, s0 - (cur - k - 1) * EPOCH_MS]);
+        const fresh = (prev?.version ?? 1) < 2; // version 1 kept miner emissions one epoch late: they're read again
+        h.starts = { ...(h.starts || {}), [cur]: s0 };
+        const clock = epochClock(h.starts);
+        const bounds = (k) => [clock(k), k + 1 === cur ? s0 : clock(k + 1)];
         const hours = Math.ceil((today - MAINNET_FROM) / H);
         // each panel has two series: A counts up through the current epoch, B holds the last finished epoch's total
         // from just after it ends. A resets hours after the boundary (and dips mid-epoch), so its maximum over an
         // epoch can pick up the epoch before's total; B, read just after the epoch ends, is that epoch's own figure.
-        const panels = await part('epochs', () => Promise.all([17, 18].map((pid) => g.post(pid, MAINNET_FROM, today, H, hours).then((fs) => ['A', 'B'].map((r) => fs.find((f) => f.ref === r))))));
+        const panels = await part('epochs', () => Promise.all([17, 18, 19].map((pid) => g.post(pid, MAINNET_FROM, today, H, hours).then((fs) => ['A', 'B'].map((r) => fs.find((f) => f.ref === r))))));
         // without them (soft), the epochs the history has stay as they were
         if (!panels) return finish();
-        const [[uf, ub], [df, db]] = panels;
+        const [[uf, ub], [df, db], [mf]] = panels;
         const after = (f, b) => { if (!f) return null; for (let i = 0; i < f.t.length; i++) if (f.t[i] > b && f.t[i] <= b + DAY && f.v[i] != null) return f.v[i]; return null; };
         const before = (f, a, b) => { let v = null; if (f) f.t.forEach((t, i) => { if (t > a && t <= b && f.v[i] != null) v = f.v[i]; }); return v; };
         const kept = h.epochs || {};
+        // data carried over each epoch's own window (panel 1 sums its range), once per epoch: a figure
+        // already kept from panel 1 or the feed stays, and Grafana keeps 90 days
+        const exact = {};
+        await pool([...Array(cur).keys()].filter((k) => !kept[k]?.dataSrc && bounds(k)[0] >= today - (ND - 1) * DAY), 3, async (k) => {
+            const [a, b] = bounds(k);
+            try {
+                const v = last(longest(await g.post(1, a, b, H, 10)));
+                if (v != null) exact[k] = v / 2 ** 30;
+            } catch (e) { log(`epoch ${k} data: ${e.message}`); } // the days it spans stand in
+        });
         h.epochs = {};
         for (let k = 0; k < cur; k++) {
-            const [a, b] = bounds(k);
-            let users = null, deposits = null, tb = 0, covered = 0;
-            users = after(ub, b) ?? before(uf, a, b);
-            deposits = after(db, b) ?? before(df, a, b);
-            for (let d = day(a); d < b; d += DAY) {
-                const v = h.days[iso(d)]?.traffic, o = Math.min(b, d + DAY) - Math.max(a, d);
-                if (o > 0 && v != null) { tb += (v * o) / DAY; covered += o; }
+            const [a, b] = bounds(k), was = kept[k] || {};
+            // a figure Grafana no longer has (it keeps 90 days) stays as the history kept it
+            const users = after(ub, b) ?? before(uf, a, b) ?? was.users ?? null;
+            const deposits = after(db, b) ?? before(df, a, b) ?? was.deposits ?? null;
+            // what providers earned: panel 19's series A is the emission captured in each epoch, so through
+            // epoch k+1 (once captured) it is epoch k's; kept figures stand where Grafana no longer reaches
+            const nextEnd = k + 1 === cur ? today : bounds(k + 1)[1];
+            const miner = before(mf, b + CAPTURE_MS, nextEnd) ?? (fresh ? null : was.miner ?? null);
+            let dataGiB = was.dataSrc ? was.dataGiB : exact[k] ?? null;
+            const dataSrc = was.dataSrc || (exact[k] != null ? 'panel1' : null);
+            if (dataGiB == null) {
+                let tb = 0, covered = 0;
+                for (let d = day(a); d < b; d += DAY) {
+                    const v = h.days[iso(d)]?.traffic, o = Math.min(b, d + DAY) - Math.max(a, d);
+                    if (o > 0 && v != null) { tb += (v * o) / DAY; covered += o; }
+                }
+                dataGiB = covered >= (b - a) * 0.9 ? (tb * 1e12) / 2 ** 30 : null;
             }
-            h.epochs[k] = { start: a, end: b, users, deposits, dataGiB: covered >= (b - a) * 0.9 ? (tb * 1e12) / 2 ** 30 : null, settlePx: h.settlePx[b] ?? null, miner: kept[k]?.miner ?? null };
+            h.epochs[k] = { start: a, end: b, users, deposits, dataGiB, dataSrc, settlePx: h.settlePx[b] ?? was.settlePx ?? null, miner, providers: was.providers ?? null };
         }
-        const last = h.epochs[cur - 1];
-        if (st.prev_users != null) last.users = st.prev_users;
-        if (st.prev_data_gib != null) last.dataGiB = st.prev_data_gib;
-        if (st.prev_miner_emissions_alpha != null) last.miner = st.prev_miner_emissions_alpha;
-        if (st.prev_demand_deposits_alpha != null) last.deposits = st.prev_demand_deposits_alpha;
+        const done = h.epochs[cur - 1];
+        if (st.prev_users != null) done.users = st.prev_users;
+        if (st.prev_data_gib != null) { done.dataGiB = st.prev_data_gib; done.dataSrc = 'feed'; }
+        if (st.prev_demand_deposits_alpha != null) done.deposits = st.prev_demand_deposits_alpha;
+        // what providers earned: an epoch's emission is captured in the next epoch's first 120 blocks and
+        // counts there, so the feed's figure now is the epoch just finished's, its previous figure the one before
+        if (st.miner_emissions_alpha != null && now >= s0 + CAPTURE_MS) done.miner = st.miner_emissions_alpha;
+        if (cur >= 2 && st.prev_miner_emissions_alpha != null) h.epochs[cur - 2].miner = st.prev_miner_emissions_alpha;
+        h.version = HISTORY_VERSION;
     }
     // the reserve's balance at the end of each day, from the archive node
     if (chain) {
@@ -302,6 +387,35 @@ export async function buildHistory({ g = grafana(), prev = null, now = Date.now(
             const at = new Map(blocks.map((b, i) => [b, want[i]])); // the day each block was chosen for
             for (const s of samples) { const t = at.get(num(s.block)); if (t) put(iso(t - DAY), 'reserve', num(s.alpha)); }
             log(`reserve: ${samples.length}/${blocks.length} days`);
+            // what providers earned in each finished epoch the history lacks it for (from epoch 2: the reserve
+            // began on 10 Oct): the reserve's balance after the block before the epoch's first and after its
+            // last, and the emission at those two blocks, which must agree (an epoch whose emission changed
+            // within it, as at a halving, gets no figure rather than a wrong one)
+            const cur = st.epoch || 0, need = [];
+            for (let k = 2; k < cur; k++) if (h.epochs?.[k] && h.epochs[k].providers == null) need.push(k);
+            const edge = (k) => epochStartBlock(k) - 1;
+            const edges = [...new Set(need.flatMap((k) => [edge(k), edge(k + 1)]))];
+            let found = [];
+            for (let pass = 0; pass < 3 && found.length < edges.length; pass++) {
+                const todo = edges.filter((b) => !found.some((x) => num(x.block) === b));
+                if (!todo.length) break;
+                try {
+                    const res = await readReserveAt({ address: RESERVE_WALLET, hotkeys: r.stakeHotkeys, blocks: todo, endpoints: archive });
+                    found = found.concat(res.samples || []);
+                } catch (e) { log(`epoch reserve reads: ${e.message}`); break; } // what was read stands
+            }
+            let rates = [];
+            try { rates = need.length ? await readEmissionAt({ blocks: [...new Set(need.flatMap((k) => [epochStartBlock(k), edge(k + 1)]))], endpoints: archive }) : []; }
+            catch (e) { log(`epoch emission reads: ${e.message}`); }
+            const alphaAt = new Map(found.map((x) => [num(x.block), num(x.alpha)]));
+            const rateAt = new Map(rates.map((x) => [x.block, x]));
+            for (const k of need) {
+                const a = rateAt.get(epochStartBlock(k)), b = rateAt.get(edge(k + 1));
+                if (!a || !b || a.minerPerBlock !== b.minerPerBlock || a.burned !== b.burned) { log(`epoch ${k} providers: emission ${a && b ? 'changed within the epoch' : 'not read'}`); continue; }
+                const earned = providersEarned({ startAlpha: alphaAt.get(edge(k)), endAlpha: alphaAt.get(edge(k + 1)), minerPerBlock: b.minerPerBlock, burned: b.burned });
+                if (earned != null) h.epochs[k].providers = earned;
+                else log(`epoch ${k} providers: not read`);
+            }
         } catch (e) { log(`reserve history: ${e.message}`); }
     }
     return finish();
@@ -371,6 +485,16 @@ export function assembleLive(answers = {}, { history = null, now = Date.now(), p
     const dayT = Array.from({ length: ND }, (_, i) => end - (ND - 1 - i) * DAY);
     const D = {};
     for (const k of [...GAUGES.map(([k]) => k), 'traffic', 'newNets', 'reserve']) D[k] = dayT.map((t) => hist.days?.[iso(t)]?.[k] ?? null);
+    // data carried on every day the history keeps, from its first, for the running total (the
+    // series above are the 90 days the periods use)
+    const allDays = Object.keys(hist.days || {}).filter((d) => d <= hist.end && hist.days[d].traffic != null).sort();
+    const ALL = { t: [], traffic: [] };
+    if (allDays.length) for (let t = Date.parse(allDays[0]); t <= end; t += DAY) { ALL.t.push(t); ALL.traffic.push(hist.days[iso(t)]?.traffic ?? null); }
+    // version 1 histories kept each epoch's miner emission against the epoch after the one that earned it
+    const epochs = hist.epochs ? (hist.version >= 2 ? hist.epochs : Object.fromEntries(Object.entries(hist.epochs).map(([k, e]) => [k, { ...e, miner: null }]))) : null;
+    // the feed's miner emission now is the epoch just finished's, once captured early in this epoch; its
+    // previous figure is the epoch before that's
+    const captured = st?.epoch_start != null && NOW >= st.epoch_start * 1000 + CAPTURE_MS;
     if (reserve && D.reserve[ND - 1] == null) D.reserve[ND - 1] = reserve.alpha;
 
     const Hs = {};
@@ -400,7 +524,7 @@ export function assembleLive(answers = {}, { history = null, now = Date.now(), p
     // the newest hour Grafana has reported (the last hour or two can still be empty)
     const lastOf = (k) => { const a = Hs[k]; for (let i = NH - 1; i >= 0; i--) if (a[i] != null) return a[i]; return null; };
     return {
-        NOW, END: end, dayT, hourT, D, Hs,
+        NOW, END: end, dayT, hourT, D, Hs, ALL,
         LIVE: {
             providers: s('online_providers'), throughput: lastOf('throughput'), conn: lastOf('conn'), users24: lastOf('users24'),
             countries: s('countries'), regions: lastOf('regions'), cities: lastOf('cities'), nets: s('total_networks'), devices: lastOf('devices'),
@@ -425,11 +549,15 @@ export function assembleLive(answers = {}, { history = null, now = Date.now(), p
         RESERVE: reserve ? { alpha: reserve.alpha, wallet: RESERVE_WALLET, block: reserve.block, time: reserve.time } : null,
         TPH: hist.tph || null,
         EXTRA: {
-            minerAlpha: st ? st.miner_emissions_alpha || 0 : null, prevMinerAlpha: st ? st.prev_miner_emissions_alpha || 0 : null, claimsAlpha: 0,
+            // α the operator pool captured for the epoch just finished (null until captured) and the one before it
+            // what providers earned in the epoch just finished, estimated from the chain now (its miner allocation
+            // at today's emission, less the reserve's share of it today) until the daily history has the exact figure
+            providersEstimate: reserve?.emission && reserve?.routing ? (EPOCH_BLOCKS * reserve.emission.minerPerDay / (DAY / BLOCK_MS)) * Math.max(0, 1 - (reserve.routing.burned || 0) - reserve.routing.reserve) : null,
+            poolLast: st && captured ? st.miner_emissions_alpha ?? null : null, poolBefore: st ? st.prev_miner_emissions_alpha ?? null : null, claimsAlpha: 0,
             depositAlpha: st ? st.demand_deposits_alpha || 0 : null, prevDepositAlpha: st ? st.prev_demand_deposits_alpha || 0 : null,
             recipients: reserve ? (reserve.hotkeys || []).map((x) => ({ hotkey: x.hotkey, uid: x.uid, alpha: alphaBy[x.hotkey] || 0 })) : null,
             prevSettlePx: hist.settlePx?.[ep('epoch_start')] ?? null,
-            epochs: hist.epochs || null,
+            epochs,
             payouts: PAYOUTS,
             conviction: answers.conviction || null,
         },

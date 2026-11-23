@@ -145,7 +145,7 @@ export default {
         usersToThen: 'Users, 24 hours to then',
         carried: 'Carried',
         carriedPer: { hour: 'Carried per hour', sixHours: 'Carried per 6 hours', day: 'Carried per day' },
-        signupsPer: { hour: 'Sign-ups per hour', sixHours: 'Sign-ups per 6 hours', day: 'Sign-ups per day' },
+        signupsPer: { hour: 'Net new networks per hour', sixHours: 'Net new networks per 6 hours', day: 'Net new networks per day' },
         onlineAverage: 'Online, average',
         networksAllTime: 'Networks, all time',
         sevenDayAverage: '7-day average',
@@ -226,12 +226,14 @@ export default {
         tableEpoch: 'Epoch',
         tableDates: 'Dates',
         now: 'now',
-        // what providers earned: after the amount and a dot
-        paid: 'paid',
-        pending: 'payout pending',
-        inProgress: 'in progress',
         // in place of the amount until the epoch settles
         atSettlement: 'at settlement',
+        // under an epoch's earned total ({value} is "1,234 α"): what went through the BringYour operator pool, and to top-level miners (top providers on their own UIDs)
+        rowPoolPending: '{value} via the BringYour operator pool, payout pending',
+        rowPoolPaid: '{value} via the BringYour operator pool, paid',
+        rowOwn: '{value} to top-level miners',
+        // the epoch table's column of operator deposits, shown once any epoch has them
+        deposits: 'Operator deposits',
         // a testing epoch's row, on hover
         testing: 'Testing epoch: providers were still paid in USDC',
         // the button that shows the earlier epochs: one ({n}) or a range ({from}–{to})
@@ -239,12 +241,11 @@ export default {
         showRange: 'Show epochs {from}–{to}',
         hide: 'Hide epoch {n}',
         hideRange: 'Hide epochs {from}–{to}',
-        // under the total earned: amounts ({value}, "1,234 α", in bold) paid and pending, a link,
-        // and the current epoch's amount so far
-        paidValue: '{value} paid',
-        pendingValue: '{value} payout pending',
+        // under the all-time total (amounts in bold): through the BringYour operator pool, paid or pending, and to top-level miners
+        poolPendingValue: '{value} via the BringYour operator pool, payout pending',
+        poolPaidValue: '{value} via the BringYour operator pool, paid',
+        ownValue: '{value} to top-level miners, paid as it’s earned',
         schedule: 'Payout schedule →',
-        inProgressValue: '{value} · epoch {n} in progress',
     },
 
     conviction: {

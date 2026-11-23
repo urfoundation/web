@@ -123,7 +123,7 @@ export default {
         runningTotal: 'Running total',
         users: 'Users',
         growth: 'Growth',
-        signups: 'Sign-ups',
+        signups: 'Net new networks',
         providers: 'Providers',
         providersByCountry: 'Providers by country',
         details: 'Details',

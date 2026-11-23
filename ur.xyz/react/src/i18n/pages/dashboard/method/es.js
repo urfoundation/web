@@ -2,7 +2,7 @@
 export default {
     headings: {
         usersPerEpoch: "Usuarios por época",
-        networksAndSignups: "Redes y registros",
+        networksAndSignups: "Redes y redes nuevas netas",
         hourlyDataCarried: "Datos transportados por hora",
         countriesAndCities: "Países y ciudades",
         change: "Cambio",
@@ -15,7 +15,7 @@ export default {
         dataCarried: "Datos que se mueven por la red para sus usuarios, según el monitoreo del operador. El número grande corresponde a las últimas 24 horas. Debajo se muestran el total del período y su promedio diario. Los promedios en Gb/s lo reparten de forma uniforme a lo largo del período.",
         dailyUsers: "Cuentas que movieron datos en una ventana de 24 horas. Un proxy alojado y los clientes que tiene detrás cuentan como una sola cuenta. El número grande corresponde a las últimas 24 horas, leído al abrir la página. Debajo se muestra el promedio del período, que también aparece como línea discontinua en el gráfico.",
         usersPerEpoch: "Cuentas que movieron datos en una época, el período de pago de 7 días de SN25, contadas una sola vez sin importar cuántos días estuvieron activas.",
-        networksAndSignups: "Una red es una cuenta. Una cuenta puede conectar varios dispositivos. Los registros son las redes creadas en el período.",
+        networksAndSignups: "Una red es una cuenta. Una cuenta puede conectar varios dispositivos. Las redes nuevas netas son el cambio en el total de redes en el período: las redes creadas menos las eliminadas, así que un día puede ser negativo.",
         whenTrafficFlows: "El día promedio del período, hora por hora, en hora local. La forma por horas sale del caudal y se escala para que las 24 horas sumen un día promedio de datos transportados.",
         hourlyDataCarried: "En las vistas {d1} y {d3}, las últimas 24 horas y las 48 anteriores son totales medidos. Cada hora recibe una parte de su total proporcional al caudal de esa hora.",
         runningTotal: "Los datos transportados sumados día a día desde el primer día que guardan nuestras estadísticas.",
@@ -23,7 +23,7 @@ export default {
         countriesAndCities: "Dónde están los proveedores, nunca dónde están los usuarios. Las ubicaciones se muestran por país y ningún proveedor se muestra de forma individual.",
         change: "El recuento actual frente al del inicio del período. Cuando nuestras estadísticas no llegan tan atrás, no se muestra ningún cambio.",
         payoutEpochs: "SN25 liquida los pagos cada 7 días (50.400 bloques). Los usuarios y los datos transportados por época usan los mismos límites.",
-        earned: "Alpha ganado por los proveedores en las épocas terminadas y en la actual, todavía en curso, a partir de las emisiones de los mineros de la subred. Aparece como pendiente hasta que se confirma el pago; los proveedores lo reclaman por su cuenta. El calendario de pagos está en {link}. Las épocas 0 y 1 fueron de prueba, cuando a los proveedores todavía se les pagaba en USDC.",
+        earned: "Alpha ganado por los proveedores en cada época terminada: todo lo que SN25 paga a los UID de mineros salvo los dos de Network Capacity Reserve. Es decir, el pool del operador BringYour, que paga a los proveedores de su red, y los mineros de nivel superior: grandes proveedores con UID propios. Es la asignación de mineros de la época menos lo que ganaron los UID de la reserva, leído en Bittensor mainnet en el primer y el último bloque de la época; la época recién terminada muestra hasta entonces una estimación a partir de la emisión actual. La época actual no tiene importe hasta que termina. La parte del pool del operador BringYour aparece como pendiente hasta que se confirma el pago, y los proveedores la reclaman por su cuenta; los mineros de nivel superior cobran en la cadena a medida que ganan. El pago del pool de las épocas 2 y 3 se liquidó junto, como el de la época 3. El calendario de pagos está en {link}. Las épocas 0 y 1 fueron de prueba, cuando a los proveedores todavía se les pagaba en USDC.",
         operatorDeposits: "Alpha que los operadores de red pagan a SN25 por el tráfico que usan.",
         reserve: "Una billetera controlada por una multifirma 2 de 3 que recibe parte de las emisiones de los proveedores de SN25 a través de dos hotkeys propias, y financia capacidad de red.",
         throughput: "Datos que circulan por la red cada segundo, contados en cada salto de una ruta, por eso el caudal supera a los datos transportados.",

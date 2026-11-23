@@ -90,7 +90,7 @@ export default {
         runningTotal: 'Нарастающий итог',
         users: 'Пользователи',
         growth: 'Рост',
-        signups: 'Регистрации',
+        signups: 'Чистый прирост сетей',
         providers: 'Провайдеры',
         providersByCountry: 'Провайдеры по странам',
         details: 'Подробности',

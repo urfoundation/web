@@ -4,7 +4,7 @@
 export default {
     headings: {
         usersPerEpoch: 'Nutzer pro Epoche',
-        networksAndSignups: 'Netzwerke und Registrierungen',
+        networksAndSignups: 'Netzwerke und netto neue Netzwerke',
         hourlyDataCarried: 'Übertragene Daten pro Stunde',
         countriesAndCities: 'Länder und Städte',
         change: 'Veränderung',
@@ -19,7 +19,7 @@ export default {
         dataCarried: 'Daten, die das Netzwerk für seine Nutzer überträgt, gezählt vom Monitoring des Betreibers. Die große Zahl gilt für die letzten 24 Stunden. Darunter stehen die Summe und der Tagesdurchschnitt des Zeitraums. Durchschnitte in Gb/s verteilen die Datenmenge gleichmäßig über den Zeitraum.',
         dailyUsers: 'Konten, die in einem 24-Stunden-Fenster Daten übertragen haben. Ein gehosteter Proxy und die Clients dahinter zählen als ein Konto. Die große Zahl gilt für die letzten 24 Stunden und wird beim Öffnen der Seite gelesen. Der Durchschnitt des Zeitraums steht darunter und erscheint als gestrichelte Linie im Diagramm.',
         usersPerEpoch: 'Konten, die in einer Epoche, dem 7-tägigen Auszahlungszeitraum von SN25, Daten übertragen haben, jedes einmal gezählt, unabhängig davon, an wie vielen Tagen es aktiv war.',
-        networksAndSignups: 'Ein Netzwerk ist ein Konto. Ein Konto kann mehrere Geräte verbinden. Registrierungen sind die im Zeitraum angelegten Netzwerke.',
+        networksAndSignups: 'Ein Netzwerk ist ein Konto. Ein Konto kann mehrere Geräte verbinden. Netto neue Netzwerke sind die Veränderung der Gesamtzahl der Netzwerke im Zeitraum: angelegte Netzwerke abzüglich entfernter, daher kann ein Tag negativ sein.',
         whenTrafficFlows: 'Der durchschnittliche Tag des Zeitraums, Stunde für Stunde, in Ortszeit. Der stündliche Verlauf stammt aus dem Durchsatz und ist so skaliert, dass die 24 Stunden zusammen einen durchschnittlichen Tag an übertragenen Daten ergeben.',
         hourlyDataCarried: 'In den Ansichten {d1} und {d3} sind die letzten 24 Stunden und die 48 davor gemessene Summen. Jede Stunde erhält ihren Anteil an der jeweiligen Summe im Verhältnis zu ihrem Durchsatz.',
         runningTotal: 'Die übertragenen Daten, Tag für Tag aufsummiert ab dem ersten Tag, den unsere Statistik erfasst.',
@@ -30,7 +30,7 @@ export default {
         // SN25
         payoutEpochs: 'SN25 rechnet Auszahlungen alle 7 Tage ab (50.400 Blöcke). Nutzer und übertragene Daten pro Epoche verwenden dieselben Grenzen.',
         // {link} is the link ur.xyz/mainnet
-        earned: 'Alpha, das Provider in abgeschlossenen Epochen und in der aktuellen, noch laufenden Epoche aus den Miner-Emissionen des Subnets verdient haben. Es wird als ausstehend angezeigt, bis die Auszahlung als bezahlt bestätigt ist; Provider beanspruchen es selbst. Der Auszahlungsplan steht auf {link}. Die Epochen 0 und 1 waren Testepochen, in denen Provider noch in USDC bezahlt wurden.',
+        earned: 'Alpha, das Provider in jeder abgeschlossenen Epoche verdient haben: alles, was SN25 an Miner-UIDs außer den zwei UIDs der Network Capacity Reserve zahlt. Das sind der Betreiber-Pool von BringYour, der die Provider in seinem Netzwerk bezahlt, und die Top-Level-Miner: große Provider mit eigenen UIDs. Es ist die Miner-Zuteilung der Epoche abzüglich dessen, was die UIDs der Reserve hinzugewonnen haben, gelesen aus Bittensor mainnet am ersten und letzten Block der Epoche; für die gerade beendete Epoche steht bis dahin eine Schätzung aus der heutigen Emission. Die laufende Epoche hat noch keinen Betrag. Der Teil des Betreiber-Pools von BringYour wird als ausstehend angezeigt, bis die Auszahlung als bezahlt bestätigt ist; Provider beanspruchen ihn selbst. Top-Level-Miner werden laufend on-chain bezahlt. Die Pool-Auszahlung für die Epochen 2 und 3 wurde zusammen abgerechnet, als die von Epoche 3. Der Auszahlungsplan steht auf {link}. Die Epochen 0 und 1 waren Testepochen, in denen Provider noch in USDC bezahlt wurden.',
         operatorDeposits: 'Alpha, das Netzbetreiber für den Datenverkehr, den sie nutzen, in SN25 einzahlen.',
         reserve: 'Eine von einem Multisig-Konto (2 von 3) gehaltene Wallet, die über zwei eigene Hotkeys einen Teil der Provider-Emissionen von SN25 erhält und Netzkapazität finanziert.',
         // More stats

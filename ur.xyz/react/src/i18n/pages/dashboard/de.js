@@ -87,7 +87,7 @@ export default {
         runningTotal: 'Laufende Summe',
         users: 'Nutzer',
         growth: 'Wachstum',
-        signups: 'Registrierungen',
+        signups: 'Netto neue Netzwerke',
         providers: 'Provider',
         providersByCountry: 'Provider nach Land',
         details: 'Details',

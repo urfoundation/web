@@ -670,6 +670,39 @@ export async function readReserve({ address, netuid = NETUID, endpoints = FINNEY
     };
 }
 
+/**
+ * The subnet's emission at past blocks, from the archive node: α emitted a block, the owner's cut, the
+ * share of the miner allocation the chain burns, and the miner allocation a block that leaves (half of
+ * what is left after the owner's cut, as readReserve counts it). Returns one entry a block that could be
+ * read, ascending; a block it couldn't read is left out.
+ */
+export async function readEmissionAt({ netuid = NETUID, blocks, endpoints = FINNEY_ARCHIVE, hashEndpoints = FINNEY_RPC, signal } = {}) {
+    if (!blocks.length) return [];
+    const n = u16le(netuid);
+    const keys = [
+        storageKey('SubtensorModule', 'SubnetAlphaOutEmission', n),
+        storageKey('SubtensorModule', 'SubnetOwnerCut'),
+        storageKey('SubtensorModule', 'MinerBurned', n),
+    ];
+    const hashes = await rpcBatch([...hashEndpoints, ...endpoints], blocks.map((b) => ['chain_getBlockHash', [b]]), signal);
+    const known = blocks.map((b, i) => [b, hashes[i]]).filter(([, h]) => typeof h === 'string');
+    const reads = await rpcBatch(endpoints, known.flatMap(([, h]) => keys.map((k) => ['state_getStorage', [k, h]])), signal);
+    const out = [];
+    known.forEach(([block], i) => {
+        try {
+            const [emission, cut, burned] = reads.slice(i * 3, i * 3 + 3).map((r, j) => unwrap(r, ['emission', 'owner cut', 'miner burned'][j]));
+            const alphaPerBlock = rao(decodeU64(emission));
+            if (alphaPerBlock == null) return;
+            const ownerCutRaw = decodeU16(cut);
+            const ownerCut = ownerCutRaw == null ? DEFAULT_OWNER_CUT : ownerCutRaw / 65_535;
+            out.push({ block, alphaPerBlock, ownerCut, burned: decodeI96F32(burned) ?? 0, minerPerBlock: (alphaPerBlock * (1 - ownerCut)) / 2 });
+        } catch {
+            // a block whose storage didn't come back: left out
+        }
+    });
+    return out.sort((x, y) => x.block - y.block);
+}
+
 const pause = (ms, signal) => new Promise((resolve, reject) => {
     const onAbort = () => { clearTimeout(timer); reject(new Error('aborted')); };
     const timer = setTimeout(() => { signal?.removeEventListener('abort', onAbort); resolve(); }, ms);

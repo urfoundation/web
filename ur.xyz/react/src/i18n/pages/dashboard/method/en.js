@@ -10,7 +10,7 @@
 export default {
     headings: {
         usersPerEpoch: 'Users per epoch',
-        networksAndSignups: 'Networks and sign-ups',
+        networksAndSignups: 'Networks and net new networks',
         hourlyDataCarried: 'Hourly data carried',
         countriesAndCities: 'Countries and cities',
         change: 'Change',
@@ -27,7 +27,7 @@ export default {
         dataCarried: "Data moved through the network for its users, as counted by the operator's monitoring. The big number is the last 24 hours. The period's total and daily average are shown below it. Averages in Gb/s spread it evenly over the period.",
         dailyUsers: "Accounts that moved data in a 24-hour window. A hosted proxy and the clients behind it count as one account. The big number is the last 24 hours, read when the page opens. The period's average is shown below it and as a dashed line on the chart.",
         usersPerEpoch: "Accounts that moved data in an epoch, SN25's 7-day payout period, each counted once however many days it was active.",
-        networksAndSignups: 'A network is an account. One account can connect several devices. Sign-ups are networks created in the period.',
+        networksAndSignups: 'A network is an account. One account can connect several devices. Net new networks are the change in total networks over the period: networks created, minus any removed, so a day can be negative.',
         whenTrafficFlows: "The period's average day, hour by hour, in local time. The hourly shape comes from throughput and is scaled so the 24 hours add up to an average day of data carried.",
         // {d1} and {d3} are the period buttons 1D and 3D (unit dashboard, periods)
         hourlyDataCarried: "In the {d1} and {d3} views, the last 24 hours and the 48 before them are measured totals. Each hour gets its share of its total in proportion to that hour's throughput.",
@@ -39,7 +39,7 @@ export default {
         // SN25
         payoutEpochs: 'SN25 settles payouts every 7 days (50,400 blocks). Users and data carried per epoch use the same boundaries.',
         // {link} is a link to the payout schedule, written ur.xyz/mainnet
-        earned: "Alpha earned by providers in finished epochs and the current one, still in progress, from the subnet's miner emissions. It shows as pending until the payout is confirmed paid; providers claim it themselves. The payout schedule is on {link}. Epochs 0 and 1 were testing, when providers were still paid in USDC.",
+        earned: "Alpha earned by providers in each finished epoch: everything SN25 pays to miner UIDs other than the Network Capacity Reserve's two. That is the BringYour operator pool, which pays the providers on its network, and the top-level miners: top providers that run their own UIDs. It is the epoch's miner allocation less what the reserve's UIDs gained, read from Bittensor mainnet at the epoch's first and last blocks; the epoch just finished shows an estimate from today's emission until that reading is in. The current epoch has no amount until it closes. The BringYour operator pool's part shows as pending until the payout is confirmed paid, and providers claim it themselves; top-level miners are paid on chain as it's earned. The pool's payout for epochs 2 and 3 was settled together, as epoch 3's. The payout schedule is on {link}. Epochs 0 and 1 were testing, when providers were still paid in USDC.",
         operatorDeposits: 'Alpha that network operators pay into SN25 for the traffic they use.',
         reserve: "A wallet held by a 2-of-3 multisig that receives part of SN25's provider emissions through two hotkeys it owns, and funds network capacity.",
         // More stats (the other three repeat the More stats tab's notes, unit dashboard, notes)

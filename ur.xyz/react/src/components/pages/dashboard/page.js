@@ -148,9 +148,10 @@ UR.part(()=>{set('#rt-u',nf(L.users24));set('#rt-p',nf(L.providers));set('#rt-c'
 new IntersectionObserver(([e])=>{if(e.isIntersecting){const r=$('.route');r.classList.remove('play');void r.offsetWidth;r.classList.add('play')}},{threshold:.5}).observe($('.route'));
 UR.onChange(()=>need($('#o-big'),any(SER('traffic').v)));
 bigTraffic($('#o-big'),250);
-const cumCfg=h=>{const t=UR.D.traffic,f=t.findIndex(v=>v!=null);let c=0;const cum=t.map(v=>v==null?null:(c+=v));return{t:UR.dayT.slice(f),series:[{v:cum.slice(f),kind:'area',color:BAR_HI,name:TX.chart.totalCarried,fmt:tbF}],T,height:h,ml:48,unit:'TB',xFmt:fmtD,tipX:fmtDw,endLabel:h>200,label:PG.titles.totalDataCarried}};
-UR.part(()=>{const t=UR.D.traffic,f=t.findIndex(v=>v!=null);if(!need($('#o-cum'),f>=0))return;let c=0;t.forEach(v=>{if(v!=null)c+=v});
-  set('#o-cum',tbF(c));html('#o-cum-s',esc(UR.f(TX.change.since,{date:fmtD(UR.dayT[f])})))});
+// the running total: every day the history keeps (S.ALL), not only the periods' 90
+const cumCfg=h=>{const A=S.ALL||{t:[],traffic:[]},t=A.traffic;let c=0;const cum=t.map(v=>v==null?null:(c+=v));return{t:A.t,series:[{v:cum,kind:'area',color:BAR_HI,name:TX.chart.totalCarried,fmt:tbF}],T,height:h,ml:48,unit:'TB',xFmt:fmtD,tipX:fmtDw,endLabel:h>200,label:PG.titles.totalDataCarried}};
+UR.part(()=>{const A=S.ALL||{t:[],traffic:[]};if(!need($('#o-cum'),A.t.length>0))return;let c=0;A.traffic.forEach(v=>{if(v!=null)c+=v});
+  set('#o-cum',tbF(c));html('#o-cum-s',esc(UR.f(TX.change.since,{date:fmtD(A.t[0])})))});
 UR.chart($('#o-cum-c'),()=>cumCfg(236));
 {const area=(k,name,fmt,label,ml,ref)=>()=>{const s=SER(k);return{t:s.t,series:[{v:s.v,kind:'area',color:BAR_HI,name:typeof name==='function'?name():name,fmt}],zero:false,trim:true,T,height:380,endLabel:true,ml:ml||56,label,ref:ref&&ref(),now:nowPt(k)}};
   const CM={users:[PG.titles.dailyUsers,plab,area('users24',uLab,nf,PG.titles.dailyUsers,undefined,()=>UR.P===1?null:{v:dailyUsers(UR.P).total,label:avgLab(UR.P)})],prov:[PG.titles.providersOnline,plab,area('providers',TX.chart.onlineAverage,v=>nf(Math.round(v)),PG.titles.providersOnline,undefined,()=>({v:SER('providers').total,label:avgLab(UR.P)}))],
@@ -235,7 +236,7 @@ UR.onChange(()=>{const P=UR.P,na=netsAdded(P);if(!need($('#n-g'),na)){html('#n-g
   const range=kMp(start,end),every=sec<60?UR.f(UR.pl(TX.network.seconds,Math.round(sec)),{count:EN?Math.round(sec):nf(Math.round(sec))}):UR.f(UR.pl(TX.network.minutes,+(sec/60).toFixed(1),{minimumFractionDigits:1}),{count:UR.fx(sec/60,1)});
   html('#n-g',`<div class="fig"><span class="k">${esc(UR.f(TX.network.networksAdded,{period:plab()}))}</span><span class="v">+${nf(added)}</span></div><div class="fig"><span class="k">${esc(UR.f(TX.network.growthLast,{period:plab()}))}</span><span class="v">+${UR.pc(added/start*100,1)}</span><span class="d">${esc(UR.f(TX.network.growthRange,{from:range[0],to:range[1]}))}</span></div><div class="fig"><span class="k">${esc(TX.network.newEvery)}</span><span class="v">${esc(every)}</span><span class="d">${esc(UR.f(TX.network.onAverageLast,{period:plab()}))}</span></div>`)});
 // total data carried, all recorded, beside the clock
-UR.part(()=>{const f=UR.D.traffic.findIndex(v=>v!=null);if(need($('#n-cum3'),f>=0))set('#n-cum-s',UR.f(TX.network.sinceChip,{date:fmtD(UR.dayT[f])}))});
+UR.part(()=>{const A=S.ALL||{t:[]};if(need($('#n-cum3'),A.t.length>0))set('#n-cum-s',UR.f(TX.network.sinceChip,{date:fmtD(A.t[0])}))});
 UR.chart($('#n-cum3'),()=>({...cumCfg(300),endLabel:true}));
 // clock by default; bars on request (remembered in this browser)
 {const pick=v=>{$$('#hodv button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));$('#n-clock').hidden=v!=='clock';$('#n-hod').hidden=v!=='bars';(v==='bars'?$('#n-hod'):$('#n-clock'))._draw();try{localStorage.setItem('ur-hod',v)}catch(e){}};
@@ -310,32 +311,55 @@ UR.part(()=>{if(!need($('#e-pct'),EP.n!=null))return;
 UR.part(()=>{const E=S.EPOCH,f=(k,v,d)=>`<div><span class="k">${k}</span><span class="v">${v}</span><span class="d">${d}</span></div>`;if(!need($('#oe-figs'),E))return;
   html('#oe-meta',UR.h(TX.epoch.overview,{epoch:`<b>${esc(UR.f(TX.epoch.name,{n:EP.n}))}</b>`,percent:UR.pc(Math.round(EP.p*100),0)}));$('#oe-bar').style.width=(EP.p*100).toFixed(1)+'%';
   html('#oe-figs',f(esc(TX.epoch.usersThisEpoch),nf(E.users),esc(UR.f(TX.epoch.inEpoch,{value:nf(E.prevUsers),n:EP.n-1})))+f(esc(TX.epoch.dataThisEpoch),tbF(epTB(E.dataGiB)),esc(UR.f(TX.epoch.inEpoch,{value:tbF(epTB(E.prevDataGiB)),n:EP.n-1})))+f(esc(TX.epoch.timeLeft),esc(EP.leftTxt),esc(UR.f(TX.epoch.ends,{when:when(EP.end)}))))});
-UR.part(()=>{if(EP.n==null)return;const W=7*UR.DAY,eps=[];for(let n=Math.max(0,EP.n-4);n<=EP.n+1;n++){const st=n===0?EP.start-(EP.n-1)*W-UR.DAY:EP.start+(n-EP.n)*W;eps.push({n,start:st,state:n<EP.n?'done':n===EP.n?'now':'sch'})}
-  html('#e-tl',eps.map(e=>`<div class="${e.state}"${e.state==='now'?` style="--p:${(EP.p*100).toFixed(1)}%"`:''}><span>${esc(UR.f(e.state==='now'?TX.epoch.shortNow:e.state==='sch'?TX.epoch.shortOn:TX.epoch.short,{n:e.n,date:e.state==='sch'?fmtD(e.start):''}))}</span></div>`).join(''));$('#e-tl').style.gridTemplateColumns=eps.map((e,i)=>e.n===0?'minmax(max-content,1.5fr)':i===eps.length-1?'minmax(max-content,4fr)':'7fr').join(' ')});
-const earnedIn=n=>{const X=S.EXTRA,p=((X.payouts&&X.payouts.epochs)||{})[n]||{},e=(X.epochs||{})[n];if(p.testing)return null;if(p.earned!=null)return p.earned;if(e&&e.miner!=null)return e.miner;return n===EP.n-1&&X.prevMinerAlpha?X.prevMinerAlpha:null};
+UR.part(()=>{if(EP.n==null)return;const W=7*UR.DAY,eps=[];for(let n=Math.max(0,EP.n-1);n<=EP.n+2;n++){const st=n===0?EP.start-(EP.n-1)*W-UR.DAY:EP.start+(n-EP.n)*W;eps.push({n,start:st,state:n<EP.n?'done':n===EP.n?'now':'sch'})}
+  html('#e-tl',eps.map(e=>`<div class="${e.state}"${e.state==='now'?` style="--p:${(EP.p*100).toFixed(1)}%"`:''}><span>${esc(UR.f(e.state==='now'?TX.epoch.shortNow:e.state==='sch'?TX.epoch.shortOn:TX.epoch.short,{n:e.n,date:e.state==='sch'?fmtD(e.start):''}))}</span></div>`).join(''));$('#e-tl').style.gridTemplateColumns=eps.map((e,i)=>e.n===0?'minmax(max-content,1.5fr)':e.state==='sch'?'minmax(max-content,4fr)':'7fr').join(' ')});
+// what providers earned in epoch n: everything paid to miner UIDs but the reserve's (total, from the chain, once the
+// daily history has it), and the part paid through the operator pool (pool, the vault's capture, from the stats feed)
+const earnedIn=n=>{const X=S.EXTRA,p=((X.payouts&&X.payouts.epochs)||{})[n]||{},e=(X.epochs||{})[n]||{};if(p.testing)return null;
+  const est=n===EP.n-1?X.providersEstimate??null:null,known=e.providers??p.total??null,
+    pool=p.poolAll&&known!=null?known:p.pool??e.miner??(n===EP.n-1?X.poolLast:n===EP.n-2?X.poolBefore:null),
+    // the live estimate is today's emission and routing: never less than what the pool is known to have captured
+    total=known??(est!=null?Math.max(est,pool||0):null);
+  if(total==null&&pool==null)return null;
+  // the rest of the total went to providers' own UIDs: unknown without the pool's part, or when the two sources disagree
+  const own=total!=null&&pool!=null&&pool<=total+.5?Math.max(0,total-pool):null;
+  // paid: the α of the pool's part confirmed paid (PAYOUTS)
+  return{total,pool,own,paid:Math.min(pool||0,+p.paid||0)}};
 UR.part(()=>{if(EP.n==null)return;const H=36e5,DAY=UR.DAY,hr=(a,b)=>UR.hourT.reduce((t,x,i)=>x>a&&x<=b&&UR.Hs.traffic[i]!=null?t+UR.Hs.traffic[i]:t,0),
     dy=(a,b)=>UR.dayT.reduce((t,x,i)=>{const s0=x,e0=x+DAY,o=Math.max(0,Math.min(b,e0)-Math.max(a,s0));return UR.D.traffic[i]!=null&&o>0?t+UR.D.traffic[i]*o/DAY:t},0);
   const curTB=epTB(S.EPOCH.dataGiB),prevTB=epTB(S.EPOCH.prevDataGiB);
   const X=S.EXTRA,PEND=X.payouts&&X.payouts.pending,
     PE=(X.payouts&&X.payouts.epochs)||{},
-    earn=r=>{const p=PE[r.n]||{},a=earnedIn(r.n);if(a==null)return'<span class="muted">—</span>';return`${nf(Math.round(a))} α <span class="muted">· ${esc(p.paid!=null?TX.epoch.paid:TX.epoch.pending)}</span>`},
+    // the epoch's total, and under it how it was paid: through the pool (pending until paid) and to providers' own UIDs
+    earn=r=>{const a=earnedIn(r.n);if(a==null)return'<span class="muted">—</span>';const v=x=>`${nf(Math.round(x))} α`,
+      parts=[a.pool>=.5?UR.f(a.paid>=a.pool-.5?TX.epoch.rowPoolPaid:TX.epoch.rowPoolPending,{value:v(a.pool)}):'',a.own>=.5?UR.f(TX.epoch.rowOwn,{value:v(a.own)}):''].filter(Boolean);
+      return`${a.total!=null?v(a.total):''}${parts.map(x=>`<span class="muted ep-split">${esc(x)}</span>`).join('')}`},
     rows=[{n:EP.n,a:EP.start,b:null,tb:curTB,users:S.EPOCH.users,dep:X.depositAlpha,cur:true}].concat(X.epochs
       ?Object.entries(X.epochs).map(([n,e])=>({n:+n,a:e.start,b:e.end,tb:e.dataGiB!=null?epTB(e.dataGiB):null,users:e.users,dep:e.deposits??null,miner:e.miner,settlePx:e.settlePx})).sort((p,q)=>q.n-p.n)
-      :[{n:EP.n-1,a:EP.start-7*DAY,b:EP.start,tb:prevTB,users:S.EPOCH.prevUsers,dep:X.prevDepositAlpha,miner:X.prevMinerAlpha}]),
+      :[]),
+    // the two epochs before this one, from the stats feed, until the history has them (its file is refreshed
+    // daily): the feed's figures for the epoch just finished, and what providers earned in the one before it
+    prevRows=[[EP.n-1,{tb:prevTB,users:S.EPOCH.prevUsers,dep:X.prevDepositAlpha}],[EP.n-2,{tb:null,users:null,dep:null}]].forEach(([n,f])=>{
+      if(n<0||rows.some(r=>r.n===n))return;const at=rows.findIndex(r=>r.n<n);
+      rows.splice(at<0?rows.length:at,0,{n,a:EP.start-(EP.n-n)*7*DAY,b:EP.start-(EP.n-n-1)*7*DAY,...f})}),
+    // operator deposits get their own column once any epoch has them (demand deposits start with epoch 7)
+    depCol=rows.some(r=>r.dep>0),
     dash='<span class="muted">—</span>',
-    row=r=>`<tr class="${r.n<EP.n-2?'ep-old':''}${(PE[r.n]||{}).testing?' ep-test':''}"${(PE[r.n]||{}).testing?` title="${esc(TX.epoch.testing)}"`:''}><td class="l">${r.n}</td><td class="l">${esc(UR.f(TX.time.days,{from:fmtD(r.a),to:r.cur?TX.epoch.now:fmtD(r.b)}))}</td><td>${r.tb!=null?tbF(r.tb):dash}</td><td>${r.users!=null?nf(r.users):dash}</td><td>${r.cur?(X.minerAlpha?`${nf(Math.round(X.minerAlpha))} α <span class="muted">· ${esc(TX.epoch.inProgress)}</span>`:`<span class="muted">${esc(TX.epoch.atSettlement)}</span>`):earn(r)}</td></tr>`,
+    row=r=>`<tr class="${r.n<EP.n-2?'ep-old':''}${(PE[r.n]||{}).testing?' ep-test':''}"${(PE[r.n]||{}).testing?` title="${esc(TX.epoch.testing)}"`:''}><td class="l">${r.n}</td><td class="l">${esc(UR.f(TX.time.days,{from:fmtD(r.a),to:r.cur?TX.epoch.now:fmtD(r.b)}))}</td><td>${r.tb!=null?tbF(r.tb):dash}</td><td>${r.users!=null?nf(r.users):dash}</td>${depCol?`<td>${r.dep!=null?`${nf(Math.round(r.dep))} α`:dash}</td>`:''}<td>${r.cur?`<span class="muted">${esc(TX.epoch.atSettlement)}</span>`:earn(r)}</td></tr>`,
     old=rows.filter(r=>r.n<EP.n-2);
-  html('#e-tbl',`<thead><tr><th class="l">${esc(TX.epoch.tableEpoch)}</th><th class="l">${esc(TX.epoch.tableDates)}</th><th>${esc(PG.titles.dataCarried)}</th><th>${esc(PG.titles.users)}</th><th>${esc(PG.titles.earned)}</th></tr></thead><tbody>${rows.map(row).join('')}</tbody>`);
+  html('#e-tbl',`<thead><tr><th class="l">${esc(TX.epoch.tableEpoch)}</th><th class="l">${esc(TX.epoch.tableDates)}</th><th>${esc(PG.titles.dataCarried)}</th><th>${esc(PG.titles.users)}</th>${depCol?`<th>${esc(TX.epoch.deposits)}</th>`:''}<th>${esc(PG.titles.earned)}</th></tr></thead><tbody>${rows.map(row).join('')}</tbody>`);
   if(old.length){const lo=Math.min(...old.map(r=>r.n)),hi=Math.max(...old.map(r=>r.n)),lab=on=>lo===hi?UR.f(on?TX.epoch.hide:TX.epoch.show,{n:lo}):UR.f(on?TX.epoch.hideRange:TX.epoch.showRange,{from:lo,to:hi});
     if(!$('#e-more')){$('#e-tbl').closest('.tw').insertAdjacentHTML('afterend',`<button class="more" id="e-more" aria-expanded="false" aria-controls="e-tbl"></button>`);
       $('#e-more').addEventListener('click',e=>{const on=$('#e-tbl').classList.toggle('show-old');e.currentTarget.setAttribute('aria-expanded',on);e.currentTarget.textContent=e.currentTarget._lab(on)})}
     const b=$('#e-more');b._lab=lab;b.textContent=lab($('#e-tbl').classList.contains('show-old'))}});
-// earned by providers, all time: finished epochs (testing aside) plus the current epoch's, in progress; pending until confirmed paid
-UR.part(()=>{if(!need($('#p-tot'),EP.n!=null))return;const X=S.EXTRA,PE=(X.payouts&&X.payouts.epochs)||{},EV=X.epochs||{},ns=[...new Set([...Object.keys(EV),...Object.keys(PE),EP.n-1].map(Number))].filter(n=>n>=0&&n<EP.n),
-    got=ns.map(n=>[n,earnedIn(n)]).filter(([,a])=>a!=null),tot=got.reduce((s,[,a])=>s+a,0),
-    paid=got.reduce((s,[n])=>s+(PE[n]&&PE[n].paid!=null?PE[n].paid:0),0),pend=tot-paid;
-  const cur=X.minerAlpha||0;set('#p-tot',nf(Math.round(tot)+Math.round(cur)));
-  html('#p-pend',[paid?UR.h(TX.epoch.paidValue,{value:`<b>${nf(Math.round(paid))} α</b>`}):'',pend>0?UR.h(TX.epoch.pendingValue,{value:`<b>${nf(Math.round(pend))} α</b>`}):'',`<a href="/mainnet">${esc(TX.epoch.schedule)}</a>`].filter(Boolean).join(' · ')+(cur?`<br>${UR.h(TX.epoch.inProgressValue,{value:`<b>${nf(Math.round(cur))} α</b>`,n:EP.n})}`:''))});
+// earned by providers, all time: finished epochs (testing aside), split into what went through the operator pools
+// (pending until confirmed paid) and to providers' own UIDs (paid on chain as it's earned). An epoch whose total
+// the history doesn't have yet counts with what its pool captured.
+UR.part(()=>{if(!need($('#p-tot'),EP.n!=null))return;const X=S.EXTRA,PE=(X.payouts&&X.payouts.epochs)||{},EV=X.epochs||{},ns=[...new Set([...Object.keys(EV),...Object.keys(PE),EP.n-1,EP.n-2].map(Number))].filter(n=>n>=0&&n<EP.n),
+    got=ns.map(earnedIn).filter(Boolean),sum=f=>got.reduce((s,a)=>s+(f(a)||0),0),
+    tot=sum(a=>a.total??a.pool),paid=sum(a=>a.paid),pend=sum(a=>(a.pool||0)-a.paid),own=sum(a=>a.own),b=x=>`<b>${nf(Math.round(x))} α</b>`;
+  set('#p-tot',nf(Math.round(tot)));
+  html('#p-pend',[[paid>=.5?UR.h(TX.epoch.poolPaidValue,{value:b(paid)}):'',pend>=.5?UR.h(TX.epoch.poolPendingValue,{value:b(pend)}):'',`<a href="/mainnet">${esc(TX.epoch.schedule)}</a>`].filter(Boolean).join(' · '),own>=.5?UR.h(TX.epoch.ownValue,{value:b(own)}):''].filter(Boolean).join('<br>'))});
 // reserve balance: its own period (7D / 30D / All); the reserve is daily and SN25 has no page-wide period
 {let RP=30;
   const rd=()=>{const r=UR.D.reserve,n=r.length,i0=r.findIndex(x=>x!=null),a=r[n-1],bi=RP?n-1-RP:-1,b=bi>=i0&&i0>=0?r[bi]:null;html('#r-d',a==null||i0<0?'':b!=null?`<b class="up">+${nf(Math.round(a-b))} α</b>${esc(UR.f(UR.pl(TX.reserve.inLastDays,RP),{count:RP}))}`:`<b class="up">+${nf(Math.round(a-r[i0]))} α</b>${esc(UR.f(TX.change.since,{date:fmtD(UR.dayT[i0])}))}`)};
@@ -361,11 +385,11 @@ UR.onChange(()=>{const tp=SER('throughput'),dv=SER('devices'),cn=SER('conn'),ex=
   if(need($('#m-tp'),any(tp.v))){set('#m-tp',gbs(tp.total));dl($('#m-tp-d'),tp.total,tp.prevTotal)}
   if(need($('#m-dev'),any(dv.v))){set('#m-dev',nf(Math.round(dv.total)));dl($('#m-dev-d'),dv.total,dv.prevTotal)}
   if(need($('#m-conn'),any(cn.v))){set('#m-conn',nf(Math.round(cn.total*1440)));dl($('#m-conn-d'),cn.total,cn.prevTotal)}
-  if(need($('#m-ext-a'),UR.EXT.online!=null||any(ex.v))){set('#m-ext-a',UR.EXT.online??'—');const sr=UR.series('extenders','last'),i=sr.v.findIndex(v=>v!=null),a=sr.v[i],d=a==null||UR.EXT.online==null?null:Math.round(UR.EXT.online-a);html('#m-ext-d',d==null?'':`<b class="${d>0?'up':d<0?'dn':'fl'}">${d>0?'↑ +'+d:d<0?'↓ −'+(-d):esc(TX.change.none)}</b>${esc(UR.f(TX.change.since,{date:UR.P<=3?UR.fmtWhen(sr.t[i]):fmtD(sr.t[i])}))}`)}});
-UR.chart($('#m-ext-c'),()=>{const s=UR.series('extenders','mean');return{t:s.t,series:[{v:s.v,kind:'area',color:BAR_HI,name:TX.chart.onlineAverage,fmt:v=>Math.round(v)}],zero:false,trim:true,int:true,T,height:222,label:PG.titles.extendersOnline}});
+  if(need($('#m-ext-a'),UR.EXT.online!=null||any(ex.v))){set('#m-ext-a',UR.EXT.online!=null?nf(UR.EXT.online):'—');const sr=UR.series('extenders','last'),i=sr.v.findIndex(v=>v!=null),a=sr.v[i],d=a==null||UR.EXT.online==null?null:Math.round(UR.EXT.online-a);html('#m-ext-d',d==null?'':`<b class="${d>0?'up':d<0?'dn':'fl'}">${d>0?'↑ +'+nf(d):d<0?'↓ −'+nf(-d):esc(TX.change.none)}</b>${esc(UR.f(TX.change.since,{date:UR.P<=3?UR.fmtWhen(sr.t[i]):fmtD(sr.t[i])}))}`)}});
+UR.chart($('#m-ext-c'),()=>{const s=UR.series('extenders','mean');return{t:s.t,series:[{v:s.v,kind:'area',color:BAR_HI,name:TX.chart.onlineAverage,fmt:v=>nf(Math.round(v))}],zero:false,trim:true,int:true,T,height:222,label:PG.titles.extendersOnline}});
 UR.chart($('#m-dev-c'),()=>{const s=SER('devices');return{t:s.t,series:[{v:s.v,kind:'area',color:BAR_HI,name:TX.chart.devicesDaily,fmt:nf}],trim:true,T,height:180,label:PG.titles.connectedDevices}});
 UR.chart($('#m-conn-c'),()=>{const s=SER('conn');return{t:s.t,series:[{v:s.v.map(v=>v==null?null:v*1440),kind:'area',color:BAR_HI,name:TX.chart.aDay,fmt:v=>nf(Math.round(v))}],trim:true,T,height:180,label:TX.chart.connectionsAria}});
-UR.part(()=>{if(!need($('#m-ext'),UR.EXT.list))return;set('#m-ext-n',UR.EXT.online??'—');const mx=Math.max(1,...UR.EXT.list.map(x=>x[2]));html('#m-ext',UR.EXT.list.map(([c,n,v])=>`<div class="r"><span>${n}</span><b>${v}</b><span class="tr"><i style="width:${(v/mx*100).toFixed(0)}%"></i></span></div>`).join(''))});
+UR.part(()=>{if(!need($('#m-ext'),UR.EXT.list))return;set('#m-ext-n',UR.EXT.online!=null?nf(UR.EXT.online):'—');const mx=Math.max(1,...UR.EXT.list.map(x=>x[2]));html('#m-ext',UR.EXT.list.map(([c,n,v])=>`<div class="r"><span>${n}</span><b>${nf(v)}</b><span class="tr"><i style="width:${(v/mx*100).toFixed(0)}%"></i></span></div>`).join(''))});
 const ipBar=(id,lid,d)=>{const t=d.v4+d.v6+d.dual,Cc=[[TX.ipFamily.v4,d.v4,BAR_HI],[TX.ipFamily.dual,d.dual,'#B77FC4'],[TX.ipFamily.v6,d.v6,BAR]];
   html(id,Cc.map(([k,v,c])=>`<div style="flex:${Math.max(v,t*.002)};background:${c}" title="${esc(UR.f(TX.ipFamily.title,{label:k,value:nf(v)}))}"></div>`).join(''));html(lid,Cc.map(([k,v,c])=>`<span><i class="bar" style="background:${c}"></i>${esc(UR.f(TX.ipFamily.legend,{label:k,value:nf(v)}))}</span>`).join(''))};
 UR.part(()=>{if(need($('#m-ipp'),UR.IPFAM.v4!=null))ipBar('#m-ipp','#m-ipp-l',UR.IPFAM);if(UR.EXT.v4!=null)ipBar('#m-ipe','#m-ipe-l',UR.EXT)});

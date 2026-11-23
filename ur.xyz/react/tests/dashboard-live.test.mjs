@@ -8,7 +8,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { CHAIN_READS, assembleLive, buildHistory, buildLive, grafana, liveReads } from '../src/lib/dashboardData.js';
+import { CHAIN_READS, assembleLive, buildHistory, buildLive, epochClock, grafana, liveReads, providersEarned } from '../src/lib/dashboardData.js';
+import { EPOCH_ZERO_START_MS } from '../src/lib/epoch.js';
 import { COUNTRIES, grafanaPanel, grafanaStats } from './dashboard-fixture.mjs';
 
 const history = JSON.parse(readFileSync(new URL('../public/dashboard/history.json', import.meta.url), 'utf8'));
@@ -57,7 +58,8 @@ test('nothing answered: the history file alone, every live part null or empty, n
     assert.equal(S.EXT.list, null);
     assert.equal(S.EXT.online, null);
     assert.equal(S.RESERVE, null);
-    assert.equal(S.EXTRA.minerAlpha, null);
+    assert.equal(S.EXTRA.poolLast, null);
+    assert.equal(S.EXTRA.poolBefore, null);
     assert.ok(S.D.providers.some((v) => v != null), 'the history\'s days');
     assert.ok(S.Hs.providers.every((v) => v == null));
     assert.ok(S.TPH && S.TPH.v.length > 0);
@@ -132,4 +134,79 @@ test('the page\'s history keeps what it could read and comes back partial; the d
     assert.equal(history.partial, undefined, 'the file itself is untouched');
     assert.equal(history.days[yesterday], undefined, 'the fixture still lacks yesterday');
     await assert.rejects(buildHistory({ g, prev: history, now: fixtureNow, days: 3, chain: false, countries: false }), /grafana panel 31: HTTP 503/);
+});
+
+test("epoch bounds: the chain's own start where the feed reported it, else interpolated by block between known times", () => {
+    const at = epochClock({ 6: Date.UTC(2026, 10, 13, 18, 28) });
+    assert.equal(at(0), EPOCH_ZERO_START_MS);
+    assert.equal(at(1), Date.UTC(2026, 9, 9, 18, 9));
+    assert.equal(at(6), Date.UTC(2026, 10, 13, 18, 28));
+    // epoch 5 lies between the latest anchor (24 Oct) and epoch 6's reported start: within a few minutes of 6 Nov 18:27
+    assert.ok(Math.abs(at(5) - Date.UTC(2026, 10, 6, 18, 27)) < 10 * 60_000, new Date(at(5)).toISOString());
+    // past the last known start, 12 s a block
+    assert.equal(at(7) - at(6), 50_400 * 12_000);
+});
+
+test("what providers earned goes to the epoch that earned it: the feed's figure now is the epoch just finished's, its previous the one before", async () => {
+    const g = grafana('http://fixture', { fetchImpl: fixtureFetch });
+    const v1 = { ...history, version: 1, epochs: Object.fromEntries(Object.entries(history.epochs || {}).map(([k, e]) => [k, { ...e, miner: 999 }])) };
+    const now = Date.now(), st = await g.stats(), cur = st.epoch;
+    const h = await buildHistory({ g, prev: v1, now, days: 3, chain: false, countries: false });
+    assert.equal(h.version, 2);
+    assert.equal(h.starts[cur], st.epoch_start * 1000);
+    assert.equal(h.epochs[cur - 2].miner, st.prev_miner_emissions_alpha);
+    const captured = now >= st.epoch_start * 1000 + 2 * 3_600_000;
+    assert.equal(h.epochs[cur - 1].miner, captured ? st.miner_emissions_alpha : null);
+    // version 1's figures were an epoch late: none is kept (older epochs are read again from panel 19)
+    for (let k = 0; k < cur; k++) assert.notEqual(h.epochs[k].miner, 999, `epoch ${k}`);
+    // epoch 0 starts at its block's own time, and every epoch ends where the next starts
+    assert.equal(h.epochs[0].start, EPOCH_ZERO_START_MS);
+    for (let k = 1; k < cur; k++) assert.equal(h.epochs[k].start, h.epochs[k - 1].end);
+    assert.equal(h.epochs[cur - 1].end, st.epoch_start * 1000);
+    // the page keeps nothing of a version 1 history's miner figures either
+    const S = assembleLive({ stats: st }, { history: v1, now });
+    assert.ok(Object.values(S.EXTRA.epochs).every((e) => e.miner == null));
+    assert.equal(S.EXTRA.poolBefore, st.prev_miner_emissions_alpha);
+    assert.equal(S.EXTRA.poolLast, captured ? st.miner_emissions_alpha : null);
+});
+
+test("the running total covers every day the history keeps, not only the periods' 90", () => {
+    const days = Object.keys(history.days).filter((d) => history.days[d].traffic != null).sort();
+    const S = assembleLive({}, { history, now: Date.parse(`${history.end}T12:00:00Z`) + DAY });
+    assert.equal(S.ALL.t[0], Date.parse(days[0]));
+    assert.equal(S.ALL.t.at(-1), Date.parse(history.end));
+    const sum = (a) => a.reduce((s, v) => s + (v ?? 0), 0);
+    assert.ok(Math.abs(sum(S.ALL.traffic) - sum(days.map((d) => history.days[d].traffic))) < 1e-6);
+    assert.equal(S.dayT.length, 90);
+});
+
+test("figures Grafana no longer has stay as the history kept them", async () => {
+    const g = grafana('http://fixture', { fetchImpl: fixtureFetch });
+    const st = await g.stats(), cur = st.epoch;
+    const first = await buildHistory({ g, prev: history, days: 3, chain: false, countries: false });
+    first.epochs[0] = { ...first.epochs[0], users: 4242, deposits: 7, miner: 12.5 };
+    // a Grafana that answers every panel empty: what it no longer has
+    const empty = grafana('http://fixture', { fetchImpl: async (url, init) => {
+        const u = new URL(url, 'http://fixture');
+        if (u.pathname.endsWith('/stats.json')) return fixtureFetch(url, init);
+        return new Response(JSON.stringify({ results: {} }), { status: 200 });
+    } });
+    const again = await buildHistory({ g: empty, prev: first, days: 3, chain: false, countries: false, soft: true });
+    assert.equal(again.epochs[0].users, 4242);
+    assert.equal(again.epochs[0].deposits, 7);
+    assert.equal(again.epochs[0].miner, 12.5);
+    assert.equal(again.epochs[cur - 2].miner, st.prev_miner_emissions_alpha);
+});
+
+test("what providers earned in an epoch: the miner allocation less what the reserve's UIDs gained", () => {
+    // epoch 6 as the chain had it: 2,952.0165 α a day to miners, the reserve gaining 18,599.13 α
+    const minerPerBlock = 2952.0164797436482 / 7200;
+    const e6 = providersEarned({ startAlpha: 96604.80, endAlpha: 115203.93, minerPerBlock });
+    assert.ok(Math.abs(e6 - 2064.99) < 0.05, String(e6));
+    // a share the chain burns isn't anyone's
+    assert.ok(Math.abs(providersEarned({ startAlpha: 0, endAlpha: 9_000, minerPerBlock: 0.2, blocks: 50_000, burned: 0.1 }) - 0) < 1e-9);
+    // the reserve gaining more than the allocation, or providers past half of it (α moved out of the reserve): no figure
+    assert.equal(providersEarned({ startAlpha: 0, endAlpha: 30_000, minerPerBlock }), null);
+    assert.equal(providersEarned({ startAlpha: 50_000, endAlpha: 40_000, minerPerBlock }), null);
+    assert.equal(providersEarned({ startAlpha: null, endAlpha: 1, minerPerBlock }), null);
 });

@@ -87,7 +87,7 @@ export default {
         runningTotal: "المجموع التراكمي",
         users: "المستخدمون",
         growth: "النمو",
-        signups: "التسجيلات",
+        signups: "صافي الشبكات الجديدة",
         providers: "المزوّدون",
         providersByCountry: "المزوّدون حسب الدولة",
         details: "التفاصيل",

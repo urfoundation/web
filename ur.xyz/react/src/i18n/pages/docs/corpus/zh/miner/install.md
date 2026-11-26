@@ -205,7 +205,27 @@ docker run -d --name urnetwork --restart unless-stopped \
 
 `auth` 会询问你的授权码，你也可以把授权码写在 `auth` 后面。矿工把身份保存在容器的 `/root/.urnetwork` 中，这里是命名卷 `urnetwork`。像这样给每个容器一个自己的状态目录，属于 root 且其他用户不可写，这样你为了更新而重新创建容器时，矿工会保留它的设备。属于其他用户的状态目录（例如用 `-v ~/.urnetwork:/root/.urnetwork` 挂载的你自己的文件夹）、所有人可写的、只读的或由多个容器共享的状态目录也能使用，但这样每个新容器都会注册一个新设备，日志会在启动时说明这一点。
 
-`docker exec urnetwork bringyour-provider status` 会显示它是否已登录并已连接。扩展器需要发布容器的端口；参见[运行扩展器](/docs/miner/extender#docker)。容器从不自行更新；参见[更新](/docs/miner/updates#docker)。
+使用 Docker Compose 时，先用上面那行 `auth` 登录，然后用 `docker compose up -d` 和下面这样的 `compose.yaml` 启动矿工。`external: true` 让 Compose 使用你已登录的那个卷，而不是自己新建一个空卷：
+
+```yaml
+services:
+  urnetwork:
+    image: bringyour/community-provider:latest
+    container_name: urnetwork
+    command: provide
+    restart: unless-stopped
+    volumes:
+      - urnetwork:/root/.urnetwork
+volumes:
+  urnetwork:
+    external: true
+```
+
+要在一台主机上运行多个节点，请给每个节点各自的卷和容器名（`urnetwork-1`、`urnetwork-2`，依此类推），并分别登录：两个容器无法在同一个状态目录中保留各自的设备。
+
+如果要把状态保存在主机上的文件夹而不是卷中，请给每个容器一个自己的文件夹，归 root 所有且只有 root 能访问，其中的文件也是如此（`sudo chown -R 0:0 <folder>` 和 `sudo chmod -R go-rwx <folder>`），然后用 `-v <folder>:/root/.urnetwork` 挂载它。
+
+`docker exec urnetwork bringyour-provider status` 会显示它是否已登录并已连接；`docker exec urnetwork bringyour-provider doctor` 还会检查状态目录在容器删除后是否仍然保留，以及 DNS、连接和时钟，并在有更新的版本发布时告诉你。扩展器需要发布容器的端口；参见[运行扩展器](/docs/miner/extender#docker)。容器从不自行更新；参见[更新](/docs/miner/updates#docker)。
 
 ## 来自运营商的二进制文件
 

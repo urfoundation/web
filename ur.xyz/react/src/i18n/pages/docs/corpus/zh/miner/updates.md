@@ -88,7 +88,7 @@ provider update --on
 
 ## Docker
 
-矿工的 [Docker 容器](/docs/miner/install#docker) 从不自行更新：在你重新创建它之前，它一直运行创建它时所用的镜像，只重启是不够的。某个版本的镜像发布后，标签 `latest` 和 `g4-latest`（以及 `beta-latest`、`g1-latest` 到 `g3-latest`）会指向它。
+矿工的 [Docker 容器](/docs/miner/install#docker) 从不自行更新：在你重新创建它之前，它一直运行创建它时所用的镜像，只重启是不够的。有更新的版本发布时，它的日志会说明，`bringyour-provider doctor` 也会。某个版本的镜像发布后，标签 `latest` 和 `g4-latest`（以及 `beta-latest`、`g1-latest` 到 `g3-latest`）会指向它。
 
 > 从 2026 年 7 月到 2026 年 11 月 22 日，该镜像没有重新构建，它的每个标签都是版本 2026.7.2。在这段时间创建的容器仍在运行 2026.7.2，直到你更新它。
 

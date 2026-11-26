@@ -205,7 +205,27 @@ docker run -d --name urnetwork --restart unless-stopped \
 
 `auth` te pide tu código de autorización, o lo acepta después de `auth`. El minero guarda su identidad en el `/root/.urnetwork` del contenedor, aquí el volumen con nombre `urnetwork`. Da a cada contenedor su propio directorio de estado como este, propiedad de root y sin permiso de escritura para otros, y el minero conserva su dispositivo cuando recreas el contenedor para actualizarlo. Un directorio de estado propiedad de otro usuario (como una carpeta tuya montada con `-v ~/.urnetwork:/root/.urnetwork`), con permiso de escritura para todos, de solo lectura o compartido por varios contenedores también funciona, pero entonces cada contenedor nuevo registra un dispositivo nuevo, y el registro lo indica al arrancar.
 
-`docker exec urnetwork bringyour-provider status` muestra si ha iniciado sesión y está conectado. El extensor necesita que los puertos del contenedor estén publicados; consulta [Ejecutar un extensor](/docs/miner/extender#docker). Un contenedor nunca se actualiza solo; consulta [Actualizaciones](/docs/miner/updates#docker).
+Con Docker Compose, inicia sesión con la línea de `auth` de arriba y luego arranca el minero con `docker compose up -d` y un `compose.yaml` como este. `external: true` hace que Compose use el volumen con el que iniciaste sesión, en lugar de crear uno propio, nuevo y vacío:
+
+```yaml
+services:
+  urnetwork:
+    image: bringyour/community-provider:latest
+    container_name: urnetwork
+    command: provide
+    restart: unless-stopped
+    volumes:
+      - urnetwork:/root/.urnetwork
+volumes:
+  urnetwork:
+    external: true
+```
+
+Para ejecutar más de un nodo en un host, da a cada uno su propio volumen y su propio nombre de contenedor (`urnetwork-1`, `urnetwork-2` y así sucesivamente), e inicia sesión en cada uno: dos contenedores no pueden conservar sus dispositivos en un mismo directorio de estado.
+
+Para guardar el estado en una carpeta del host en lugar de un volumen, da a cada contenedor su propia carpeta, propiedad de root y accesible solo para root, con sus archivos incluidos (`sudo chown -R 0:0 <folder>` y `sudo chmod -R go-rwx <folder>`), y móntala con `-v <folder>:/root/.urnetwork`.
+
+`docker exec urnetwork bringyour-provider status` muestra si ha iniciado sesión y está conectado; `docker exec urnetwork bringyour-provider doctor` además comprueba si el directorio de estado sobrevive al contenedor, el DNS, la conexión y el reloj, e indica cuándo hay una versión más reciente. El extensor necesita que los puertos del contenedor estén publicados; consulta [Ejecutar un extensor](/docs/miner/extender#docker). Un contenedor nunca se actualiza solo; consulta [Actualizaciones](/docs/miner/updates#docker).
 
 ## Un binario de tu operador
 

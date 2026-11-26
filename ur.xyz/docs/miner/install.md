@@ -205,7 +205,27 @@ docker run -d --name urnetwork --restart unless-stopped \
 
 `auth` asks for your auth code, or takes it after `auth`. The miner keeps its identity in the container's `/root/.urnetwork`, here the named volume `urnetwork`. Give each container its own state directory like this one, owned by root and not writable by others, and the miner keeps its device when you recreate the container to update it. A state directory owned by another user (such as a folder of yours mounted with `-v ~/.urnetwork:/root/.urnetwork`), writable by everyone, read-only, or shared by several containers works too, but then each new container registers a new device, and the log says so when it starts.
 
-`docker exec urnetwork bringyour-provider status` shows whether it's signed in and connected. The extender needs the container's ports published; see [Run an extender](/docs/miner/extender#docker). A container never updates itself; see [Updates](/docs/miner/updates#docker).
+With Docker Compose, sign in with the `auth` line above, then start the miner with `docker compose up -d` from a `compose.yaml` like this one. `external: true` makes Compose use the volume you signed in, not a new, empty one of its own:
+
+```yaml
+services:
+  urnetwork:
+    image: bringyour/community-provider:latest
+    container_name: urnetwork
+    command: provide
+    restart: unless-stopped
+    volumes:
+      - urnetwork:/root/.urnetwork
+volumes:
+  urnetwork:
+    external: true
+```
+
+To run more than one node on a host, give each its own volume and container name (`urnetwork-1`, `urnetwork-2`, and so on), and sign each one in: two containers can't keep their devices in one state directory.
+
+To keep the state in a folder on the host instead of a volume, give each container its own folder, owned by root and private to it, files included (`sudo chown -R 0:0 <folder>` and `sudo chmod -R go-rwx <folder>`), and mount it with `-v <folder>:/root/.urnetwork`.
+
+`docker exec urnetwork bringyour-provider status` shows whether it's signed in and connected; `docker exec urnetwork bringyour-provider doctor` also checks that the state directory outlives the container, DNS, the connection and the clock, and says when a newer release is out. The extender needs the container's ports published; see [Run an extender](/docs/miner/extender#docker). A container never updates itself; see [Updates](/docs/miner/updates#docker).
 
 ## A binary from your operator
 

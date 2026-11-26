@@ -88,7 +88,7 @@ También puedes instalar el servicio con las actualizaciones desactivadas: `URNE
 
 ## Docker
 
-Un [contenedor de Docker](/docs/miner/install#docker) del minero nunca se actualiza solo: ejecuta la imagen a partir de la que se creó hasta que lo recreas, y reiniciarlo no basta. Cuando se publica la imagen de una versión, las etiquetas `latest` y `g4-latest` (y `beta-latest`, de `g1-latest` a `g3-latest`) pasan a ella.
+Un [contenedor de Docker](/docs/miner/install#docker) del minero nunca se actualiza solo: ejecuta la imagen a partir de la que se creó hasta que lo recreas, y reiniciarlo no basta. Su registro indica cuándo hay una versión más reciente, y `bringyour-provider doctor` también. Cuando se publica la imagen de una versión, las etiquetas `latest` y `g4-latest` (y `beta-latest`, de `g1-latest` a `g3-latest`) pasan a ella.
 
 > Desde julio de 2026 hasta el 22 de noviembre de 2026, la imagen no se reconstruyó, y todas sus etiquetas eran la versión 2026.7.2. Un contenedor creado en ese tiempo sigue ejecutando 2026.7.2 hasta que lo actualices.
 

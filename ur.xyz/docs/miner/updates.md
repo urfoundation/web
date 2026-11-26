@@ -88,7 +88,7 @@ You can also install the service with updates off: `URNETWORK_AUTO_UPDATE=0 prov
 
 ## Docker
 
-A [Docker container](/docs/miner/install#docker) of the miner never updates itself: it runs the image it was created from until you recreate it, and restarting it isn't enough. When a release's image is published, the tags `latest` and `g4-latest` (and `beta-latest`, `g1-latest` to `g3-latest`) move to it.
+A [Docker container](/docs/miner/install#docker) of the miner never updates itself: it runs the image it was created from until you recreate it, and restarting it isn't enough. Its log says when a newer release is out, and so does `bringyour-provider doctor`. When a release's image is published, the tags `latest` and `g4-latest` (and `beta-latest`, `g1-latest` to `g3-latest`) move to it.
 
 > From July 2026 until November 22, 2026, the image wasn't rebuilt, and every tag of it was version 2026.7.2. A container created in that time still runs 2026.7.2 until you update it.
 

@@ -205,7 +205,27 @@ docker run -d --name urnetwork --restart unless-stopped \
 
 `auth` fragt nach deinem Auth-Code oder nimmt ihn nach `auth` entgegen. Der Miner bewahrt seine Identität im `/root/.urnetwork` des Containers auf, hier im benannten Volume `urnetwork`. Gib jedem Container ein eigenes Zustandsverzeichnis wie dieses, das root gehört und für andere nicht beschreibbar ist, dann behält der Miner sein Gerät, wenn du den Container für ein Update neu erstellst. Ein Zustandsverzeichnis, das einem anderen Benutzer gehört (etwa ein Ordner von dir, eingebunden mit `-v ~/.urnetwork:/root/.urnetwork`), für alle beschreibbar, schreibgeschützt oder von mehreren Containern geteilt ist, funktioniert auch, aber dann registriert jeder neue Container ein neues Gerät, und das Log sagt es beim Start.
 
-`docker exec urnetwork bringyour-provider status` zeigt, ob er angemeldet und verbunden ist. Der Extender braucht die veröffentlichten Ports des Containers; siehe [Einen Extender betreiben](/docs/miner/extender#docker). Ein Container aktualisiert sich nie selbst; siehe [Updates](/docs/miner/updates#docker).
+Mit Docker Compose meldest du dich mit der `auth`-Zeile oben an und startest den Miner dann mit `docker compose up -d` und einer `compose.yaml` wie dieser. `external: true` lässt Compose das Volume nutzen, mit dem du dich angemeldet hast, statt ein neues, leeres eigenes anzulegen:
+
+```yaml
+services:
+  urnetwork:
+    image: bringyour/community-provider:latest
+    container_name: urnetwork
+    command: provide
+    restart: unless-stopped
+    volumes:
+      - urnetwork:/root/.urnetwork
+volumes:
+  urnetwork:
+    external: true
+```
+
+Um mehr als einen Node auf einem Host zu betreiben, gib jedem ein eigenes Volume und einen eigenen Containernamen (`urnetwork-1`, `urnetwork-2` und so weiter) und melde jeden einzeln an: Zwei Container können ihre Geräte nicht in einem Zustandsverzeichnis behalten.
+
+Um den Zustand statt in einem Volume in einem Ordner auf dem Host zu halten, gib jedem Container einen eigenen Ordner, der root gehört und nur root zugänglich ist, samt seinen Dateien (`sudo chown -R 0:0 <folder>` und `sudo chmod -R go-rwx <folder>`), und binde ihn mit `-v <folder>:/root/.urnetwork` ein.
+
+`docker exec urnetwork bringyour-provider status` zeigt, ob er angemeldet und verbunden ist; `docker exec urnetwork bringyour-provider doctor` prüft außerdem, ob das Zustandsverzeichnis den Container überdauert, sowie DNS, die Verbindung und die Uhr, und sagt, wenn ein neueres Release erschienen ist. Der Extender braucht die veröffentlichten Ports des Containers; siehe [Einen Extender betreiben](/docs/miner/extender#docker). Ein Container aktualisiert sich nie selbst; siehe [Updates](/docs/miner/updates#docker).
 
 ## Ein Binary von deinem Betreiber
 

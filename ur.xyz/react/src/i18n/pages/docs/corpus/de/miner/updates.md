@@ -88,7 +88,7 @@ Du kannst den Dienst auch mit abgeschalteten Updates installieren: `URNETWORK_AU
 
 ## Docker
 
-Ein [Docker-Container](/docs/miner/install#docker) des Miners aktualisiert sich nie selbst: Er führt das Image aus, aus dem er erstellt wurde, bis du ihn neu erstellst, und ein Neustart reicht nicht. Wenn das Image eines Releases veröffentlicht wird, wandern die Tags `latest` und `g4-latest` (sowie `beta-latest`, `g1-latest` bis `g3-latest`) zu ihm.
+Ein [Docker-Container](/docs/miner/install#docker) des Miners aktualisiert sich nie selbst: Er führt das Image aus, aus dem er erstellt wurde, bis du ihn neu erstellst, und ein Neustart reicht nicht. Sein Log sagt, wenn ein neueres Release erschienen ist, und `bringyour-provider doctor` ebenso. Wenn das Image eines Releases veröffentlicht wird, wandern die Tags `latest` und `g4-latest` (sowie `beta-latest`, `g1-latest` bis `g3-latest`) zu ihm.
 
 > Von Juli 2026 bis zum 22. November 2026 wurde das Image nicht neu gebaut, und jeder seiner Tags war Version 2026.7.2. Ein Container, der in dieser Zeit erstellt wurde, führt weiterhin 2026.7.2 aus, bis du ihn aktualisierst.
 

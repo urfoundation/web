@@ -205,7 +205,27 @@ docker run -d --name urnetwork --restart unless-stopped \
 
 يطلب `auth` رمز المصادقة الخاص بك، أو يأخذه بعد `auth`. يحتفظ المُعدِّن بهويته في `/root/.urnetwork` داخل الحاوية، وهو هنا وحدة التخزين المسمّاة `urnetwork`. امنح كل حاوية دليل حالة خاصًا بها مثل هذا، مملوكًا للمستخدم root وغير قابل للكتابة من الآخرين، فيحتفظ المُعدِّن بجهازه عندما تعيد إنشاء الحاوية لتحديثها. ويعمل أيضًا دليل حالة يملكه مستخدم آخر (مثل مجلد لك مركّب بالخيار `-v ~/.urnetwork:/root/.urnetwork`)، أو قابل للكتابة من الجميع، أو للقراءة فقط، أو مشترك بين عدة حاويات، لكن عندها تسجّل كل حاوية جديدة جهازًا جديدًا، ويذكر السجل ذلك عند بدء التشغيل.
 
-يُظهر `docker exec urnetwork bringyour-provider status` ما إذا كان قد سجّل الدخول وما إذا كان متصلًا. يحتاج الموسِّع إلى نشر منافذ الحاوية؛ راجع [تشغيل موسِّع](/docs/miner/extender#docker). لا تحدّث الحاوية نفسها أبدًا؛ راجع [التحديثات](/docs/miner/updates#docker).
+مع Docker Compose، سجّل الدخول بسطر `auth` أعلاه، ثم شغّل المُعدِّن بالأمر `docker compose up -d` وملف `compose.yaml` مثل هذا. يجعل `external: true` أداة Compose تستخدم وحدة التخزين التي سجّلت الدخول بها، بدلًا من إنشاء وحدة جديدة فارغة خاصة بها:
+
+```yaml
+services:
+  urnetwork:
+    image: bringyour/community-provider:latest
+    container_name: urnetwork
+    command: provide
+    restart: unless-stopped
+    volumes:
+      - urnetwork:/root/.urnetwork
+volumes:
+  urnetwork:
+    external: true
+```
+
+لتشغيل أكثر من عقدة على مضيف واحد، امنح كل عقدة وحدة تخزين خاصة بها واسم حاوية خاصًا بها (`urnetwork-1` و`urnetwork-2` وهكذا)، وسجّل الدخول في كل منها: لا تستطيع حاويتان الاحتفاظ بجهازيهما في دليل حالة واحد.
+
+للاحتفاظ بالحالة في مجلد على المضيف بدلًا من وحدة تخزين، امنح كل حاوية مجلدًا خاصًا بها، مملوكًا للمستخدم root ومقصورًا عليه، بما في ذلك ملفاته (`sudo chown -R 0:0 <folder>` و`sudo chmod -R go-rwx <folder>`)، وركّبه بالخيار `-v <folder>:/root/.urnetwork`.
+
+يُظهر `docker exec urnetwork bringyour-provider status` ما إذا كان قد سجّل الدخول وما إذا كان متصلًا؛ ويتحقق `docker exec urnetwork bringyour-provider doctor` أيضًا مما إذا كان دليل الحالة يبقى بعد الحاوية، ومن DNS والاتصال والساعة، ويخبرك عندما تصدر نسخة أحدث. يحتاج الموسِّع إلى نشر منافذ الحاوية؛ راجع [تشغيل موسِّع](/docs/miner/extender#docker). لا تحدّث الحاوية نفسها أبدًا؛ راجع [التحديثات](/docs/miner/updates#docker).
 
 ## ملف تنفيذي من مشغّلك
 

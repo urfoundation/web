@@ -3,6 +3,16 @@
 // `node tests/i18n-staleness.mjs --unit mainnet/data --accept de <key> ...` from react/.
 export default {
     notices: {
+        'notice-epoch-8-late-binding': {
+            title: 'Top-200-Bindungen, die bis zum 29. November landen, zählen für Epoche 8.',
+            paragraphs: [
+                'Das Laufzeit-Autoritätsdokument für Flotten für die Laufzeit 497 wurde am 27. November gegen 20:40 UTC veröffentlicht, nachdem Epoche 8 bei Block 9.600.028 begonnen hatte. Deshalb konnte keine Flotte rechtzeitig für Epoche 8 binden. Die Verzögerung lag bei uns.',
+                'Einmalig und nur für Epoche 8 zählt eine Bindung, die ab Epoche 9 signiert ist und in einem Block von 9.600.028 bis 9.615.060 landet, auch für Epoche 8, ab dem Block, in dem sie landet. Block 9.615.061 wird am 29. November gegen 20:40 UTC erwartet, nicht früher. Eine Bindung, die in diesem Block oder später landet, wartet auf Epoche 9, wie es die normale Regel vorsieht.',
+                'Ein im Zeitfenster gebundenes Gerät zählt ab dem Block, in dem seine Bindung landet, zum Score seiner Flotte. Wie jedes gebundene Gerät verlässt es den Provider-Pool für die ganze Epoche 8. Wäge das also ab, bevor du ein Gerät bindest, das im Pool gut verdient. Bindungen von vor Epoche 8 und alle anderen Epochen bleiben unverändert.',
+                'Die Ausnahme gilt mit den Releases des SN25-Validators und des Servers des Netzbetreibers, die sie enthalten, und Arbeit, die der Validator davor gemessen hat, behält ihren Score. Um das Zeitfenster zu nutzen, binde vor Block 9.615.061 mit --valid_from_epoch 9.',
+            ],
+            link: 'Die vollständige Mitteilung lesen',
+        },
         'notice-proxy-slots-count-again': {
             title: 'Proxy-Slots zählen wieder wie jeder andere Provider.',
             paragraphs: [

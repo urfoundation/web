@@ -3,6 +3,16 @@
 // `node tests/i18n-staleness.mjs --unit mainnet/data --accept es <key> ...` from react/.
 export default {
     notices: {
+        'notice-epoch-8-late-binding': {
+            title: 'Las vinculaciones del Top 200 que lleguen hasta el 29 de noviembre cuentan para la época 8.',
+            paragraphs: [
+                'El documento de autoridad de runtime de flotas para el runtime 497 se publicó el 27 de noviembre hacia las 20:40 UTC, después de que la época 8 empezara en el bloque 9.600.028, así que ninguna flota pudo vincularse a tiempo para la época 8. El retraso fue nuestro.',
+                'Por única vez y solo para la época 8, una vinculación firmada para empezar en la época 9 que entra en cualquier bloque del 9.600.028 al 9.615.060 cuenta también para la época 8, desde el bloque en el que entra. El bloque 9.615.061 se espera el 29 de noviembre hacia las 20:40 UTC, y no antes. Una vinculación que entra en ese bloque o después espera a la época 9, como dice la regla normal.',
+                'Un dispositivo vinculado dentro de la ventana cuenta en la puntuación de su flota desde el bloque en el que entra su vinculación. Como cualquier dispositivo vinculado, sale del pool de proveedores durante toda la época 8, así que tenlo en cuenta antes de vincular un dispositivo que gana bien en el pool. Las vinculaciones hechas antes de la época 8, y todas las demás épocas, no cambian.',
+                'La excepción entra en vigor con las versiones del validador de SN25 y del servidor del operador de red que la incluyen, y el trabajo que el validador midió antes conserva su puntuación. Para usar la ventana, vincula antes del bloque 9.615.061 con --valid_from_epoch 9.',
+            ],
+            link: 'Leer el aviso completo',
+        },
         'notice-proxy-slots-count-again': {
             title: 'Los slots de proxy vuelven a contar como cualquier otro proveedor.',
             paragraphs: [

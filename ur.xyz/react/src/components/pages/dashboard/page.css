@@ -579,3 +579,5 @@ section[data-tab] :is(.pn.wait :is(.big,.mid,.fig .v,.fig .d,.dl,.sub),.fig .wai
 section[data-tab] :is(.pn.wait :is(.big,.mid,.fig .v,.fig .d,.dl,.sub),.fig .wait):empty{display:inline-block;min-width:5ch;min-height:1em;vertical-align:middle}
 section[data-tab] .pn.wait :is(svg,canvas,.t tbody,.wl,.lk-list){opacity:.08}
 @media (max-width:620px){section[data-tab] .world.na{padding:26px 0}}
+/* the period bar fills in only once it sticks; at rest its fill showed as a dark box over the page's glow */
+.pbar:not(.stuck){background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}

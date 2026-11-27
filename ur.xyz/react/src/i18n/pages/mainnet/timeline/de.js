@@ -367,6 +367,13 @@ export default {
                 'Das Design im sn-Repo',
             ],
         },
+        'epoch-8-late-binding': {
+            title: 'Top-200-Bindungen, die bis zum 29. November landen, zählen für Epoche 8',
+            detail: 'Das Laufzeit-Autoritätsdokument für Flotten für die Laufzeit 497 wurde am 27. November gegen 20:40 UTC veröffentlicht, nachdem Epoche 8 bei Block 9.600.028 begonnen hatte, sodass keine Flotte rechtzeitig dafür binden konnte. Einmalig und nur für Epoche 8 zählt eine ab Epoche 9 signierte Bindung, die in den Blöcken 9.600.028 bis 9.615.060 landet, ab dem Block, in dem sie landet, für Epoche 8. Block 9.615.061 wird am 29. November um 20:40 UTC oder etwas später erwartet, nie früher, und eine Bindung, die darin oder später landet, wartet auf Epoche 9. Ein im Zeitfenster gebundenes Gerät zählt ab dann zum Score seiner Flotte und verlässt wie jedes gebundene Gerät den Provider-Pool von Epoche 8. Die Ausnahme gilt mit den Releases des Validators und des Servers, die sie enthalten.',
+            sources: [
+                'Die vollständige Mitteilung im sn-Repo',
+            ],
+        },
         'capture-the-flag-first-draw': {
             title: 'Zufallsauswahl und Root von Capture the Flag für Epoche 8',
             detail: 'Epoche 8 endet mit Block 9.650.428. Der Netzbetreiber schreibt seine Teilnehmerliste bis Block 9.651.028 fest, eine mindestens eine Minute später veröffentlichte drand-Runde wählt die Gewinner zufällig aus, und der Root von Capture the Flag wird zusammen mit dem des Provider-Pools bis Block 9.651.628 festgeschrieben. Ist die Zufallsauswahl bis dahin nicht fertig, schreibt der Betreiber für Epoche 8 keine Liste fest: Jeder Slot wird in den Topf seines Landes übertragen, und die ersten Gewinner werden in Epoche 9 zufällig ausgewählt.',

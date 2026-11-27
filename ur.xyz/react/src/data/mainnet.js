@@ -142,8 +142,10 @@ export const mainnetActions = {
 // in the order they were posted: a new notice goes at the end. The page shows
 // mainnetNotices, the same notices newest first: sorted by `date`, the day each
 // was posted ("November 11, 2026"), and within a day by the order they were
-// posted, the later first. So it shows that proxy slots count like any other
-// provider again, of November 21, then Top 200 fleet binding open on SN25, of
+// posted, the later first. So it shows that Top 200 bindings that land by
+// November 29 count for epoch 8, of November 27, then that proxy slots count
+// like any other provider again, of November 21, then Top 200 fleet binding
+// open on SN25, of
 // November 17, then the share of extenders reached only over WebRTC, of
 // November 16, then the providers without UDP or IPv6, offered for the traffic
 // they carry as the next releases roll out, of November 13, then the extender
@@ -274,6 +276,18 @@ const NOTICES = [
             'Nothing to do. You can bind a proxy slot like any other device. Hops a proxy slot confirmed between November 19 and this release recorded no prefix and keep what they recorded.',
         ],
         link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-21-proxy-slots-count-again.md' },
+    },
+    {
+        id: 'notice-epoch-8-late-binding',
+        date: 'November 27, 2026',
+        title: 'Top 200 bindings that land by November 29 count for epoch 8.',
+        paragraphs: [
+            'The fleet runtime authority document for runtime 497 was published on November 27 at about 20:40 UTC, after epoch 8 began at block 9,600,028, so no fleet could bind in time for epoch 8. The delay was on our side.',
+            'Once, for epoch 8 only, a binding signed to start at epoch 9 that lands in any block from 9,600,028 through 9,615,060 counts for epoch 8 as well, from the block it lands in. Block 9,615,061 is due on November 29 at about 20:40 UTC, and no earlier. A binding that lands in it or later waits for epoch 9, as the normal rule says.',
+            "A device bound in the window counts in its fleet's head score from the block it lands in. Like any bound device, it leaves the provider pool for all of epoch 8, so weigh that before binding a device that earns well in the pool. Bindings made before epoch 8, and every other epoch, are unchanged.",
+            "It takes effect with the SN25 validator and the network operator's server releases that carry it, and work the validator measured before then keeps its score. To use the window, bind before block 9,615,061 with --valid_from_epoch 9.",
+        ],
+        link: { label: 'Read the full notice', href: 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-27-epoch-8-late-binding.md' },
     },
 ];
 

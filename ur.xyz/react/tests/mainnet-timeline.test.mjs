@@ -783,14 +783,16 @@ test('extenders reached only over WebRTC: a milestone and a notice as the next s
 });
 
 test('the notices at the top run newest first, by the day each was posted', () => {
-    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): proxy slots counting like any other
-    // provider again, of November 21, then Top 200 binding, of November 17, then the share of extenders reached
+    // the page shows mainnetNotices in order (components/pages/Mainnet.jsx): Top 200 bindings that land by November
+    // 29 counting for epoch 8, of November 27, then proxy slots counting like any other provider again, of
+    // November 21, then Top 200 binding, of November 17, then the share of extenders reached
     // only over WebRTC, of November 16, then the providers without UDP or IPv6, of November 13, then the extender
     // pool and the extenders' share, both of November 12, then capture the flag and Pro data, both of November 11,
     // the later-posted first, then epoch 3's of October 31. The data lists them in the order they were posted, the
     // other way round, so this order is the sort's. The notice of November 19, that a proxy slot showed no unit,
     // came off the top when it was withdrawn on November 21; its milestone keeps the record
     assert.deepEqual(mainnetNotices.map((n) => [n.id, n.date]), [
+        ['notice-epoch-8-late-binding', 'November 27, 2026'],
         ['notice-proxy-slots-count-again', 'November 21, 2026'],
         ['notice-top200-binding-open', 'November 17, 2026'],
         ['notice-extender-webrtc-relay-share', 'November 16, 2026'],
@@ -1126,8 +1128,9 @@ test('proxy slots count like any other provider again: a milestone and a notice,
 
     const notice = mainnetNotices.find((n) => n.id === 'notice-proxy-slots-count-again');
     assert.ok(notice, 'the notice is listed');
-    // the newest, at the top: posted the day of the milestone, and the full text in the sn repo is named by that day
-    assert.equal(mainnetNotices[0], notice);
+    // posted the day of the milestone, below the notice of November 27, and the full text in the sn repo is named by
+    // that day
+    assert.equal(mainnetNotices[1], notice);
     assert.equal(notice.date, 'November 21, 2026');
     assert.equal(noticeDay(notice), Date.UTC(2026, 10, 21));
     assert.equal(notice.title, 'Proxy slots count like any other provider again.');
@@ -1157,10 +1160,11 @@ test('the measured cohort rotates from epoch 8: a scheduled milestone at epoch 8
     assert.equal(milestone.date, epoch7.end.time);
     assert.equal(whenText(parseWhen(milestone.date), { approxStart: isApproximate(milestone) }), 'Fri Nov 27 · ≈18:25 UTC');
     assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-8');
-    // in date order: after the extender pool and capture the flag, which start at the same block, before epoch 8's draw
+    // in date order: after the extender pool and capture the flag, which start at the same block, before the epoch 8
+    // late-binding window, which opened at epoch 8's first block as the chain timed it, and epoch 8's draw
     const ids = events.map((e) => e.id);
     assert.equal(ids.indexOf(milestone.id), ids.indexOf('capture-the-flag-epoch-8') + 1);
-    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-first-draw'));
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('epoch-8-late-binding'));
     assert.deepEqual(milestone.sources, [{ label: 'The design in the sn repo', kind: 'doc', ref: 'https://github.com/urfoundation/sn/blob/main/VERIFY-COHORT-V2.md' }]);
     assert.equal(milestone.title, 'The measured cohort rotates from epoch 8');
     // R1, the cohort's expiry and its admission order: claimed fleets' 7 devices each, then one device of each
@@ -1171,4 +1175,52 @@ test('the measured cohort rotates from epoch 8: a scheduled milestone at epoch 8
     assert.match(milestone.detail, / Quality scores only weigh pools against each other, so no one's pay changes\.$/);
     // the rule moves who is measured, not amounts: no reward figure
     assert.doesNotMatch(`${milestone.title} ${milestone.detail}`, /\d\s?%|\$\s?\d|\d\s?α|\balpha\b/i);
+});
+
+test('Top 200 bindings that land by November 29 count for epoch 8: a milestone over the window and a notice, with its blocks and no reward figure', () => {
+    // the runtime 497 fleet runtime authority (sn mainnet/fleet-runtime-authority/runtime-497.json) was published at
+    // about 20:40 UTC on November 27, after epoch 8 began, so the owner let bindings that land until November 29,
+    // 20:40 UTC count from epoch 8 (sn protocol/fleet_late_binding_epoch8.go): blocks 9,600,028 through 9,615,060.
+    // Epoch 8's first block carries 18:33:24 UTC, and block 9,615,061 is 14,298 twelve-second slots after block
+    // 9,600,763 at 21:00:24 UTC, so it comes no earlier than 20:40:00 UTC
+    const milestone = events.find((e) => e.id === 'epoch-8-late-binding');
+    assert.ok(milestone, 'the milestone is listed');
+    assert.equal(milestone.status, 'in_progress');
+    assert.equal(milestone.approximate, undefined);
+    assert.equal(milestone.key, undefined);
+    assert.equal(milestone.date, '2026-11-27T18:33:24Z/2026-11-29T20:40:00Z');
+    assert.equal(Date.parse('2026-11-27T21:00:24Z') + (9_615_061 - 9_600_763) * SECONDS_PER_BLOCK * 1000, Date.parse('2026-11-29T20:40:00Z'));
+    assert.equal(whenText(parseWhen(milestone.date), { approxStart: isApproximate(milestone) }), 'Fri Nov 27 · 18:33 → Sun Nov 29 · 20:40 UTC');
+    assert.equal(groupByEpoch(events, mainnetEpochs).find((g) => g.events.some((e) => e.id === milestone.id)).id, 'epoch-8');
+    // in date order: after the milestones at epoch 8's projected first block, before epoch 8's draw
+    const ids = events.map((e) => e.id);
+    assert.equal(ids.indexOf(milestone.id), ids.indexOf('measured-cohort-rotates-epoch-8') + 1);
+    assert.equal(ids.indexOf(milestone.id) + 1, ids.indexOf('capture-the-flag-first-draw'));
+    const fullText = 'https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-27-epoch-8-late-binding.md';
+    assert.deepEqual(milestone.sources, [{ label: 'The full notice in the sn repo', kind: 'doc', ref: fullText }]);
+    assert.equal(milestone.title, 'Top 200 bindings that land by November 29 count for epoch 8');
+    assert.ok(milestone.detail.startsWith('The fleet runtime authority document for runtime 497 was published on November 27 at about 20:40 UTC, after epoch 8 began at block 9,600,028, so no fleet could bind in time for it. '));
+    assert.match(milestone.detail, / Once, for epoch 8 only, a binding signed from epoch 9 that lands in blocks 9,600,028 to 9,615,060 counts for epoch 8 from the block it lands in\. Block 9,615,061 is due on November 29 at 20:40 UTC or a little later, never earlier, and a binding that lands in it or later waits for epoch 9\. /);
+    // a device earns in one tier at a time: bound at epoch 8's last boundary, it is out of epoch 8's pool
+    assert.match(milestone.detail, / it leaves the epoch 8 provider pool like any bound device\. It takes effect with the validator and server releases that carry it\.$/);
+
+    const notice = mainnetNotices.find((n) => n.id === 'notice-epoch-8-late-binding');
+    assert.ok(notice, 'the notice is listed');
+    // the newest, at the top: posted the day the window opened, and the full text in the sn repo is named by that day
+    assert.equal(mainnetNotices[0], notice);
+    assert.equal(notice.date, 'November 27, 2026');
+    assert.equal(noticeDay(notice), Date.UTC(2026, 10, 27));
+    assert.equal(notice.title, 'Top 200 bindings that land by November 29 count for epoch 8.');
+    assert.equal(notice.paragraphs.length, 4);
+    const [why, window, pool, when] = notice.paragraphs;
+    assert.match(why, /^The fleet runtime authority document for runtime 497 was published on November 27 at about 20:40 UTC, after epoch 8 began at block 9,600,028, /);
+    assert.match(window, /^Once, for epoch 8 only, a binding signed to start at epoch 9 that lands in any block from 9,600,028 through 9,615,060 counts for epoch 8 as well, from the block it lands in\. Block 9,615,061 /);
+    assert.match(pool, / it leaves the provider pool for all of epoch 8, /);
+    assert.match(pool, / Bindings made before epoch 8, and every other epoch, are unchanged\.$/);
+    assert.match(when, /^It takes effect with the SN25 validator and the network operator's server releases that carry it, /);
+    assert.match(when, / bind before block 9,615,061 with --valid_from_epoch 9\.$/);
+    assert.deepEqual(notice.link, { label: 'Read the full notice', href: fullText });
+    // the rule moves when a binding counts, not amounts: no reward figure
+    const words = [milestone.title, milestone.detail, notice.title, ...notice.paragraphs].join(' ');
+    assert.doesNotMatch(words, /\d\s?%|\$\s?\d|\d\s?α|\balpha\b/i);
 });

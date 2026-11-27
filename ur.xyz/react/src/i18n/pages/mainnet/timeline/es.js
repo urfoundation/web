@@ -367,6 +367,13 @@ export default {
                 'El diseño en el repositorio sn',
             ],
         },
+        'epoch-8-late-binding': {
+            title: 'Las vinculaciones del Top 200 que lleguen hasta el 29 de noviembre cuentan para la época 8',
+            detail: 'El documento de autoridad de runtime de flotas para el runtime 497 se publicó el 27 de noviembre hacia las 20:40 UTC, después de que la época 8 empezara en el bloque 9.600.028, así que ninguna flota pudo vincularse a tiempo. Por única vez y solo para la época 8, una vinculación firmada desde la época 9 que entra en los bloques 9.600.028 a 9.615.060 cuenta para la época 8 desde el bloque en el que entra. El bloque 9.615.061 se espera el 29 de noviembre a las 20:40 UTC o un poco después, nunca antes, y una vinculación que entra en él o después espera a la época 9. Un dispositivo vinculado dentro de la ventana cuenta desde entonces en la puntuación de su flota y, como cualquier dispositivo vinculado, sale del pool de proveedores de la época 8. Entra en vigor con las versiones del validador y del servidor que la incluyen.',
+            sources: [
+                'El aviso completo en el repositorio sn',
+            ],
+        },
         'capture-the-flag-first-draw': {
             title: 'Selección aleatoria y raíz de Captura la bandera de la época 8',
             detail: 'La época 8 termina en el bloque 9.650.428. El operador de red registra su lista de participantes antes del bloque 9.651.028, una ronda de drand publicada al menos un minuto después selecciona al azar a los ganadores, y la raíz de Captura la bandera se registra junto con la del pool de proveedores antes del bloque 9.651.628. Si la selección aleatoria no está lista para entonces, el operador no registra ninguna lista para la época 8: cada slot se traslada al fondo acumulado de su país, y los primeros ganadores se seleccionan al azar en la época 9.',

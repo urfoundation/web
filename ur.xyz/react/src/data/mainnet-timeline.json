@@ -541,6 +541,16 @@
       ]
     },
     {
+      "id": "epoch-8-late-binding",
+      "date": "2026-11-27T18:33:24Z/2026-11-29T20:40:00Z",
+      "status": "in_progress",
+      "title": "Top 200 bindings that land by November 29 count for epoch 8",
+      "detail": "The fleet runtime authority document for runtime 497 was published on November 27 at about 20:40 UTC, after epoch 8 began at block 9,600,028, so no fleet could bind in time for it. Once, for epoch 8 only, a binding signed from epoch 9 that lands in blocks 9,600,028 to 9,615,060 counts for epoch 8 from the block it lands in. Block 9,615,061 is due on November 29 at 20:40 UTC or a little later, never earlier, and a binding that lands in it or later waits for epoch 9. A device bound in the window counts in its fleet's head score from then, and it leaves the epoch 8 provider pool like any bound device. It takes effect with the validator and server releases that carry it.",
+      "sources": [
+        { "label": "The full notice in the sn repo", "kind": "doc", "ref": "https://github.com/urfoundation/sn/blob/main/mainnet/notices/2026-11-27-epoch-8-late-binding.md" }
+      ]
+    },
+    {
       "id": "capture-the-flag-first-draw",
       "date": "2026-12-04T18:25:00Z/2026-12-04T22:25:00Z",
       "status": "planned",
